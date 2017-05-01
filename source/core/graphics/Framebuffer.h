@@ -2,7 +2,6 @@
 
 #include "Platform.h"
 #include "GType.h"
-#include "math\MVector.h"
 
 namespace gl
 {
@@ -12,6 +11,5 @@ namespace gl
 		Guint FBO;
 		Guint RBO;
 		Guint colorTexture;
-		gml::Vec4<float> clearColor;
 	};
 }
