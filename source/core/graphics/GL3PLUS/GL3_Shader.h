@@ -1,19 +1,23 @@
 #pragma once
 
+#include <string>
 #include <map>
 
-#include "Platform.h"
-#include "GType.h"
-
+#include "gl3.h"
+#include "GL3_Object.h"
+#include "GL3_Context.h"
 #include "math\MVector.h"
 
-namespace gl
+namespace gl3
 {
-	struct Shader
-	{
-		Guint id;
-		std::map<std::string, Gint> uniformLocations;
+	class GL3_Context;
 
+	class GL3_Shader : public GL3_Object
+	{
+	private:
+		GL3_Context* glContext;
+		std::map<std::string, GLint> uniformLocations;
+	public:
 		void setUniform(std::string name, int value);
 		void setUniform(std::string name, bool value);
 		void setUniform(std::string name, float value);

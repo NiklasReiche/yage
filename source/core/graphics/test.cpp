@@ -1,3 +1,13 @@
-#include "GType.h"
+#define GL3
+#include "Graphics.h"
+#include <iostream>
 
-Gchar var = 5;
+int main()
+{
+	gl::Gchar var = 5;
+
+	gl::GraphicsContext context(500, 500);
+
+	std::cin.get();
+	return 0;
+}

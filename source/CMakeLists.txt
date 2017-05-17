@@ -15,3 +15,4 @@ file(GLOB corelib_SRC
 )
 
 add_library(corelib STATIC ${corelib_SRC})
+#add_executable(testexe ${corelib_SRC})

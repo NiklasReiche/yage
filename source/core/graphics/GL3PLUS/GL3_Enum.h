@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Platform.h"
+#include "gl3.h"
 
-
-namespace gl
+namespace gl3
 {
 	enum class InternalFormat
 	{
