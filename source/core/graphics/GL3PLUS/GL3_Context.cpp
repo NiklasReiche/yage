@@ -2,6 +2,11 @@
 
 namespace gl3
 {
+	void error_callback(int error, const char* description)
+	{
+		throw GlfwException(GLFW_ERROR, description);
+	}
+
 	InternalFormat GL3_Context::convertToInternalFormat(ImageFormat format)
 	{
 		switch (format)
@@ -99,7 +104,7 @@ namespace gl3
 	void GL3_Context::setActiveViewport(const Viewport & viewport)
 	{
 		glViewport(viewport.x, glState.renderTarget_height - (viewport.y + viewport.height), viewport.width, viewport.height);
-		active_Viewport = viewport;
+		glState.viewport = viewport;
 	}
 	void GL3_Context::setActiveRenderTarget(const GL3_Framebuffer & framebuffer)
 	{

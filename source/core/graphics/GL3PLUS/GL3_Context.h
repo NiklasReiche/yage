@@ -13,6 +13,7 @@
 #include "GL3_Drawable.h"
 #include "GL3_Framebuffer.h"
 #include "GL3_Shader.h"
+#include "GL3_Viewport.h"
 #include "GL3_Texture.h"
 
 #include "math\MVector.h"

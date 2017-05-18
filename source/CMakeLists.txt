@@ -14,5 +14,8 @@ file(GLOB corelib_SRC
 	"core/math/*.h"
 )
 
-add_library(corelib STATIC ${corelib_SRC})
-#add_executable(testexe ${corelib_SRC})
+
+#add_library(corelib STATIC ${corelib_SRC})
+add_executable(testexe ${corelib_SRC})
+
+target_link_libraries(testexe opengl32.lib glew32sMD_d.lib glfw32sMD_d.lib)

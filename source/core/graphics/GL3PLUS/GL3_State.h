@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gl3.h"
+#include "GL3_Viewport.h"
 
 namespace gl3
 {
@@ -11,6 +12,7 @@ namespace gl3
 		int renderTarget_width;
 		int renderTarget_height;
 
+		Viewport viewport;
 		GLuint shader = -1;
 		GLuint renderTarget = -1;
 		GLuint VAO = 0;

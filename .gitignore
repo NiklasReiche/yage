@@ -5,5 +5,8 @@
 [Bb]uild/
 bin/
 
+# External libraries
+lib/
+
 # Visual Studio cache/options directory
 .vs/
