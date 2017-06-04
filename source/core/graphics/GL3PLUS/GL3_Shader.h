@@ -14,6 +14,7 @@ namespace gl3
 
 	class GL3_Shader : public GL3_Object
 	{
+		friend class GL3_Context;
 	private:
 		GL3_Context* glContext;
 		std::map<std::string, GLint> uniformLocations;

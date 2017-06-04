@@ -6,6 +6,44 @@ namespace gl3
 	{
 		throw GlfwException(GLFW_ERROR, description);
 	}
+	int GL3_Context::checkShaderCompilationError(GLuint program, std::string type)
+	{
+		int success;
+		char infoLog[512];
+		if (type == "VERTEX_SHADER") {
+			glGetShaderiv(program, GL_COMPILE_STATUS, &success);
+			if (!success) {
+				glGetShaderInfoLog(program, 512, NULL, infoLog);
+				std::cout << "ERROR: Vertex Shader Compilation Failed\n" << infoLog << std::endl;
+				return -1;
+			}
+		}
+		else if (type == "FRAGMENT_SHADER") {
+			glGetShaderiv(program, GL_COMPILE_STATUS, &success);
+			if (!success) {
+				glGetShaderInfoLog(program, 512, NULL, infoLog);
+				std::cout << "ERROR: Fragment Shader Compilation Failed\n" << infoLog << std::endl;
+				return -1;
+			}
+		}
+		else if (type == "GEOMETRY_SHADER") {
+			glGetShaderiv(program, GL_COMPILE_STATUS, &success);
+			if (!success) {
+				glGetShaderInfoLog(program, 512, NULL, infoLog);
+				std::cout << "ERROR: Geometry Shader Compilation Failed\n" << infoLog << std::endl;
+				return -1;
+			}
+		}
+		else if (type == "SHADER_PROGRAM") {
+			glGetProgramiv(program, GL_LINK_STATUS, &success);
+			if (!success) {
+				glGetProgramInfoLog(program, 512, NULL, infoLog);
+				std::cout << "ERROR: Shader Program Linking Failed\n" << infoLog << std::endl;
+				return -1;
+			}
+		}
+		return 0;
+	}
 
 	InternalFormat GL3_Context::convertToInternalFormat(ImageFormat format)
 	{
@@ -356,6 +394,70 @@ namespace gl3
 		texture = createCubemapTexture(images, width, height);
 	}
 
+	GL3_Shader GL3_Context::compileShader(std::string vertexCode, std::string fragmentCode, std::string geometryCode)
+	{
+		GL3_Shader shader;
+
+		GLuint vertexShader, fragmentShader, geometryShader;
+		const char* vertexSource = vertexCode.c_str();
+		const char* fragmentSource = fragmentCode.c_str();
+		const char* geometrySource = geometryCode.c_str();
+		// Vertex Shader
+		vertexShader = glCreateShader(GL_VERTEX_SHADER);
+		glShaderSource(vertexShader, 1, &vertexSource, NULL);
+		glCompileShader(vertexShader);
+		checkShaderCompilationError(vertexShader, "VERTEX_SHADER");
+		// Fragment Shader
+		fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
+		glCompileShader(fragmentShader);
+		checkShaderCompilationError(fragmentShader, "FRAGMENT_SHADER");
+		// Geometry Shader
+		if (geometryCode != "") {
+			geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+			glShaderSource(geometryShader, 1, &geometrySource, NULL);
+			glCompileShader(geometryShader);
+			checkShaderCompilationError(geometryShader, "GEOMETRY_SHADER");
+		}
+		// Link Program
+		shader.id = glCreateProgram();
+		glAttachShader(shader.id, vertexShader);
+		glAttachShader(shader.id, fragmentShader);
+		if (geometryCode != "") {
+			glAttachShader(shader.id, geometryShader);
+		}
+		glLinkProgram(shader.id);
+		checkShaderCompilationError(shader.id, "SHADER_PROGRAM");
+		// Delete Shaders
+		glDeleteShader(vertexShader);
+		glDeleteShader(fragmentShader);
+		if (geometryCode != "") {
+			glDeleteShader(geometryShader);
+		}
+
+		// Save uniform locations
+		GLint count;
+
+		GLint size; // size of the variable
+		GLenum type; // type of the variable (float, vec3 or mat4, etc)
+
+		GLsizei bufSize; // maximum name length
+		GLchar* name; // variable name in GLSL
+		GLsizei length; // name length
+
+		glGetProgramiv(shader.id, GL_ACTIVE_UNIFORMS, &count);
+		glGetProgramiv(shader.id, GL_ACTIVE_UNIFORM_MAX_LENGTH, &bufSize);
+
+		name = new GLchar[bufSize];
+
+		for (int i = 0; i < count; i++) {
+			glGetActiveUniform(shader.id, (GLuint)i, bufSize, &length, &size, &type, name);
+			shader.uniformLocations[name] = glGetUniformLocation(shader.id, name);
+		}
+		delete name;
+
+		return shader;
+	}
 
 	void GL3_Context::draw(GL3_Drawable & drawable)
 	{

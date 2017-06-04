@@ -1,11 +1,37 @@
 cmake_minimum_required(VERSION 3.6)
 
-project(YAGE CXX)
+project(YAGE CXX C)
+set(CMAKE_CXX_STANDARD 11)
 
-include_directories(external/include)
-include_directories(source/core)
+# output directories
+if(ANDROID)
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/android/${CMAKE_ANDROID_ARCH_ABI})
+elseif(WIN32)
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/win)
+endif()
 
-set(libPath ${CMAKE_SOURCE_DIR}/lib)
-link_directories(${CMAKE_SOURCE_DIR}/lib)
+
+# include directories
+include_directories("source/core")
+include_directories("source/modules")
+
+if(ANDROID)
+	include_directories("${CMAKE_ANDROID_NDK}/platforms/android-${CMAKE_ANDROID_API}/arch-${CMAKE_ANDROID_ARCH_ABI}/usr/include")
+elseif(WIN32)
+	include_directories("external/include")
+endif()
+
+if(ANDROID_DUMMY)
+	include_directories(${NDK_DUMMY_INCLUDE})
+endif(ANDROID_DUMMY)
+
+
+# link directories
+if(ANDROID)
+	link_directories("${CMAKE_ANDROID_NDK}/platforms/android-${CMAKE_ANDROID_API}/arch-${CMAKE_ANDROID_ARCH_ABI}/usr/lib")
+elseif(WIN32)
+	link_directories(${CMAKE_SOURCE_DIR}/external/lib)
+endif()
+
 
 add_subdirectory(source)

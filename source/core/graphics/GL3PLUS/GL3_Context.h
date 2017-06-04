@@ -37,6 +37,7 @@ namespace gl3
 
 		GL3_State glState;
 
+		int checkShaderCompilationError(GLuint program, std::string type);
 		InternalFormat convertToInternalFormat(ImageFormat format);
 		int convertToChannelSize(ImageFormat format);
 	public:
