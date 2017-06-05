@@ -8,8 +8,6 @@
 #include "image.h"
 #include "bmp.h"
 
-#include <NGL\glHeader.h>
-
 
 namespace img
 {
