@@ -5,7 +5,6 @@
 
 #include "gl3.h"
 #include "GL3_Enum.h"
-#include "GL3_Shader.h"
 
 namespace gl3
 {
@@ -39,11 +38,5 @@ namespace gl3
 			"	}															\n";
 		std::vector<int> vertexLayout = { 2, 2 };
 		DrawMode mode = DrawMode::DRAW_STATIC;
-	};
-
-	struct GL3_UnitShader
-	{
-		GLuint VAO;
-		GL3_Shader shader;
 	};
 }

@@ -115,7 +115,8 @@ namespace gl3
 
 		// --- Internal initialization ---
 		GL3_UnitShaderTemplate UnitShaderTemplate;
-		unitShader.VAO = createDrawable(UnitShaderTemplate.vertices, UnitShaderTemplate.vertexLayout, UnitShaderTemplate.mode).VAO;
+		unitDrawable = createDrawable(UnitShaderTemplate.vertices, UnitShaderTemplate.vertexLayout, UnitShaderTemplate.mode);
+		unitShader = std::make_unique<GL3_Shader>(compileShader(UnitShaderTemplate.vertexCode, UnitShaderTemplate.fragmentCode));
 	}
 	GL3_Context::~GL3_Context()
 	{
@@ -474,14 +475,12 @@ namespace gl3
 		setActiveRenderTarget(0);
 		setActiveViewport(glState.viewport);
 
-		useShader(unitShader.shader);
+		useShader(*unitShader);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, buffer.colorTexture);
 
-		glBindVertexArray(unitShader.VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glBindVertexArray(0);
+		draw(unitDrawable);
 	}
 	void GL3_Context::useShader(GL3_Shader & shader)
 	{

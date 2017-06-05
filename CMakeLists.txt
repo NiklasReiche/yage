@@ -8,6 +8,8 @@ if(ANDROID)
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/android/${CMAKE_ANDROID_ARCH_ABI})
 elseif(WIN32)
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/win)
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/win)
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/win)
 endif()
 
 
@@ -31,7 +33,13 @@ if(ANDROID)
 	link_directories("${CMAKE_ANDROID_NDK}/platforms/android-${CMAKE_ANDROID_API}/arch-${CMAKE_ANDROID_ARCH_ABI}/usr/lib")
 elseif(WIN32)
 	link_directories(${CMAKE_SOURCE_DIR}/external/lib)
+	#link_directories(${CMAKE_SOURCE_DIR}/bin/win)
 endif()
 
 
-add_subdirectory(source)
+add_subdirectory(source/core)
+add_subdirectory(source/modules)
+
+if(WIN32)
+	add_subdirectory(tests/graphics)
+endif()

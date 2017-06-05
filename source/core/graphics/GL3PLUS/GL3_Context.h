@@ -4,16 +4,17 @@
 #include <vector>
 #include <array>
 #include <numeric>
+#include <memory>
 
 #include "gl3.h"
 #include "GL3_Exception.h"
 #include "GL3_Enum.h"
 #include "GL3_State.h"
+#include "GL3_Shader.h"
 #include "GL3_UnitShader.h"
 
 #include "GL3_Drawable.h"
 #include "GL3_Framebuffer.h"
-#include "GL3_Shader.h"
 #include "GL3_Viewport.h"
 #include "GL3_Texture.h"
 
@@ -37,7 +38,9 @@ namespace gl3
 		std::string title;
 
 		GL3_State glState;
-		GL3_UnitShader unitShader;
+
+		std::unique_ptr<GL3_Shader> unitShader;
+		GL3_Drawable unitDrawable;
 
 		int checkShaderCompilationError(GLuint program, std::string type);
 		InternalFormat convertToInternalFormat(ImageFormat format);
