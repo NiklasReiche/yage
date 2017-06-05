@@ -467,7 +467,17 @@ namespace gl3
 	}
 	void GL3_Context::draw(GL3_Framebuffer & buffer)
 	{
+		setActiveRenderTarget(0);
+		setActiveViewport(glState.viewport);
 
+		useShader(unitShader);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, buffer.colorTexture);
+
+		glBindVertexArray(unitVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
 	}
 	void GL3_Context::useShader(GL3_Shader & shader)
 	{
