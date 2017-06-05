@@ -9,6 +9,7 @@
 #include "GL3_Exception.h"
 #include "GL3_Enum.h"
 #include "GL3_State.h"
+#include "GL3_UnitShader.h"
 
 #include "GL3_Drawable.h"
 #include "GL3_Framebuffer.h"
@@ -36,6 +37,7 @@ namespace gl3
 		std::string title;
 
 		GL3_State glState;
+		GL3_UnitShader unitShader;
 
 		int checkShaderCompilationError(GLuint program, std::string type);
 		InternalFormat convertToInternalFormat(ImageFormat format);

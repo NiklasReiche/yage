@@ -112,6 +112,10 @@ namespace gl3
 		if (err != GLEW_OK) {
 			throw GlewException(err, "GL::ERROR: Failed to initialize GLEW");
 		}
+
+		// --- Internal initialization ---
+		GL3_UnitShaderTemplate UnitShaderTemplate;
+		unitShader.VAO = createDrawable(UnitShaderTemplate.vertices, UnitShaderTemplate.vertexLayout, UnitShaderTemplate.mode).VAO;
 	}
 	GL3_Context::~GL3_Context()
 	{
@@ -470,12 +474,12 @@ namespace gl3
 		setActiveRenderTarget(0);
 		setActiveViewport(glState.viewport);
 
-		useShader(unitShader);
+		useShader(unitShader.shader);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, buffer.colorTexture);
 
-		glBindVertexArray(unitVAO);
+		glBindVertexArray(unitShader.VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
 	}
