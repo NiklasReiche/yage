@@ -43,16 +43,19 @@ namespace img
 		{
 			for (int j = 0; j < image.width; j++)
 			{
-				std::string pad = "";
-				int value = (int)image.data.at(i * image.width + j);
+				for (int k = 0; k < image.channels; ++k)
+				{
+					std::string pad = "";
+					int value = (int)image.data.at(i * image.width * image.channels + j * image.channels + k);
 
-				if (value < 10) {
-					pad = "  ";
+					if (value < 10) {
+						pad = "  ";
+					}
+					else if (value < 100) {
+						pad = " ";
+					}
+					std::cout << pad << value << " ";
 				}
-				else if (value < 100) {
-					pad = " ";
-				}
-				std::cout << pad << value << " ";
 			}
 			std::cout << "\n";
 		}

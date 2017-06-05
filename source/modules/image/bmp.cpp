@@ -103,7 +103,7 @@ namespace bmp
 	void Bitmap::createPalette(int size)
 	{
 		palette.resize(0);
-		for (uint8_t i = 0; i < size; ++i)
+		for (int i = 0; i < size; ++i)
 		{
 			PALETTE_ELEMENT element{ i, i, i, 0x00 };
 			palette.push_back(element);
@@ -185,7 +185,7 @@ namespace bmp
 		int rows = infoheader.biHeight;
 		int width = infoheader.biWidth;
 		int bytes = infoheader.biBitCount / 8;
-		int pad = (width*bytes) % (bytes);
+		int pad = 4 - (width * bytes) % 4;
 
 		int pointer = fileheader.bfOffBits;
 		file.seekg(pointer, std::ios::beg);
@@ -216,7 +216,7 @@ namespace bmp
 		int rows = infoheader.biHeight;
 		int width = infoheader.biWidth;
 		int bytes = infoheader.biBitCount / 8;
-		int pad = (width*bytes) % (bytes);
+		int pad = 4 - (width * bytes) % 4;
 
 		int pointer = fileheader.bfOffBits;
 		file.seekg(pointer, std::ios::beg);
@@ -232,7 +232,9 @@ namespace bmp
 				{
 					file.seekg(pointer, std::ios::beg);
 					file.read((char*)&pixel[b], 1);
-					pixels.push_back(pixel[b]);
+					pixels.push_back(palette[pixel[b]].red);
+					pixels.push_back(palette[pixel[b]].green);
+					pixels.push_back(palette[pixel[b]].blue);
 					++pointer;
 				}
 			}
@@ -250,7 +252,7 @@ namespace bmp
 		int rows = infoheader.biHeight;
 		int width = infoheader.biWidth;
 		int bytes = infoheader.biBitCount / 8;
-		int pad = (width*bytes) % (bytes);
+		int pad = 4 - (width * bytes) % 4;
 
 		int byteOrderOffset;
 		if (bytes == 3) {
@@ -391,7 +393,7 @@ namespace bmp
 			readImageData(file);
 		}
 		else {
-			readImageData(file);
+			readImageDataIndexed(file);
 		}
 		if (checkError(file)) {
 			std::cout << "Could not read image data '" << filename << "'" << std::endl;
@@ -453,9 +455,12 @@ namespace bmp
 	void img::bmp::Bitmap::toImage(Image & image)
 	{
 		image.width = infoheader.biWidth;
-		image.height = infoheader.biHeight;
+		image.height = std::abs(infoheader.biHeight);
 		image.channels = infoheader.biBitCount / 8;
 		image.data = std::move(pixels);
+		if (infoheader.biHeight > 0) {
+			image.flip();
+		}
 	}
 	void Bitmap::fromImage(Image & image, bool moveData)
 	{
@@ -513,6 +518,7 @@ namespace bmp
 			loadFlags.hasPalette = true;
 		}
 
+		image.flip();
 		if (moveData) {
 			pixels = std::move(image.data);
 		}
