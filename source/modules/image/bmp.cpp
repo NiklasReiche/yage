@@ -347,9 +347,9 @@ namespace bmp
 				std::cout << "Could not read v4 header '" << filename << "'" << std::endl;
 				return 2;
 			}
-		}
-		else {
-			loadFlags.hasV4header = true;
+			else {
+				loadFlags.hasV4header = true;
+			}
 		}
 
 		/* read bitmask if present */
