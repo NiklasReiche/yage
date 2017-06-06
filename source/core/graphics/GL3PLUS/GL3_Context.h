@@ -25,8 +25,6 @@
 
 namespace gl3
 {
-	class GL3_Object;
-
 	void error_callback(int error, const char* description);
 
 	class GL3_Context
@@ -153,6 +151,6 @@ namespace gl3
 
 		void useShader(const GL3_Shader & shader);
 
-		void bindTexture(const GL3_Texture & texture, int unit);
+		void bindTexture(const GL3_Texture & texture, int unit = 0);
 	};
 }
