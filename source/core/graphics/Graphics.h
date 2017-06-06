@@ -26,6 +26,7 @@ namespace gl
 	typedef gl3::GL3_Shader Shader;
 	typedef gl3::GL3_Texture Texture;
 	typedef gl3::GL3_Framebuffer Framebuffer;
+	typedef gl3::Viewport Viewport;
 
 	typedef gl3::ImageFormat ImageFormat;
 	typedef gl3::InternalFormat InternalFormat;
