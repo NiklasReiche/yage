@@ -28,5 +28,8 @@ namespace gl3
 		void configTextureWrapper(TextureWrapper x_option, TextureWrapper y_option);
 		void configTextureFilter(TextureFilter min_option, TextureFilter mag_option);
 		void configTextureFilter(MipmapOption min_option, TextureFilter mag_option);
+
+		int getWidth() { return width; }
+		int getHeight() { return height; }
 	};
 }
