@@ -24,6 +24,19 @@ namespace gl
 	typedef gl3::GL3_Shader Shader;
 	typedef gl3::GL3_Texture Texture;
 	typedef gl3::GL3_Framebuffer Framebuffer;
+
+	typedef gl3::ImageFormat ImageFormat;
+	typedef gl3::InternalFormat InternalFormat;
+	typedef gl3::PixelType PixelType;
+	typedef gl3::TextureType TextureType;
+	typedef gl3::TextureFilter TextureFilter;
+	typedef gl3::MipmapOption MipmapOption;
+	typedef gl3::VertexFormat VertexFormat;
+	typedef gl3::DrawMode DrawMode;
+	typedef gl3::BufferType BufferType;
+	typedef gl3::RenderFlag RenderFlag;
+	typedef gl3::PrimitiveType PrimitiveType;
+	typedef gl3::TextureWrapper TextureWrapper;
 #endif // GL3
 
 #ifdef GLES2
