@@ -2,12 +2,12 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
-#include <NGL\glHeader.h>
-#include <IMG\image.h>
+#include <graphics\Graphics.h>
+#include <image\image.h>
 
 #include "font.h"
-
 
 namespace font
 {

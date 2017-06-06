@@ -18,7 +18,14 @@ file(GLOB gui_SRC
 if(WIN32)
 	add_library(YAGEimage STATIC ${image_SRC})
 
-	target_link_libraries(YAGEimage PUBLIC YAGEcore
-								    PUBLIC freetype32sMD_d.lib)
+	target_link_libraries(YAGEimage PUBLIC YAGEcore)
+
+
+	add_library(YAGEfont STATIC ${font_SRC})
+
+	target_link_libraries(YAGEfont PUBLIC YAGEcore
+								   PUBLIC freetype32sMD_d.lib)
+
+	target_compile_definitions(YAGEfont PUBLIC "GL3")
 
 endif()

@@ -1,63 +1,59 @@
 #include "text.h"
 
-using namespace std;
-using namespace gml;
-
-
 namespace font
 {
 	/*****************************************
 	**			Drawable Text				**
 	*****************************************/
 
-	Text::Text(std::string text, const Font & font, gml::Vec2<float> position, unsigned int color, int size)
-		: text(text), position(position), color(ngl::toVec4(color)), fontSize(size)
+	Text::Text(gl::GraphicsContext glContext, std::string text, const Font & font, gml::Vec2<float> position, unsigned int color, int size)
+		: text(text), position(position), color(gl::toVec4(color)), fontSize(size)
 	{
-		vector<Gfloat> vertices;
+		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices, font);
 		this->textureAtlas = font.textureAtlas;
-		ngl::genDrawable(*this, vertices, vector<int> { 2, 2, 4 }, ngl::DrawMode::DRAW_DYNAMIC, ngl::VertexFormat::BATCHED);
+		glContext.createDrawable(*this, vertices, std::vector<int> { 2, 2, 4 }, gl::DrawMode::DRAW_DYNAMIC, gl::VertexFormat::BATCHED);
 	}
 
-	void Text::constructVertices(std::vector<Gfloat>& vertices, const Font & font)
+	void Text::constructVertices(std::vector<gl::Gfloat>& vertices, const Font & font)
 	{
-		vector<Gfloat> coords;
+		std::vector<gl::Gfloat> coords;
 		constructVertexCoords(coords, font);
 		vertices.insert(std::end(vertices), std::begin(coords), std::end(coords));
 
-		vector<Gfloat> texCoords;
+		std::vector<gl::Gfloat> texCoords;
 		constructVertexTexCoords(texCoords, font);
 		vertices.insert(std::end(vertices), std::begin(texCoords), std::end(texCoords));
 		
-		vector<Gfloat> colors;
+		std::vector<gl::Gfloat> colors;
 		constructVertexColors(colors);
 		vertices.insert(std::end(vertices), std::begin(colors), std::end(colors));
 	}
 
-	void Text::constructVertexCoords(std::vector<Gfloat>& vertices, const Font & font)
+	void Text::constructVertexCoords(std::vector<gl::Gfloat>& vertices, const Font & font)
 	{
 		float scale = fontSize / (float)font.metrics.PT_size;
 
-		float globalWidth = (float)font.textureAtlas.width;
-		float globalHeight = (float)font.textureAtlas.height;
+		float globalWidth = (float)font.textureAtlas.getWidth();
+		float globalHeight = (float)font.textureAtlas.getHeight();
 
 		float xpos = position.x;
 		float ypos = position.y;
 
-		vector<Gfloat> coords;
+		std::vector<gl::Gfloat> coords;
 
 		// Iterate through all characters
 		for (unsigned int i = 0; i < text.length(); ++i)
 		{
 			const Character & ch = font.characters.at(text[i]);
 
-			Gfloat left = xpos + ch.glyph.bearing.x * scale;
-			Gfloat right = left + ch.glyph.size.x * scale;
-			Gfloat top = ypos + (font.maxGlyph.bearing.y * scale - ch.glyph.bearing.y * scale);
-			Gfloat bottom = top + ch.glyph.size.y * scale;
+			gl::Gfloat left = xpos + ch.glyph.bearing.x * scale;
+			gl::Gfloat right = left + ch.glyph.size.x * scale;
+			gl::Gfloat top = ypos + (font.maxGlyph.bearing.y * scale - ch.glyph.bearing.y * scale);
+			gl::Gfloat bottom = top + ch.glyph.size.y * scale;
 
 			// Generate glyph quad for each character
-			std::array<Gfloat, 12> localCoords = {
+			std::array<gl::Gfloat, 12> localCoords = {
 				left, top,
 				left, bottom,
 				right,	bottom,
@@ -82,21 +78,21 @@ namespace font
 		vertexOffsetCoords = 0;
 		vertices.insert(std::end(vertices), std::begin(coords), std::end(coords));
 	}
-	void Text::constructVertexTexCoords(std::vector<Gfloat>& vertices, const Font & font)
+	void Text::constructVertexTexCoords(std::vector<gl::Gfloat>& vertices, const Font & font)
 	{
-		vector<Gfloat> texCoords;
+		std::vector<gl::Gfloat> texCoords;
 
 		for (unsigned int i = 0; i < text.length(); ++i)
 		{
 			const Character & ch = font.characters.at(text[i]);
 
-			Gfloat texLeft = ch.texCoords.left;
-			Gfloat texRight = ch.texCoords.right;
-			Gfloat texBottom = ch.texCoords.bottom;
-			Gfloat texTop = ch.texCoords.top;
+			gl::Gfloat texLeft = ch.texCoords.left;
+			gl::Gfloat texRight = ch.texCoords.right;
+			gl::Gfloat texBottom = ch.texCoords.bottom;
+			gl::Gfloat texTop = ch.texCoords.top;
 
 			// Generate glyph quad for each character
-			std::array<Gfloat, 12> localTexCoords = {
+			std::array<gl::Gfloat, 12> localTexCoords = {
 				texLeft, texTop,
 				texLeft, texBottom,
 				texRight, texBottom,
@@ -114,14 +110,14 @@ namespace font
 		vertexOffsetTexCoords = VERTEX_SIZE_COORDS * text.length();
 		vertices.insert(std::end(vertices), std::begin(texCoords), std::end(texCoords));
 	}
-	void Text::constructVertexColors(std::vector<Gfloat>& vertices)
+	void Text::constructVertexColors(std::vector<gl::Gfloat>& vertices)
 	{
-		vector<Gfloat> colors;
+		std::vector<gl::Gfloat> colors;
 
 		for (unsigned int i = 0; i < text.length(); ++i)
 		{
 			// Generate glyph quad for each character
-			std::array<Gfloat, 24> localColors = {
+			std::array<gl::Gfloat, 24> localColors = {
 				color.x, color.y, color.z, color.w,
 				color.x, color.y, color.z, color.w,
 				color.x, color.y, color.z, color.w,
@@ -143,34 +139,34 @@ namespace font
 	{
 		this->text = text;
 
-		vector<Gfloat> vertices;
+		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices, font);
 		this->textureAtlas = font.textureAtlas;
-		ngl::configVBO(VBO, 0, vertices);
+		bufferSubData(0, vertices);
 	}
 
 	void Text::appendText(std::string text, const Font & font)
 	{
 		this->text += text;
 
-		vector<Gfloat> vertices;
+		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices, font);
-		ngl::configVBO(VBO, 0, vertices);
+		bufferSubData(0, vertices);
 
-		
+
 	}
 
 
 	void Text::setColor(unsigned int icolor)
 	{
-		this->color = ngl::toVec4(icolor);
+		this->color = gl::toVec4(icolor);
 
-		vector<Gfloat> vertices;
+		std::vector<gl::Gfloat> vertices;
 		constructVertexColors(vertices);
-		ngl::configVBO(VBO, vertexOffsetColors, vertices);
+		bufferSubData(vertexOffsetColors, vertices);
 	}
 
-	ngl::Texture Text::getTexture()
+	gl::Texture Text::getTexture()
 	{
 		return textureAtlas;
 	}

@@ -3,8 +3,8 @@
 #include <string>
 #include <map>
 
-#include <NGL\glHeader.h>
-
+#include <math\MVector.h>
+#include <graphics\Graphics.h>
 
 namespace font
 {
@@ -46,7 +46,7 @@ namespace font
 		std::string name = "arial";
 		FontMetrics metrics;
 		GlyphMetrics maxGlyph;
-		ngl::Texture textureAtlas;
+		gl::Texture textureAtlas;
 		std::map<unsigned char, Character> characters;
 	};
 }

@@ -21,6 +21,9 @@ namespace font
 		return gml::Vector2D<float>(scale_x, scale_y);
 	}
 
+	FontLoader::FontLoader(gl::GraphicsContext* glContext)
+		: glContext(glContext) {}
+
 	Font FontLoader::loadFont(std::string filename, int ptsize, int dpi)
 	{
 		Fontfile fontfile;
@@ -70,9 +73,9 @@ namespace font
 			character.texCoords.bottom = fontfile.glyphs[i].texCoord_bottom + 4.0f / fontfile.sdfinfo.height;
 		}
 
-		font.textureAtlas = ngl::gen2DTexture(&fontfile.sdf[0], fontfile.sdfinfo.width, fontfile.sdfinfo.height, ngl::ImageFormat::R, 1);
-		ngl::configTextureWrapper(font.textureAtlas, ngl::TextureWrapper::CLAMP_TO_BORDER, ngl::TextureWrapper::CLAMP_TO_BORDER);
-		ngl::configTextureFilter(font.textureAtlas, ngl::TextureFilter::LINEAR, ngl::TextureFilter::LINEAR);
+		font.textureAtlas = glContext->create2DTexture(&fontfile.sdf[0], fontfile.sdfinfo.width, fontfile.sdfinfo.height, gl::ImageFormat::R, 1);
+		font.textureAtlas.configTextureWrapper(gl::TextureWrapper::CLAMP_TO_BORDER, gl::TextureWrapper::CLAMP_TO_BORDER);
+		font.textureAtlas.configTextureFilter(gl::TextureFilter::LINEAR, gl::TextureFilter::LINEAR);
 
 		return font;
 	}

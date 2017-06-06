@@ -11,8 +11,8 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H 
 
-#include <NGL\glHeader.h>
-#include <IMG\img.h>
+#include <graphics\Graphics.h>
+#include <image\img.h>
 
 #include "fileformat.h"
 #include "font.h"
@@ -69,7 +69,7 @@ namespace font
 	private:
 		FT_Loader ft_loader;
 		ConvertMetrics convertMetrics;
-
+		gl::GraphicsContext* glContext;
 	
 		void loadGlyphMetrics(FT_Face face, unsigned char c, GlyphMetrics & metrics);
 		void loadTextureMetrics(FT_Face face, unsigned char c, TexMetrics & metrics, gml::Vector2D<int> offset, int padding);
@@ -85,14 +85,16 @@ namespace font
 
 		// SDF related
 		void generateTextureAtlas(FT_Face face, img::Image & image, int padding);
-		void uploadGlyphBitmaps(FT_Face face, ngl::Texture & texture, int padding);
+		void uploadGlyphBitmaps(FT_Face face, gl::Texture & texture, int padding);
 		void generateSdfTexMetrics(FT_Face face, std::map<unsigned char, TexMetrics> & metrics, int padding);
 		void generateSDF(FT_Face face, img::Image & input, img::Image & output, int loadSize, int loadPadding, int resizeFactor);
 
 		// file writing
 		void writeFontfile(std::string filename);
+
 	public:
-		void convertFont2(std::string filepath_TTF, std::string filepath_FONT, ENCODING encoding = ENCODING::ASCII);
+		FontConverter(gl::GraphicsContext* glContext);
+
 		void convertFont(std::string filename_TTF, std::string filename_FONT, ENCODING encoding = ENCODING::ASCII);
 	};
 }

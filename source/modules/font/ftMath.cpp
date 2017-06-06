@@ -1,6 +1,5 @@
 #include "ftMath.h"
 
-
 namespace font
 {
 	/*****************************************

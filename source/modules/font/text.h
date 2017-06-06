@@ -11,17 +11,16 @@
 
 #include "font.h"
 
-
 namespace font
 {
 	/*****************************************
 	**			Drawable Text				**
 	*****************************************/
 
-	class Text : public ngl::Drawable
+	class Text : public gl::Drawable
 	{
 	private:
-		ngl::Texture textureAtlas;
+		gl::Texture textureAtlas;
 
 		gml::Vector2D<float> position;
 		gml::Vector2D<float> size;
@@ -38,14 +37,14 @@ namespace font
 		int vertexOffsetTexCoords;
 		int vertexOffsetColors;
 
-		void constructVertices(std::vector<Gfloat> & vertices, const Font & font);
+		void constructVertices(std::vector<GLfloat> & vertices, const Font & font);
 
-		void constructVertexCoords(std::vector<Gfloat> & vertices, const Font & font);
-		void constructVertexTexCoords(std::vector<Gfloat> & vertices, const Font & font);
-		void constructVertexColors(std::vector<Gfloat> & vertices);
+		void constructVertexCoords(std::vector<GLfloat> & vertices, const Font & font);
+		void constructVertexTexCoords(std::vector<GLfloat> & vertices, const Font & font);
+		void constructVertexColors(std::vector<GLfloat> & vertices);
 	public:
 		Text(){}
-		Text(std::string text, const Font & font, gml::Vec2<float> position = gml::Vec2<float>(0.0f), unsigned int color = 0x000000FFu, int size = 14);
+		Text(gl::GraphicsContext glContext, std::string text, const Font & font, gml::Vec2<float> position = gml::Vec2<float>(0.0f), unsigned int color = 0x000000FFu, int size = 14);
 
 		gml::Vector2D<float> getSize() { return size; }
 		gml::Vector2D<float> getPosition() { return position; }
@@ -56,6 +55,6 @@ namespace font
 
 		void setColor(unsigned int color);
 
-		ngl::Texture getTexture();
+		gl::Texture getTexture();
 	};
 }

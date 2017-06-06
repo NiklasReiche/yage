@@ -59,6 +59,9 @@ namespace font
 	/*****************************************
 	**			SDF Generator	 			**
 	*****************************************/
+	FontConverter::FontConverter(gl::GraphicsContext* glContext)
+		: glContext(glContext) {}
+
 
 	void FontConverter::generateTextureAtlas(FT_Face face, img::Image & image, int padding)
 	{
@@ -66,7 +69,7 @@ namespace font
 		clampTo4(size);
 
 		std::vector<unsigned char> emptyImage(size.x * size.y, 0);
-		ngl::Texture tempTexture = ngl::gen2DTexture(&emptyImage[0], size.x, size.y, ngl::ImageFormat::R, 1);
+		gl::Texture tempTexture = glContext->create2DTexture(&emptyImage[0], size.x, size.y, gl::ImageFormat::R, 1);
 
 		gml::Vector2D<int> tex_offset(0, 0);
 		for (unsigned char c = convertMetrics.c_min; c <= convertMetrics.c_max; ++c)
@@ -80,19 +83,19 @@ namespace font
 				std::vector<unsigned char> image;
 				img::unpackBitmap(bitmap.buffer, image, bitmap.rows, bitmap.width, bitmap.pitch);
 				img::flip(image, bitmap.rows, bitmap.width, 1);
-				ngl::config2DTexture(tempTexture, tex_offset.x + padding, tempTexture.height - (bitmap.rows + padding), bitmap.width, bitmap.rows, &image[0]);
+				tempTexture.bufferSubData(tex_offset.x + padding, tempTexture.getHeight() - (bitmap.rows + padding), bitmap.width, bitmap.rows, image);
 			}
 			// Advance texture offset
 			tex_offset.x += bitmap.width + (padding * 2);
 		}
 
-		ngl::getTextureImage(tempTexture, image.data);
+		tempTexture.getTextureImage(image.data);
 		image.channels = 1;
 		image.width = size.x;
 		image.height = size.y;
 	}
 
-	void FontConverter::uploadGlyphBitmaps(FT_Face face, ngl::Texture & texture, int padding)
+	void FontConverter::uploadGlyphBitmaps(FT_Face face, gl::Texture & texture, int padding)
 	{
 		gml::Vector2D<int> tex_offset(0, 0);
 		for (unsigned char c = convertMetrics.c_min; c <= convertMetrics.c_max; ++c)
@@ -106,7 +109,7 @@ namespace font
 				std::vector<unsigned char> image;
 				img::unpackBitmap(bitmap.buffer, image, bitmap.rows, bitmap.width, bitmap.pitch);
 				img::flip(image, bitmap.rows, bitmap.width, 1);
-				ngl::config2DTexture(texture, tex_offset.x + padding, texture.height - (bitmap.rows + padding), bitmap.width, bitmap.rows, &image[0]);
+				texture.bufferSubData(tex_offset.x + padding, texture.getHeight() - (bitmap.rows + padding), bitmap.width, bitmap.rows, image);
 			}
 			// Advance texture offset
 			tex_offset.x += bitmap.width + (padding * 2);
@@ -138,16 +141,16 @@ namespace font
 		genDistanceFieldPerGlyph(input, metrics, output);
 
 		// Convert SDF-Image to texture and downscale through mipmaps
-		ngl::Texture sdf_texture = ngl::gen2DTexture(&output.data[0], input.width, input.height, ngl::ImageFormat::R, 1);
-		ngl::configTextureWrapper(sdf_texture, ngl::TextureWrapper::CLAMP_TO_BORDER, ngl::TextureWrapper::CLAMP_TO_BORDER);
-		ngl::configTextureFilter(sdf_texture, ngl::MipmapOption::LINEAR_LINEAR, ngl::TextureFilter::NEAREST);
+		gl::Texture sdf_texture = glContext->create2DTexture(&output.data[0], input.width, input.height, gl::ImageFormat::R, 1);
+		sdf_texture.configTextureWrapper(gl::TextureWrapper::CLAMP_TO_BORDER, gl::TextureWrapper::CLAMP_TO_BORDER);
+		sdf_texture.configTextureFilter(gl::MipmapOption::LINEAR_LINEAR, gl::TextureFilter::NEAREST);
 
 		// resize
 		output.width = input.width / resizeFactor;
 		output.height = input.height / resizeFactor;
 		output.channels = 1;
 
-		ngl::getTextureImage(sdf_texture, output.data, (int)std::log2(resizeFactor));
+		sdf_texture.getTextureImage(output.data, (int)std::log2(resizeFactor));
 	}
 
 	/*****************************************
