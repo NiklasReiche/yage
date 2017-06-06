@@ -40,7 +40,7 @@ namespace gl3
 
 		GL3_State glState;
 
-		std::unique_ptr<GL3_Shader> unitShader;
+		GL3_Shader unitShader;
 		GL3_Drawable unitDrawable;
 
 		int checkShaderCompilationError(GLuint program, std::string type);
