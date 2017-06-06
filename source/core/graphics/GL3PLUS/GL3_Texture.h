@@ -23,7 +23,7 @@ namespace gl3
 
 	public:
 		void bufferSubData(int x_offset, int y_offset, int width, int height, std::vector<unsigned char> & data);
-		void getTextureImage(std::vector<unsigned char> & data, int level);
+		void getTextureImage(std::vector<unsigned char> & data, int level = 0);
 
 		void configTextureWrapper(TextureWrapper x_option, TextureWrapper y_option);
 		void configTextureFilter(TextureFilter min_option, TextureFilter mag_option);
