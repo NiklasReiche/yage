@@ -22,7 +22,7 @@ namespace gl3
 		int nChannels;
 
 	public:
-		void bufferSubData(int x_offset, int y_offset, std::vector<unsigned char> & data);
+		void bufferSubData(int x_offset, int y_offset, int width, int height, std::vector<unsigned char> & data);
 		void getTextureImage(std::vector<unsigned char> & data, int level);
 
 		void configTextureWrapper(TextureWrapper x_option, TextureWrapper y_option);

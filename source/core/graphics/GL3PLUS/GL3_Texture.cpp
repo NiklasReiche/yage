@@ -3,7 +3,7 @@
 
 namespace gl3
 {
-	void GL3_Texture::bufferSubData(int x_offset, int y_offset, std::vector<unsigned char> & data)
+	void GL3_Texture::bufferSubData(int x_offset, int y_offset, int width, int height, std::vector<unsigned char> & data)
 	{
 		glContext->setUnpackAlignment(rowAlignment);
 		glContext->bindTexture(*this);
