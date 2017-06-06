@@ -1,13 +1,18 @@
 #pragma once
 
+#include <vector>
+
 #include "gl3.h"
 #include "GL3_Object.h"
 #include "GL3_Enum.h"
 
 namespace gl3
 {
-	struct GL3_Texture : public GL3_Object
+	class GL3_Texture : public GL3_Object
 	{
+	private:
+		friend class GL3_Context;
+
 		int width, height;
 		TextureType target;
 		InternalFormat format;
@@ -15,5 +20,13 @@ namespace gl3
 		PixelType px_type;
 		int rowAlignment = 4;
 		int nChannels;
+
+	public:
+		void bufferSubData(int x_offset, int y_offset, std::vector<unsigned char> & data);
+		void getTextureImage(std::vector<unsigned char> & data, int level);
+
+		void configTextureWrapper(TextureWrapper x_option, TextureWrapper y_option);
+		void configTextureFilter(TextureFilter min_option, TextureFilter mag_option);
+		void configTextureFilter(MipmapOption min_option, TextureFilter mag_option);
 	};
 }
