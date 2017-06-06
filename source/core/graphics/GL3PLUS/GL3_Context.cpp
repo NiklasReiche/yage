@@ -349,6 +349,8 @@ namespace gl3
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		// Build Texture
+		texture.glContext = this;
+
 		texture.height = height;
 		texture.width = width;
 
@@ -389,9 +391,11 @@ namespace gl3
 		// Unbind
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
+		texture.glContext = this;
 		texture.target = TextureType::TEXTURE_CUBEMAP;
 		texture.height = height;
 		texture.width = width;
+
 		return texture;
 	}
 	void GL3_Context::createCubemapTexture(GL3_Texture & texture, std::array<unsigned char*, 6> images, int width, int height)
@@ -439,6 +443,8 @@ namespace gl3
 		if (geometryCode != "") {
 			glDeleteShader(geometryShader);
 		}
+
+		shader.glContext = this;
 
 		// Save uniform locations
 		GLint count;
