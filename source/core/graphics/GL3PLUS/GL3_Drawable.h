@@ -11,6 +11,8 @@ namespace gl3
 	class GL3_Drawable : public GL3_Object
 	{
 	private:
+		friend class GL3_Context;
+
 		GLuint VAO;
 		GLuint VBO;
 		GLint nVertices;
