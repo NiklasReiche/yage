@@ -464,13 +464,13 @@ namespace gl3
 		return shader;
 	}
 
-	void GL3_Context::draw(GL3_Drawable & drawable)
+	void GL3_Context::draw(const GL3_Drawable & drawable)
 	{
 		glBindVertexArray(drawable.VAO);
 		glDrawArrays((GLenum)drawable.primitive, 0, drawable.nVertices);
 		glBindVertexArray(0);
 	}
-	void GL3_Context::draw(GL3_Framebuffer & buffer)
+	void GL3_Context::draw(const GL3_Framebuffer & buffer)
 	{
 		setActiveRenderTarget(0);
 		setActiveViewport(glState.viewport);
@@ -482,14 +482,14 @@ namespace gl3
 
 		draw(unitDrawable);
 	}
-	void GL3_Context::useShader(GL3_Shader & shader)
+	void GL3_Context::useShader(const GL3_Shader & shader)
 	{
 		if (glState.shader != shader.id) {
 			glUseProgram(shader.id);
 			glState.shader = shader.id;
 		}
 	}
-	void GL3_Context::bindTexture(GL3_Texture & texture, int unit)
+	void GL3_Context::bindTexture(const GL3_Texture & texture, int unit)
 	{
 		glActiveTexture(GL_TEXTURE0 + unit);
 		glBindTexture((GLenum)texture.target, texture.id);

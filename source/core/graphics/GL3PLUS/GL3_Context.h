@@ -10,6 +10,9 @@
 #include "GL3_Exception.h"
 #include "GL3_Enum.h"
 #include "GL3_State.h"
+
+#include "GL3_Object.h"
+
 #include "GL3_Shader.h"
 #include "GL3_UnitShader.h"
 
@@ -22,7 +25,7 @@
 
 namespace gl3
 {
-	class GL3_Shader;
+	class GL3_Object;
 
 	void error_callback(int error, const char* description);
 
@@ -45,6 +48,7 @@ namespace gl3
 		int checkShaderCompilationError(GLuint program, std::string type);
 		InternalFormat convertToInternalFormat(ImageFormat format);
 		int convertToChannelSize(ImageFormat format);
+
 	public:
 		GL3_Context(int width, int height, std::string title = "OpenGL");
 		~GL3_Context();
@@ -144,9 +148,11 @@ namespace gl3
 		**			Usage functions				**
 		*****************************************/
 
-		void draw(GL3_Drawable & drawable);
-		void draw(GL3_Framebuffer & buffer);
-		void useShader(GL3_Shader & shader);
-		void bindTexture(GL3_Texture & texture, int unit);
+		void draw(const GL3_Drawable & drawable);
+		void draw(const GL3_Framebuffer & buffer);
+
+		void useShader(const GL3_Shader & shader);
+
+		void bindTexture(const GL3_Texture & texture, int unit);
 	};
 }
