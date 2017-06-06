@@ -8,6 +8,8 @@
 #include "GLES2\GLES2_Context.h"
 #endif // GLES2
 
+#include "Color.h"
+
 namespace gl
 {
 #ifdef GL3

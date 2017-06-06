@@ -29,7 +29,7 @@ namespace gl3
 		void configTextureFilter(TextureFilter min_option, TextureFilter mag_option);
 		void configTextureFilter(MipmapOption min_option, TextureFilter mag_option);
 
-		int getWidth() { return width; }
-		int getHeight() { return height; }
+		int getWidth() const { return width; }
+		int getHeight() const { return height; }
 	};
 }

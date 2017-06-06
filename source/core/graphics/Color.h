@@ -2,7 +2,6 @@
 
 #include "math\MVector.h"
 
-
 namespace gl
 {
 	namespace Color
