@@ -97,8 +97,7 @@ namespace gl3
 
 		GL3_Framebuffer createFramebuffer(
 			GLint width,
-			GLint height,
-			gml::Vec4<float> clearColor = gml::Vec4<float>(0.0f, 0.0f, 0.0f, 1.0f));
+			GLint height);
 
 		GL3_Drawable createDrawable(
 			std::vector<GLfloat> & vertices,

@@ -242,7 +242,7 @@ namespace gl3
 	}
 
 
-	GL3_Framebuffer GL3_Context::createFramebuffer(GLint width, GLint height, gml::Vec4<float> clearColor)
+	GL3_Framebuffer GL3_Context::createFramebuffer(GLint width, GLint height)
 	{
 		GL3_Framebuffer buffer;
 		// Create Framebuffer Object
@@ -272,6 +272,9 @@ namespace gl3
 			throw;
 		}
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		buffer.glContext = this;
+		buffer.id = buffer.FBO;
 
 		buffer.height = height;
 		buffer.width = width;
