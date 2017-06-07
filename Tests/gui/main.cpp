@@ -41,6 +41,7 @@ int main()
 	glContext.showWindow();
 	while (!glContext.getCloseFlag())
 	{
+		std::cout << inputController.getInput()->getMousePos() << std::endl;
 		gui.master->update();
 
 		glContext.swapBuffers();

@@ -81,7 +81,7 @@ namespace glfw
 	void GLFWHandle::onMousePosEvent(double xpos, double ypos)
 	{
 		try {
-			onMousePosEventCallback(ypos, ypos);
+			onMousePosEventCallback(xpos, ypos);
 		}
 		catch (std::bad_function_call) {
 
