@@ -6,13 +6,13 @@ namespace font
 	**			Drawable Text				**
 	*****************************************/
 
-	Text::Text(gl::GraphicsContext glContext, std::string text, const Font & font, gml::Vec2<float> position, unsigned int color, int size)
+	Text::Text(gl::GraphicsContext* glContext, std::string text, const Font & font, gml::Vec2<float> position, unsigned int color, int size)
 		: text(text), position(position), color(gl::toVec4(color)), fontSize(size)
 	{
 		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices, font);
 		this->textureAtlas = font.textureAtlas;
-		glContext.createDrawable(*this, vertices, std::vector<int> { 2, 2, 4 }, gl::DrawMode::DRAW_DYNAMIC, gl::VertexFormat::BATCHED);
+		glContext->createDrawable(*this, vertices, std::vector<int> { 2, 2, 4 }, gl::DrawMode::DRAW_DYNAMIC, gl::VertexFormat::BATCHED);
 	}
 
 	void Text::constructVertices(std::vector<gl::Gfloat>& vertices, const Font & font)

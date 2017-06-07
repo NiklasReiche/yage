@@ -44,7 +44,7 @@ namespace font
 		void constructVertexColors(std::vector<GLfloat> & vertices);
 	public:
 		Text(){}
-		Text(gl::GraphicsContext glContext, std::string text, const Font & font, gml::Vec2<float> position = gml::Vec2<float>(0.0f), unsigned int color = 0x000000FFu, int size = 14);
+		Text(gl::GraphicsContext* glContext, std::string text, const Font & font, gml::Vec2<float> position = gml::Vec2<float>(0.0f), unsigned int color = 0x000000FFu, int size = 14);
 
 		gml::Vector2D<float> getSize() { return size; }
 		gml::Vector2D<float> getPosition() { return position; }

@@ -29,6 +29,9 @@ namespace font
 		Fontfile fontfile;
 
 		std::ifstream file(filename, std::ios::binary);
+		if (!file.is_open()) {
+			std::cout << "ERROR::FONT_LOADER: could not open file " << filename << std::endl;
+		}
 
 		file.seekg(0);
 		file.read((char*)&fontfile.fileheader, sizeof(fontfile.fileheader));
