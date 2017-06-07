@@ -21,7 +21,8 @@
 #include "GL3_Viewport.h"
 #include "GL3_Texture.h"
 
-#include "math\MVector.h"
+#include <math\MVector.h>
+#include <platform\Platform.h>
 
 namespace gl3
 {
@@ -30,9 +31,7 @@ namespace gl3
 	class GL3_Context
 	{
 	private:
-		GLFWwindow* glfwHandle;
-		const int GL_VERSION_MAJOR = 3;
-		const int GL_VERSION_MINOR = 3;
+		platform::PlatformHandle* systemHandle;
 
 		GLuint width;
 		GLuint height;
@@ -48,7 +47,7 @@ namespace gl3
 		int convertToChannelSize(ImageFormat format);
 
 	public:
-		GL3_Context(int width, int height, std::string title = "OpenGL");
+		GL3_Context(platform::PlatformHandle* systemHandle, int width, int height, std::string title = "OpenGL");
 		~GL3_Context();
 
 
@@ -61,10 +60,9 @@ namespace gl3
 		void hideWindow();
 		void swapBuffers();
 
-		GLFWwindow* getGlfwHandle() { return glfwHandle; }
 		int getWidth() { return width; }
 		int getHeight() { return height; }
-		int getCloseFlag() { return glfwWindowShouldClose(glfwHandle); }
+		int getCloseFlag() { return systemHandle->shouldDestroy(); }
 
 
 		/*****************************************

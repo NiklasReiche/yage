@@ -79,32 +79,10 @@ namespace gl3
 	}
 
 
-	GL3_Context::GL3_Context(int width, int height, std::string title)
-		: width(width), height(height), title(title)
+	GL3_Context::GL3_Context(platform::PlatformHandle* systemHandle, int width, int height, std::string title)
+		: systemHandle(systemHandle), width(width), height(height), title(title)
 	{
-		// --- GLFW ---
-		glfwSetErrorCallback(error_callback);
-		if (!glfwInit()) {
-			throw GlfwException(GLFW_ERROR, "GL::ERROR: Failed to initialize GLFW");
-		}
-
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GL_VERSION_MAJOR);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GL_VERSION_MINOR);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-
-		glfwHandle = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
-
-		if (glfwHandle == nullptr) {
-			glfwTerminate();
-			throw GlfwException(GLFW_ERROR, "GL::ERROR: Failed to create GLFW window");
-		}
-
-		glfwMakeContextCurrent(glfwHandle);
-		glfwSetWindowPos(glfwHandle, 50, 50);
-		glfwSetWindowUserPointer(glfwHandle, this);
-		glfwSwapInterval(1);
+		systemHandle->createContext(width, height, title);
 
 		// --- GLEW ---
 		glewExperimental = GL_TRUE;
@@ -113,6 +91,8 @@ namespace gl3
 			throw GlewException(err, "GL::ERROR: Failed to initialize GLEW");
 		}
 
+		makeCurrent();
+
 		// --- Internal initialization ---
 		GL3_UnitShaderTemplate UnitShaderTemplate;
 		unitDrawable = createDrawable(UnitShaderTemplate.vertices, UnitShaderTemplate.vertexLayout, UnitShaderTemplate.mode);
@@ -120,7 +100,7 @@ namespace gl3
 	}
 	GL3_Context::~GL3_Context()
 	{
-		glfwTerminate();
+		
 	}
 
 
@@ -128,19 +108,19 @@ namespace gl3
 	{
 		glState.window_width = width;
 		glState.window_height = height;
-		glfwMakeContextCurrent(glfwHandle);
+		systemHandle->makeCurrent();
 	}
 	void GL3_Context::showWindow()
 	{
-		glfwShowWindow(glfwHandle);
+		systemHandle->showWindow();
 	}
 	void GL3_Context::hideWindow()
 	{
-		glfwHideWindow(glfwHandle);
+		systemHandle->hideWindow();
 	}
 	void GL3_Context::swapBuffers()
 	{
-		glfwSwapBuffers(glfwHandle);
+		systemHandle->swapBuffers();
 	}
 
 

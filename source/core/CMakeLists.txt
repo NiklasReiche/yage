@@ -2,6 +2,11 @@
 # source/core/Cmake
 #########################
 
+file(GLOB math_SRC
+	"math/*.cpp"
+	"math/*.h"
+)
+
 file(GLOB graphics_SRC
     "graphics/*.cpp"
 	"graphics/*.h"
@@ -18,24 +23,32 @@ file(GLOB graphics_GLES3_SRC
 	"graphics/GLES3/*.cpp"
 	"graphics/GLES3/*.h"
 )
+
 file(GLOB platform_ANDROID_SRC
 	"platform/android/*c"
 	"platform/android/*.cpp"
 	"platform/android/*.h"
 )
+file(GLOB platform_DESKTOP_SRC
+	"platform/desktop/*.cpp"
+	"platform/desktop/*.h"
+)
+
 file(GLOB input_SRC
 	"input/*.cpp"
 	"input/*.h"
 )
-file(GLOB math_SRC
-	"math/*.cpp"
-	"math/*.h"
+file(GLOB input_DESKTOP_SRC
+	"input/desktop/*.cpp"
+	"input/desktop/*.h"
 )
 
 
 if(WIN32)
 	add_library(YAGEcore STATIC ${math_SRC}
+								${platform_DESKTOP_SRC}
 								${input_SRC}
+								${input_DESKTOP_SRC}
 								${graphics_SRC}
 								${graphics_GL3_SRC})
 
