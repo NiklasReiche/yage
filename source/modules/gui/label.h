@@ -5,7 +5,6 @@
 #include "core.h"
 #include "widget.h"
 
-
 namespace gui
 {
 	struct W_Text

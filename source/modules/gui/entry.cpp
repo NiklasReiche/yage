@@ -28,9 +28,9 @@ namespace gui
 
 	void TextEntry::update()
 	{
-		std::vector<int> & keys = masterInterface.inputManger->getPressedKeys();
+		//std::vector<int> & keys = masterInterface.inputManger->getPressedKeys();
 
-		for (unsigned int i = 0; i < keys.size(); ++i)
+		for (unsigned int i = 0; i < 1/*keys.size()*/; ++i)
 		{
 			//text += glfwGetKeyName(keys[i]);
 		}

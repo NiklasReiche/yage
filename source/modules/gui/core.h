@@ -1,8 +1,8 @@
 #pragma once
 
-#include <NGL\glHeader.h>
-#include <FONT\fontHeader.h>
-
+#include <graphics/Graphics.h>
+#include <input/InputController.h>
+#include <font/fontHeader.h>
 
 namespace gui 
 {

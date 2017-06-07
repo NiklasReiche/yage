@@ -1,67 +1,63 @@
 #include "renderer.h"
 
-using namespace std;
-using namespace gml;
-
-
 namespace gui
 {
 	/*************************************************
 	** Basic Gui Renderer
 	*************************************************/
 
-	GuiRenderer::GuiRenderer(ngl::Viewport viewport)
-		: Renderer(viewport)
+	GuiRenderer::GuiRenderer(gl::GraphicsContext* glContext, gl::Viewport viewport)
+		: Renderer(glContext, viewport)
 	{
-		ngl::ShaderLoader loader;
-		guiShader = loader.loadShader("../NE Gui Library/shader/guiShader.vert", "../NE Gui Library/shader/guiShader.frag");
-		textShader = loader.loadShader("../NE Font Library/shader/textShader.vert", "../NE Font Library/shader/textShader.frag");
+		gl::ShaderLoader loader(glContext);
+		guiShader = loader.loadShader("D:/Dev/Projects/YAGE/source/modules/gui/guiShader.vert", "D:/Dev/Projects/YAGE/source/modules/gui/guiShader.frag");
+		textShader = loader.loadShader("D:/Dev/Projects/YAGE/source/modules/font/textShader.vert", "D:/Dev/Projects/YAGE/source/modules/font/textShader.frag");
 
-		Matrix4D<float> projection = gml::orthographic<float>(0.0f, (float)viewport.width, (float)viewport.height, 0.0f, 0.1f, 100.0f);
-		ngl::setUniform(guiShader, "projection", projection);
-		ngl::setUniform(textShader, "projection", projection);
+		gml::Matrix4D<float> projection = gml::orthographic<float>(0.0f, (float)viewport.width, (float)viewport.height, 0.0f, 0.1f, 100.0f);
+		guiShader.setUniform("projection", projection);
+		textShader.setUniform("projection", projection);
 
-		default_framebuffer.clearColor = gml::Vec4<float>(1, 1, 1, 1);
+		clearColor = gml::Vec4<float>(1, 1, 1, 1);
 	}
 
 
 	void GuiRenderer::render()
 	{
 		prepareRenderTarget();
-		ngl::enableBlending();
+		glContext->enableBlending();
 
-		ngl::useShader(guiShader);
+		glContext->useShader(guiShader);
 		for (unsigned int i = 0; i < widgets.size(); ++i)
 		{
-			ngl::draw(*widgets[i]);
+			glContext->draw(*widgets[i]);
 		}
 
 		//ngl::enableBlending();
-		ngl::useShader(textShader);
+		glContext->useShader(textShader);
 		for (unsigned int i = 0; i < text.size(); ++i)
 		{
-			ngl::bindTexture(text[i]->getTexture(), 0);
-			ngl::draw(*text[i]);
+			glContext->bindTexture(text[i]->getTexture(), 0);
+			glContext->draw(*text[i]);
 		}
 
-		ngl::disableBlending();
+		glContext->disableBlending();
 		renderToScreen();
 	}
 
-	void GuiRenderer::drawWidget(ngl::Drawable & widget)
+	void GuiRenderer::drawWidget(gl::Drawable & widget)
 	{
-		ngl::useShader(guiShader);
-		ngl::draw(widget);
+		glContext->useShader(guiShader);
+		glContext->draw(widget);
 	}
 
 	void GuiRenderer::drawText(font::Text & text)
 	{
-		ngl::enableBlending();
-		ngl::useShader(textShader);
+		glContext->enableBlending();
+		glContext->useShader(textShader);
 
-		ngl::bindTexture(text.getTexture(), 0);
-		ngl::draw(text);
+		glContext->bindTexture(text.getTexture(), 0);
+		glContext->draw(text);
 
-		ngl::disableBlending();
+		glContext->disableBlending();
 	}
 }

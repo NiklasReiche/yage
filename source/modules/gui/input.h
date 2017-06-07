@@ -17,26 +17,16 @@ namespace gui
 	class InputManager
 	{
 	private:
-		ngl::Window * window;
+		input::InputController * inputController;
 
-		std::array<InputAction, 512> keys;
-		std::vector<int> keys_pressed;
-		std::vector<int> keys_released;
-
-		gml::Vec2<float> mouse_pos;
-		gml::Vec2<float> mouse_wheel_offset;
+		input::InputState* input;
 
 		bool isHoveredOver(Widget & widget);
 	public:
-		InputManager();
-		void initialize(ngl::Window * window);
+		InputManager() {}
+		void initialize(input::InputController * inputController);
 
 		void update(Widget & root);
 		void walkWidgets(Widget & widget, int level);
-
-		gml::Vec2<float> getMousePos() { return mouse_pos; }
-		InputAction getKeyState(int key) { return keys[key]; }
-		std::vector<int>& getPressedKeys() { return keys_pressed; }
-		std::vector<int>& getReleasedKeys() { return keys_released; }
 	};
 }

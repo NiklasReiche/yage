@@ -9,7 +9,7 @@ namespace gui
 
 		if (text.text != "") {
 			font::Font & mFont = mInterface.fontManager->getFont(text.font);
-			this->text = font::Text(text.text, mFont, this->position + gml::Vec2<float>(padding), text.color, text.size);
+			this->text = font::Text(mInterface.glContext, text.text, mFont, this->position + gml::Vec2<float>(padding), text.color, text.size);
 
 			if (size == gml::Vec2<float>(0.0f)) {
 				this->size = this->text.getSize() + gml::Vec2<float>(padding * 2);
@@ -21,7 +21,7 @@ namespace gui
 	void Label::setText(W_Text text)
 	{
 		font::Font & mFont = masterInterface.fontManager->getFont(text.font);
-		this->text = font::Text(text.text, mFont, this->position + gml::Vec2<float>(padding), text.color, text.size);
+		this->text = font::Text(masterInterface.glContext, text.text, mFont, this->position + gml::Vec2<float>(padding), text.color, text.size);
 
 		if (size == gml::Vec2<float>(0.0f)) {
 			this->size = this->text.getSize() + gml::Vec2<float>(padding * 2);

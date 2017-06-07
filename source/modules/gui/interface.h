@@ -14,5 +14,6 @@ namespace gui
 		FontManager* fontManager;
 		InputManager* inputManger;
 		GuiRenderer* renderer;
+		gl::GraphicsContext* glContext;
 	};
 }

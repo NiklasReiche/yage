@@ -5,19 +5,19 @@ namespace gui
 	Widget::Widget(Widget * parent, ManagerInterface mInterface, W_Geometry geometry, unsigned int color, W_Border border, W_Shadow shadow)
 		: parent(parent), masterInterface(mInterface), position(geometry.position), size(geometry.size), borderSize(border.size), shadowOffset(shadow.offset), shadowHardness(shadow.hardness)
 	{
-		this->color = ngl::toVec4(color);
-		this->borderColor = ngl::toVec4(border.color);
+		this->color = gl::toVec4(color);
+		this->borderColor = gl::toVec4(border.color);
 		this->position = parent->getPosition() + position;
 
-		std::vector<Gfloat> vertices;
+		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices);
-		ngl::genDrawable(*this, vertices, std::vector<int> { 2, 4 }, ngl::DrawMode::DRAW_DYNAMIC, ngl::VertexFormat::BATCHED);
+		masterInterface.glContext->createDrawable(*this, vertices, std::vector<int> { 2, 4 }, gl::DrawMode::DRAW_DYNAMIC, gl::VertexFormat::BATCHED);
 	}
 
-	void Widget::constructVertices(std::vector<Gfloat>& vertices)
+	void Widget::constructVertices(std::vector<gl::Gfloat>& vertices)
 	{
-		std::vector<Gfloat> coords;
-		std::vector<Gfloat> colors;
+		std::vector<gl::Gfloat> coords;
+		std::vector<gl::Gfloat> colors;
 
 		float left = position.x;
 		float top = position.y;
@@ -35,7 +35,7 @@ namespace gui
 		// Drop Shadow Effect
 		if (sh > 0)
 		{
-			std::array<Gfloat, 12> pos_shadow = {
+			std::array<gl::Gfloat, 12> pos_shadow = {
 				left + so,	top + so,
 				left + so,	bottom + so,
 				right + so,	bottom + so,
@@ -43,7 +43,7 @@ namespace gui
 				right + so,	top + so,
 				left + so,	top + so,
 			};
-			std::array<Gfloat, 24> color_shadow = {
+			std::array<gl::Gfloat, 24> color_shadow = {
 				0.0f, 0.0f, 0.0f, sh,
 				0.0f, 0.0f, 0.0f, sh,
 				0.0f, 0.0f, 0.0f, sh,
@@ -68,7 +68,7 @@ namespace gui
 				bottom -= bs;
 			}
 
-			std::array<Gfloat, 48> pos_border = {
+			std::array<gl::Gfloat, 48> pos_border = {
 				left,		top,
 				left - bs,	top - bs,
 				right + bs,	top - bs,
@@ -97,7 +97,7 @@ namespace gui
 				left,		top,
 				left,		bottom
 			};
-			std::array<Gfloat, 96> color_border = {
+			std::array<gl::Gfloat, 96> color_border = {
 				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
 				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
 				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
@@ -131,7 +131,7 @@ namespace gui
 		}
 
 		// Main geometry
-		std::array<Gfloat, 12> pos_plain = {
+		std::array<gl::Gfloat, 12> pos_plain = {
 			left,	top,
 			left,	bottom,
 			right,	bottom,
@@ -139,7 +139,7 @@ namespace gui
 			right,	top,
 			left,	top,
 		};
-		std::array<Gfloat, 24> color_plain = {
+		std::array<gl::Gfloat, 24> color_plain = {
 			gl_color.x, gl_color.y, gl_color.z, gl_color.w,
 			gl_color.x, gl_color.y, gl_color.z, gl_color.w,
 			gl_color.x, gl_color.y, gl_color.z, gl_color.w,
@@ -156,8 +156,8 @@ namespace gui
 
 	void Widget::updateParams()
 	{
-		std::vector<Gfloat> vertices;
+		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices);
-		ngl::configVBO(VBO, 0, vertices);
+		bufferSubData(0, vertices);
 	}
 }

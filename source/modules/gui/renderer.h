@@ -3,28 +3,27 @@
 #include <vector>
 #include "core.h"
 
-
 namespace gui
 {
 	/*************************************************
 	** Basic Gui Renderer
 	*************************************************/
 
-	class GuiRenderer : public ngl::Renderer
+	class GuiRenderer : public gl::Renderer
 	{
 	private:
-		ngl::Shader guiShader;
-		ngl::Shader textShader;
+		gl::Shader guiShader;
+		gl::Shader textShader;
 	public:
-		std::vector<ngl::Drawable*> widgets;
+		std::vector<gl::Drawable*> widgets;
 		std::vector<font::Text*> text;
 
 		GuiRenderer() {}
-		GuiRenderer(ngl::Viewport viewport);
+		GuiRenderer(gl::GraphicsContext* glContext, gl::Viewport viewport);
 
 		void render();
 
-		void drawWidget(ngl::Drawable & widget);
+		void drawWidget(gl::Drawable & widget);
 		void drawText(font::Text & text);
 	};
 }

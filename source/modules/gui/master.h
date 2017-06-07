@@ -17,7 +17,7 @@ namespace gui
 	class Master
 	{
 	private:
-		ngl::Window * window;
+		gl::GraphicsContext * glContext;
 
 		FontManager fontManager;
 		InputManager inputManger;
@@ -25,9 +25,9 @@ namespace gui
 
 		Widget root;
 
-		void sortWidgets(std::vector<ngl::Drawable*> & vector_widget, std::vector<font::Text*> & vector_text, Widget & widget);
+		void sortWidgets(std::vector<gl::Drawable*> & vector_widget, std::vector<font::Text*> & vector_text, Widget & widget);
 	public:
-		Master(ngl::Window * window);
+		Master(gl::GraphicsContext * glContext, input::InputController * inputController);
 
 		void update();
 

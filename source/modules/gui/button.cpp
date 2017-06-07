@@ -6,8 +6,8 @@ namespace gui
 	PushButton::PushButton(Widget * parent, ManagerInterface mInterface, W_Geometry geometry, W_Border border, unsigned int color, unsigned int hoverColor)
 		: Widget(parent, mInterface, geometry, color, border, W_Shadow{ 0, 0.0f })
 	{
-		this->primaryColor = ngl::toVec4(color);
-		this->secondaryColor = ngl::toVec4(hoverColor);
+		this->primaryColor = gl::toVec4(color);
+		this->secondaryColor = gl::toVec4(hoverColor);
 
 		geometry.position = gml::Vec2<float>();
 		color = 0x00u;

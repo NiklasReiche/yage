@@ -2,14 +2,14 @@
 
 namespace gui
 {
-	Master::Master(ngl::Window * window)
-		: window(window)
+	Master::Master(gl::GraphicsContext * glContext, input::InputController * inputController)
+		: glContext(glContext), fontManager(FontManager(glContext))
 	{
-		inputManger.initialize(window);
-		renderer = GuiRenderer(ngl::Viewport(0, 0, window->getWidth(), window->getHeight()));
+		inputManger.initialize(inputController);
+		renderer = GuiRenderer(glContext, gl::Viewport(0, 0, glContext->getWidth(), glContext->getHeight()));
 	}
 
-	void Master::sortWidgets(std::vector<ngl::Drawable*> & vector_widget, std::vector<font::Text*> & vector_text, Widget & widget)
+	void Master::sortWidgets(std::vector<gl::Drawable*> & vector_widget, std::vector<font::Text*> & vector_text, Widget & widget)
 	{
 		for (unsigned int i = 0; i < widget.getChildrenCount(); ++i)
 		{
@@ -26,7 +26,7 @@ namespace gui
 	{
 		inputManger.update(root);
 
-		std::vector<ngl::Drawable*> vector_widget;
+		std::vector<gl::Drawable*> vector_widget;
 		std::vector<font::Text*> vector_text;
 
 		sortWidgets(vector_widget, vector_text, root);

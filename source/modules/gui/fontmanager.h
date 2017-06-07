@@ -14,7 +14,7 @@ namespace gui
 		font::FontLoader fontLoader;
 		std::map<std::string, font::Font> fonts;
 	public:
-		FontManager() {}
+		FontManager(gl::GraphicsContext * glContext);
 
 		void addFont(std::string filename);
 		void removeFont(std::string name);

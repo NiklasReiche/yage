@@ -28,4 +28,13 @@ if(WIN32)
 
 	target_compile_definitions(YAGEfont PUBLIC "GL3")
 
+
+	add_library(YAGEgui STATIC ${gui_SRC})
+
+	target_link_libraries(YAGEgui PUBLIC YAGEcore
+								  PUBLIC YAGEimage
+								  PUBLIC YAGEfont)
+
+	target_compile_definitions(YAGEgui PUBLIC "GL3")
+
 endif()

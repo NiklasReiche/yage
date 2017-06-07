@@ -9,7 +9,6 @@
 #include "interface.h"
 #include "fontmanager.h"
 
-
 namespace gui
 {
 	struct W_Geometry
@@ -28,12 +27,12 @@ namespace gui
 		float hardness;
 	};
 
-	class Widget : public ngl::Drawable
+	class Widget : public gl::Drawable
 	{
 	friend class InputManager;
 
 	private:
-		void constructVertices(std::vector<Gfloat> & vertices);
+		void constructVertices(std::vector<gl::Gfloat> & vertices);
 
 	protected:
 		Widget* parent;
@@ -75,7 +74,7 @@ namespace gui
 		virtual void whileClickHold() {};
 
 		virtual void update() {};
-		void del();
+		//virtual void del() {}
 
 		/* Getter */
 		bool is_Active() { return isActive; }
@@ -99,12 +98,12 @@ namespace gui
 		void setPosition(gml::Vec2<float> position) { this->position = position; }
 		void setSize(gml::Vec2<float> size) { this->size = size; }
 
-		void setColor(int color) { this->color = ngl::toVec4(color); }
+		void setColor(int color) { this->color = gl::toVec4(color); }
 		void setColor(gml::Vec4<float> color) { this->color = color; }
 
-		void setBorder(W_Border border) { this->borderSize = border.size; this->borderColor = ngl::toVec4(border.color); }
+		void setBorder(W_Border border) { this->borderSize = border.size; this->borderColor = gl::toVec4(border.color); }
 		void setBorderSize(int size) { this->borderSize = size; }
-		void setBorderColor(unsigned int color) { this->borderColor = ngl::toVec4(color); }
+		void setBorderColor(unsigned int color) { this->borderColor = gl::toVec4(color); }
 
 		void setShadow(W_Shadow shadow) { this->shadowOffset = shadow.offset; this->shadowHardness = shadow.hardness; }
 		void setShadow(int offset) { this->shadowOffset = offset; }
