@@ -7,13 +7,13 @@ namespace gl
 {
 	class Renderer
 	{
-	private:
+	protected:
 		GraphicsContext* glContext;
 
-	protected:
 		Viewport default_viewport;
 		Framebuffer default_framebuffer;
 		Viewport framebuffer_viewport;
+
 		gml::Vec4<float> clearColor = gml::Vec4<float>(0.0f, 0.0f, 0.0f, 1.0f);
 
 	public:

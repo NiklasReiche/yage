@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fstream>
+
 #include "gl.h"
 
 namespace gl
