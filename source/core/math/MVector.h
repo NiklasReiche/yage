@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <cmath>
 
 const float PI = 3.141592653589793238463f;
 
@@ -286,7 +287,7 @@ namespace gml
 	}
 	template <typename T>
 	bool operator==(const Vector4D<T>& left, const Vector4D<T>& right) {
-		return left.x == right.x && left.y == right.y && left.z == right.z && left.w == right.w
+		return left.x == right.x && left.y == right.y && left.z == right.z && left.w == right.w;
 	}
 
 	template <typename T>
@@ -694,17 +695,17 @@ namespace gml
 		}
 		float rad = deg * (PI / 180);
 		vec = normalize(vec);
-		mat.value[0][0] = vec.x * vec.x * (1 - cos(rad)) + cos(rad);
-		mat.value[0][1] = vec.x * vec.y * (1 - cos(rad)) - vec.z * sin(rad);
-		mat.value[0][2] = vec.x * vec.z * (1 - cos(rad)) + vec.y * sin(rad);
+		mat.value[0][0] = vec.x * vec.x * (1 - std::cos(rad)) + std::cos(rad);
+		mat.value[0][1] = vec.x * vec.y * (1 - std::cos(rad)) - vec.z * sin(rad);
+		mat.value[0][2] = vec.x * vec.z * (1 - std::cos(rad)) + vec.y * sin(rad);
 
-		mat.value[1][0] = vec.y * vec.x * (1 - cos(rad)) + vec.z * sin(rad);
-		mat.value[1][1] = vec.y * vec.y * (1 - cos(rad)) + cos(rad);
-		mat.value[1][2] = vec.y * vec.z * (1 - cos(rad)) - vec.x * sin(rad);
+		mat.value[1][0] = vec.y * vec.x * (1 - std::cos(rad)) + vec.z * sin(rad);
+		mat.value[1][1] = vec.y * vec.y * (1 - std::cos(rad)) + std::cos(rad);
+		mat.value[1][2] = vec.y * vec.z * (1 - std::cos(rad)) - vec.x * sin(rad);
 
-		mat.value[2][0] = vec.z * vec.x * (1 - cos(rad)) - vec.y * sin(rad);
-		mat.value[2][1] = vec.z * vec.y * (1 - cos(rad)) + vec.x * sin(rad);
-		mat.value[2][2] = vec.z * vec.z * (1 - cos(rad)) + cos(rad);
+		mat.value[2][0] = vec.z * vec.x * (1 - std::cos(rad)) - vec.y * sin(rad);
+		mat.value[2][1] = vec.z * vec.y * (1 - std::cos(rad)) + vec.x * sin(rad);
+		mat.value[2][2] = vec.z * vec.z * (1 - std::cos(rad)) + std::cos(rad);
 		return mat;
 	}
 	template <typename T>
@@ -841,14 +842,14 @@ namespace gml
 		q.x = axis.x * s;
 		q.y = axis.y * s;
 		q.z = axis.z * s;
-		q.w = cos(rad / 2);
+		q.w = std::cos(rad / 2);
 		return q;
 	}
 	template <typename T>
 	Quaternion<T> eulerAngle(float yaw, float pitch, float roll) {
-		//Quaternion qroll = Quaternion(cos(angle_y / 2), sin(angle_y / 2), 0, 0);
-		//Quaternion qpitch = Quaternion(cos(angle_x / 2), 0, sin(angle_x / 2), 0);
-		//Quaternion qyaw = Quaternion(cos(angle_z / 2), 0, 0, sin(angle_z / 2));
+		//Quaternion qroll = Quaternion(std::cos(angle_y / 2), sin(angle_y / 2), 0, 0);
+		//Quaternion qpitch = Quaternion(std::cos(angle_x / 2), 0, sin(angle_x / 2), 0);
+		//Quaternion qyaw = Quaternion(std::cos(angle_z / 2), 0, 0, sin(angle_z / 2));
 		return Quaternion<T>();
 	}
 }
