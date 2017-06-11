@@ -1,4 +1,6 @@
-set(ANDROID_DUMMY TRUE)
+set(ANDROID TRUE)
+set(WIN32 0)
 
-set(NDK_DUMMY_PATH "C:/DEV/Android/sdk/ndk-bundle")
-set(NDK_DUMMY_INCLUDE "C:/DEV/Android/sdk/ndk-bundle/platforms/android-24/arch-arm/usr/include")
+set(CMAKE_ANDROID_API 24)
+set(CMAKE_ANDROID_ARCH_ABI "x86")
+set(CMAKE_ANDROID_NDK "C:/DEV/Android/sdk/ndk-bundle")
