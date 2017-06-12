@@ -2,8 +2,8 @@
 
 namespace gles2
 {
-	class GLES2_Drawable
+	class GLES2_Viewport
 	{
-		
+
 	};
 }

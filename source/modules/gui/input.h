@@ -17,8 +17,7 @@ namespace gui
 	class InputManager
 	{
 	private:
-		input::InputController * inputController;
-
+		input::InputListener * inputListener;
 		input::InputState* input;
 
 		bool isHoveredOver(Widget & widget);
@@ -28,5 +27,7 @@ namespace gui
 
 		void update(Widget & root);
 		void walkWidgets(Widget & widget, int level);
+
+		void onMouseEvent(input::MouseKeyCode, input::KeyAction);
 	};
 }

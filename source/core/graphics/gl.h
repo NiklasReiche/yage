@@ -9,17 +9,17 @@
 
 
 #ifdef GL3
-#include "GL3PLUS\gl3.h"
-#include "GL3PLUS\GL3_Exception.h"
-#include "GL3PLUS\GL3_Enum.h"
+#include "GL3\gl3.h"
+#include "GL3\GL3_Exception.h"
+#include "GL3\GL3_Enum.h"
 
-#include "GL3PLUS\GL3_Drawable.h"
-#include "GL3PLUS\GL3_Texture.h"
-#include "GL3PLUS\GL3_Framebuffer.h"
-#include "GL3PLUS\GL3_Shader.h"
-#include "GL3PLUS\GL3_Viewport.h"
+#include "GL3\GL3_Drawable.h"
+#include "GL3\GL3_Texture.h"
+#include "GL3\GL3_Framebuffer.h"
+#include "GL3\GL3_Shader.h"
+#include "GL3\GL3_Viewport.h"
 
-#include "GL3PLUS\GL3_Context.h"
+#include "GL3\GL3_Context.h"
 #endif // GL3
 
 #ifdef GLES2
@@ -72,5 +72,10 @@ namespace gl
 	typedef GLenum Genum;
 
 	typedef gles2::GLES2_Context GraphicsContext;
+	typedef gles2::GLES2_Drawable Drawable;
+	typedef gles2::GLES2_Shader Shader;
+	typedef gles2::GLES2_Texture Texture;
+	typedef gles2::GLES2_Framebuffer Framebuffer;
+	typedef gles2::GLES2_Viewport Viewport;
 #endif // GLES2
 }

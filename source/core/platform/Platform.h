@@ -1,16 +1,12 @@
 #pragma once
 
-#define DESKTOP
-
 #ifdef DESKTOP
-#include "desktop\GLFW_Handle.h"
+#include "desktop/GLFW_Handle.h"
 #endif
 
 #ifdef ANDROID
-#include "android\AndroidApp.h"
+#include "android/Android_Handle.h"
 #endif
-
-#include "desktop\Keyboard.h"
 
 namespace platform
 {
@@ -19,11 +15,6 @@ namespace platform
 #endif
 
 #ifdef ANDROID
-	typedef android::AndroidApp PlatformHandle;
+	typedef android::Android_Handle PlatformHandle;
 #endif
-
-	typedef glfw::KeyAction KeyAction;
-	typedef glfw::KeyCode KeyCode;
-	typedef glfw::MouseKeyCode MouseKeyCode;
-	typedef glfw::JoystickKeyCode JoystickKeyCode;
 }

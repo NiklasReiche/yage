@@ -72,37 +72,29 @@ namespace glfw
 	void GLFWHandle::onKeyEvent(int key, int scancode, int action, int mode)
 	{
 		try {
-			onKeyEventCallback(KeyCode(key), KeyAction(action));
+			onKeyEventCallback(key, action);
 		}
-		catch (std::bad_function_call) {
-
-		}
+		catch (std::bad_function_call) {}
 	}
-	void GLFWHandle::onMousePosEvent(double xpos, double ypos)
+	void GLFWHandle::onMousePosEvent(float xpos, float ypos)
 	{
 		try {
 			onMousePosEventCallback(xpos, ypos);
 		}
-		catch (std::bad_function_call) {
-
-		}
+		catch (std::bad_function_call) {}
 	}
 	void GLFWHandle::onMouseButtonEvent(int button, int action, int mods)
 	{
 		try {
-			onMouseButtonEventCallback(MouseKeyCode(button), KeyAction(action));
+			onMouseButtonEventCallback(button, action);
 		}
-		catch (std::bad_function_call) {
-
-		}
+		catch (std::bad_function_call) {}
 	}
-	void GLFWHandle::onMouseWheelEvent(double xoffset, double yoffset)
+	void GLFWHandle::onMouseWheelEvent(float xoffset, float yoffset)
 	{
 		try {
 			onMouseWheelEventCallback(xoffset, yoffset);
 		}
-		catch (std::bad_function_call) {
-
-		}
+		catch (std::bad_function_call) {}
 	}
 }

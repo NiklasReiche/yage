@@ -1,13 +1,54 @@
 #pragma once
 
-#include <GLFW\glfw3.h>
+#include <platform/Platform.h>
 
-namespace glfw
+namespace input
 {
+	enum class TouchAction;
+	enum class TouchState;
+	enum class TouchIndexCode;
+
+	enum class KeyAction;
+	enum class KeyState;
+	enum class KeyCode;
+	enum class MouseKeyCode;
+	enum class JoystickKeyCode;
+
+
+#ifdef ANDROID
+	enum class TouchAction
+	{
+		PRESS = AMOTION_EVENT_ACTION_DOWN,
+		RELEASE = AMOTION_EVENT_ACTION_UP,
+		CANCEL = AMOTION_EVENT_ACTION_CANCEL,
+		OUTSIDE = AMOTION_EVENT_ACTION_OUTSIDE
+	};
+	enum class KeyState
+	{
+		UP,
+		DOWN
+	};
+	enum class TouchIndexCode
+	{
+		TOUCH_INDEX_1,
+		TOUCH_INDEX_2,
+		TOUCH_INDEX_3,
+		TOUCH_INDEX_4,
+		TOUCH_INDEX_5
+	};
+#endif
+
+
+#ifdef DESKTOP
 	enum class KeyAction
 	{
 		PRESS = GLFW_PRESS,
 		RELEASE = GLFW_RELEASE
+	};
+	enum class KeyState
+	{
+		UP,
+		DOWN
 	};
 
 	enum class KeyCode
@@ -133,7 +174,6 @@ namespace glfw
 		KEY_RIGHT_SUPER = GLFW_KEY_RIGHT_SUPER,
 		KEY_MENU = GLFW_KEY_MENU
 	};
-
 	enum class MouseKeyCode
 	{
 		KEY_MOUSE_1 = GLFW_MOUSE_BUTTON_1,
@@ -145,7 +185,6 @@ namespace glfw
 		KEY_MOUSE_7 = GLFW_MOUSE_BUTTON_7,
 		KEY_MOUSE_8 = GLFW_MOUSE_BUTTON_8
 	};
-
 	enum class JoystickKeyCode
 	{
 		KEY_PAD_A = 1,
@@ -164,4 +203,5 @@ namespace glfw
 		KEY_PAD_LEFT = 14,
 		KEY_PAD_RIGHT = 15,
 	};
+#endif
 }

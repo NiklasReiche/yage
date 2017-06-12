@@ -9,89 +9,164 @@ namespace input
 		systemHandle->setOnMouseButtonEvent(std::bind(&InputController::onMouseButtonEvent, this, std::placeholders::_1, std::placeholders::_2));
 		systemHandle->setOnMousePosEvent(std::bind(&InputController::onMousePosEvent, this, std::placeholders::_1, std::placeholders::_2));
 		systemHandle->setOnMouseWheelEvent(std::bind(&InputController::onMouseWheelEvent, this, std::placeholders::_1, std::placeholders::_2));
+		systemHandle->setOnTouchEvent(std::bind(&InputController::onTouchEvent, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
 	}
 
 	void InputController::poll()
 	{
+		for (auto& func : funcs) func();
+		funcs.clear();
 		systemHandle->pollEvents();
 	}
 
-	void InputController::onKeyEvent(platform::KeyCode key, platform::KeyAction action)
+	InputListener* InputController::addListener()
 	{
-		std::map<platform::KeyCode, KeyState>::iterator it = input.keyboardKeys.find(key);
-
-		if (it == std::end(input.keyboardKeys))
-		{
-			if (action == platform::KeyAction::PRESS) {
-				input.keyboardKeys[key] = KeyState::PRESS;
-			}
-			else if (action == platform::KeyAction::RELEASE) {
-				input.keyboardKeys[key] = KeyState::RELEASE;
-			}
-		}
-		else {
-			KeyState keyState = it->second;
-
-			if ((keyState == KeyState::RELEASE || keyState == KeyState::IDLE) && action == platform::KeyAction::PRESS) {
-				input.keyboardKeys.at(key) = KeyState::PRESS;
-			}
-			else if (keyState == KeyState::PRESS && action == platform::KeyAction::PRESS) {
-				input.keyboardKeys.at(key) = KeyState::HOLD;
-			}
-			else if ((keyState == KeyState::PRESS || keyState == KeyState::HOLD) && action == platform::KeyAction::RELEASE) {
-				input.keyboardKeys.at(key) = KeyState::RELEASE;
-			}
-			else if (keyState == KeyState::RELEASE && action == platform::KeyAction::RELEASE) {
-				input.keyboardKeys.at(key) = KeyState::IDLE;
-			}
-		}
+		listeners[listenerId] = InputListener(listenerId);
+		listeners[listenerId].controller = this;
+		listenerId++;
+		return &listeners.at(listenerId - 1);
+	}
+	void InputController::removeListener(InputListener* listener)
+	{
+		listeners.erase(listener->id);
 	}
 
-	void InputController::onMousePosEvent(double xpos, double ypos)
+	void InputController::onKeyEvent(int _key, int _action)
+	{
+#ifdef DESKTOP
+		KeyAction action = KeyAction(_action);
+		KeyCode key = KeyCode(_key);
+
+		KeyState lastState = input.getKey(key);
+		KeyState newState;
+		if (action == KeyAction::PRESS && lastState == KeyState::UP) {
+			newState = KeyState::DOWN;
+			funcs.push_back(std::bind(&InputController::onMouseButtonEvent, this, _key, _action));
+		}
+		else if (action == KeyAction::PRESS && lastState == KeyState::DOWN) {
+			newState = KeyState::DOWN;
+		}
+		else if (action == KeyAction::RELEASE && lastState == KeyState::DOWN) {
+			newState = KeyState::UP;
+			funcs.push_back(std::bind(&InputController::onMouseButtonEvent, this, _key, _action));
+		}
+		else if (action == KeyAction::RELEASE && lastState == KeyState::UP) {
+			newState = KeyState::UP;
+		}
+
+		input.keyboardKeys[key] = newState;
+		input.keyboardKeysLast[key] = lastState;
+
+
+		for (auto const &listener : listeners)
+		{
+			try {
+				listener.second.onKeyEventCallback(key, action);
+			}
+			catch (std::bad_function_call) {}
+		}
+#endif
+	}
+
+	void InputController::onMousePosEvent(float xpos, float ypos)
 	{
 		input.mousePos.x = xpos;
 		input.mousePos.y = ypos;
+
+		for (auto const &listener : listeners)
+		{
+			try {
+				listener.second.onMousePosEventCallback(xpos, ypos);
+			}
+			catch (std::bad_function_call) {}
+		}
 	}
 
-	void InputController::onMouseWheelEvent(double xoffset, double yoffset)
+	void InputController::onMouseWheelEvent(float xoffset, float yoffset)
 	{
 		input.mouseWheelOffset.x = xoffset;
 		input.mouseWheelOffset.y = yoffset;
-	}
 
-	void InputController::onMouseButtonEvent(platform::MouseKeyCode key, platform::KeyAction action)
-	{
-		std::map<platform::MouseKeyCode, KeyState>::iterator it = input.mouseKeys.find(key);
-
-		if (it == std::end(input.mouseKeys))
+		for (auto const &listener : listeners)
 		{
-			if (action == platform::KeyAction::PRESS) {
-				input.mouseKeys[key] = KeyState::PRESS;
+			try {
+				listener.second.onMouseWheelEventCallback(xoffset, yoffset);
 			}
-			else if (action == platform::KeyAction::RELEASE) {
-				input.mouseKeys[key] = KeyState::RELEASE;
-			}
-		}
-		else {
-			KeyState keyState = it->second;
-
-			if ((keyState == KeyState::RELEASE || keyState == KeyState::IDLE) && action == platform::KeyAction::PRESS) {
-				input.mouseKeys.at(key) = KeyState::PRESS;
-			}
-			else if (keyState == KeyState::PRESS && action == platform::KeyAction::PRESS) {
-				input.mouseKeys.at(key) = KeyState::HOLD;
-			}
-			else if ((keyState == KeyState::PRESS || keyState == KeyState::HOLD) && action == platform::KeyAction::RELEASE) {
-				input.mouseKeys.at(key) = KeyState::RELEASE;
-			}
-			else if (keyState == KeyState::RELEASE && action == platform::KeyAction::RELEASE) {
-				input.mouseKeys.at(key) = KeyState::IDLE;
-			}
+			catch (std::bad_function_call) {}
 		}
 	}
 
-	void InputController::onTouchEvent(double xpos, double ypos)
+	void InputController::onMouseButtonEvent(int _key, int _action)
 	{
+#ifdef DESKTOP
+		KeyAction action = KeyAction(_action);
+		MouseKeyCode key = MouseKeyCode(_key);
 
+		KeyState lastState = input.getMouseKey(key);
+		KeyState newState;
+		if (action == KeyAction::PRESS && lastState == KeyState::UP) {
+			newState = KeyState::DOWN;
+			funcs.push_back(std::bind(&InputController::onMouseButtonEvent, this, _key, _action));
+		}
+		else if (action == KeyAction::PRESS && lastState == KeyState::DOWN) {
+			newState = KeyState::DOWN;
+		}
+		else if (action == KeyAction::RELEASE && lastState == KeyState::DOWN) {
+			newState = KeyState::UP;
+			funcs.push_back(std::bind(&InputController::onMouseButtonEvent, this, _key, _action));
+		}
+		else if (action == KeyAction::RELEASE && lastState == KeyState::UP) {
+			newState = KeyState::UP;
+		}
+
+		input.mouseKeys[key] = newState;
+		input.mouseKeysLast[key] = lastState;
+
+
+		for (auto const &listener : listeners)
+		{
+			try {
+				listener.second.onMouseButtonEventCallback(key, action);
+			}
+			catch (std::bad_function_call) {}
+		}
+#endif
+	}
+
+	void InputController::onTouchEvent(float xpos, float ypos, int index, int _action)
+	{
+#ifdef ANDROID
+		TouchAction action = TouchAction(action);
+		TouchIndexCode key = TouchIndexCode(index);
+
+		KeyState lastState = input.getTouchState(key);
+		KeyState newState;
+		if (action == KeyAction::PRESS && lastState == KeyState::UP) {
+			newState = KeyState::DOWN;
+			funcs.push_back(std::bind(&InputController::onMouseButtonEvent, this, xpos, ypos, _key, _action));
+		}
+		else if (action == KeyAction::PRESS && lastState == KeyState::DOWN) {
+			newState = KeyState::DOWN;
+		}
+		else if (action == KeyAction::RELEASE && lastState == KeyState::DOWN) {
+			newState = KeyState::UP;
+			funcs.push_back(std::bind(&InputController::onMouseButtonEvent, this, xpos, ypos, _key, _action));
+		}
+		else if (action == KeyAction::RELEASE && lastState == KeyState::UP) {
+			newState = KeyState::UP;
+		}
+
+		input.touchAction[key] = newState;
+		input.touchActionLast[key] = lastState;
+
+
+		for (auto const &listener : listeners)
+		{
+			try {
+				listener.second.onTouchEventCallback(xpos, ypos, key, action);
+			}
+			catch (std::bad_function_call) {}
+		}
+#endif
 	}
 }

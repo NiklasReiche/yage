@@ -4,7 +4,6 @@
 
 #include <GLFW\glfw3.h>
 #include "GLFW_Callback.h"
-#include "Keyboard.h"
 
 #include <platform\GenericHandle.h>
 
@@ -15,10 +14,10 @@ namespace glfw
 	private:
 		GLFWwindow* glfwWindow;
 
-		std::function<void(KeyCode, KeyAction)> onKeyEventCallback;
-		std::function<void(double, double)> onMousePosEventCallback;
-		std::function<void(MouseKeyCode, KeyAction)> onMouseButtonEventCallback;
-		std::function<void(double, double)> onMouseWheelEventCallback;
+		std::function<void(int, int)> onKeyEventCallback;
+		std::function<void(float, float)> onMousePosEventCallback;
+		std::function<void(int, int)> onMouseButtonEventCallback;
+		std::function<void(float, float)> onMouseWheelEventCallback;
 
 	public:
 		GLFWHandle();
@@ -26,22 +25,22 @@ namespace glfw
 
 		void createContext(int width, int height, std::string title = "OpenGL", int versionMajor = 3, int versionMinor = 3);
 
-		void showWindow();
-		void hideWindow();
 		void makeCurrent();
 		void pollEvents();
 		void swapBuffers();
+		void showWindow();
+		void hideWindow();
 
 		int shouldDestroy();
 
 		void onKeyEvent(int key, int scancode, int action, int mode);
-		void onMousePosEvent(double xpos, double ypos);
+		void onMousePosEvent(float xpos, float ypos);
 		void onMouseButtonEvent(int button, int action, int mods);
-		void onMouseWheelEvent(double xoffset, double yoffset);
+		void onMouseWheelEvent(float xoffset, float yoffset);
 
-		void setOnKeyEvent(std::function<void(KeyCode, KeyAction)> callback) { onKeyEventCallback = callback; }
-		void setOnMousePosEvent(std::function<void(double, double)> callback) { onMousePosEventCallback = callback; }
-		void setOnMouseButtonEvent(std::function<void(MouseKeyCode, KeyAction)> callback) { onMouseButtonEventCallback = callback; }
-		void setOnMouseWheelEvent(std::function<void(double, double)> callback) { onMouseWheelEventCallback = callback; }
+		void setOnKeyEvent(std::function<void(int, int)> callback) { onKeyEventCallback = callback; }
+		void setOnMousePosEvent(std::function<void(float, float)> callback) { onMousePosEventCallback = callback; }
+		void setOnMouseButtonEvent(std::function<void(int, int)> callback) { onMouseButtonEventCallback = callback; }
+		void setOnMouseWheelEvent(std::function<void(float, float)> callback) { onMouseWheelEventCallback = callback; }
 	};
 }

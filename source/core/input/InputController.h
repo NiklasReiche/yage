@@ -1,9 +1,13 @@
 #pragma once
 
 #include <functional>
+#include <map>
+#include <vector>
 
-#include <platform\Platform.h>
+#include <platform/Platform.h>
 #include "InputState.h"
+#include "InputNames.h"
+#include "InputListener.h"
 
 namespace input
 {
@@ -11,7 +15,12 @@ namespace input
 	{
 	private:
 		platform::PlatformHandle* systemHandle;
+
 		InputState input;
+		std::vector<std::function<void()>> funcs;
+
+		int listenerId = 0;
+		std::map<int, InputListener> listeners;
 
 	public:
 		InputController(platform::PlatformHandle* systemHandle);
@@ -19,12 +28,13 @@ namespace input
 		void poll();
 		InputState* getInput() { return &input; }
 
-		void onKeyEvent(platform::KeyCode key, platform::KeyAction action);
+		InputListener* addListener();
+		void removeListener(InputListener* listener);
 
-		void onMousePosEvent(double xpos, double ypos);
-		void onMouseWheelEvent(double xoffset, double yoffset);
-		void onMouseButtonEvent(platform::MouseKeyCode key, platform::KeyAction action);
-
-		void onTouchEvent(double xpos, double ypos);
+		void onKeyEvent(int key, int action);
+		void onMousePosEvent(float xpos, float ypos);
+		void onMouseWheelEvent(float xoffset, float yoffset);
+		void onMouseButtonEvent(int key, int action);
+		void onTouchEvent(float xpos, float ypos, int index, int action);
 	};
 }

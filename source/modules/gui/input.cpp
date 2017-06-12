@@ -4,12 +4,12 @@ namespace gui
 {
 	void InputManager::initialize(input::InputController * inputController)
 	{
-		this->inputController = inputController;
+		this->inputListener = inputController->addListener();
 	}
 
 	void InputManager::update(Widget & root)
 	{
-		input = inputController->getInput();
+		input = inputListener->getInput();
 		
 		walkWidgets(root, 0);
 	}
@@ -39,10 +39,10 @@ namespace gui
 					child.isHovered = false;
 					child.onHoverRelease();
 				}
-				if (child.isHovered && input->getMouseKey(input::MouseKeyCode::KEY_MOUSE_1) == input::KeyState::PRESS) {
+				if (child.isHovered && input->getMouseKey(input::MouseKeyCode::KEY_MOUSE_1) == input::KeyState::DOWN && input->getMouseKeyLast(input::MouseKeyCode::KEY_MOUSE_1) == input::KeyState::UP) {
 					child.onClick();
 				}
-				else if (child.isHovered &&  input->getMouseKey(input::MouseKeyCode::KEY_MOUSE_1) == input::KeyState::RELEASE) {
+				else if (child.isHovered && input->getMouseKey(input::MouseKeyCode::KEY_MOUSE_1) == input::KeyState::UP && input->getMouseKeyLast(input::MouseKeyCode::KEY_MOUSE_1) == input::KeyState::DOWN) {
 					child.onClickRelease();
 				}
 
@@ -52,5 +52,10 @@ namespace gui
 				walkWidgets(child, level);
 			}
 		}
+	}
+
+	void InputManager::onMouseEvent(input::MouseKeyCode, input::KeyAction)
+	{
+		
 	}
 }

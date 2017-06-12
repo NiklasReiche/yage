@@ -1,4 +1,7 @@
+#define DESKTOP
+#define GL3
 #include <graphics\Graphics.h>
+#include <platform\Platform.h>
 #include <input\InputController.h>
 #include <gui\gui.h>
 
@@ -34,14 +37,18 @@ int main()
 
 	gl::GraphicsContext glContext(&platformHandle, 500, 500);
 	glContext.makeCurrent();
+	glContext.showWindow();
+
 	input::InputController inputController(&platformHandle);
+
+	input::InputListener* listener = inputController.addListener();
 
 	GuiTest gui(&glContext, &inputController);
 	
-	glContext.showWindow();
 	while (!glContext.getCloseFlag())
 	{
-		std::cout << inputController.getInput()->getMousePos() << std::endl;
+		std::cout << (int)listener->getInput()->getMouseKey(input::MouseKeyCode::KEY_MOUSE_1) << " " << (int)listener->getInput()->getMouseKeyLast(input::MouseKeyCode::KEY_MOUSE_1) << std::endl;
+
 		gui.master->update();
 
 		glContext.swapBuffers();
