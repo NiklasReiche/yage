@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 # output directories
 if(ANDROID)
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/android/${CMAKE_ANDROID_ARCH_ABI})
+	#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/android/${CMAKE_ANDROID_ARCH_ABI})
 elseif(WIN32)
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/win)
 	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/win)
@@ -13,19 +13,19 @@ elseif(WIN32)
 endif()
 
 
+set( YAGE_CORE_PATH "${CMAKE_SOURCE_DIR}/source/core" )
+set( YAGE_MODULES_PATH "${CMAKE_SOURCE_DIR}/source/modules" )
+set( YAGE_CMAKE_PATH "${CMAKE_SOURCE_DIR}/Cmake"  )
+
 # include directories
-include_directories("source/core")
-include_directories("source/modules")
+include_directories( ${YAGE_CORE_PATH} )
+include_directories( ${YAGE_MODULES_PATH} )
 
 if(ANDROID)
-	include_directories("${CMAKE_ANDROID_NDK}/platforms/android-${CMAKE_ANDROID_API}/arch-${CMAKE_ANDROID_ARCH_ABI}/usr/include")
+	include_directories("${CMAKE_ANDROID_NDK}/sysroot/usr/include")
 elseif(WIN32)
 	include_directories("external/include")
 endif()
-
-if(ANDROID_DUMMY)
-	include_directories(${NDK_DUMMY_INCLUDE})
-endif(ANDROID_DUMMY)
 
 
 # link directories
@@ -40,7 +40,7 @@ endif()
 add_subdirectory(source/core)
 add_subdirectory(source/modules)
 
-if(WIN32)
+if(WIN32 AND NOT ANDROID)
 	add_subdirectory(tests/graphics)
 	add_subdirectory(tests/image)
 	add_subdirectory(tests/font)
