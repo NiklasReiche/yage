@@ -16,7 +16,7 @@ namespace glfw
 	void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	{
 		GLFWHandle* handle = (GLFWHandle*)glfwGetWindowUserPointer(window);
-		handle->onMousePosEvent(xpos, ypos);
+		handle->onMousePosEvent((float)xpos, (float)ypos);
 	}
 	void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	{
@@ -26,6 +26,6 @@ namespace glfw
 	void mouse_wheel_callback(GLFWwindow* window, double xoffset, double yoffset)
 	{
 		GLFWHandle* handle = (GLFWHandle*)glfwGetWindowUserPointer(window);
-		handle->onMouseWheelEvent(xoffset, yoffset);
+		handle->onMouseWheelEvent((float)xoffset, (float)yoffset);
 	}
 }
