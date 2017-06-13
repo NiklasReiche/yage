@@ -77,7 +77,7 @@ namespace font
 		}
 
 		font.textureAtlas = glContext->create2DTexture(&fontfile.sdf[0], fontfile.sdfinfo.width, fontfile.sdfinfo.height, gl::ImageFormat::R, 1);
-		font.textureAtlas.configTextureWrapper(gl::TextureWrapper::CLAMP_TO_BORDER, gl::TextureWrapper::CLAMP_TO_BORDER);
+		font.textureAtlas.configTextureWrapper(gl::TextureWrapper::CLAMP_TO_EDGE, gl::TextureWrapper::CLAMP_TO_EDGE);
 		font.textureAtlas.configTextureFilter(gl::TextureFilter::LINEAR, gl::TextureFilter::LINEAR);
 
 		return font;

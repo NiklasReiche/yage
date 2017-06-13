@@ -8,7 +8,6 @@
 #include "font.h"
 #include "fileformat.h"
 
-#include <image\img.h>
 #include <graphics\Graphics.h>
 
 namespace font

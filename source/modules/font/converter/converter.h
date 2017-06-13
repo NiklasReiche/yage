@@ -14,8 +14,8 @@
 #include <graphics\Graphics.h>
 #include <image\img.h>
 
-#include "fileformat.h"
-#include "font.h"
+#include "../fileformat.h"
+#include "../font.h"
 #include "ftMath.h"
 
 
