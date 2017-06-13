@@ -22,6 +22,7 @@ if(ANDROID)
 								   liblog.so)
 
 	target_compile_definitions(YAGEcore PUBLIC "ANDROID")
+	target_compile_definitions(YAGEcore PUBLIC "GLES2")
 
 elseif(WIN32)
 	add_library(YAGEcore STATIC ${YAGE_MATH_SOURCE}
@@ -39,5 +40,6 @@ elseif(WIN32)
 								   PUBLIC glfw32sMD_d.lib)
 
 	target_compile_definitions(YAGEcore PUBLIC "DESKTOP")
+	target_compile_definitions(YAGEcore PUBLIC "GL3")
 
 endif()
