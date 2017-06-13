@@ -5,7 +5,6 @@
 
 namespace gl
 {
-#ifdef GL3
 	class Renderer
 	{
 	protected:
@@ -48,5 +47,4 @@ namespace gl
 			glContext->draw(default_framebuffer);
 		}
 	};
-#endif
 }

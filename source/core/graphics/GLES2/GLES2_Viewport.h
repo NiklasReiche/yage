@@ -2,8 +2,13 @@
 
 namespace gles2
 {
-	class GLES2_Viewport
+	struct GLES2_Viewport
 	{
+		int x, y;	// Top Left Corner
+		int width, height;
 
+		GLES2_Viewport() {}
+		GLES2_Viewport(int x, int y, int width, int height)
+			: x(x), y(y), width(width), height(height) {}
 	};
 }

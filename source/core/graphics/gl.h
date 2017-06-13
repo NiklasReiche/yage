@@ -1,13 +1,5 @@
 #pragma once
 
-
-#ifndef GL3
-#ifndef GLES2
-#define GL3
-#endif
-#endif
-
-
 #ifdef GL3
 #include "GL3\gl3.h"
 #include "GL3\GL3_Exception.h"
@@ -25,7 +17,12 @@
 #ifdef GLES2
 #include "GLES2\gles2.h"
 
+#include "GLES2\GLES2_Enum.h"
 #include "GLES2\GLES2_Drawable.h"
+#include "GLES2\GLES2_Texture.h"
+#include "GLES2\GLES2_Framebuffer.h"
+#include "GLES2\GLES2_Shader.h"
+#include "GLES2\GLES2_Viewport.h"
 
 #include "GLES2\GLES2_Context.h"
 #endif // GLES2
@@ -77,5 +74,18 @@ namespace gl
 	typedef gles2::GLES2_Texture Texture;
 	typedef gles2::GLES2_Framebuffer Framebuffer;
 	typedef gles2::GLES2_Viewport Viewport;
+
+	typedef gles2::ImageFormat ImageFormat;
+	typedef gles2::InternalFormat InternalFormat;
+	typedef gles2::PixelType PixelType;
+	typedef gles2::TextureType TextureType;
+	typedef gles2::TextureFilter TextureFilter;
+	typedef gles2::MipmapOption MipmapOption;
+	typedef gles2::VertexFormat VertexFormat;
+	typedef gles2::DrawMode DrawMode;
+	typedef gles2::BufferType BufferType;
+	typedef gles2::RenderFlag RenderFlag;
+	typedef gles2::PrimitiveType PrimitiveType;
+	typedef gles2::TextureWrapper TextureWrapper;
 #endif // GLES2
 }

@@ -47,16 +47,25 @@ set( YAGE_GRAPHICS_GLES2_SOURCE
 
 	"${YAGE_CORE_PATH}/graphics/GLES2/gles2.h"
 	
+	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Enum.h"
+	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_State.h"
+
+	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Object.h"
+
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Drawable.h"
+	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Drawable.cpp"
 
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Framebuffer.h"
 
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Shader.h"
+	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Shader.cpp"
 
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Texture.h"
+	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Texture.cpp"
 
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Viewport.h"
 
+	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_UnitShader.h"
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Context.h"
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Context.cpp"
 
