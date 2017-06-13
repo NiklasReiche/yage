@@ -43,6 +43,8 @@ namespace android
 		EGLSurface eglSurface;
 		EGLContext eglContext;
 
+		AAssetManager* assetManager;
+
 		void checkError(std::string msg);
 
 	public:
@@ -60,6 +62,7 @@ namespace android
 		int shouldDestroy();
 
 		void log(std::string msg, std::string logTag = "LOG");
+		void read(std::string filename, std::stringstream & output);
 
 		void setonAppStart(std::function<void()> callback) { callbacks.onAppStart = callback; }
 		void setOnAppResume(std::function<void()> callback) { callbacks.onAppResume = callback; }

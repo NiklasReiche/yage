@@ -112,6 +112,8 @@ namespace android
 		app->userData = this;
 		app->onAppCmd = handleCommand;
 		app->onInputEvent = handleInputEvent;
+
+		assetManager = app->activity->assetManager;
 	}
 	Android_Handle::~Android_Handle()
 	{
@@ -222,5 +224,28 @@ namespace android
 		std::string tmp = str.str();
 		const char* cmsg = tmp.c_str();
 		__android_log_print(ANDROID_LOG_DEBUG, logTag.c_str(), "%s", cmsg);
+	}
+
+	void Android_Handle::read(std::string filename, std::stringstream & output)
+	{
+		// Open your file
+		AAsset* file = AAssetManager_open(assetManager, filename.c_str(), AASSET_MODE_BUFFER);
+		// Get the file length
+		size_t fileLength = AAsset_getLength(file);
+
+		// Allocate memory to read your file
+		char* fileContent = new char[fileLength + 1];
+
+		// Read your file
+		AAsset_read(file, fileContent, fileLength);
+		// For safety you can add a 0 terminating character at the end of your file ...
+		fileContent[fileLength] = '\0';
+
+		// Do whatever you want with the content of the file
+		output = std::stringstream(fileContent);
+
+		// Free the memoery you allocated earlier
+		delete[] fileContent;
+		AAsset_close(file);
 	}
 }
