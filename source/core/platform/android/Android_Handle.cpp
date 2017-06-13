@@ -174,7 +174,12 @@ namespace android
 		eglSurface = eglCreateWindowSurface(eglDisplay, config, app->window, NULL);
 		checkError("eglCreateWindowSurface");
 
-		eglContext = eglCreateContext(eglDisplay, config, NULL, NULL);
+		EGLint contextAttribs[] =
+		{
+			EGL_CONTEXT_CLIENT_VERSION, 2, // Specifies OpenGL ES 2.0.
+			EGL_NONE
+		};
+		eglContext = eglCreateContext(eglDisplay, config, NULL, contextAttribs);
 		checkError("eglCreateContext");
 
 		eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext);
