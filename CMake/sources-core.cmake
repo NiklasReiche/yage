@@ -13,7 +13,6 @@ set( YAGE_GRAPHICS_SOURCE
 	"${YAGE_CORE_PATH}/graphics/gl.h"
 	"${YAGE_CORE_PATH}/graphics/Color.h"
 	"${YAGE_CORE_PATH}/graphics/Renderer.h"
-	"${YAGE_CORE_PATH}/graphics/ShaderLoader.h"
 	"${YAGE_CORE_PATH}/graphics/Graphics.h"
 
 )
@@ -42,6 +41,9 @@ set( YAGE_GRAPHICS_GL3_SOURCE
 	"${YAGE_CORE_PATH}/graphics/GL3/GL3_Context.h"
 	"${YAGE_CORE_PATH}/graphics/GL3/GL3_Context.cpp"
 
+	"${YAGE_CORE_PATH}/graphics/GL3/GL3_ShaderLoader.h"
+	"${YAGE_CORE_PATH}/graphics/GL3/GL3_ShaderLoader.cpp"
+
 )
 set( YAGE_GRAPHICS_GLES2_SOURCE
 
@@ -68,6 +70,9 @@ set( YAGE_GRAPHICS_GLES2_SOURCE
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_UnitShader.h"
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Context.h"
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Context.cpp"
+
+	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_ShaderLoader.h"
+	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_ShaderLoader.cpp"
 
 )
 

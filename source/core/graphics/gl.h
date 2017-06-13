@@ -12,6 +12,7 @@
 #include "GL3\GL3_Viewport.h"
 
 #include "GL3\GL3_Context.h"
+#include "GL3\GL3_ShaderLoader.h"
 #endif // GL3
 
 #ifdef GLES2
@@ -25,6 +26,7 @@
 #include "GLES2\GLES2_Viewport.h"
 
 #include "GLES2\GLES2_Context.h"
+#include "GLES2\GLES2_ShaderLoader.h"
 #endif // GLES2
 
 namespace gl
@@ -44,6 +46,7 @@ namespace gl
 	typedef gl3::GL3_Texture Texture;
 	typedef gl3::GL3_Framebuffer Framebuffer;
 	typedef gl3::Viewport Viewport;
+	typedef gl3::GL3_ShaderLoader ShaderLoader;
 
 	typedef gl3::ImageFormat ImageFormat;
 	typedef gl3::InternalFormat InternalFormat;
@@ -74,6 +77,7 @@ namespace gl
 	typedef gles2::GLES2_Texture Texture;
 	typedef gles2::GLES2_Framebuffer Framebuffer;
 	typedef gles2::GLES2_Viewport Viewport;
+	typedef gles2::GLES2_ShaderLoader ShaderLoader;
 
 	typedef gles2::ImageFormat ImageFormat;
 	typedef gles2::InternalFormat InternalFormat;
