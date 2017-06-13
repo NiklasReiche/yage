@@ -58,7 +58,7 @@ namespace gl3
 		case ImageFormat::RGBA:
 			return InternalFormat::RGBA8;
 		default:
-			return InternalFormat::ERROR;
+			return InternalFormat::UNDEFINED;
 		}
 	}
 	int GL3_Context::convertToChannelSize(ImageFormat format)
