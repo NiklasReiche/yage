@@ -41,14 +41,14 @@ namespace input
 		KeyState newState;
 		if (action == KeyAction::PRESS && lastState == KeyState::UP) {
 			newState = KeyState::DOWN;
-			funcs.push_back(std::bind(&InputController::onMouseButtonEvent, this, _key, _action));
+			funcs.push_back(std::bind(&InputController::onKeyEvent, this, _key, _action));
 		}
 		else if (action == KeyAction::PRESS && lastState == KeyState::DOWN) {
 			newState = KeyState::DOWN;
 		}
 		else if (action == KeyAction::RELEASE && lastState == KeyState::DOWN) {
 			newState = KeyState::UP;
-			funcs.push_back(std::bind(&InputController::onMouseButtonEvent, this, _key, _action));
+			funcs.push_back(std::bind(&InputController::onKeyEvent, this, _key, _action));
 		}
 		else if (action == KeyAction::RELEASE && lastState == KeyState::UP) {
 			newState = KeyState::UP;
@@ -141,18 +141,18 @@ namespace input
 
 		KeyState lastState = input.getTouchState(key);
 		KeyState newState;
-		if (action == KeyAction::PRESS && lastState == KeyState::UP) {
+		if (action == TouchAction::PRESS && lastState == KeyState::UP) {
 			newState = KeyState::DOWN;
-			funcs.push_back(std::bind(&InputController::onMouseButtonEvent, this, xpos, ypos, _key, _action));
+			funcs.push_back(std::bind(&InputController::onTouchEvent, this, xpos, ypos, index, _action));
 		}
-		else if (action == KeyAction::PRESS && lastState == KeyState::DOWN) {
+		else if (action == TouchAction::PRESS && lastState == KeyState::DOWN) {
 			newState = KeyState::DOWN;
 		}
-		else if (action == KeyAction::RELEASE && lastState == KeyState::DOWN) {
+		else if (action == TouchAction::RELEASE && lastState == KeyState::DOWN) {
 			newState = KeyState::UP;
-			funcs.push_back(std::bind(&InputController::onMouseButtonEvent, this, xpos, ypos, _key, _action));
+			funcs.push_back(std::bind(&InputController::onTouchEvent, this, xpos, ypos, index, _action));
 		}
-		else if (action == KeyAction::RELEASE && lastState == KeyState::UP) {
+		else if (action == TouchAction::RELEASE && lastState == KeyState::UP) {
 			newState = KeyState::UP;
 		}
 
