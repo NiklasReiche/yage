@@ -6,7 +6,7 @@ namespace gl3
 {
 	enum class InternalFormat
 	{
-		ERROR = 0,
+		UNDEFINED = 0,
 		R8 = GL_R8,
 		RG8 = GL_RG8,
 		RGB8 = GL_RGB8,
