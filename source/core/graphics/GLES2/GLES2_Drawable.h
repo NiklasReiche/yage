@@ -32,5 +32,8 @@ namespace gles2
 		GLint nVertices;
 		PrimitiveType primitive;
 		DrawMode usage;
+
+	public:
+		void bufferSubData(int offset, std::vector<GLfloat> & vertices);
 	};
 }
