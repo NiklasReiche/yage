@@ -14,7 +14,7 @@ namespace gles2
 		try {
 			std::stringstream vertexFile, fragmentFile;
 			systemHandle->read(vertex_path, vertexFile);
-			systemHandle->read(vertex_path, fragmentFile);
+			systemHandle->read(fragment_path, fragmentFile);
 
 			while (getline(vertexFile, vertexCodeLine))
 			{
