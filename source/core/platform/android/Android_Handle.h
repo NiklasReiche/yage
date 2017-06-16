@@ -7,13 +7,13 @@
 #include <vector>
 
 #include <EGL/egl.h>
-//#include <EGL/eglext.h>
 #include <android/log.h>
 #include <android/input.h>
 
 #include <platform/GenericHandle.h>
 
 #include "android_native_app_glue.h"
+#include "Android_File.h"
 
 namespace android
 {
@@ -62,6 +62,9 @@ namespace android
 		int shouldDestroy();
 
 		void log(std::string msg, std::string logTag = "LOG");
+		void log(std::stringstream sstream);
+
+		Android_File open(std::string filename);
 		void read(std::string filename, std::stringstream & output);
 
 		void setonAppStart(std::function<void()> callback) { callbacks.onAppStart = callback; }

@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "core.h"
-#include "widget.h"
+#include "../core.h"
+#include "../Widget.h"
 
 namespace gui
 {

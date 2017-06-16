@@ -22,9 +22,9 @@ namespace font
 	private:
 		gl::Texture textureAtlas;
 
-		gml::Vector2D<float> position;
-		gml::Vector2D<float> size;
-		gml::Vector4D<float> color;
+		gml::Vec2<float> position;
+		gml::Vec2<float> size;
+		gml::Vec4<float> color;
 
 		std::string text;
 		int fontSize = 16;
@@ -46,9 +46,9 @@ namespace font
 		Text(){}
 		Text(gl::GraphicsContext* glContext, std::string text, const Font & font, gml::Vec2<float> position = gml::Vec2<float>(0.0f), unsigned int color = 0x000000FFu, int size = 14);
 
-		gml::Vector2D<float> getSize() { return size; }
-		gml::Vector2D<float> getPosition() { return position; }
-		gml::Vector4D<float> getColor() { return color; }
+		gml::Vec2<float> getSize() { return size; }
+		gml::Vec2<float> getPosition() { return position; }
+		gml::Vec4<float> getColor() { return color; }
 
 		void setText(std::string text, const Font & font);
 		void appendText(std::string text, const Font & font);

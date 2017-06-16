@@ -78,8 +78,12 @@ namespace gles2
 
 		// --- Internal initialization ---
 		GLES2_UnitShaderTemplate UnitShaderTemplate;
-		unitDrawable = createDrawable(UnitShaderTemplate.vertices, UnitShaderTemplate.vertexLayout, UnitShaderTemplate.mode);
 		unitShader = compileShader(UnitShaderTemplate.vertexCode, UnitShaderTemplate.fragmentCode, UnitShaderTemplate.shaderAttributes);
+		unitShader.setUniform("screenTexture", 0);
+		unitDrawable = createDrawable(UnitShaderTemplate.vertices, UnitShaderTemplate.vertexLayout, UnitShaderTemplate.mode);
+		
+		glState.window_width = width;
+		glState.window_height = height;
 	}
 	GLES2_Context::~GLES2_Context()
 	{
@@ -192,7 +196,7 @@ namespace gles2
 		// Create empty Texture
 		glGenTextures(1, &buffer.colorTexture);
 		glBindTexture(GL_TEXTURE_2D, buffer.colorTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -200,18 +204,22 @@ namespace gles2
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, buffer.colorTexture, 0);
 
 		// Depth & Stencil Buffers
-		glGenRenderbuffers(1, &buffer.RBO_D);
-		glBindRenderbuffer(GL_RENDERBUFFER, buffer.RBO_D);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, buffer.RBO_D);
+		//glGenRenderbuffers(1, &buffer.RBO_D);
+		//glBindRenderbuffer(GL_RENDERBUFFER, buffer.RBO_D);
+		//glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
+		//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, buffer.RBO_D);
 
-		glGenRenderbuffers(1, &buffer.RBO_S);
-		glBindRenderbuffer(GL_RENDERBUFFER, buffer.RBO_S);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, width, height);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, buffer.RBO_S);
+		//glGenRenderbuffers(1, &buffer.RBO_S);
+		//glBindRenderbuffer(GL_RENDERBUFFER, buffer.RBO_S);
+		//glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, width, height);
+		//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, buffer.RBO_S);
 
 		// Completeness check
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+			std::stringstream msg;
+			msg << (int)glCheckFramebufferStatus(GL_FRAMEBUFFER);
+            std::string what = msg.str();
+            systemHandle->log(what);
 			throw;
 		}
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -228,10 +236,14 @@ namespace gles2
 	{
 		GLES2_Drawable drawable;
 		// Generate
+        systemHandle->log("pre Context::glGenBuffers " + clib::to_string(glGetError()));
 		glGenBuffers(1, &drawable.VBO);
+        systemHandle->log("Context::glGenBuffers " + clib::to_string(glGetError()));
 		// Bind VBO
 		glBindBuffer(GL_ARRAY_BUFFER, drawable.VBO);
+        systemHandle->log("Context::glBindBuffer " + clib::to_string(glGetError()));
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), &vertices[0], (GLenum)usage);
+        systemHandle->log("Context::glBufferData " + clib::to_string(glGetError()));
 		// Config Vertex Attributes
 		int vertexSize = std::accumulate(vertexLayout.begin(), vertexLayout.end(), 0);
 		int nVertices = (int)vertices.size() / vertexSize;
@@ -253,7 +265,12 @@ namespace gles2
 			}
 		}
 
+
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+        systemHandle->log("Context::glBindBuffer 2 " + clib::to_string(glGetError()));
+
+		drawable.glContext = this;
+		drawable.id = drawable.VBO;
 
 		drawable.nVertices = nVertices;
 		drawable.usage = usage;

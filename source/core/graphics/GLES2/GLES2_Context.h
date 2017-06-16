@@ -71,9 +71,6 @@ namespace gles2
 		void enableBlending();
 		void disableBlending();
 
-		void enableWireframe();
-		void disableWireframe();
-
 
 		/*****************************************
 		**			Generator functions			**

@@ -5,11 +5,11 @@
 #include <memory>
 #include <functional>
 
-#include "core.h"
+#include "../core.h"
 
-#include "input.h"
+#include "../InputManager.h"
 
-#include "widget.h"
+#include "../Widget.h"
 #include "label.h"
 
 

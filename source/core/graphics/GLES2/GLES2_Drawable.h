@@ -27,13 +27,15 @@ namespace gles2
 	private:
 		friend class GLES2_Context;
 
+
+
+	public:
 		GLuint VBO;
 		VertexArrayObject VAO;
 		GLint nVertices;
 		PrimitiveType primitive;
 		DrawMode usage;
 
-	public:
 		void bufferSubData(int offset, std::vector<GLfloat> & vertices);
 	};
 }

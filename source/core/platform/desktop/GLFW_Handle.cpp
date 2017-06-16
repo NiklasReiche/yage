@@ -97,4 +97,14 @@ namespace glfw
 		}
 		catch (std::bad_function_call) {}
 	}
+
+	Desktop_File GLFWHandle::open(std::string filename)
+	{
+		return Desktop_File(filename);
+	}
+
+	void GLFWHandle::log(std::string msg)
+	{
+		std::cout << msg << std::endl;
+	}
 }

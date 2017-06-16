@@ -1,11 +1,16 @@
 #pragma once
 
+#include <string>
+#include <iostream>
 #include <functional>
 
-#include <GLFW\glfw3.h>
-#include "GLFW_Callback.h"
+#define GLEW_STATIC
+#include <GLEW/glew.h>
+#include <GLFW/glfw3.h>
 
-#include <platform\GenericHandle.h>
+#include "../GenericHandle.h"
+#include "GLFW_Callback.h"
+#include "Desktop_File.h"
 
 namespace glfw
 {
@@ -37,6 +42,9 @@ namespace glfw
 		void onMousePosEvent(float xpos, float ypos);
 		void onMouseButtonEvent(int button, int action, int mods);
 		void onMouseWheelEvent(float xoffset, float yoffset);
+
+		Desktop_File open(std::string filename);
+		void log(std::string msg);
 
 		void setOnKeyEvent(std::function<void(int, int)> callback) { onKeyEventCallback = callback; }
 		void setOnMousePosEvent(std::function<void(float, float)> callback) { onMousePosEventCallback = callback; }

@@ -1,9 +1,9 @@
-﻿#include "fontmanager.h"
+﻿#include "FontManager.h"
 
 namespace gui
 {
-	FontManager::FontManager(gl::GraphicsContext * glContext)
-		: fontLoader(font::FontLoader(glContext)) {}
+	FontManager::FontManager(platform::PlatformHandle* platform, gl::GraphicsContext * glContext)
+		: fontLoader(font::FontLoader(platform, glContext)) {}
 
 	void FontManager::addFont(std::string filename)
 	{

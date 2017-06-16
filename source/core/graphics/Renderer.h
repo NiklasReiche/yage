@@ -14,7 +14,7 @@ namespace gl
 		Framebuffer default_framebuffer;
 		Viewport framebuffer_viewport;
 
-		gml::Vec4<float> clearColor = gml::Vec4<float>(0.0f, 0.0f, 0.0f, 1.0f);
+		gml::Vec4<float> clearColor = gml::Vec4<float>(0.0f, 1.0f, 0.0f, 1.0f);
 
 	public:
 		Renderer() {}
@@ -37,8 +37,9 @@ namespace gl
 			glContext->setActiveRenderTarget(default_framebuffer);
 			glContext->setActiveViewport(framebuffer_viewport);
 
-			glClearColor(clearColor.x, clearColor.z, clearColor.z, clearColor.w);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+			glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+			//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT);
 		}
 
 		void renderToScreen()

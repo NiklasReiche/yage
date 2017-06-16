@@ -136,29 +136,35 @@ namespace input
 	void InputController::onTouchEvent(float xpos, float ypos, int index, int _action)
 	{
 #ifdef ANDROID
-		TouchAction action = TouchAction(action);
+		TouchAction action = TouchAction(_action);
 		TouchIndexCode key = TouchIndexCode(index);
 
-		KeyState lastState = input.getTouchState(key);
-		KeyState newState;
-		if (action == TouchAction::PRESS && lastState == KeyState::UP) {
-			newState = KeyState::DOWN;
-			funcs.push_back(std::bind(&InputController::onTouchEvent, this, xpos, ypos, index, _action));
-		}
-		else if (action == TouchAction::PRESS && lastState == KeyState::DOWN) {
-			newState = KeyState::DOWN;
-		}
-		else if (action == TouchAction::RELEASE && lastState == KeyState::DOWN) {
-			newState = KeyState::UP;
-			funcs.push_back(std::bind(&InputController::onTouchEvent, this, xpos, ypos, index, _action));
-		}
-		else if (action == TouchAction::RELEASE && lastState == KeyState::UP) {
-			newState = KeyState::UP;
-		}
+		input.touchPos[key].x = xpos;
+		input.touchPos[key].y = ypos;
 
-		input.touchAction[key] = newState;
-		input.touchActionLast[key] = lastState;
+		if (action == TouchAction::PRESS || action == TouchAction::RELEASE) {
 
+			KeyState lastState = input.getTouchState(key);
+			KeyState newState;
+
+			if (action == TouchAction::PRESS && lastState == KeyState::UP) {
+				newState = KeyState::DOWN;
+				funcs.push_back(std::bind(&InputController::onTouchEvent, this, xpos, ypos, index, _action));
+			}
+			else if (action == TouchAction::PRESS && lastState == KeyState::DOWN) {
+				newState = KeyState::DOWN;
+			}
+			else if (action == TouchAction::RELEASE && lastState == KeyState::DOWN) {
+				newState = KeyState::UP;
+				funcs.push_back(std::bind(&InputController::onTouchEvent, this, xpos, ypos, index, _action));
+			}
+			else if (action == TouchAction::RELEASE && lastState == KeyState::UP) {
+				newState = KeyState::UP;
+			}
+
+			input.touchAction[key] = newState;
+			input.touchActionLast[key] = lastState;
+		}
 
 		for (auto const &listener : listeners)
 		{

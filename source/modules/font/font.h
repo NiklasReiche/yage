@@ -14,8 +14,8 @@ namespace font
 
 	struct GlyphMetrics
 	{
-		gml::Vector2D<float> size;
-		gml::Vector2D<float> bearing;
+		gml::Vec2<float> size;
+		gml::Vec2<float> bearing;
 		float advance = 0;
 	};
 

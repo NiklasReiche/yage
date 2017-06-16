@@ -114,6 +114,9 @@ namespace android
 		app->onInputEvent = handleInputEvent;
 
 		assetManager = app->activity->assetManager;
+
+		const char* externalDir = app->activity->externalDataPath;
+		const char* internalDir = app->activity->internalDataPath;
 	}
 	Android_Handle::~Android_Handle()
 	{
@@ -138,6 +141,8 @@ namespace android
 			EGL_BLUE_SIZE, 8,
 			EGL_GREEN_SIZE, 8,
 			EGL_RED_SIZE, 8,
+			EGL_DEPTH_SIZE, 16,
+			EGL_STENCIL_SIZE, 8,
 			EGL_NONE
 		};
 
@@ -224,6 +229,12 @@ namespace android
 		std::string tmp = str.str();
 		const char* cmsg = tmp.c_str();
 		__android_log_print(ANDROID_LOG_DEBUG, logTag.c_str(), "%s", cmsg);
+	}
+
+	Android_File Android_Handle::open(std::string filename)
+	{
+		AAsset* asset = AAssetManager_open(assetManager, filename.c_str(), AASSET_MODE_BUFFER);
+		return Android_File(asset);
 	}
 
 	void Android_Handle::read(std::string filename, std::stringstream & output)

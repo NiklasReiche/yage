@@ -1,13 +1,12 @@
-#include "master.h"
+#include "Master.h"
 
 namespace gui
 {
-	Master::Master(gl::GraphicsContext * glContext, input::InputController * inputController)
-		: glContext(glContext), fontManager(FontManager(glContext))
-	{
-		inputManger.initialize(inputController);
-		renderer = GuiRenderer(glContext, gl::Viewport(0, 0, glContext->getWidth(), glContext->getHeight()));
-	}
+	Master::Master(platform::PlatformHandle * platform, gl::GraphicsContext * glContext, input::InputController * inputController)
+		: platform(platform), glContext(glContext), 
+		fontManager(FontManager(platform, glContext)),
+		inputManager(InputManager(inputController->addListener())), 
+		renderer(GuiRenderer(platform, glContext, gl::Viewport(0, 0, glContext->getWidth(), glContext->getHeight()))) {}
 
 	void Master::sortWidgets(std::vector<gl::Drawable*> & vector_widget, std::vector<font::Text*> & vector_text, Widget & widget)
 	{
@@ -24,7 +23,7 @@ namespace gui
 
 	void Master::update()
 	{
-		inputManger.update(root);
+		inputManager.update(root);
 
 		std::vector<gl::Drawable*> vector_widget;
 		std::vector<font::Text*> vector_text;

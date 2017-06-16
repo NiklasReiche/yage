@@ -21,19 +21,19 @@ namespace font
 		return gml::Vector2D<float>(scale_x, scale_y);
 	}
 
-	FontLoader::FontLoader(gl::GraphicsContext* glContext)
-		: glContext(glContext) {}
+	FontLoader::FontLoader(platform::PlatformHandle* platform, gl::GraphicsContext* glContext)
+		: platform(platform), glContext(glContext) {}
 
 	Font FontLoader::loadFont(std::string filename, int ptsize, int dpi)
 	{
 		Fontfile fontfile;
 
-		std::ifstream file(filename, std::ios::binary);
+		platform::File file = platform->open(filename);
 		if (!file.is_open()) {
-			std::cout << "ERROR::FONT_LOADER: could not open file " << filename << std::endl;
+			platform->log("ERROR::FONT_LOADER: could not open file " + filename);
 		}
 
-		file.seekg(0);
+		file.seek(0, platform::SeekOffset::BEG);
 		file.read((char*)&fontfile.fileheader, sizeof(fontfile.fileheader));
 		file.read((char*)&fontfile.fontinfo, sizeof(fontfile.fontinfo));
 		file.read((char*)&fontfile.sdfinfo, sizeof(fontfile.sdfinfo));
@@ -45,8 +45,7 @@ namespace font
 		fontfile.sdf.resize(fontfile.sdfinfo.width * fontfile.sdfinfo.height * fontfile.sdfinfo.channels);
 		file.read((char*)&fontfile.sdf[0], sizeof(uint8_t) * fontfile.sdf.size());
 
-
-		gml::Vector2D<float> scale = calcScale(ptsize, fontfile.fontinfo.EM_size, dpi);
+		gml::Vec2<float> scale = calcScale(ptsize, fontfile.fontinfo.EM_size, dpi);
 
 		Font font;
 		font.metrics.EM_size = fontfile.fontinfo.EM_size;
@@ -76,9 +75,13 @@ namespace font
 			character.texCoords.bottom = fontfile.glyphs[i].texCoord_bottom + 4.0f / fontfile.sdfinfo.height;
 		}
 
+        platform->log("pre Loader::glcreate2DTexture " + clib::to_string(glGetError()));
 		font.textureAtlas = glContext->create2DTexture(&fontfile.sdf[0], fontfile.sdfinfo.width, fontfile.sdfinfo.height, gl::ImageFormat::R, 1);
+		platform->log("Loader::glcreate2DTexture " + clib::to_string(glGetError()));
 		font.textureAtlas.configTextureWrapper(gl::TextureWrapper::CLAMP_TO_EDGE, gl::TextureWrapper::CLAMP_TO_EDGE);
+		platform->log("Loader::configTextureWrapper " + clib::to_string(glGetError()));
 		font.textureAtlas.configTextureFilter(gl::TextureFilter::LINEAR, gl::TextureFilter::LINEAR);
+		platform->log("Loader::configTextureFilter " + clib::to_string(glGetError()));
 
 		return font;
 	}

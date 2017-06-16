@@ -99,6 +99,8 @@ set( YAGE_PLATFORM_DESKTOP_SOURCE
 	"${YAGE_CORE_PATH}/platform/desktop/GLFW_Callback.cpp"
 	"${YAGE_CORE_PATH}/platform/desktop/GLFW_Handle.h"
 	"${YAGE_CORE_PATH}/platform/desktop/GLFW_Handle.cpp"
+	"${YAGE_CORE_PATH}/platform/desktop/Desktop_File.h"
+	"${YAGE_CORE_PATH}/platform/desktop/Desktop_File.cpp"
 
 )
 set( YAGE_PLATFORM_ANDROID_SOURCE
@@ -107,5 +109,8 @@ set( YAGE_PLATFORM_ANDROID_SOURCE
 	"${YAGE_CORE_PATH}/platform/android/Android_Handle.cpp"
 	"${YAGE_CORE_PATH}/platform/android/android_native_app_glue.h"
 	"${YAGE_CORE_PATH}/platform/android/android_native_app_glue.c"
+	"${YAGE_CORE_PATH}/platform/android/Android_File.h"
+	"${YAGE_CORE_PATH}/platform/android/Android_File.cpp"
+	"${YAGE_CORE_PATH}/platform/android/clib.h"
 
 )

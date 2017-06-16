@@ -25,9 +25,10 @@ namespace gles2
 	}
 	void GLES2_Shader::setUniform(std::string name, gml::Matrix4D<float> value)
 	{
+        value = transpose(value);
 		float matrix[16];
 		value.convertToArray(matrix);
 		glContext->useShader(*this);
-		glUniformMatrix4fv(uniformLocations[name], 1, GL_TRUE, matrix);
+		glUniformMatrix4fv(uniformLocations[name], 1, GL_FALSE, matrix);
 	}
 }

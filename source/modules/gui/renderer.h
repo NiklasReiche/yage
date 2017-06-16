@@ -12,14 +12,16 @@ namespace gui
 	class GuiRenderer : public gl::Renderer
 	{
 	private:
+		platform::PlatformHandle* platform;
 		gl::Shader guiShader;
 		gl::Shader textShader;
+
 	public:
 		std::vector<gl::Drawable*> widgets;
 		std::vector<font::Text*> text;
 
 		GuiRenderer() {}
-		GuiRenderer(gl::GraphicsContext* glContext, gl::Viewport viewport);
+		GuiRenderer(platform::PlatformHandle * platform, gl::GraphicsContext* glContext, gl::Viewport viewport);
 
 		void render();
 

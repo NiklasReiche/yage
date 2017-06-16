@@ -5,29 +5,30 @@
 #include <memory>
 
 #include "core.h"
-#include "renderer.h"
-#include "fontmanager.h"
-#include "input.h"
+#include "Renderer.h"
+#include "FontManager.h"
+#include "InputManager.h"
 #include "interface.h"
-#include "widget.h"
-
+#include "Widget.h"
 
 namespace gui
 {
 	class Master
 	{
 	private:
+		platform::PlatformHandle * platform;
 		gl::GraphicsContext * glContext;
 
 		FontManager fontManager;
-		InputManager inputManger;
+		InputManager inputManager;
 		GuiRenderer renderer;
 
 		Widget root;
 
 		void sortWidgets(std::vector<gl::Drawable*> & vector_widget, std::vector<font::Text*> & vector_text, Widget & widget);
+
 	public:
-		Master(gl::GraphicsContext * glContext, input::InputController * inputController);
+		Master(platform::PlatformHandle * platform, gl::GraphicsContext * glContext, input::InputController * inputController);
 
 		void update();
 
@@ -36,7 +37,7 @@ namespace gui
 		template <typename Element, typename... Args>
 		Element* createWidget(Widget* parent, Args... args)
 		{
-			ManagerInterface mInterface { &fontManager, &inputManger, &renderer };
+			ManagerInterface mInterface { &fontManager, &inputManager, &renderer, glContext };
 			if (parent == nullptr) {
 				return root.createWidget<Element>(mInterface, args...);
 			}

@@ -7,7 +7,7 @@
 
 #include "core.h"
 #include "interface.h"
-#include "fontmanager.h"
+#include "FontManager.h"
 
 namespace gui
 {

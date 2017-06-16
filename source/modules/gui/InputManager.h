@@ -1,19 +1,10 @@
 #pragma once
 
 #include "core.h"
-#include "widget.h"
-
+#include "Widget.h"
 
 namespace gui
 {
-	enum class InputAction
-	{
-		IDLE,
-		HOLD,
-		PRESS,
-		RELEASE
-	};
-
 	class InputManager
 	{
 	private:
@@ -21,9 +12,9 @@ namespace gui
 		input::InputState* input;
 
 		bool isHoveredOver(Widget & widget);
+
 	public:
-		InputManager() {}
-		void initialize(input::InputController * inputController);
+		InputManager(input::InputListener * inputListener);
 
 		void update(Widget & root);
 		void walkWidgets(Widget & widget, int level);

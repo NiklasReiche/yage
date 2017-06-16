@@ -2,7 +2,6 @@
 
 #include "core.h"
 
-
 namespace gui
 {
 	class FontManager;

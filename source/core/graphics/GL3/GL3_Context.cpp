@@ -97,6 +97,9 @@ namespace gl3
 		GL3_UnitShaderTemplate UnitShaderTemplate;
 		unitDrawable = createDrawable(UnitShaderTemplate.vertices, UnitShaderTemplate.vertexLayout, UnitShaderTemplate.mode);
 		unitShader = compileShader(UnitShaderTemplate.vertexCode, UnitShaderTemplate.fragmentCode);
+
+		glState.window_width = width;
+		glState.window_height = height;
 	}
 	GL3_Context::~GL3_Context()
 	{

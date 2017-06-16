@@ -5,7 +5,7 @@ namespace gl3
 	GL3_ShaderLoader::GL3_ShaderLoader(GL3_Context* glContext)
 		: glContext(glContext) {}
 
-	GL3_Shader GL3_ShaderLoader::loadShader(std::string vertex_path, std::string fragment_path, std::string geometry_path = "")
+	GL3_Shader GL3_ShaderLoader::loadShader(std::string vertex_path, std::string fragment_path, std::string geometry_path)
 	{
 		std::string vertexCode(""), fragmentCode(""), geometryCode("");
 		std::string vertexCodeLine, fragmentCodeLine, geometryCodeLine;
