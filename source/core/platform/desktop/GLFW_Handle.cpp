@@ -68,6 +68,17 @@ namespace glfw
 		return glfwWindowShouldClose(glfwWindow);
 	}
 
+	double GLFWHandle::getTime()
+	{
+		return glfwGetTime();
+	}
+	double GLFWHandle::getTimeStep()
+	{
+		double now = glfwGetTime();
+		double step = now - lastTimeStep;
+		lastTimeStep = now;
+		return step;
+	}
 
 	void GLFWHandle::onKeyEvent(int key, int scancode, int action, int mode)
 	{

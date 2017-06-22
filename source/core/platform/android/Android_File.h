@@ -2,6 +2,7 @@
 
 #include <android/asset_manager.h>
 #include <cstdio>
+#include <sstream>
 
 namespace android
 {
@@ -22,6 +23,7 @@ namespace android
 
 		void seek(int index, SeekOffset offset);
 		void read(void* buffer, size_t size);
+		void read(std::stringstream & output);
 		void close();
 
 		bool is_open();

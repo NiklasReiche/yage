@@ -45,6 +45,8 @@ namespace android
 
 		AAssetManager* assetManager;
 
+		double lastTimeStep = 0.0;
+
 		void checkError(std::string msg);
 
 	public:
@@ -61,9 +63,10 @@ namespace android
 
 		int shouldDestroy();
 
-		void log(std::string msg, std::string logTag = "LOG");
-		void log(std::stringstream sstream);
+		double getTime();
+		double getTimeStep();
 
+		void log(std::string msg, std::string logTag = "LOG");
 		Android_File open(std::string filename);
 		void read(std::string filename, std::stringstream & output);
 

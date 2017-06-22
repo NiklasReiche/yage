@@ -236,14 +236,10 @@ namespace gles2
 	{
 		GLES2_Drawable drawable;
 		// Generate
-        systemHandle->log("pre Context::glGenBuffers " + clib::to_string(glGetError()));
 		glGenBuffers(1, &drawable.VBO);
-        systemHandle->log("Context::glGenBuffers " + clib::to_string(glGetError()));
 		// Bind VBO
 		glBindBuffer(GL_ARRAY_BUFFER, drawable.VBO);
-        systemHandle->log("Context::glBindBuffer " + clib::to_string(glGetError()));
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), &vertices[0], (GLenum)usage);
-        systemHandle->log("Context::glBufferData " + clib::to_string(glGetError()));
 		// Config Vertex Attributes
 		int vertexSize = std::accumulate(vertexLayout.begin(), vertexLayout.end(), 0);
 		int nVertices = (int)vertices.size() / vertexSize;
@@ -265,9 +261,7 @@ namespace gles2
 			}
 		}
 
-
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-        systemHandle->log("Context::glBindBuffer 2 " + clib::to_string(glGetError()));
 
 		drawable.glContext = this;
 		drawable.id = drawable.VBO;

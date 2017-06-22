@@ -16,9 +16,11 @@ namespace gui
 		for (unsigned int i = 0; i < widget.getChildrenCount(); ++i)
 		{
 			Widget & child = widget.getChild(i);
-			vector_widget.push_back(&child);
-			if (child.has_Text()) {
-				vector_text.push_back(child.getText());
+			if (child.is_Active()) {
+				vector_widget.push_back(&child);
+				if (child.has_Text()) {
+					vector_text.push_back(child.getText());
+				}
 			}
 			sortWidgets(vector_widget, vector_text, child);
 		}
