@@ -21,10 +21,10 @@ namespace input
 
 	InputListener* InputController::addListener()
 	{
+		listenerId++;
 		listeners[listenerId] = InputListener(listenerId);
 		listeners[listenerId].controller = this;
-		listenerId++;
-		return &listeners.at(listenerId - 1);
+		return &listeners.at(listenerId);
 	}
 	void InputController::removeListener(InputListener* listener)
 	{
@@ -41,13 +41,27 @@ namespace input
 		KeyState newState;
 		if (action == KeyAction::PRESS && lastState == KeyState::UP) {
 			newState = KeyState::DOWN;
-			funcs.push_back(std::bind(&InputController::onKeyEvent, this, _key, _action));
+			for (auto const &listener : listeners)
+			{
+				try {
+					listener.second.onKeyEventCallback(key, action);
+				}
+				catch (std::bad_function_call) {}
+			}
+			funcs.push_back(std::bind(&InputController::onKeyEvent, this, _key, _action)); /* store function call for next frame to simulate key event */
 		}
 		else if (action == KeyAction::PRESS && lastState == KeyState::DOWN) {
-			newState = KeyState::DOWN;
+			newState = KeyState::DOWN; /* this gets called in the simulated key event, so that both key and last key are DOWN */
 		}
 		else if (action == KeyAction::RELEASE && lastState == KeyState::DOWN) {
 			newState = KeyState::UP;
+			for (auto const &listener : listeners)
+			{
+				try {
+					listener.second.onKeyEventCallback(key, action);
+				}
+				catch (std::bad_function_call) {}
+			}
 			funcs.push_back(std::bind(&InputController::onKeyEvent, this, _key, _action));
 		}
 		else if (action == KeyAction::RELEASE && lastState == KeyState::UP) {
@@ -56,15 +70,6 @@ namespace input
 
 		input.keyboardKeys[key] = newState;
 		input.keyboardKeysLast[key] = lastState;
-
-
-		for (auto const &listener : listeners)
-		{
-			try {
-				listener.second.onKeyEventCallback(key, action);
-			}
-			catch (std::bad_function_call) {}
-		}
 #endif
 	}
 
@@ -106,6 +111,13 @@ namespace input
 		KeyState newState;
 		if (action == KeyAction::PRESS && lastState == KeyState::UP) {
 			newState = KeyState::DOWN;
+			for (auto const &listener : listeners)
+			{
+				try {
+					listener.second.onMouseButtonEventCallback(key, action);
+				}
+				catch (std::bad_function_call) {}
+			}
 			funcs.push_back(std::bind(&InputController::onMouseButtonEvent, this, _key, _action));
 		}
 		else if (action == KeyAction::PRESS && lastState == KeyState::DOWN) {
@@ -113,6 +125,13 @@ namespace input
 		}
 		else if (action == KeyAction::RELEASE && lastState == KeyState::DOWN) {
 			newState = KeyState::UP;
+			for (auto const &listener : listeners)
+			{
+				try {
+					listener.second.onMouseButtonEventCallback(key, action);
+				}
+				catch (std::bad_function_call) {}
+			}
 			funcs.push_back(std::bind(&InputController::onMouseButtonEvent, this, _key, _action));
 		}
 		else if (action == KeyAction::RELEASE && lastState == KeyState::UP) {
@@ -121,15 +140,6 @@ namespace input
 
 		input.mouseKeys[key] = newState;
 		input.mouseKeysLast[key] = lastState;
-
-
-		for (auto const &listener : listeners)
-		{
-			try {
-				listener.second.onMouseButtonEventCallback(key, action);
-			}
-			catch (std::bad_function_call) {}
-		}
 #endif
 	}
 
@@ -149,6 +159,13 @@ namespace input
 
 			if (action == TouchAction::PRESS && lastState == KeyState::UP) {
 				newState = KeyState::DOWN;
+				for (auto const &listener : listeners)
+				{
+					try {
+						listener.second.onTouchEventCallback(xpos, ypos, key, action);
+					}
+					catch (std::bad_function_call) {}
+				}
 				funcs.push_back(std::bind(&InputController::onTouchEvent, this, xpos, ypos, index, _action));
 			}
 			else if (action == TouchAction::PRESS && lastState == KeyState::DOWN) {
@@ -156,6 +173,13 @@ namespace input
 			}
 			else if (action == TouchAction::RELEASE && lastState == KeyState::DOWN) {
 				newState = KeyState::UP;
+				for (auto const &listener : listeners)
+				{
+					try {
+						listener.second.onTouchEventCallback(xpos, ypos, key, action);
+					}
+					catch (std::bad_function_call) {}
+				}
 				funcs.push_back(std::bind(&InputController::onTouchEvent, this, xpos, ypos, index, _action));
 			}
 			else if (action == TouchAction::RELEASE && lastState == KeyState::UP) {
@@ -165,13 +189,20 @@ namespace input
 			input.touchAction[key] = newState;
 			input.touchActionLast[key] = lastState;
 		}
+		else if (action == TouchAction::MOVE) {
+			TouchAction action = TouchAction(_action);
+			TouchIndexCode key = TouchIndexCode(index);
 
-		for (auto const &listener : listeners)
-		{
-			try {
-				listener.second.onTouchEventCallback(xpos, ypos, key, action);
+			for (auto const &listener : listeners)
+			{
+				try {
+					listener.second.onTouchEventCallback(xpos, ypos, key, action);
+				}
+				catch (std::bad_function_call) {}
 			}
-			catch (std::bad_function_call) {}
+
+			input.touchAction[key] = KeyState::DOWN;
+			input.touchActionLast[key] = KeyState::DOWN;
 		}
 #endif
 	}

@@ -1,17 +1,20 @@
-#include "button.h"
-
+#include "Button.h"
 
 namespace gui
 {
-	PushButton::PushButton(Widget * parent, ManagerInterface mInterface, W_Geometry geometry, W_Border border, unsigned int color, unsigned int hoverColor)
-		: Widget(parent, mInterface, geometry, color, border, W_Shadow{ 0, 0.0f })
+	PushButton::PushButton(Widget * parent, MasterInterface master, const ButtonLayout & layout)
+		: Widget(parent, master, layout), command(layout.command)
 	{
-		this->primaryColor = gl::toVec4(color);
-		this->secondaryColor = gl::toVec4(hoverColor);
+		this->isInteractable = true;
+		this->idleColor = gl::toVec4(layout.color);
+		this->hoverColor = gl::toVec4(layout.hoverColor);
+		this->clickColor = gl::toVec4(layout.clickColor);
 
-		geometry.position = gml::Vec2<float>();
-		color = 0x00u;
-		label = this->createWidget<Label>(mInterface, geometry, color, W_Border{ 0, 0x00u }, W_Text());
+		WidgetLayout labelLayout = layout;
+		labelLayout.geometry.position = gml::Vec2<float>();
+        labelLayout.geometry.size = gml::Vec2<float>();
+		labelLayout.color = 0x00000000;
+		label = this->createWidget<Label>(master, labelLayout, layout.text);
 
 		if (size == gml::Vec2<float>(0.0f)) {
 			this->size = label->getSize();
@@ -19,20 +22,109 @@ namespace gui
 		}
 	}
 
+	void PushButton::onClick()
+	{
+		setColor(clickColor);
+		updateParams();
+	}
+
 	void PushButton::onClickRelease()
 	{
-		command();
+		setColor(idleColor);
+		updateParams();
+
+		try {
+			command();
+		}
+		catch (std::bad_function_call) {}
 	}
 
 	void PushButton::onHover()
 	{
-		setColor(gml::Vec4<float>(secondaryColor.x, secondaryColor.y, secondaryColor.z, secondaryColor.w));
+		setColor(hoverColor);
 		updateParams();
 	}
 
 	void PushButton::onHoverRelease()
 	{
-		setColor(gml::Vec4<float>(primaryColor.x, primaryColor.y, primaryColor.z, primaryColor.w));
+		setColor(idleColor);
 		updateParams();
 	}
+
+	void PushButton::onCancel() 
+	{
+		setColor(idleColor);
+		updateParams();
+	}
+
+
+	CheckButton::CheckButton(Widget * parent, MasterInterface master, const ButtonLayout & layout, bool activate)
+		: PushButton(parent, master, layout)
+	{
+		if (activate) {
+			setColor(clickColor);
+			updateParams();
+			state = true;
+		}
+	}
+
+	void CheckButton::onClick()
+	{
+		if (state) {
+			setColor(idleColor);
+		}
+		else {
+			setColor(clickColor);
+		}
+
+		updateParams();
+	}
+
+	void CheckButton::onClickRelease()
+	{
+		if (state) {
+			state = false;
+		}
+		else {
+			state = true;
+		}
+
+		try {
+			command();
+		}
+		catch (std::bad_function_call) {}
+	}
+
+	void CheckButton::onHover()
+	{
+		if (!state)
+		{
+			setColor(hoverColor);
+			updateParams();
+		}
+	}
+
+	void CheckButton::onHoverRelease()
+	{
+		if (!state) {
+			setColor(idleColor);
+		}
+		else {
+			setColor(clickColor);
+		}
+		updateParams();
+	}
+
+	void CheckButton::onCancel()
+	{
+		if (state) {
+			setColor(clickColor);
+		}
+		else {
+			setColor(idleColor);
+		}
+
+		updateParams();
+	}
+
 }

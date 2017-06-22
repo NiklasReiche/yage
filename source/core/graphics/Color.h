@@ -6,7 +6,7 @@ namespace gl
 {
 	namespace Color
 	{
-		enum Color
+		enum Color : uint32_t
 		{
 			BLACK = 0x000000FFu,
 			WHITE = 0xFFFFFFFFu,
@@ -32,28 +32,28 @@ namespace gl
 		};
 	}
 
-	inline void setRed(unsigned int & color, unsigned int red)
+	inline void setRed(uint32_t & color, uint32_t red)
 	{
 		color |= red << 24;
 	}
-	inline void setGreen(unsigned int & color, unsigned int green)
+	inline void setGreen(uint32_t & color, uint32_t green)
 	{
 		color |= green << 16;
 	}
-	inline void setBlue(unsigned int & color, unsigned int blue)
+	inline void setBlue(uint32_t & color, uint32_t blue)
 	{
 		color |= blue << 8;
 	}
-	inline void setAlpha(unsigned int & color, unsigned int alpha)
+	inline void setAlpha(uint32_t & color, uint32_t alpha)
 	{
 		color |= alpha;
 	}
 
-	inline gml::Vec3<float> toVec3(unsigned int color)
+	inline gml::Vec3<float> toVec3(uint32_t color)
 	{
 		return gml::Vec3<float>(((color >> 24) & 0xff) / 255.0f, ((color >> 16) & 0xff) / 255.0f, ((color >> 8) & 0xff) / 255.0f);
 	}
-	inline gml::Vec4<float> toVec4(unsigned int color)
+	inline gml::Vec4<float> toVec4(uint32_t color)
 	{
 		return gml::Vec4<float>(((color >> 24) & 0xff) / 255.0f, ((color >> 16) & 0xff) / 255.0f, ((color >> 8) & 0xff) / 255.0f, ((color) & 0xff) / 255.0f);
 	}

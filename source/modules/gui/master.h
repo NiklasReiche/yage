@@ -8,7 +8,7 @@
 #include "Renderer.h"
 #include "FontManager.h"
 #include "InputManager.h"
-#include "interface.h"
+#include "Interface.h"
 #include "Widget.h"
 
 namespace gui
@@ -37,12 +37,12 @@ namespace gui
 		template <typename Element, typename... Args>
 		Element* createWidget(Widget* parent, Args... args)
 		{
-			ManagerInterface mInterface { &fontManager, &inputManager, &renderer, glContext };
+			MasterInterface master { platform, glContext, &fontManager, &inputManager, &renderer };
 			if (parent == nullptr) {
-				return root.createWidget<Element>(mInterface, args...);
+				return root.createWidget<Element>(master, args...);
 			}
 			else {
-				return parent->createWidget<Element>(mInterface, args...);
+				return parent->createWidget<Element>(master, args...);
 			}
 		}
 	};

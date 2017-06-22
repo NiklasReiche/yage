@@ -75,13 +75,9 @@ namespace font
 			character.texCoords.bottom = fontfile.glyphs[i].texCoord_bottom + 4.0f / fontfile.sdfinfo.height;
 		}
 
-        platform->log("pre Loader::glcreate2DTexture " + clib::to_string(glGetError()));
 		font.textureAtlas = glContext->create2DTexture(&fontfile.sdf[0], fontfile.sdfinfo.width, fontfile.sdfinfo.height, gl::ImageFormat::R, 1);
-		platform->log("Loader::glcreate2DTexture " + clib::to_string(glGetError()));
 		font.textureAtlas.configTextureWrapper(gl::TextureWrapper::CLAMP_TO_EDGE, gl::TextureWrapper::CLAMP_TO_EDGE);
-		platform->log("Loader::configTextureWrapper " + clib::to_string(glGetError()));
 		font.textureAtlas.configTextureFilter(gl::TextureFilter::LINEAR, gl::TextureFilter::LINEAR);
-		platform->log("Loader::configTextureFilter " + clib::to_string(glGetError()));
 
 		return font;
 	}

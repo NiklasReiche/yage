@@ -6,12 +6,9 @@
 #include <functional>
 
 #include "../core.h"
-
 #include "../InputManager.h"
-
 #include "../Widget.h"
-#include "label.h"
-
+#include "Label.h"
 
 namespace gui
 {
@@ -21,13 +18,14 @@ namespace gui
 		Label * label;
 		bool isFocused = false;
 		std::string text;
+
 	public:
-		TextEntry(Widget * parent, ManagerInterface mInterface, W_Geometry geometry, W_Border border, unsigned int color);
+		TextEntry(Widget * parent, MasterInterface master, W_Geometry geometry, W_Border border, unsigned int color);
 
 		virtual void onClick();
 		virtual void update();
 
-		void setText(W_Text text) { label->setText(text); }
+		void setText(TextLayout text) { label->setText(text); }
 		void setTextColor(unsigned int color) { label->setTextColor(color); }
 	};
 }

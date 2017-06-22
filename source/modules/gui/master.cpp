@@ -5,8 +5,11 @@ namespace gui
 	Master::Master(platform::PlatformHandle * platform, gl::GraphicsContext * glContext, input::InputController * inputController)
 		: platform(platform), glContext(glContext), 
 		fontManager(FontManager(platform, glContext)),
-		inputManager(InputManager(inputController->addListener())), 
-		renderer(GuiRenderer(platform, glContext, gl::Viewport(0, 0, glContext->getWidth(), glContext->getHeight()))) {}
+		inputManager(InputManager(inputController->addListener(), &root)),
+		renderer(GuiRenderer(platform, glContext, gl::Viewport(0, 0, glContext->getWidth(), glContext->getHeight())))
+	{
+		root.setSize(gml::Vec2<float>(glContext->getWidth(), glContext->getHeight()));
+	}
 
 	void Master::sortWidgets(std::vector<gl::Drawable*> & vector_widget, std::vector<font::Text*> & vector_text, Widget & widget)
 	{

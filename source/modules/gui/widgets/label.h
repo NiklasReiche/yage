@@ -7,13 +7,12 @@
 
 namespace gui
 {
-	struct W_Text
+	struct TextLayout
 	{
-		std::string text;
-		std::string font;
-		int size;
-		unsigned int color;
-		unsigned int bgColor;
+		std::string text = "";
+		std::string font = "arial";
+		int size = 16;
+		unsigned int color = gl::Color::BLACK;
 	};
 
 	class Label : public Widget
@@ -23,17 +22,13 @@ namespace gui
 
 		float padding = 2;
 
-		gml::Vec3<float> backgroundColor;
-		gml::Vec3<float> hoverColor;
-	public:
-		Label(Widget * parent, ManagerInterface mInterface, W_Geometry geometry, unsigned int color, W_Border border, W_Text text);
 
-		void onHover() {}
-		void onHoverRelease() {}
+	public:
+		Label(Widget * parent, MasterInterface master, WidgetLayout layout, TextLayout text);
 
 		font::Text* getText() { return &text; }
 
-		void setText(W_Text text);
+		void setText(TextLayout text);
 		void setTextColor(unsigned int color) { text.setColor(color); }
 	};
 }

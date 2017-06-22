@@ -6,7 +6,7 @@
 #include <functional>
 
 #include "core.h"
-#include "interface.h"
+#include "Interface.h"
 #include "FontManager.h"
 
 namespace gui
@@ -18,29 +18,38 @@ namespace gui
 	};
 	struct W_Border
 	{
-		int size;
-		unsigned int color;
+		int size = 0;
+		unsigned int color = gl::Color::BLACK;
 	};
 	struct W_Shadow
 	{
-		int offset;
-		float hardness;
+		int offset = 0;
+		float hardness = 0;
+	};
+	struct WidgetLayout
+	{
+		W_Geometry geometry;
+		W_Border border;
+		W_Shadow shadow;
+		unsigned int color = gl::Color::WHITE;
 	};
 
 	class Widget : public gl::Drawable
 	{
-	friend class InputManager;
-
 	private:
+		friend class InputManager;
+
 		void constructVertices(std::vector<gl::Gfloat> & vertices);
 
 	protected:
 		Widget* parent;
 		std::vector<std::unique_ptr<Widget>> children;
 
-		ManagerInterface masterInterface;
+		MasterInterface master;
 
+		int level = 0; /* position of the widget in the widget tree hirachy */
 		bool isActive = true;
+		bool isInteractable = false;
 		bool isHovered = false;
 		bool hasText = false;
 
@@ -56,28 +65,29 @@ namespace gui
 
 	public:
 		Widget() {}
-		Widget(Widget * parent, ManagerInterface mInterface, W_Geometry geometry, unsigned int color, W_Border border, W_Shadow shadow);
+		Widget(Widget * parent, MasterInterface master, W_Geometry geometry, unsigned int color, W_Border border, W_Shadow shadow);
+		Widget(Widget * parent, MasterInterface master, const WidgetLayout & layout);
 		virtual ~Widget() {}
 
 		template <typename Element, typename... Args>
-		Element* createWidget(ManagerInterface mInterface, Args... args)
+		Element* createWidget(MasterInterface mInterface, Args... args)
 		{
 			children.push_back( std::make_unique<Element>(this, mInterface, std::forward<Args>(args)...) );
 			return (Element*)children.back().get();
 		}
 		
-		virtual void onHover() {};
-		virtual void onHoverRelease() {};
-		virtual void whileHover() {};
-		virtual void onClick() {};
-		virtual void onClickRelease() {};
-		virtual void whileClickHold() {};
+		virtual void onHover() {}
+		virtual void onHoverRelease() {}
+		virtual void onClick() {}
+		virtual void onClickRelease() {}
+		virtual void onCancel() {}
 
 		virtual void update() {};
 		//virtual void del() {}
 
 		/* Getter */
 		bool is_Active() { return isActive; }
+		bool is_Interactable() { return isInteractable; }
 		bool isHoverActive() { return isHovered; }
 		bool has_Text() { return hasText; }
 

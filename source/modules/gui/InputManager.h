@@ -11,14 +11,19 @@ namespace gui
 		input::InputListener * inputListener;
 		input::InputState* input;
 
-		bool isHoveredOver(Widget & widget);
+		Widget* rootWidget;
+		Widget* selectedWidget = nullptr;
+		Widget* activeWidget = nullptr;
+
+		Widget* searchSelected(Widget * widget, float xpos, float ypos);
 
 	public:
-		InputManager(input::InputListener * inputListener);
+		InputManager(input::InputListener * inputListener, Widget* rootWidget);
 
 		void update(Widget & root);
-		void walkWidgets(Widget & widget, int level);
 
+		void onMousePosEvent(float x, float y);
 		void onMouseEvent(input::MouseKeyCode, input::KeyAction);
+		void onTouchEvent(float x, float y, input::TouchIndexCode, input::TouchAction);
 	};
 }

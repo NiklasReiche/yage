@@ -8,11 +8,13 @@ namespace gui
 	class InputManager;
 	class GuiRenderer;
 
-	struct ManagerInterface
+	struct MasterInterface
 	{
+		platform::PlatformHandle * platform;
+		gl::GraphicsContext* glContext;
+
 		FontManager* fontManager;
 		InputManager* inputManger;
 		GuiRenderer* renderer;
-		gl::GraphicsContext* glContext;
 	};
 }

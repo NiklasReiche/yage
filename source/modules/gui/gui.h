@@ -7,9 +7,9 @@
 #include "Renderer.h"
 #include "InputManager.h"
 #include "FontManager.h"
-#include "interface.h"
+#include "Interface.h"
 
 #include "Widget.h"
-#include "widgets/button.h"
-#include "widgets/label.h"
-#include "widgets/frame.h"
+#include "widgets/Button.h"
+#include "widgets/Label.h"
+#include "widgets/Frame.h"

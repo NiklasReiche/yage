@@ -8,8 +8,9 @@
 #ifdef ANDROID
 #include "android/Android_Handle.h"
 #include "android/Android_File.h"
-#include "android/clib.h"
 #endif
+
+#include "android/clib.h"
 
 namespace platform
 {
