@@ -13,8 +13,10 @@ namespace gles2
 		// File Handle
 		try {
 			std::stringstream vertexFile, fragmentFile;
-			systemHandle->read(vertex_path, vertexFile);
-			systemHandle->read(fragment_path, fragmentFile);
+            platform::File vertexFileHandle = systemHandle->open(vertex_path);
+            platform::File fragmentFileHandle = systemHandle->open(fragment_path);
+            vertexFileHandle.read(vertexFile);
+            fragmentFileHandle.read(fragmentFile);
 
 			while (getline(vertexFile, vertexCodeLine))
 			{

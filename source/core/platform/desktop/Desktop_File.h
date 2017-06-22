@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <string>
+#include <sstream>
 #include <memory>
 
 namespace glfw
@@ -24,6 +25,7 @@ namespace glfw
 
 		void seek(int index, SeekOffset offset);
 		void read(void* buffer, size_t size);
+		void read(std::stringstream & output);
 		void close();
 
 		bool is_open();

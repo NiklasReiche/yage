@@ -222,6 +222,20 @@ namespace android
 		return app->destroyRequested;
 	}
 
+	double Android_Handle::getTime()
+	{
+		struct timespec time;
+		clock_gettime(CLOCK_REALTIME, &time);
+		return (double)time.tv_sec + time.tv_nsec / 1000000000.0;
+	}
+	double Android_Handle::getTimeStep()
+	{
+		double now = getTime();
+		double step = now - lastTimeStep;
+		lastTimeStep = now;
+		return step;
+	}
+
 	void Android_Handle::log(std::string msg, std::string logTag)
 	{
 		std::stringstream str;
@@ -235,28 +249,5 @@ namespace android
 	{
 		AAsset* asset = AAssetManager_open(assetManager, filename.c_str(), AASSET_MODE_BUFFER);
 		return Android_File(asset);
-	}
-
-	void Android_Handle::read(std::string filename, std::stringstream & output)
-	{
-		// Open your file
-		AAsset* file = AAssetManager_open(assetManager, filename.c_str(), AASSET_MODE_BUFFER);
-		// Get the file length
-		size_t fileLength = AAsset_getLength(file);
-
-		// Allocate memory to read your file
-		char* fileContent = new char[fileLength + 1];
-
-		// Read your file
-		AAsset_read(file, fileContent, fileLength);
-		// For safety you can add a 0 terminating character at the end of your file ...
-		fileContent[fileLength] = '\0';
-
-		// Do whatever you want with the content of the file
-		output = std::stringstream(fileContent);
-
-		// Free the memoery you allocated earlier
-		delete[] fileContent;
-		AAsset_close(file);
 	}
 }

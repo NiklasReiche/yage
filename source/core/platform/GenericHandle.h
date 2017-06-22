@@ -16,6 +16,8 @@ namespace platform
 
 		virtual int shouldDestroy() { return 0; }
 
+		virtual double getTime() {}
+
 		virtual void setOnKeyEvent(std::function<void(int, int)> callback) {}
 		virtual void setOnMousePosEvent(std::function<void(float, float)> callback) {}
 		virtual void setOnMouseButtonEvent(std::function<void(int, int)> callback) {}
