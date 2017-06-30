@@ -16,8 +16,8 @@ namespace gui
 #endif
 #ifdef ANDROID
         gl::ShaderLoader loader(platform, glContext);
-		guiShader = loader.loadShader("shaders/gui/guiShader_ES1.vert", "shaders/gui/guiShader_ES1.frag");
-		textShader = loader.loadShader("shaders/font/textShader_ES1.vert", "shaders/font/textShader_ES1.frag");
+		guiShader = loader.loadShader("assets/shaders/gui/guiShader_ES1.vert", "assets/shaders/gui/guiShader_ES1.frag");
+		textShader = loader.loadShader("assets/shaders/font/textShader_ES1.vert", "assets/shaders/font/textShader_ES1.frag");
 #endif
 
 		gml::Matrix4D<float> projection = gml::orthographic<float>(0.0f, (float)viewport.width, (float)viewport.height, 0.0f, 0.1f, 100.0f);
