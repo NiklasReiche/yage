@@ -19,6 +19,8 @@ namespace glfw
 	private:
 		GLFWwindow* glfwWindow;
 
+		float dpi;
+
 		double lastTimeStep = 0.0;
 
 		std::function<void(int, int)> onKeyEventCallback;
@@ -40,6 +42,7 @@ namespace glfw
 
 		int shouldDestroy();
 
+		float getDPI() { return dpi; }
 		double getTime();
 		double getTimeStep();
 

@@ -9,6 +9,7 @@
 #include <EGL/egl.h>
 #include <android/log.h>
 #include <android/input.h>
+#include <jni.h>
 
 #include <platform/GenericHandle.h>
 
@@ -39,11 +40,14 @@ namespace android
 	{
 	private:
 		android_app * app;
+		AAssetManager* assetManager;
+		JNIEnv* jni;
+
 		EGLDisplay eglDisplay;
 		EGLSurface eglSurface;
 		EGLContext eglContext;
 
-		AAssetManager* assetManager;
+		float dpi;
 
 		double lastTimeStep = 0.0;
 
@@ -63,6 +67,7 @@ namespace android
 
 		int shouldDestroy();
 
+		float getDPI() { return dpi; }
 		double getTime();
 		double getTimeStep();
 

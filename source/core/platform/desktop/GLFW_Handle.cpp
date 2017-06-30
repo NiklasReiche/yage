@@ -40,6 +40,8 @@ namespace glfw
 		glfwSetCursorPosCallback(glfwWindow, mouse_callback);
 		glfwSetMouseButtonCallback(glfwWindow, mouse_button_callback);
 		glfwSetScrollCallback(glfwWindow, mouse_wheel_callback);
+
+		dpi = 96;
 	}
 
 	void GLFWHandle::showWindow()

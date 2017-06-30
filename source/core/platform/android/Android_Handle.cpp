@@ -113,6 +113,25 @@ namespace android
 		app->onAppCmd = handleCommand;
 		app->onInputEvent = handleInputEvent;
 
+
+		/* copied from stackoverflow - working, but no idea how exactly */
+		app->activity->vm->AttachCurrentThread(&jni, NULL);
+		jclass activityClass = jni->FindClass("android/app/NativeActivity");
+		jmethodID getWindowManager = jni->GetMethodID(activityClass, "getWindowManager", "()Landroid/view/WindowManager;");
+		jobject wm = jni->CallObjectMethod(app->activity->clazz, getWindowManager);
+		jclass windowManagerClass = jni->FindClass("android/view/WindowManager");
+		jmethodID getDefaultDisplay = jni->GetMethodID(windowManagerClass, "getDefaultDisplay", "()Landroid/view/Display;");
+		jobject display = jni->CallObjectMethod(wm, getDefaultDisplay);
+		jclass displayClass = jni->FindClass("android/view/Display");
+		jclass displayMetricsClass = jni->FindClass("android/util/DisplayMetrics");
+		jmethodID displayMetricsConstructor = jni->GetMethodID(displayMetricsClass, "<init>", "()V");
+		jobject displayMetrics = jni->NewObject(displayMetricsClass, displayMetricsConstructor);
+		jmethodID getMetrics = jni->GetMethodID(displayClass, "getMetrics", "(Landroid/util/DisplayMetrics;)V");
+		jni->CallVoidMethod(display, getMetrics, displayMetrics);
+		jfieldID xdpi_id = jni->GetFieldID(displayMetricsClass, "xdpi", "F");
+		dpi = jni->GetFloatField(displayMetrics, xdpi_id);
+
+
 		assetManager = app->activity->assetManager;
 
 		const char* externalDir = app->activity->externalDataPath;
@@ -247,7 +266,13 @@ namespace android
 
 	Android_File Android_Handle::open(std::string filename)
 	{
-		AAsset* asset = AAssetManager_open(assetManager, filename.c_str(), AASSET_MODE_BUFFER);
-		return Android_File(asset);
+		std::string folder = clib::strip(filename, "/").at(0);
+		if (folder == "assets") {
+			AAsset* asset = AAssetManager_open(assetManager, filename.substr(7, std::string::npos).c_str(), AASSET_MODE_BUFFER);
+			return Android_File(asset);
+		}
+		else {
+			FILE* file = std::fopen(filename.c_str(), "r");
+		}
 	}
 }
