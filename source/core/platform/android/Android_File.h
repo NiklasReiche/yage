@@ -3,6 +3,9 @@
 #include <android/asset_manager.h>
 #include <cstdio>
 #include <sstream>
+#include <exception>
+
+#include "../clib.h"
 
 namespace android
 {
@@ -15,10 +18,12 @@ namespace android
 	class Android_File
 	{
 	private:
-		AAsset* asset;
+		AAsset* asset = nullptr;
+		FILE* file = nullptr;
 
 	public:
 		Android_File(AAsset* asset);
+		Android_File(FILE* file);
 		~Android_File();
 
 		void seek(int index, SeekOffset offset);

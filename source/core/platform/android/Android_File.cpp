@@ -4,19 +4,44 @@ namespace android
 {
 	Android_File::Android_File(AAsset* asset)
 		: asset(asset) {}
+	Android_File::Android_File(FILE* file)
+		: file(file) {}
 	Android_File::~Android_File()
 	{
-		AAsset_close(asset);
+		if (asset != nullptr) {
+			AAsset_close(asset);
+		}
+		else if (file != nullptr) {
+			std::fclose(file);
+		}
 	}
 
 	void Android_File::seek(int index, SeekOffset offset)
 	{
-		AAsset_seek(asset, index, (int)offset);
+		if (asset != nullptr) {
+			AAsset_seek(asset, index, (int)offset);
+		}
+		else if (file != nullptr) {
+			std::fseek(file, index, (int)offset);
+		}
+		else {
+			throw std::runtime_error("File error: handle is null");
+		}
 	}
 
 	void Android_File::read(void* buffer, size_t size)
 	{
-		AAsset_read(asset, buffer, size);
+		if (asset != nullptr) {
+			AAsset_read(asset, buffer, size);
+		}
+		else if (file != nullptr) {
+			if (std::fread(buffer, size, 1, file) != 1) {
+				throw std::runtime_error("File error: could not read " + clib::to_string(size) + " bytes");
+			};
+		}
+		else {
+			throw std::runtime_error("File error: handle is null");
+		}
 	}
 
 	void Android_File::read(std::stringstream & output)
@@ -34,17 +59,25 @@ namespace android
 		// Do whatever you want with the content of the file
 		output = std::stringstream(fileContent);
 
-		// Free the memoery you allocated earlier
+		// Free the memory allocated earlier
 		delete[] fileContent;
 	}
 
 	void Android_File::close()
 	{
-		AAsset_close(asset);
+		if (asset != nullptr) {
+			AAsset_close(asset);
+		}
+		else if (file != nullptr) {
+			std::fclose(file);
+		}
 	}
 
 	bool Android_File::is_open()
 	{
-		return true;
+		if (asset != nullptr || file != nullptr) {
+			return true;
+		}
+		return false;
 	}
 }

@@ -10,7 +10,7 @@
 #include "android/Android_File.h"
 #endif
 
-#include "android/clib.h"
+#include "clib.h"
 
 namespace platform
 {
