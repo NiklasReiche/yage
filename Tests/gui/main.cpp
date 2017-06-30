@@ -1,10 +1,11 @@
 #define DESKTOP
 #define GL3
-#include <graphics\Graphics.h>
-#include <platform\Platform.h>
+#include <graphics/Graphics.h>
+#include <platform/Platform.h>
 
-#include <input\InputController.h>
-#include <gui\gui.h>
+#include <input/InputController.h>
+#include <gui/gui.h>
+#include <gui/Animation.h>
 
 class GuiTest
 {
@@ -15,6 +16,8 @@ private:
 
 public:
 	gui::Master* master;
+
+	gui::Frame* frame_1;
 
 	gui::PushButton* button_1;
 	int clicks = 0;
@@ -32,15 +35,23 @@ public:
 		master = new gui::Master(platform, gl, inputController);
 		master->addFont("D:/Dev/Projects/YAGE/Tests/gui/res/arial.font");
 
+		gui::WidgetLayout frameLayout;
+		frameLayout.color = 0x00000000u;
+		frameLayout.geometry.size = gml::Vec2<float>(250, 100);
+
+		frame_1 = master->createWidget<gui::Frame>(nullptr, frameLayout);
+
 		gui::ButtonLayout buttonLayout;
 		buttonLayout.geometry.position = gml::Vec2<float>(10.0f);
 		buttonLayout.hoverColor = 0xDDDDDDFF;
 		buttonLayout.clickColor = gl::Color::GREY;
 		buttonLayout.border.size = 1;
+		buttonLayout.shadow.offset = 5;
+		buttonLayout.shadow.hardness = 0.2;
 		buttonLayout.text.text = "Push Button";
 		buttonLayout.command = std::bind(&GuiTest::on_button_1_click, this);
 
-		button_1 = master->createWidget<gui::PushButton>(nullptr, buttonLayout);
+		button_1 = master->createWidget<gui::PushButton>(frame_1, buttonLayout);
 
 		buttonLayout.geometry.position = gml::Vec2<float>(10.0f, 100.0f);
 		buttonLayout.text.text = "Check Button";
@@ -53,7 +64,7 @@ public:
 		gui::TextLayout textLayout;
 		textLayout.text = "clicks: 0";
 
-		label_1 = master->createWidget<gui::Label>(nullptr, labelLayout, textLayout);
+		label_1 = master->createWidget<gui::Label>(frame_1, labelLayout, textLayout);
 
 		labelLayout.geometry.position = gml::Vec2<float>(16.0f + button_2->getSize().x, 100.0f);
 		textLayout.text = "state: unselected";
@@ -111,15 +122,22 @@ public:
 int main()
 {
 	platform::PlatformHandle platformHandle;
-	gl::GraphicsContext glContext(&platformHandle, 500, 500);
+	gl::GraphicsContext glContext(&platformHandle, 1000, 500);
 	input::InputController inputController(&platformHandle);
 
-	GuiTest gui(&platformHandle, &glContext, &inputController);
+	GuiTest guiTest(&platformHandle, &glContext, &inputController);
+
+	gui::Animation animation(guiTest.frame_1, gml::Vec2<float>(500.0f, 0.0f), 1);
+	animation.start();
 	
 	glContext.showWindow();
+	platformHandle.getTimeStep();
 	while (!glContext.getCloseFlag())
 	{
-		gui.master->update();
+		double dt = platformHandle.getTimeStep();
+		animation.update(dt);
+
+		guiTest.master->update();
 
 		glContext.swapBuffers();
 		inputController.poll();

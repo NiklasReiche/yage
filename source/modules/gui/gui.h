@@ -13,3 +13,5 @@
 #include "widgets/Button.h"
 #include "widgets/Label.h"
 #include "widgets/Frame.h"
+
+#include "Animation.h"
