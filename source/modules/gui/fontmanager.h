@@ -10,6 +10,7 @@ namespace gui
 	class FontManager
 	{
 	private:
+		platform::PlatformHandle* platform;
 		font::FontLoader fontLoader;
 		std::map<std::string, font::Font> fonts;
 
