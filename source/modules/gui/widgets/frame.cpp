@@ -2,7 +2,9 @@
 
 namespace gui
 {
-	Frame::Frame()
+	Frame::Frame(Widget * parent, MasterInterface master, WidgetLayout layout)
+		: Widget(parent, master, layout)
 	{
+		isInteractable = false;
 	}
 }

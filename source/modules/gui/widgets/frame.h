@@ -11,8 +11,8 @@ namespace gui
 	class Frame : public Widget
 	{
 	private:
-		std::vector<std::shared_ptr<Widget>> children;
+		
 	public:
-		Frame();
+		Frame(Widget * parent, MasterInterface master, WidgetLayout layout);
 	};
 }
