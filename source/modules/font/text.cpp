@@ -7,7 +7,7 @@ namespace font
 	*****************************************/
 
 	Text::Text(gl::GraphicsContext* glContext, std::string text, const Font & font, gml::Vec2<float> position, unsigned int color, int size)
-		: text(text), position(position), color(gl::toVec4(color)), fontSize(size)
+		: text(text), position(position), color(gl::toVec4(color)), fontSize(size), font(font)
 	{
 		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices, font);
@@ -164,6 +164,14 @@ namespace font
 		std::vector<gl::Gfloat> vertices;
 		constructVertexColors(vertices);
 		bufferSubData(vertexOffsetColors, vertices);
+	}
+
+	void Text::setPosition(gml::Vec2<float> position)
+	{
+		this->position = position;
+		std::vector<gl::Gfloat> vertices;
+		constructVertices(vertices, font);
+		this->bufferSubData(0, vertices);
 	}
 
 	gl::Texture Text::getTexture()

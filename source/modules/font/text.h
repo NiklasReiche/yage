@@ -21,6 +21,7 @@ namespace font
 	{
 	private:
 		gl::Texture textureAtlas;
+		font::Font font;
 
 		gml::Vec2<float> position;
 		gml::Vec2<float> size;
@@ -54,6 +55,8 @@ namespace font
 		void appendText(std::string text, const Font & font);
 
 		void setColor(unsigned int color);
+
+		void setPosition(gml::Vec2<float> position);
 
 		gl::Texture getTexture();
 	};
