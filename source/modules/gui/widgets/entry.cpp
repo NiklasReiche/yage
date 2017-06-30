@@ -3,6 +3,7 @@
 
 namespace gui
 {
+#if 0
 	TextEntry::TextEntry(Widget * parent, MasterInterface master, W_Geometry geometry, W_Border border, unsigned int color)
 		: Widget(parent, master, geometry, color, border, W_Shadow{ 0, 0.0f })
 	{
@@ -35,4 +36,5 @@ namespace gui
 			//text += glfwGetKeyName(keys[i]);
 		}
 	}
+#endif
 }

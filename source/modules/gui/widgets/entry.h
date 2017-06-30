@@ -12,6 +12,7 @@
 
 namespace gui
 {
+#if 0
 	class TextEntry : public Widget
 	{
 	private:
@@ -28,4 +29,5 @@ namespace gui
 		void setText(TextLayout text) { label->setText(text); }
 		void setTextColor(unsigned int color) { label->setTextColor(color); }
 	};
+#endif
 }
