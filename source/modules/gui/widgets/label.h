@@ -30,5 +30,7 @@ namespace gui
 
 		void setText(TextLayout text);
 		void setTextColor(unsigned int color) { text.setColor(color); }
+
+		void move(gml::Vec2<float> position);
 	};
 }

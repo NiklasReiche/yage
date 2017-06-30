@@ -5,9 +5,8 @@ namespace gui
 	Label::Label(Widget * parent, MasterInterface master, WidgetLayout layout, TextLayout text)
 		: Widget(parent, master, layout)
 	{
-		this->hasText = true;
-
 		if (text.text != "") {
+			this->hasText = true;
 			font::Font & mFont = master.fontManager->getFont(text.font);
 			this->text = font::Text(master.glContext, text.text, mFont, this->position + gml::Vec2<float>(padding), text.color, text.size);
 
@@ -29,5 +28,11 @@ namespace gui
 			parent->setSize(this->size);
 			parent->updateParams();
 		}
+	}
+
+	void Label::move(gml::Vec2<float> position)
+	{
+		Widget::move(position);
+		text.setPosition(position);
 	}
 }
