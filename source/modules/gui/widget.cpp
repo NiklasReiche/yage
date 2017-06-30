@@ -2,19 +2,8 @@
 
 namespace gui
 {
-	Widget::Widget(Widget * parent, MasterInterface master, W_Geometry geometry, unsigned int color, W_Border border, W_Shadow shadow)
-		: parent(parent), master(master), position(geometry.position), size(geometry.size), borderSize(border.size), shadowOffset(shadow.offset), shadowHardness(shadow.hardness)
-	{
-		this->color = gl::toVec4(color);
-		this->borderColor = gl::toVec4(border.color);
-		this->position = parent->getPosition() + position;
-
-		std::vector<gl::Gfloat> vertices;
-		constructVertices(vertices);
-		master.glContext->createDrawable(*this, vertices, std::vector<int> { 2, 4 }, gl::DrawMode::DRAW_DYNAMIC, gl::VertexFormat::BATCHED);
-	}
 	Widget::Widget(Widget * parent, MasterInterface master, const WidgetLayout & layout)
-		: parent(parent), master(master), position(layout.geometry.position), size(layout.geometry.size), borderSize(layout.border.size)
+		: parent(parent), master(master), position(layout.geometry.position), size(layout.geometry.size), borderSize(layout.border.size), shadowOffset(layout.shadow.offset), shadowHardness(layout.shadow.hardness)
 	{
 		this->color = gl::toVec4(layout.color);
 		this->borderColor = gl::toVec4(layout.border.color);
@@ -44,7 +33,7 @@ namespace gui
 		
 
 		// Drop Shadow Effect
-		if (sh > 0)
+		if (so != 0 && sh > 0)
 		{
 			std::array<gl::Gfloat, 12> pos_shadow = {
 				left + so,	top + so,
@@ -170,5 +159,22 @@ namespace gui
 		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices);
 		bufferSubData(0, vertices);
+	}
+
+	void Widget::resize(gml::Vec2<float> size) 
+	{
+		this->size = size;
+		updateParams();
+	}
+	void Widget::move(gml::Vec2<float> position)
+	{
+		for (auto & child : children)
+		{
+			gml::Vec2<float> childPosition = child->getPosition() - this->position;
+			child->move(position + childPosition);
+		}
+
+		this->position = position;
+		updateParams();
 	}
 }
