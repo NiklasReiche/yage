@@ -13,12 +13,14 @@ namespace gui
 		WidgetLayout labelLayout = layout;
 		labelLayout.geometry.position = gml::Vec2<float>();
         labelLayout.geometry.size = gml::Vec2<float>();
-		labelLayout.color = 0x00000000;
+		labelLayout.color = 0x00000000u;
+		labelLayout.shadow.offset = 0;
+		labelLayout.border.size = 0;
 		label = this->createWidget<Label>(master, labelLayout, layout.text);
 
 		if (size == gml::Vec2<float>(0.0f)) {
 			this->size = label->getSize();
-			updateParams();
+			resize(this->size);
 		}
 	}
 
