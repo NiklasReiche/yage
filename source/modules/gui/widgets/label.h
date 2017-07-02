@@ -22,7 +22,6 @@ namespace gui
 
 		float padding = 2;
 
-
 	public:
 		Label(Widget * parent, MasterInterface master, WidgetLayout layout, TextLayout text);
 
@@ -31,6 +30,6 @@ namespace gui
 		void setText(TextLayout text);
 		void setTextColor(unsigned int color) { text.setColor(color); }
 
-		void move(gml::Vec2<float> position);
+		void updateGeometry();
 	};
 }

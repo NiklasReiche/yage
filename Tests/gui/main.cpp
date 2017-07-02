@@ -29,6 +29,8 @@ public:
 	gui::RadioGroup<int>* radio;
 	gui::Label* label_3;
 
+	gui::Animation* animation_1;
+
 	GuiTest(platform::PlatformHandle * platform, gl::GraphicsContext * gl, input::InputController * inputController)
 		: platform(platform), gl(gl), input(inputController)
 	{
@@ -36,13 +38,27 @@ public:
 		master->addFont("D:/Dev/Projects/YAGE/Tests/gui/res/arial.font");
 
 		gui::WidgetLayout frameLayout;
-		frameLayout.color = 0x00000000u;
-		frameLayout.geometry.size = gml::Vec2<float>(250, 100);
+		frameLayout.color = gl::Color::GREY;
+		frameLayout.layout = gui::LayoutType::V_LIST_LAYOUT;
+		frameLayout.geometry.parentSizeHint = gui::ParentSizeHint::WRAP_AROUND;
+		frameLayout.geometry.anchor = gui::Anchor::TOP_LEFT;
+		frameLayout.geometry.size = gml::Vec2<float>(100, 100);
+		frameLayout.geometry.offset = gml::Vec2<float>(50, 50);
 
 		frame_1 = master->createWidget<gui::Frame>(nullptr, frameLayout);
 
+		gui::WidgetLayout labelLayout;
+		labelLayout.border.size = 3;
+		labelLayout.geometry.offset = gml::Vec2<float>(10);
+		labelLayout.geometry.anchor = gui::Anchor::BOTTOM_LEFT;
+		gui::TextLayout textLayout;
+		textLayout.text = "Label";
+
+		label_1 = master->createWidget<gui::Label>(frame_1, labelLayout, textLayout);
+
 		gui::ButtonLayout buttonLayout;
-		buttonLayout.geometry.position = gml::Vec2<float>(10.0f);
+		buttonLayout.geometry.anchor = gui::Anchor::TOP_RIGHT;
+		buttonLayout.geometry.offset = gml::Vec2<float>(10);
 		buttonLayout.hoverColor = 0xDDDDDDFF;
 		buttonLayout.clickColor = gl::Color::GREY;
 		buttonLayout.border.size = 1;
@@ -53,6 +69,9 @@ public:
 
 		button_1 = master->createWidget<gui::PushButton>(frame_1, buttonLayout);
 
+		animation_1 = frame_1->createAnimation(master, frame_1->getPosition(), frame_1->getPosition() + gml::Vec2<float>(200, 0), 2);
+
+#if 0
 		buttonLayout.geometry.position = gml::Vec2<float>(10.0f, 100.0f);
 		buttonLayout.text.text = "Check Button";
 		buttonLayout.command = std::bind(&GuiTest::on_button_2_click, this);
@@ -87,6 +106,7 @@ public:
 		textLayout.text = "state: 1";
 
 		label_3 = master->createWidget<gui::Label>(nullptr, labelLayout, textLayout);
+#endif
 	}
 	~GuiTest()
 	{
@@ -95,10 +115,13 @@ public:
 
 	void on_button_1_click()
 	{
+		animation_1->start();
+		/*
 		clicks++;
 		gui::TextLayout textLayout;
 		textLayout.text = "clicks: " + clib::to_string(clicks);
 		label_1->setText(textLayout);
+		*/
 	}
 	void on_button_2_click()
 	{
@@ -127,17 +150,15 @@ int main()
 
 	GuiTest guiTest(&platformHandle, &glContext, &inputController);
 
-	gui::Animation animation(guiTest.frame_1, gml::Vec2<float>(500.0f, 0.0f), 1);
-	animation.start();
+	
 	
 	glContext.showWindow();
 	platformHandle.getTimeStep();
 	while (!glContext.getCloseFlag())
 	{
 		double dt = platformHandle.getTimeStep();
-		animation.update(dt);
 
-		guiTest.master->update();
+		guiTest.master->update(dt);
 
 		glContext.swapBuffers();
 		inputController.poll();

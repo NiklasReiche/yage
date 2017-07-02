@@ -5,6 +5,7 @@
 set( YAGE_MATH_SOURCE
 
 	"${YAGE_CORE_PATH}/math/MVector.h"
+	"${YAGE_CORE_PATH}/math/Interpolation.h"
 	
 )
 
@@ -91,6 +92,7 @@ set( YAGE_PLATFORM_SOURCE
 
 	"${YAGE_CORE_PATH}/platform/Platform.h"
 	"${YAGE_CORE_PATH}/platform/GenericHandle.h"
+	"${YAGE_CORE_PATH}/platform/clib.h"
 
 )
 set( YAGE_PLATFORM_DESKTOP_SOURCE
@@ -111,6 +113,5 @@ set( YAGE_PLATFORM_ANDROID_SOURCE
 	"${YAGE_CORE_PATH}/platform/android/android_native_app_glue.c"
 	"${YAGE_CORE_PATH}/platform/android/Android_File.h"
 	"${YAGE_CORE_PATH}/platform/android/Android_File.cpp"
-	"${YAGE_CORE_PATH}/platform/android/clib.h"
 
 )

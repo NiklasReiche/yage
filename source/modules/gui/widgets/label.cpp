@@ -11,8 +11,7 @@ namespace gui
 			this->text = font::Text(master.glContext, text.text, mFont, this->position + gml::Vec2<float>(padding), text.color, text.size);
 
 			if (size == gml::Vec2<float>(0.0f)) {
-				this->size = this->text.getSize() + gml::Vec2<float>(padding * 2);
-				updateParams();
+				resize(this->text.getSize() + gml::Vec2<float>(padding * 2));
 			}
 		}
 	}
@@ -23,16 +22,14 @@ namespace gui
 		this->text = font::Text(master.glContext, text.text, mFont, this->position + gml::Vec2<float>(padding), text.color, text.size);
 
 		if (size == gml::Vec2<float>(0.0f)) {
-			this->size = this->text.getSize() + gml::Vec2<float>(padding * 2);
-			updateParams();
-			parent->setSize(this->size);
-			parent->updateParams();
+			resize(this->text.getSize() + gml::Vec2<float>(padding * 2));
 		}
 	}
 
-	void Label::move(gml::Vec2<float> position)
+
+	void Label::updateGeometry()
 	{
-		Widget::move(position);
+		Widget::updateGeometry();
 		text.setPosition(position);
 	}
 }

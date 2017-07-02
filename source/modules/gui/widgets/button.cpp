@@ -11,7 +11,7 @@ namespace gui
 		this->clickColor = gl::toVec4(layout.clickColor);
 
 		WidgetLayout labelLayout = layout;
-		labelLayout.geometry.position = gml::Vec2<float>();
+		labelLayout.geometry.offset = gml::Vec2<float>();
         labelLayout.geometry.size = gml::Vec2<float>();
 		labelLayout.color = 0x00000000u;
 		labelLayout.shadow.offset = 0;

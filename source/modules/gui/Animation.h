@@ -2,16 +2,19 @@
 
 #include "core.h"
 #include <math/Interpolation.h>
-#include "Widget.h"
 
 namespace gui
 {
+	class Widget;
+	class Master;
+
 	class Animation
 	{
 	private:
+		Master* master;
 		Widget* widget;
 
-		double timeCurrent;
+		double timeCurrent = 0.0;
 		double timeEnd;
 		gml::Vec2<float> beg;
 		gml::Vec2<float> goal;
@@ -19,11 +22,12 @@ namespace gui
 		bool isFinished = false;
 
 	public:
-		Animation(Widget* widget, gml::Vec2<float> goal, double time);
+		Animation(Widget* widget, Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time);
 
 		void start();
-		void update(double dt);
 		void stop();
+		void update(double dt);
+		void reset();
 
 		bool is_finished();
 	};

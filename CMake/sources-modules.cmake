@@ -60,5 +60,9 @@ set( YAGE_GUI_SOURCE
 	"${YAGE_MODULES_PATH}/gui/widgets/label.cpp"
 
 	"${YAGE_MODULES_PATH}/gui/interface.h"
+	"${YAGE_MODULES_PATH}/gui/Animation.h"
+	"${YAGE_MODULES_PATH}/gui/Animation.cpp"
+	"${YAGE_MODULES_PATH}/gui/Layouts.h"
+	"${YAGE_MODULES_PATH}/gui/Layouts.cpp"
 	
 )

@@ -8,7 +8,7 @@ namespace gui
 		inputManager(InputManager(inputController->addListener(), &root)),
 		renderer(GuiRenderer(platform, glContext, gl::Viewport(0, 0, glContext->getWidth(), glContext->getHeight())))
 	{
-		root.setSize(gml::Vec2<float>(glContext->getWidth(), glContext->getHeight()));
+		root.resize(gml::Vec2<float>(glContext->getWidth(), glContext->getHeight()));
 	}
 
 	void Master::sortWidgets(std::vector<gl::Drawable*> & vector_widget, std::vector<font::Text*> & vector_text, Widget & widget)
@@ -26,8 +26,20 @@ namespace gui
 		}
 	}
 
-	void Master::update()
+	void Master::update(double dt)
 	{
+		auto it = animations.begin();
+		while (it != animations.end())
+		{
+			if ((*it)->is_finished()) {
+				it = animations.erase(it);
+			}
+			else {
+				(*it)->update(dt);
+				++it;
+			}
+		}
+
 		inputManager.update(root);
 
 		std::vector<gl::Drawable*> vector_widget;
@@ -39,5 +51,14 @@ namespace gui
 		renderer.text = std::move(vector_text);
 
 		renderer.render();
+	}
+
+	void Master::activateAnimation(Animation * animation)
+	{
+		animations.push_back(animation);
+	}
+	void Master::deactivateAnimation(Animation * animation)
+	{
+		animations.erase(std::remove(animations.begin(), animations.end(), animation), animations.end());
 	}
 }

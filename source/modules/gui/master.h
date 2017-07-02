@@ -10,6 +10,7 @@
 #include "InputManager.h"
 #include "Interface.h"
 #include "Widget.h"
+#include "Animation.h"
 
 namespace gui
 {
@@ -24,15 +25,19 @@ namespace gui
 		GuiRenderer renderer;
 
 		Widget root;
+		std::vector<Animation*> animations;
 
 		void sortWidgets(std::vector<gl::Drawable*> & vector_widget, std::vector<font::Text*> & vector_text, Widget & widget);
 
 	public:
 		Master(platform::PlatformHandle * platform, gl::GraphicsContext * glContext, input::InputController * inputController);
 
-		void update();
+		void update(double dt);
 
 		void addFont(std::string filename) { fontManager.addFont(filename); }
+
+		void activateAnimation(Animation * animation);
+		void deactivateAnimation(Animation * animation);
 
 		template <typename Element, typename... Args>
 		Element* createWidget(Widget* parent, Args... args)

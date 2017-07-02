@@ -3,18 +3,53 @@
 #include <vector>
 #include <array>
 #include <memory>
+#include <tuple>
 #include <functional>
 
 #include "core.h"
 #include "Interface.h"
 #include "FontManager.h"
+#include "Animation.h"
+#include "Layouts.h"
 
 namespace gui
 {
+	class Master;
+
+	enum class Anchor
+	{
+		TOP_LEFT,
+		TOP_RIGHT,
+		BOTTOM_LEFT,
+		BOTTOM_RIGHT,
+		CENTER
+	};
+	enum class ValueType
+	{
+		ABSOLUTE,
+		RELATIVE
+	};
+	enum class ParentSizeHint
+	{
+		WRAP_CHILDREN,
+		WRAP_AROUND
+	};
+	enum class ChildSizeHint
+	{
+		MIN,
+		FIXED,
+		ASPECT
+	};
+
 	struct W_Geometry
 	{
-		gml::Vec2<float> position;
+		Anchor anchor = Anchor::TOP_LEFT;
+		ValueType offsetType = ValueType::ABSOLUTE;
+		gml::Vec2<float> offset;
+		ValueType sizeType = ValueType::ABSOLUTE;
 		gml::Vec2<float> size;
+		ParentSizeHint parentSizeHint = ParentSizeHint::WRAP_CHILDREN;
+		ChildSizeHint childSizeHint = ChildSizeHint::MIN;
 	};
 	struct W_Border
 	{
@@ -24,28 +59,34 @@ namespace gui
 	struct W_Shadow
 	{
 		int offset = 0;
-		float hardness = 0;
+		float hardness = 0.5f;
 	};
 	struct WidgetLayout
 	{
+		LayoutType layout;
 		W_Geometry geometry;
 		W_Border border;
 		W_Shadow shadow;
 		unsigned int color = gl::Color::WHITE;
 	};
 
+
 	class Widget : public gl::Drawable
 	{
 	private:
 		friend class InputManager;
+		friend class Animation;
 
+		void constructCoords(std::vector<gl::Gfloat> & vertices);
+		void constructColors(std::vector<gl::Gfloat> & vertices);
 		void constructVertices(std::vector<gl::Gfloat> & vertices);
 
 	protected:
-		Widget* parent;
-		std::vector<std::unique_ptr<Widget>> children;
-
 		MasterInterface master;
+		Widget* parent = nullptr;
+		std::vector<std::unique_ptr<Widget>> children;
+		std::unique_ptr<Layout> layouter;
+		std::vector<Animation> animations;
 
 		int level = 0; /* position of the widget in the widget tree hirachy */
 		bool isActive = true;
@@ -53,6 +94,10 @@ namespace gui
 		bool isHovered = false;
 		bool hasText = false;
 
+		Anchor anchor;
+		ParentSizeHint parentSizeHint;
+		ChildSizeHint childSizeHint;
+		gml::Vec2<float> offset;
 		gml::Vec2<float> position;
 		gml::Vec2<float> size;
 		gml::Vec4<float> color;
@@ -64,8 +109,7 @@ namespace gui
 		float shadowHardness;
 
 	public:
-		Widget() {}
-		Widget(Widget * parent, MasterInterface master, W_Geometry geometry, unsigned int color, W_Border border, W_Shadow shadow);
+		Widget();
 		Widget(Widget * parent, MasterInterface master, const WidgetLayout & layout);
 		virtual ~Widget() {}
 
@@ -73,6 +117,7 @@ namespace gui
 		Element* createWidget(MasterInterface mInterface, Args... args)
 		{
 			children.push_back( std::make_unique<Element>(this, mInterface, std::forward<Args>(args)...) );
+			layouter->update(this);
 			return (Element*)children.back().get();
 		}
 		
@@ -104,9 +149,11 @@ namespace gui
 		void hide() { isActive = false; }
 		void show() { isActive = true; }
 
+#if 0
 		void setGeometry(W_Geometry geometry) { this->position = geometry.position; this->size = geometry.size; }
 		void setPosition(gml::Vec2<float> position) { this->position = position; }
 		void setSize(gml::Vec2<float> size) { this->size = size; }
+#endif
 
 		void setColor(int color) { this->color = gl::toVec4(color); }
 		void setColor(gml::Vec4<float> color) { this->color = color; }
@@ -121,7 +168,14 @@ namespace gui
 
 		/* update semantics */
 		void updateParams();
-		void resize(gml::Vec2<float> size) { setSize(size); updateParams(); }
-		void reposition(gml::Vec2<float> position) { setPosition(position); updateParams(); }
+		virtual void updateGeometry();
+		virtual void resize(gml::Vec2<float> size);
+		virtual void move(gml::Vec2<float> position);
+		virtual void setAnchor(Anchor anchor);
+
+		ParentSizeHint getParentSizeHint() { return parentSizeHint; }
+		ChildSizeHint getChildSizeHint() { return childSizeHint; }
+
+		Animation* createAnimation(Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time);
 	};
 }
