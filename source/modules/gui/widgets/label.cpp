@@ -2,16 +2,18 @@
 
 namespace gui
 {	
-	Label::Label(Widget * parent, MasterInterface master, WidgetLayout layout, TextLayout text)
-		: Widget(parent, master, layout)
+	Label::Label(Widget * parent, MasterInterface master, LabelLayout layout, TextLayout text)
+		: Widget(parent, master, layout), padding(layout.padding)
 	{
 		if (text.text != "") {
 			this->hasText = true;
 			font::Font & mFont = master.fontManager->getFont(text.font);
-			this->text = font::Text(master.glContext, text.text, mFont, this->position + gml::Vec2<float>(padding), text.color, text.size);
+			gml::Vec2f textPosition = this->position + gml::Vec2f(borderSize) + padding;
+
+			this->text = font::Text(master.glContext, text.text, mFont, textPosition, text.color, text.size);
 
 			if (size == gml::Vec2<float>(0.0f)) {
-				resize(this->text.getSize() + gml::Vec2<float>(padding * 2));
+				resize(this->text.getSize() + padding * 2);
 			}
 		}
 	}
@@ -19,10 +21,12 @@ namespace gui
 	void Label::setText(TextLayout text)
 	{
 		font::Font & mFont = master.fontManager->getFont(text.font);
-		this->text = font::Text(master.glContext, text.text, mFont, this->position + gml::Vec2<float>(padding), text.color, text.size);
+		gml::Vec2f textPosition = this->position + gml::Vec2f(borderSize) + padding;
 
-		if (size == gml::Vec2<float>(0.0f)) {
-			resize(this->text.getSize() + gml::Vec2<float>(padding * 2));
+		this->text = font::Text(master.glContext, text.text, mFont, textPosition, text.color, text.size);
+
+		if (size == gml::Vec2f(0.0f)) {
+			resize(this->text.getSize() + padding * 2);
 		}
 	}
 
@@ -30,6 +34,7 @@ namespace gui
 	void Label::updateGeometry()
 	{
 		Widget::updateGeometry();
-		text.setPosition(position);
+		gml::Vec2f textPosition = position + gml::Vec2f(borderSize) + padding;
+		text.setPosition(textPosition);
 	}
 }

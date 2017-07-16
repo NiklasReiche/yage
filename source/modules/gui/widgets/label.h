@@ -7,6 +7,10 @@
 
 namespace gui
 {
+	struct LabelLayout : public WidgetLayout
+	{
+		gml::Vec2f padding = 2.0f;
+	};
 	struct TextLayout
 	{
 		std::string text = "";
@@ -20,10 +24,10 @@ namespace gui
 	private:
 		font::Text text;
 
-		float padding = 2;
+		gml::Vec2f padding = gml::Vec2f(2.0f);
 
 	public:
-		Label(Widget * parent, MasterInterface master, WidgetLayout layout, TextLayout text);
+		Label(Widget * parent, MasterInterface master, LabelLayout layout, TextLayout text);
 
 		font::Text* getText() { return &text; }
 

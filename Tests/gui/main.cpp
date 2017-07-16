@@ -40,15 +40,15 @@ public:
 		gui::WidgetLayout frameLayout;
 		frameLayout.color = gl::Color::GREY;
 		frameLayout.layout = gui::LayoutType::V_LIST_LAYOUT;
-		frameLayout.geometry.parentSizeHint = gui::ParentSizeHint::WRAP_AROUND;
+		frameLayout.geometry.parentSizeHint = gui::ParentSizeHint::WRAP_CHILDREN_RESIZE;
 		frameLayout.geometry.anchor = gui::Anchor::TOP_LEFT;
 		frameLayout.geometry.size = gml::Vec2<float>(100, 100);
 		frameLayout.geometry.offset = gml::Vec2<float>(50, 50);
 
 		frame_1 = master->createWidget<gui::Frame>(nullptr, frameLayout);
 
-		gui::WidgetLayout labelLayout;
-		labelLayout.border.size = 3;
+		gui::LabelLayout labelLayout;
+		labelLayout.border.size = 1;
 		labelLayout.geometry.offset = gml::Vec2<float>(10);
 		labelLayout.geometry.anchor = gui::Anchor::BOTTOM_LEFT;
 		gui::TextLayout textLayout;

@@ -9,6 +9,7 @@ namespace gui
 	Widget::Widget(Widget * parent, MasterInterface master, const WidgetLayout & layout)
 		: parent(parent), master(master), offset(layout.geometry.offset), anchor(layout.geometry.anchor), size(layout.geometry.size), borderSize(layout.border.size), shadowOffset(layout.shadow.offset), shadowHardness(layout.shadow.hardness)
 	{
+		this->innerSize = size - gml::Vec2f(borderSize * 2);
 		this->color = gl::toVec4(layout.color);
 		this->borderColor = gl::toVec4(layout.border.color);
 
@@ -22,11 +23,11 @@ namespace gui
 			this->layouter = std::make_unique<Layout>();
 		}
 
-		updateGeometry();
-
 		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices);
 		master.glContext->createDrawable(*this, vertices, std::vector<int> { 2, 4 }, gl::DrawMode::DRAW_DYNAMIC, gl::VertexFormat::BATCHED);
+
+		updateGeometry();
 	}
 	
 	void Widget::constructCoords(std::vector<gl::Gfloat> & vertices)
@@ -57,6 +58,7 @@ namespace gui
 		if (bs != 0)
 		{
 			// Check if inline border
+			bs *= -1;
 			if (bs < 0)
 			{
 				bs *= -1;
@@ -218,6 +220,7 @@ namespace gui
 		if (bs != 0)
 		{
 			// Check if inline border
+			bs *= -1;
 			if (bs < 0)
 			{
 				bs *= -1;
@@ -320,12 +323,13 @@ namespace gui
 		bufferSubData(0, vertices);
 	}
 
-	void Widget::resize(gml::Vec2<float> size) 
+	void Widget::resize(gml::Vec2f size) 
 	{
 		this->size = size;
+		this->innerSize = size - gml::Vec2f(borderSize);
 		updateGeometry();
 	}
-	void Widget::move(gml::Vec2<float> position)
+	void Widget::move(gml::Vec2f position)
 	{
 		this->offset = position;
 		updateGeometry();
@@ -338,23 +342,34 @@ namespace gui
 
 	void Widget::updateGeometry()
 	{
-		if (anchor == Anchor::TOP_LEFT) {
-			position = parent->getPosition() + offset;
-		}
-		else if (anchor == Anchor::BOTTOM_LEFT) {
-			position.x = parent->getPosition().x + offset.x;
-			position.y = (parent->getPosition().y + parent->getSize().y) - (offset.y + size.y);
-		}
-		else if (anchor == Anchor::TOP_RIGHT) {
-			position.x = (parent->getPosition().x + parent->getSize().x) - (offset.x + size.x);
-			position.y = parent->getPosition().y + offset.y;
-		}
-		else if (anchor == Anchor::BOTTOM_RIGHT) {
-			position.x = (parent->getPosition().x + parent->getSize().x) - (offset.x + size.x);
-			position.y = (parent->getPosition().y + parent->getSize().y) - (offset.y + size.y);
-		}
-		else if (anchor == Anchor::CENTER) {
-			position = parent->getPosition() + parent->getSize() / 2 + offset;
+		if (parent != nullptr) {
+			switch (anchor)
+			{
+			case Anchor::TOP_LEFT:
+				position = parent->getInnerPosition() + offset;
+				break;
+
+			case Anchor::BOTTOM_LEFT:
+				position.x = parent->getInnerPosition().x + offset.x;
+				position.y = (parent->getInnerPosition().y + parent->getInnerSize().y) - (offset.y + size.y);
+				break;
+
+			case Anchor::TOP_RIGHT:
+				position.x = (parent->getInnerPosition().x + parent->getInnerSize().x) - (offset.x + size.x);
+				position.y = parent->getInnerPosition().y + offset.y;
+				break;
+
+			case Anchor::BOTTOM_RIGHT:
+				position.x = (parent->getInnerPosition().x + parent->getInnerSize().x) - (offset.x + size.x);
+				position.y = (parent->getInnerPosition().y + parent->getInnerSize().y) - (offset.y + size.y);
+				break;
+
+			case Anchor::CENTER:
+				position = parent->getInnerPosition() + parent->getInnerSize() / 2 + offset;
+				break;
+			}
+
+			innerPosition = position + gml::Vec2f(borderSize);
 		}
 
 		for (auto & child : children)

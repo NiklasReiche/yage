@@ -10,15 +10,16 @@ namespace gui
 		this->hoverColor = gl::toVec4(layout.hoverColor);
 		this->clickColor = gl::toVec4(layout.clickColor);
 
-		WidgetLayout labelLayout = layout;
-		labelLayout.geometry.offset = gml::Vec2<float>();
-        labelLayout.geometry.size = gml::Vec2<float>();
+		LabelLayout labelLayout;
+		labelLayout.geometry.offset = gml::Vec2f();
+        labelLayout.geometry.size = gml::Vec2f();
 		labelLayout.color = 0x00000000u;
 		labelLayout.shadow.offset = 0;
 		labelLayout.border.size = 0;
+
 		label = this->createWidget<Label>(master, labelLayout, layout.text);
 
-		if (size == gml::Vec2<float>(0.0f)) {
+		if (size == gml::Vec2f(0.0f)) {
 			this->size = label->getSize();
 			resize(this->size);
 		}

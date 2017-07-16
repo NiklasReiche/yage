@@ -8,10 +8,10 @@ namespace gui
 
 	void VListLayout::update(Widget* parent)
 	{
+		gml::Vec2<float> padding(5.0f, 5.0f);
 		gml::Vec2<float> globalSize = parent->getSize();
 		float slotSize = globalSize.y / parent->getChildrenCount();
-		float offset = 10.0f;
-
+		float offset = padding.y;
 		
 		for (unsigned int i = 0; i < parent->getChildrenCount(); ++i)
 		{
@@ -19,14 +19,22 @@ namespace gui
 			child.setAnchor(Anchor::TOP_LEFT);
 			child.move(gml::Vec2<float>(0.0f, offset));
 			
-			if (parent->getParentSizeHint() == ParentSizeHint::WRAP_CHILDREN) {
+			switch (parent->getParentSizeHint())
+			{
+			case ParentSizeHint::WRAP_CHILDREN_RESIZE:
 				child.resize(gml::Vec2<float>(globalSize.x, slotSize));
 				offset += slotSize;
-			}
-			else if (parent->getParentSizeHint() == ParentSizeHint::WRAP_AROUND) {
+				break;
+
+			case ParentSizeHint::WRAP_CHILDREN_FIXED:
 				offset += child.getSize().y;
+				break;
+
+			case ParentSizeHint::WRAP_AROUND:
+				offset += child.getSize().y;
+				parent->resize(gml::Vec2<float>(globalSize.x, offset + padding.y));
+				break;
 			}
-		}
-		
+		}	
 	}
 }

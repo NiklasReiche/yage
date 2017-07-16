@@ -31,7 +31,8 @@ namespace gui
 	};
 	enum class ParentSizeHint
 	{
-		WRAP_CHILDREN,
+		WRAP_CHILDREN_RESIZE,
+		WRAP_CHILDREN_FIXED,
 		WRAP_AROUND
 	};
 	enum class ChildSizeHint
@@ -48,7 +49,7 @@ namespace gui
 		gml::Vec2<float> offset;
 		ValueType sizeType = ValueType::ABSOLUTE;
 		gml::Vec2<float> size;
-		ParentSizeHint parentSizeHint = ParentSizeHint::WRAP_CHILDREN;
+		ParentSizeHint parentSizeHint = ParentSizeHint::WRAP_CHILDREN_RESIZE;
 		ChildSizeHint childSizeHint = ChildSizeHint::MIN;
 	};
 	struct W_Border
@@ -94,19 +95,23 @@ namespace gui
 		bool isHovered = false;
 		bool hasText = false;
 
-		Anchor anchor;
+		Anchor anchor = Anchor::TOP_LEFT;
 		ParentSizeHint parentSizeHint;
 		ChildSizeHint childSizeHint;
-		gml::Vec2<float> offset;
-		gml::Vec2<float> position;
-		gml::Vec2<float> size;
+		gml::Vec2f offset;
+
+		gml::Vec2f position;
+		gml::Vec2f size;
+		gml::Vec2f innerPosition;
+		gml::Vec2f innerSize;
+
 		gml::Vec4<float> color;
 
-		int borderSize;
+		int borderSize = 0;
 		gml::Vec4<float> borderColor;
 		
-		int shadowOffset;
-		float shadowHardness;
+		int shadowOffset = 0;
+		float shadowHardness = 0.0f;
 
 	public:
 		Widget();
@@ -141,19 +146,15 @@ namespace gui
 
 		virtual font::Text* getText() { return nullptr; }
 
-		gml::Vec2<float> getPosition() { return position; }
-		gml::Vec2<float> getSize() { return size; }
-		gml::Vec4<float> getColor() { return color; }
+		gml::Vec2f getPosition() { return position; }
+		gml::Vec2f getInnerPosition() { return innerPosition; }
+		gml::Vec2f getSize() { return size; }
+		gml::Vec2f getInnerSize() { return innerSize; }
+		gml::Vec4f getColor() { return color; }
 
 		/* Setter */
 		void hide() { isActive = false; }
 		void show() { isActive = true; }
-
-#if 0
-		void setGeometry(W_Geometry geometry) { this->position = geometry.position; this->size = geometry.size; }
-		void setPosition(gml::Vec2<float> position) { this->position = position; }
-		void setSize(gml::Vec2<float> size) { this->size = size; }
-#endif
 
 		void setColor(int color) { this->color = gl::toVec4(color); }
 		void setColor(gml::Vec4<float> color) { this->color = color; }
@@ -169,8 +170,9 @@ namespace gui
 		/* update semantics */
 		void updateParams();
 		virtual void updateGeometry();
-		virtual void resize(gml::Vec2<float> size);
-		virtual void move(gml::Vec2<float> position);
+
+		virtual void resize(gml::Vec2f size);
+		virtual void move(gml::Vec2f position);
 		virtual void setAnchor(Anchor anchor);
 
 		ParentSizeHint getParentSizeHint() { return parentSizeHint; }
