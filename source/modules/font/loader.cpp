@@ -30,7 +30,7 @@ namespace font
 
 		platform::File file = platform->open(filename);
 		if (!file.is_open()) {
-			platform->log("ERROR::FONT_LOADER: could not open file " + filename);
+			throw FileException(filename);
 		}
 
 		file.seek(0, platform::SeekOffset::BEG);

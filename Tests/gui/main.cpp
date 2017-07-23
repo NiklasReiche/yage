@@ -35,7 +35,12 @@ public:
 		: platform(platform), gl(gl), input(inputController)
 	{
 		master = new gui::Master(platform, gl, inputController);
-		master->addFont("D:/Dev/Projects/YAGE/Tests/gui/res/arial.font");
+		try {
+			master->addFont("D:/Dev/Projects/YAGE/Tests/gui/res/arial.font");
+		}
+		catch (FileException& exception) {
+			platform->log("ERROR::FONT_LOADER: could not open file " + exception.what());
+		}
 
 		gui::WidgetLayout frameLayout;
 		frameLayout.color = gl::Color::GREY;

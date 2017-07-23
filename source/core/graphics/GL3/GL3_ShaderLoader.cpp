@@ -10,34 +10,47 @@ namespace gl3
 		std::string vertexCode(""), fragmentCode(""), geometryCode("");
 		std::string vertexCodeLine, fragmentCodeLine, geometryCodeLine;
 		// File Handle
-		try {
-			std::ifstream vertexFile, fragmentFile, geometryFile;
 
-			vertexFile.open(vertex_path);
-			while (getline(vertexFile, vertexCodeLine))
-			{
-				vertexCode += vertexCodeLine + "\n";
-			}
-			vertexFile.close();
+		std::ifstream vertexFile, fragmentFile, geometryFile;
 
-			fragmentFile.open(fragment_path);
-			while (getline(fragmentFile, fragmentCodeLine))
-			{
-				fragmentCode += fragmentCodeLine + "\n";
-			}
-			fragmentFile.close();
-
-			if (geometry_path != "") {
-				geometryFile.open(geometry_path);
-				while (getline(geometryFile, geometryCodeLine))
-				{
-					geometryCode += geometryCodeLine + "\n";
-				}
-				geometryFile.close();
-			}
+		vertexFile.open(vertex_path);
+		if (!vertexFile.is_open()) {
+			throw FileException(vertex_path);
 		}
-		catch (std::exception err) {
-			std::cout << "ERROR::SHADER_LOADER: File Handling Error" << std::endl;
+			
+		while (getline(vertexFile, vertexCodeLine))
+		{
+			vertexCode += vertexCodeLine + "\n";
+		}
+
+		vertexFile.close();
+
+
+		fragmentFile.open(fragment_path);
+		if (!fragmentFile.is_open()) {
+			throw FileException(fragment_path);
+		}
+
+		while (getline(fragmentFile, fragmentCodeLine))
+		{
+			fragmentCode += fragmentCodeLine + "\n";
+		}
+
+		fragmentFile.close();
+
+
+		if (geometry_path != "") {
+			geometryFile.open(geometry_path);
+			if (!geometryFile.is_open()) {
+				throw FileException(geometry_path);
+			}
+
+			while (getline(geometryFile, geometryCodeLine))
+			{
+				geometryCode += geometryCodeLine + "\n";
+			}
+
+			geometryFile.close();
 		}
 
 		return glContext->compileShader(vertexCode, fragmentCode, geometryCode);

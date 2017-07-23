@@ -93,6 +93,7 @@ set( YAGE_PLATFORM_SOURCE
 	"${YAGE_CORE_PATH}/platform/Platform.h"
 	"${YAGE_CORE_PATH}/platform/GenericHandle.h"
 	"${YAGE_CORE_PATH}/platform/clib.h"
+	"${YAGE_CORE_PATH}/platform/Exception.h"
 
 )
 set( YAGE_PLATFORM_DESKTOP_SOURCE

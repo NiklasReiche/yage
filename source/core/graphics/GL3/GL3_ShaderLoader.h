@@ -8,6 +8,7 @@
 #include "gl3.h"
 #include "GL3_Context.h"
 #include "GL3_Shader.h"
+#include "platform/Exception.h"
 
 namespace gl3
 {

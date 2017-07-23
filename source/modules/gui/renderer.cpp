@@ -11,8 +11,13 @@ namespace gui
 	{
 #ifdef DESKTOP
 		gl::ShaderLoader loader(glContext);
-		guiShader = loader.loadShader("D:/Dev/Projects/YAGE/source/modules/gui/shaders/guiShader_GL3.vert", "D:/Dev/Projects/YAGE/source/modules/gui/shaders/guiShader_GL3.frag");
-		textShader = loader.loadShader("D:/Dev/Projects/YAGE/source/modules/font/shaders/textShader_GL3.vert", "D:/Dev/Projects/YAGE/source/modules/font/shaders/textShader_GL3.frag");
+		try {
+			guiShader = loader.loadShader("D:/Dev/Projects/YAGE/source/modules/gui/shaders/guiShader_GL3.vert", "D:/Dev/Projects/YAGE/source/modules/gui/shaders/guiShader_GL3.frag");
+			textShader = loader.loadShader("D:/Dev/Projects/YAGE/source/modules/font/shaders/textShader_GL3.vert", "D:/Dev/Projects/YAGE/source/modules/font/shaders/textShader_GL3.frag");
+		}
+		catch (FileException &exception) {
+			platform->log("ERROR::SHADER_LOADER: Could not open file " + exception.what());
+		}
 #endif
 #ifdef ANDROID
         gl::ShaderLoader loader(platform, glContext);

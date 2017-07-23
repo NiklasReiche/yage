@@ -11,6 +11,7 @@
 #endif
 
 #include "clib.h"
+#include "Exception.h"
 
 namespace platform
 {
