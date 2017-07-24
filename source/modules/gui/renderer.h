@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "core.h"
+#include "font/Shaders.h"
 
 namespace gui
 {

@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "Shaders.h"
 
 namespace gui
 {
@@ -9,21 +10,10 @@ namespace gui
 	GuiRenderer::GuiRenderer(platform::PlatformHandle * platform, gl::GraphicsContext* glContext, gl::Viewport viewport)
 		: Renderer(glContext, viewport), platform(platform)
 	{
-#ifdef DESKTOP
-		gl::ShaderLoader loader(glContext);
-		try {
-			guiShader = loader.loadShader("D:/Dev/Projects/YAGE/source/modules/gui/shaders/guiShader_GL3.vert", "D:/Dev/Projects/YAGE/source/modules/gui/shaders/guiShader_GL3.frag");
-			textShader = loader.loadShader("D:/Dev/Projects/YAGE/source/modules/font/shaders/textShader_GL3.vert", "D:/Dev/Projects/YAGE/source/modules/font/shaders/textShader_GL3.frag");
-		}
-		catch (FileException &exception) {
-			platform->log("ERROR::SHADER_LOADER: Could not open file " + exception.what());
-		}
-#endif
-#ifdef ANDROID
-        gl::ShaderLoader loader(platform, glContext);
-		guiShader = loader.loadShader("assets/shaders/gui/guiShader_ES1.vert", "assets/shaders/gui/guiShader_ES1.frag");
-		textShader = loader.loadShader("assets/shaders/font/textShader_ES1.vert", "assets/shaders/font/textShader_ES1.frag");
-#endif
+		gui::ShaderTemplate guiShaderTemplate;
+		guiShader = glContext->compileShader(guiShaderTemplate.guiShader_vert, guiShaderTemplate.guiShader_frag);
+		font::ShaderTemplate fontShaderTemplate;
+		textShader = glContext->compileShader(fontShaderTemplate.textShader_vert, fontShaderTemplate.textShader_frag);
 
 		gml::Matrix4D<float> projection = gml::orthographic<float>(0.0f, (float)viewport.width, (float)viewport.height, 0.0f, 0.1f, 100.0f);
 		guiShader.setUniform("projection", projection);

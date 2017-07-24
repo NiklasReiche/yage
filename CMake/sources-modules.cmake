@@ -23,6 +23,7 @@ set( YAGE_FONT_SOURCE
 	"${YAGE_MODULES_PATH}/font/loader.cpp"
 	"${YAGE_MODULES_PATH}/font/text.h"
 	"${YAGE_MODULES_PATH}/font/text.cpp"
+	"${YAGE_MODULES_PATH}/font/Shaders.h"
 	
 )
 set( YAGE_FONT_CONVERTER_SOURCE
@@ -38,6 +39,8 @@ set( YAGE_GUI_SOURCE
 
 	"${YAGE_MODULES_PATH}/gui/gui.h"
 	"${YAGE_MODULES_PATH}/gui/core.h"
+
+	"${YAGE_MODULES_PATH}/gui/Shaders.h"
 
 	"${YAGE_MODULES_PATH}/gui/Master.h"
 	"${YAGE_MODULES_PATH}/gui/Master.cpp"

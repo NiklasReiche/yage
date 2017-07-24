@@ -1,3 +1,5 @@
+R"(
+
 #version 100
 
 attribute vec2 position;
@@ -16,3 +18,5 @@ void main()
 	TexCoords = vec2(texcoords.x, texcoords.y);
 	Color = color;
 }
+
+)"

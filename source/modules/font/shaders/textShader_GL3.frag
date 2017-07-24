@@ -1,3 +1,5 @@
+R"(
+
 #version 330 core
 
 in vec2 TexCoords;
@@ -21,3 +23,5 @@ void main()
 	float alpha = smoothstep(0.5 - smoothing, 0.5 + smoothing, dist); 
 	color = vec4( Color.rgb, alpha * Color.a );
 }
+
+)"
