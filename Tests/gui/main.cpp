@@ -36,7 +36,7 @@ public:
 	{
 		master = new gui::Master(platform, gl, inputController);
 		try {
-			master->addFont("D:/Dev/Projects/YAGE/Tests/gui/res/arial.font");
+			master->addFont("C:/Users/Niklas/Desktop/DEV/Projects/yage/Tests/gui/res/arial.font");
 		}
 		catch (FileException& exception) {
 			platform->log("ERROR::FONT_LOADER: could not open file " + exception.what());
