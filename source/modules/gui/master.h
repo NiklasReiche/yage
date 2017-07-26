@@ -10,6 +10,7 @@
 #include "InputManager.h"
 #include "Interface.h"
 #include "Widget.h"
+#include "rootWidget.h"
 #include "Animation.h"
 
 namespace gui
@@ -24,7 +25,7 @@ namespace gui
 		InputManager inputManager;
 		GuiRenderer renderer;
 
-		Widget root;
+		RootWidget root;
 		std::vector<Animation*> animations;
 
 		void sortWidgets(std::vector<gl::Drawable*> & vector_widget, std::vector<font::Text*> & vector_text, Widget & widget);

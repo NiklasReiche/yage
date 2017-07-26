@@ -3,38 +3,198 @@
 
 namespace gui
 {
-	VListLayout::VListLayout()
-		:Layout() {}
-
-	void VListLayout::update(Widget* parent)
+	AbsoluteLayout::AbsoluteLayout()
+		: Layout(LayoutType::ABSOLUTE_LAYOUT) {}
+	void AbsoluteLayout::update(Widget* widget)
 	{
-		gml::Vec2<float> padding(5.0f, 5.0f);
-		gml::Vec2<float> globalSize = parent->getSize();
-		float slotSize = globalSize.y / parent->getChildrenCount();
-		float offset = padding.y;
-		
+		for (unsigned int i = 0; i < widget->getChildrenCount(); ++i)
+		{
+			Widget & child = widget->getChild(i);
+			child.setSize(child.getPreferredSize());
+		}
+	}
+
+
+	VListLayout::VListLayout()
+		:Layout(LayoutType::V_LIST_LAYOUT) {}
+	gml::Vec2f VListLayout::calcParentPrefSize(Widget* parent)
+	{
+		gml::Vec2f parentPrefSize;
+
 		for (unsigned int i = 0; i < parent->getChildrenCount(); ++i)
 		{
 			Widget & child = parent->getChild(i);
-			child.setAnchor(Anchor::TOP_LEFT);
-			child.move(gml::Vec2<float>(0.0f, offset));
+			gml::Vec2<ChildSizeHint> sizeHint = child.getChildSizeHint();
+			gml::Vec2f childPrefSize = child.getPreferredSize() + child.getCellMargin();
+
+			switch (sizeHint.x)
+			{
+			case ChildSizeHint::FIXED:
+				parentPrefSize.x = std::max(childPrefSize.x, parentPrefSize.x);
+				break;
+			case ChildSizeHint::MIN:
+				parentPrefSize.x = std::max(childPrefSize.x, parentPrefSize.x);
+				break;
+			}
 			
-			switch (parent->getParentSizeHint())
+			switch (sizeHint.y)
+			{
+			case ChildSizeHint::FIXED:
+				parentPrefSize.y += childPrefSize.y;
+				break;
+			case ChildSizeHint::MIN:
+				parentPrefSize.y += childPrefSize.y;
+				break;
+			}
+		}
+		return parentPrefSize + parent->getLayoutMargin() * 2;
+	}
+	void VListLayout::update(Widget* widget)
+	{
+		gml::Vec2f globalSize = widget->getInnerSize() - widget->getLayoutMargin() * 2;
+		float slotSize = globalSize.y / widget->getChildrenCount();
+		gml::Vec2f offset = widget->getLayoutMargin();
+		
+		for (unsigned int i = 0; i < widget->getChildrenCount(); ++i)
+		{
+			Widget & child = widget->getChild(i);
+			child.setAnchor(Anchor::TOP_LEFT);
+			
+			gml::Vec2f childSizePref = child.getPreferredSize();
+			gml::Vec2<ChildSizeHint> childSizeHint = child.getChildSizeHint();
+			gml::Vec2f childSize;
+
+			offset += child.getCellMargin();
+			child.move(offset);
+
+			switch (widget->getParentSizeHint().y)
 			{
 			case ParentSizeHint::WRAP_CHILDREN_RESIZE:
-				child.resize(gml::Vec2<float>(globalSize.x, slotSize));
-				offset += slotSize;
+				childSize.y = slotSize;
+				offset.y += slotSize;
 				break;
 
 			case ParentSizeHint::WRAP_CHILDREN_FIXED:
-				offset += child.getSize().y;
+				childSize.y = childSizePref.y;
+				offset.y += childSizePref.y;
 				break;
 
 			case ParentSizeHint::WRAP_AROUND:
-				offset += child.getSize().y;
-				parent->resize(gml::Vec2<float>(globalSize.x, offset + padding.y));
+				childSize.y = childSizePref.y;
+				offset.y += childSizePref.y;
 				break;
 			}
+
+			switch (widget->getParentSizeHint().x)
+			{
+			case ParentSizeHint::WRAP_CHILDREN_RESIZE:
+				childSize.x = globalSize.x;
+				break;
+
+			case ParentSizeHint::WRAP_CHILDREN_FIXED:
+				childSize.x = childSizePref.x;
+				break;
+
+			case ParentSizeHint::WRAP_AROUND:
+				childSize.x = childSizePref.x;
+				break;
+			}
+			child.setSize(childSize);
+			offset.x = widget->getLayoutMargin().x;
 		}	
 	}
+
+
+	HListLayout::HListLayout()
+		: Layout(LayoutType::H_LIST_LAYOUT) {}
+	gml::Vec2f HListLayout::calcParentPrefSize(Widget* parent)
+	{
+		gml::Vec2f parentPrefSize;
+
+		for (unsigned int i = 0; i < parent->getChildrenCount(); ++i)
+		{
+			Widget & child = parent->getChild(i);
+			gml::Vec2<ChildSizeHint> sizeHint = child.getChildSizeHint();
+			gml::Vec2f childPrefSize = child.getPreferredSize() + child.getCellMargin();
+
+			switch (sizeHint.y)
+			{
+			case ChildSizeHint::FIXED:
+				parentPrefSize.y = std::max(childPrefSize.y, parentPrefSize.y);
+				break;
+			case ChildSizeHint::MIN:
+				parentPrefSize.y = std::max(childPrefSize.y, parentPrefSize.y);
+				break;
+			}
+
+			switch (sizeHint.x)
+			{
+			case ChildSizeHint::FIXED:
+				parentPrefSize.x += childPrefSize.x;
+				break;
+			case ChildSizeHint::MIN:
+				parentPrefSize.x += childPrefSize.x;
+				break;
+			}
+		}
+		return parentPrefSize + parent->getLayoutMargin() * 2;
+	}
+	void HListLayout::update(Widget* widget)
+	{
+		gml::Vec2f globalSize = widget->getInnerSize() - widget->getLayoutMargin() * 2;
+		float slotSize = globalSize.y / widget->getChildrenCount();
+		gml::Vec2f offset = widget->getLayoutMargin();
+
+		for (unsigned int i = 0; i < widget->getChildrenCount(); ++i)
+		{
+			Widget & child = widget->getChild(i);
+			child.setAnchor(Anchor::TOP_LEFT);
+
+			gml::Vec2f childSizePref = child.getPreferredSize();
+			gml::Vec2<ChildSizeHint> childSizeHint = child.getChildSizeHint();
+			gml::Vec2f childSize;
+
+			offset += child.getCellMargin();
+			child.move(offset);
+
+			switch (widget->getParentSizeHint().x)
+			{
+			case ParentSizeHint::WRAP_CHILDREN_RESIZE:
+				childSize.x = slotSize;
+				offset.x += slotSize;
+				break;
+
+			case ParentSizeHint::WRAP_CHILDREN_FIXED:
+				childSize.x = childSizePref.x;
+				offset.x += childSizePref.x;
+				break;
+
+			case ParentSizeHint::WRAP_AROUND:
+				childSize.x = childSizePref.x;
+				offset.x += childSizePref.x;
+				break;
+			}
+
+			switch (widget->getParentSizeHint().y)
+			{
+			case ParentSizeHint::WRAP_CHILDREN_RESIZE:
+				childSize.y = globalSize.y;
+				break;
+
+			case ParentSizeHint::WRAP_CHILDREN_FIXED:
+				childSize.y = childSizePref.y;
+				break;
+
+			case ParentSizeHint::WRAP_AROUND:
+				childSize.y = childSizePref.y;
+				break;
+			}
+			child.setSize(childSize);
+			offset.y = widget->getLayoutMargin().y;
+		}
+	}
+
+
+	GridLayout::GridLayout()
+		: Layout(LayoutType::GRID_LAYOUT) {}
 }

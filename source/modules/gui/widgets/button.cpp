@@ -2,7 +2,7 @@
 
 namespace gui
 {
-	PushButton::PushButton(Widget * parent, MasterInterface master, const ButtonLayout & layout)
+	PushButton::PushButton(Widget * parent, MasterInterface master, const ButtonTemplate & layout)
 		: Widget(parent, master, layout), command(layout.command)
 	{
 		this->isInteractable = true;
@@ -10,7 +10,7 @@ namespace gui
 		this->hoverColor = gl::toVec4(layout.hoverColor);
 		this->clickColor = gl::toVec4(layout.clickColor);
 
-		LabelLayout labelLayout;
+		LabelTemplate labelLayout;
 		labelLayout.geometry.offset = gml::Vec2f();
         labelLayout.geometry.size = gml::Vec2f();
 		labelLayout.color = 0x00000000u;
@@ -19,10 +19,10 @@ namespace gui
 
 		label = this->createWidget<Label>(master, labelLayout, layout.text);
 
-		if (size == gml::Vec2f(0.0f)) {
-			this->size = label->getSize();
-			resize(this->size);
-		}
+		this->layout = std::make_unique<VListLayout>();
+		parentSizeHint = gml::Vec2<ParentSizeHint>(ParentSizeHint::WRAP_AROUND);
+		childSizeHint = gml::Vec2<ChildSizeHint>(ChildSizeHint::MIN);
+		prefSize = this->layout->calcParentPrefSize(this) + gml::Vec2f(borderSize);
 	}
 
 	void PushButton::onClick()
@@ -61,7 +61,7 @@ namespace gui
 	}
 
 
-	CheckButton::CheckButton(Widget * parent, MasterInterface master, const ButtonLayout & layout, bool activate)
+	CheckButton::CheckButton(Widget * parent, MasterInterface master, const ButtonTemplate & layout, bool activate)
 		: PushButton(parent, master, layout)
 	{
 		if (activate) {

@@ -4,29 +4,30 @@ namespace gui
 {
 	Widget::Widget()
 	{
-		this->layouter = std::make_unique<Layout>();
+		this->layout = std::make_unique<Layout>();
 	}
-	Widget::Widget(Widget * parent, MasterInterface master, const WidgetLayout & layout)
-		: parent(parent), master(master), offset(layout.geometry.offset), anchor(layout.geometry.anchor), size(layout.geometry.size), borderSize(layout.border.size), shadowOffset(layout.shadow.offset), shadowHardness(layout.shadow.hardness)
+	Widget::Widget(Widget * parent, MasterInterface master, const WidgetTemplate & wTemplate)
+		: parent(parent), master(master), 
+		anchor(wTemplate.geometry.anchor),
+		offset(wTemplate.geometry.offset),
+		cellMargin(wTemplate.geometry.offset),
+		size(wTemplate.geometry.size),
+		color(gl::toVec4(wTemplate.color)),
+		borderSize(wTemplate.border.size),
+		borderColor(gl::toVec4(wTemplate.border.color)),
+		shadowOffset(wTemplate.shadow.offset),
+		shadowHardness(wTemplate.shadow.hardness)
 	{
-		this->innerSize = size - gml::Vec2f(borderSize * 2);
-		this->color = gl::toVec4(layout.color);
-		this->borderColor = gl::toVec4(layout.border.color);
+		innerPosition = position + gml::Vec2f(borderSize);
+		innerSize = size - gml::Vec2f(borderSize * 2);
 
-		this->parentSizeHint = layout.geometry.parentSizeHint;
-		this->childSizeHint = layout.geometry.childSizeHint;
-
-		if (layout.layout == LayoutType::V_LIST_LAYOUT) {
-			this->layouter = std::make_unique<VListLayout>();
-		}
-		else {
-			this->layouter = std::make_unique<Layout>();
-		}
+		layout = std::make_unique<Layout>();
 
 		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices);
 		master.glContext->createDrawable(*this, vertices, std::vector<int> { 2, 4 }, gl::DrawMode::DRAW_DYNAMIC, gl::VertexFormat::BATCHED);
 
+		prefSize = layout->calcParentPrefSize(this);
 		updateGeometry();
 	}
 	
@@ -323,11 +324,24 @@ namespace gui
 		bufferSubData(0, vertices);
 	}
 
-	void Widget::resize(gml::Vec2f size) 
+	void Widget::relayout()
+	{
+		prefSize = layout->calcParentPrefSize(this);
+		parent->relayout();
+		layout->update(this);
+	}
+	void Widget::setSize(gml::Vec2f size)
 	{
 		this->size = size;
 		this->innerSize = size - gml::Vec2f(borderSize);
 		updateGeometry();
+		layout->update(this);
+	}
+	void Widget::resize(gml::Vec2f size) 
+	{
+		prefSize = size;
+		parent->relayout();
+		layout->update(this);
 	}
 	void Widget::move(gml::Vec2f position)
 	{

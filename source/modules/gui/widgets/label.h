@@ -7,7 +7,7 @@
 
 namespace gui
 {
-	struct LabelLayout : public WidgetLayout
+	struct LabelTemplate : public WidgetTemplate
 	{
 		gml::Vec2f padding = 2.0f;
 	};
@@ -27,7 +27,7 @@ namespace gui
 		gml::Vec2f padding = gml::Vec2f(2.0f);
 
 	public:
-		Label(Widget * parent, MasterInterface master, LabelLayout layout, TextLayout text);
+		Label(Widget * parent, MasterInterface master, LabelTemplate layout, TextLayout text);
 
 		font::Text* getText() { return &text; }
 

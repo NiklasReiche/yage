@@ -10,67 +10,12 @@
 #include "Interface.h"
 #include "FontManager.h"
 #include "Animation.h"
+#include "widgetTemplate.h"
 #include "Layouts.h"
 
 namespace gui
 {
 	class Master;
-
-	enum class Anchor
-	{
-		TOP_LEFT,
-		TOP_RIGHT,
-		BOTTOM_LEFT,
-		BOTTOM_RIGHT,
-		CENTER
-	};
-	enum class ValueType
-	{
-		ABSOLUTE,
-		RELATIVE
-	};
-	enum class ParentSizeHint
-	{
-		WRAP_CHILDREN_RESIZE,
-		WRAP_CHILDREN_FIXED,
-		WRAP_AROUND
-	};
-	enum class ChildSizeHint
-	{
-		MIN,
-		FIXED,
-		ASPECT
-	};
-
-	struct W_Geometry
-	{
-		Anchor anchor = Anchor::TOP_LEFT;
-		ValueType offsetType = ValueType::ABSOLUTE;
-		gml::Vec2<float> offset;
-		ValueType sizeType = ValueType::ABSOLUTE;
-		gml::Vec2<float> size;
-		ParentSizeHint parentSizeHint = ParentSizeHint::WRAP_CHILDREN_RESIZE;
-		ChildSizeHint childSizeHint = ChildSizeHint::MIN;
-	};
-	struct W_Border
-	{
-		int size = 0;
-		unsigned int color = gl::Color::BLACK;
-	};
-	struct W_Shadow
-	{
-		int offset = 0;
-		float hardness = 0.5f;
-	};
-	struct WidgetLayout
-	{
-		LayoutType layout;
-		W_Geometry geometry;
-		W_Border border;
-		W_Shadow shadow;
-		unsigned int color = gl::Color::WHITE;
-	};
-
 
 	class Widget : public gl::Drawable
 	{
@@ -86,7 +31,7 @@ namespace gui
 		MasterInterface master;
 		Widget* parent = nullptr;
 		std::vector<std::unique_ptr<Widget>> children;
-		std::unique_ptr<Layout> layouter;
+
 		std::vector<Animation> animations;
 
 		int level = 0; /* position of the widget in the widget tree hirachy */
@@ -95,15 +40,27 @@ namespace gui
 		bool isHovered = false;
 		bool hasText = false;
 
+		std::unique_ptr<Layout> layout;
+		gml::Vec2<ParentSizeHint> parentSizeHint = gml::Vec2<ParentSizeHint>(ParentSizeHint::WRAP_CHILDREN_RESIZE);
+		gml::Vec2<ChildSizeHint> childSizeHint = gml::Vec2<ChildSizeHint>(ChildSizeHint::MIN);
 		Anchor anchor = Anchor::TOP_LEFT;
-		ParentSizeHint parentSizeHint;
-		ChildSizeHint childSizeHint;
+		/* offset from parent widget */
 		gml::Vec2f offset;
+		/* offset value used by layouts */
+		gml::Vec2f cellMargin;
+		/* padding for layouts */
+		gml::Vec2f layoutMargin;
 
+		/* absolute position of the outer top left edge */
 		gml::Vec2f position;
+		/* absolute total size of the widget */
 		gml::Vec2f size;
+		/* absolute position of the inner top left edge - equal to position for borderless widgets */
 		gml::Vec2f innerPosition;
+		/* absolute size of the widget interior space - equal to size for borderless widgets */
 		gml::Vec2f innerSize;
+		/* prefered size for layouters */
+		gml::Vec2f prefSize;
 
 		gml::Vec4<float> color;
 
@@ -115,14 +72,14 @@ namespace gui
 
 	public:
 		Widget();
-		Widget(Widget * parent, MasterInterface master, const WidgetLayout & layout);
+		Widget(Widget * parent, MasterInterface master, const WidgetTemplate & widgetTemplate);
 		virtual ~Widget() {}
 
 		template <typename Element, typename... Args>
 		Element* createWidget(MasterInterface mInterface, Args... args)
 		{
 			children.push_back( std::make_unique<Element>(this, mInterface, std::forward<Args>(args)...) );
-			layouter->update(this);
+			relayout();
 			return (Element*)children.back().get();
 		}
 		
@@ -141,11 +98,14 @@ namespace gui
 		bool isHoverActive() { return isHovered; }
 		bool has_Text() { return hasText; }
 
+		Widget* getParent() { return parent; }
 		Widget& getChild(int i) { return *children[i].get(); }
 		unsigned int getChildrenCount() { return children.size(); }
 
 		virtual font::Text* getText() { return nullptr; }
 
+		gml::Vec2f getCellMargin() { return cellMargin; }
+		gml::Vec2f getLayoutMargin() { return layoutMargin; }
 		gml::Vec2f getPosition() { return position; }
 		gml::Vec2f getInnerPosition() { return innerPosition; }
 		gml::Vec2f getSize() { return size; }
@@ -159,24 +119,20 @@ namespace gui
 		void setColor(int color) { this->color = gl::toVec4(color); }
 		void setColor(gml::Vec4<float> color) { this->color = color; }
 
-		void setBorder(W_Border border) { this->borderSize = border.size; this->borderColor = gl::toVec4(border.color); }
-		void setBorderSize(int size) { this->borderSize = size; }
-		void setBorderColor(unsigned int color) { this->borderColor = gl::toVec4(color); }
-
-		void setShadow(W_Shadow shadow) { this->shadowOffset = shadow.offset; this->shadowHardness = shadow.hardness; }
-		void setShadow(int offset) { this->shadowOffset = offset; }
-		void setShadow(float hardness) { this->shadowHardness = hardness; }
-
 		/* update semantics */
 		void updateParams();
 		virtual void updateGeometry();
 
+		virtual void relayout();
+		virtual void setSize(gml::Vec2f size);
 		virtual void resize(gml::Vec2f size);
 		virtual void move(gml::Vec2f position);
 		virtual void setAnchor(Anchor anchor);
 
-		ParentSizeHint getParentSizeHint() { return parentSizeHint; }
-		ChildSizeHint getChildSizeHint() { return childSizeHint; }
+		gml::Vec2<ParentSizeHint> getParentSizeHint() { return parentSizeHint; }
+		gml::Vec2<ChildSizeHint> getChildSizeHint() { return childSizeHint; }
+		gml::Vec2f getPreferredSize() { return prefSize; }
+		void setPreferredSize(gml::Vec2f size) { prefSize = size; }
 
 		Animation* createAnimation(Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time);
 	};

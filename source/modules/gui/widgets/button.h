@@ -8,10 +8,11 @@
 #include "../core.h"
 #include "../Widget.h"
 #include "Label.h"
+#include "frame.h"
 
 namespace gui
 {
-	struct ButtonLayout : public WidgetLayout
+	struct ButtonTemplate : public WidgetTemplate
 	{
 		TextLayout text;
 		unsigned int clickColor = color;
@@ -29,7 +30,7 @@ namespace gui
 		gml::Vec4<float> clickColor;
 
 	public:
-		PushButton(Widget * parent, MasterInterface master, const ButtonLayout & layout);
+		PushButton(Widget * parent, MasterInterface master, const ButtonTemplate & layout);
 		virtual ~PushButton() {}
 
 		virtual void onClick();
@@ -49,7 +50,7 @@ namespace gui
 		bool state = false;
 
 	public:
-		CheckButton(Widget * parent, MasterInterface master, const ButtonLayout & layout, bool activate = false);
+		CheckButton(Widget * parent, MasterInterface master, const ButtonTemplate & layout, bool activate = false);
 
 		virtual void onClick();
 		virtual void onClickRelease();
@@ -70,7 +71,7 @@ namespace gui
 		T value;
 
 	public:
-		RadioButton(Widget * parent, MasterInterface master, const ButtonLayout & layout, T value, bool isDefault = false)
+		RadioButton(Widget * parent, MasterInterface master, const ButtonTemplate & layout, T value, bool isDefault = false)
 			: CheckButton(parent, master, layout, isDefault), value(value) {}
 
 		virtual void onClick()
@@ -97,18 +98,20 @@ namespace gui
 	};
 
 	template<typename T>
-	class RadioGroup : public Widget
+	class RadioGroup : public Frame
 	{
 	private:
 		T state;
-		ButtonLayout buttonLayout;
+		ButtonTemplate buttonLayout;
 		std::map<T, RadioButton<T>*> buttons;
 
 	public:
-		RadioGroup(Widget * parent, MasterInterface master, const WidgetLayout & layout, const ButtonLayout & buttonLayout, T defaultValue)
-			: Widget(parent, master, layout), buttonLayout(buttonLayout), state(defaultValue) 
+		RadioGroup(Widget * parent, MasterInterface master, const FrameTemplate & layout, const ButtonTemplate & buttonLayout, T defaultValue)
+			: Frame(parent, master, layout), buttonLayout(buttonLayout), state(defaultValue) 
 		{
-			this->buttonLayout.geometry.position = gml::Vec2<float>();
+			this->parentSizeHint = gml::Vec2<ParentSizeHint>(ParentSizeHint::WRAP_AROUND);
+			this->childSizeHint = gml::Vec2<ChildSizeHint>(ChildSizeHint::MIN);
+			this->buttonLayout.geometry.offset = gml::Vec2<float>();
 		}
 
 		void addButton(std::string text, T value, bool isDefault = false)
@@ -119,11 +122,6 @@ namespace gui
 			if (isDefault) {
 				state = value;
 			}
-
-			// ToDo: different options for button placing 
-			buttonLayout.geometry.position.y += buttons.at(value)->getSize().y;
-			this->size.y += buttons.at(value)->getSize().y;
-			this->size.x = std::max(this->size.x, buttons.at(value)->getSize().x);
 		}
 
 		void onRadioButtonClick(T value)

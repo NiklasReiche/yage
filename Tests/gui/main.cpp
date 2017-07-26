@@ -18,6 +18,7 @@ public:
 	gui::Master* master;
 
 	gui::Frame* frame_1;
+	gui::Frame* frame_2;
 
 	gui::PushButton* button_1;
 	int clicks = 0;
@@ -26,6 +27,7 @@ public:
 	gui::CheckButton* button_2;
 	gui::Label* label_2;
 
+	gui::Frame* radioFrame;
 	gui::RadioGroup<int>* radio;
 	gui::Label* label_3;
 
@@ -42,33 +44,38 @@ public:
 			platform->log("ERROR::FONT_LOADER: could not open file " + exception.what());
 		}
 
-		gui::WidgetLayout frameLayout;
-		frameLayout.color = gl::Color::GREY;
-		frameLayout.layout = gui::LayoutType::V_LIST_LAYOUT;
-		frameLayout.geometry.parentSizeHint = gui::ParentSizeHint::WRAP_CHILDREN_RESIZE;
-		frameLayout.geometry.anchor = gui::Anchor::TOP_LEFT;
-		frameLayout.geometry.size = gml::Vec2<float>(100, 100);
-		frameLayout.geometry.offset = gml::Vec2<float>(50, 50);
+		gui::FrameTemplate frameTemplate;
+		frameTemplate.color = gl::Color::GREY;
+		frameTemplate.layoutType = gui::LayoutType::V_LIST_LAYOUT;
+		frameTemplate.parentSizeHint.x = gui::ParentSizeHint::WRAP_AROUND;
+		frameTemplate.parentSizeHint.y = gui::ParentSizeHint::WRAP_AROUND;
+		frameTemplate.layoutMargin = gml::Vec2f(5.0f);
+		frameTemplate.geometry.anchor = gui::Anchor::TOP_LEFT;
+		frameTemplate.geometry.size = gml::Vec2<float>(100, 100);
+		frameTemplate.geometry.offset = gml::Vec2<float>(50, 50);
 
-		frame_1 = master->createWidget<gui::Frame>(nullptr, frameLayout);
+		frame_1 = master->createWidget<gui::Frame>(nullptr, frameTemplate);
 
-		gui::LabelLayout labelLayout;
+		frameTemplate.layoutType = gui::LayoutType::H_LIST_LAYOUT;
+		frameTemplate.geometry.offset = gml::Vec2<float>(0.0f, 0.0f);
+		frame_2 = master->createWidget<gui::Frame>(frame_1, frameTemplate);
+
+		gui::LabelTemplate labelLayout;
 		labelLayout.border.size = 1;
-		labelLayout.geometry.offset = gml::Vec2<float>(10);
-		labelLayout.geometry.anchor = gui::Anchor::BOTTOM_LEFT;
+		labelLayout.geometry.offset = gml::Vec2<float>(5.0f);
 		gui::TextLayout textLayout;
 		textLayout.text = "Label";
 
-		label_1 = master->createWidget<gui::Label>(frame_1, labelLayout, textLayout);
+		label_1 = master->createWidget<gui::Label>(frame_2, labelLayout, textLayout);
+		master->createWidget<gui::Label>(frame_2, labelLayout, textLayout);
+		master->createWidget<gui::Label>(frame_2, labelLayout, textLayout);
 
-		gui::ButtonLayout buttonLayout;
+		gui::ButtonTemplate buttonLayout;
 		buttonLayout.geometry.anchor = gui::Anchor::TOP_RIGHT;
 		buttonLayout.geometry.offset = gml::Vec2<float>(10);
 		buttonLayout.hoverColor = 0xDDDDDDFF;
 		buttonLayout.clickColor = gl::Color::GREY;
 		buttonLayout.border.size = 1;
-		buttonLayout.shadow.offset = 5;
-		buttonLayout.shadow.hardness = 0.2;
 		buttonLayout.text.text = "Push Button";
 		buttonLayout.command = std::bind(&GuiTest::on_button_1_click, this);
 
@@ -94,24 +101,42 @@ public:
 		textLayout.text = "state: unselected";
 
 		label_2 = master->createWidget<gui::Label>(nullptr, labelLayout, textLayout);
+#endif
 
-		gui::WidgetLayout radioLayout;
-		radioLayout.geometry.position = gml::Vec2<float>(15.0f, 300.0f);
-		gui::ButtonLayout radioButtonLayout;
+
+		gui::FrameTemplate radioFrameTemplate;
+		radioFrameTemplate.geometry.anchor = gui::Anchor::TOP_LEFT;
+		radioFrameTemplate.geometry.offset = gml::Vec2<float>(400, 50);
+		radioFrameTemplate.layoutType = gui::LayoutType::V_LIST_LAYOUT;
+		radioFrameTemplate.parentSizeHint.x = gui::ParentSizeHint::WRAP_AROUND;
+		radioFrameTemplate.parentSizeHint.y = gui::ParentSizeHint::WRAP_AROUND;
+		radioFrameTemplate.color = gl::Color::CYAN;
+
+		radioFrame = master->createWidget<gui::Frame>(nullptr, radioFrameTemplate);
+
+		gui::LabelTemplate radiolabelTemplate;
+		radiolabelTemplate.border.size = 1;
+		labelLayout.geometry.offset = gml::Vec2<float>(5.0f, 5.0f);
+		gui::TextLayout radiotextLayout;
+		radiotextLayout.text = "state: 1";
+
+		label_3 = master->createWidget<gui::Label>(radioFrame, radiolabelTemplate, radiotextLayout);
+
+		gui::FrameTemplate radioTemplate;
+		radioTemplate.geometry.offset = gml::Vec2<float>(0.0f, 5.0f);
+		radioTemplate.layoutType = gui::LayoutType::V_LIST_LAYOUT;
+		gui::ButtonTemplate radioButtonLayout;
 		radioButtonLayout.border.size = 1;
 		radioButtonLayout.hoverColor = 0xDDDDDDFF;
 		radioButtonLayout.clickColor = gl::Color::GREY;
 		radioButtonLayout.command = std::bind(&GuiTest::on_radio_click, this);
-		radio = master->createWidget<gui::RadioGroup<int>>(nullptr, radioLayout, radioButtonLayout, 0);
+
+		radio = master->createWidget<gui::RadioGroup<int>>(radioFrame, radioTemplate, radioButtonLayout, 0);
 		radio->addButton("Radio Button 1", 1, true);
 		radio->addButton("Radio Button 2", 2);
 		radio->addButton("Radio Button 3", 3);
 
-		labelLayout.geometry.position = gml::Vec2<float>(20.0f + radio->getSize().x, 300.0f);
-		textLayout.text = "state: 1";
-
-		label_3 = master->createWidget<gui::Label>(nullptr, labelLayout, textLayout);
-#endif
+		
 	}
 	~GuiTest()
 	{
@@ -155,7 +180,6 @@ int main()
 
 	GuiTest guiTest(&platformHandle, &glContext, &inputController);
 
-	
 	
 	glContext.showWindow();
 	platformHandle.getTimeStep();
