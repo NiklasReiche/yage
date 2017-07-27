@@ -223,6 +223,14 @@ namespace gl3
 			glState.isWireframeEnabled = false;
 		}
 	}
+	void GL3_Context::enableVSync()
+	{
+		glfwSwapInterval(1);
+	}
+	void GL3_Context::disableVSync()
+	{
+		glfwSwapInterval(0);
+	}
 
 
 	GL3_Framebuffer GL3_Context::createFramebuffer(GLint width, GLint height)

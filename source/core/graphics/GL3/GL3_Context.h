@@ -88,6 +88,9 @@ namespace gl3
 		void enableWireframe();
 		void disableWireframe();
 
+		void enableVSync();
+		void disableVSync();
+
 
 		/*****************************************
 		**			Generator functions			**

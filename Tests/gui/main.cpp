@@ -414,7 +414,7 @@ int main()
 	gui::MoveAnimation anim;
 
 
-	
+	glContext.disableVSync();
 	glContext.showWindow();
 	platformHandle.getTimeStep();
 	while (!glContext.getCloseFlag())
