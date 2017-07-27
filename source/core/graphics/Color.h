@@ -8,6 +8,7 @@ namespace gl
 	{
 		enum Color : uint32_t
 		{
+			TRANSPARENT = 0x00000000u,
 			BLACK = 0x000000FFu,
 			WHITE = 0xFFFFFFFFu,
 

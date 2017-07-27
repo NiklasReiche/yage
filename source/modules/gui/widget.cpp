@@ -326,16 +326,20 @@ namespace gui
 
 	void Widget::relayout()
 	{
-		prefSize = layout->calcParentPrefSize(this);
-		parent->relayout();
+		if (parentSizeHint.x == ParentSizeHint::WRAP_AROUND || parentSizeHint.y == ParentSizeHint::WRAP_AROUND) {
+			prefSize = layout->calcParentPrefSize(this);
+			parent->relayout();
+		}
 		layout->update(this);
 	}
 	void Widget::setSize(gml::Vec2f size)
 	{
-		this->size = size;
-		this->innerSize = size - gml::Vec2f(borderSize);
-		updateGeometry();
-		layout->update(this);
+		if (size != this->size) {
+			this->size = size;
+			this->innerSize = size - gml::Vec2f(borderSize);
+			updateGeometry();
+			layout->update(this);
+		}
 	}
 	void Widget::resize(gml::Vec2f size) 
 	{
@@ -345,13 +349,17 @@ namespace gui
 	}
 	void Widget::move(gml::Vec2f position)
 	{
-		this->offset = position;
-		updateGeometry();
+		if (this->offset != position) {
+			this->offset = position;
+			updateGeometry();
+		}
 	}
 	void Widget::setAnchor(Anchor anchor) 
 	{
-		this->anchor = anchor;
-		updateGeometry();
+		if (this->anchor != anchor) {
+			this->anchor = anchor;
+			updateGeometry();
+		}
 	}
 
 	void Widget::updateGeometry()
@@ -396,7 +404,7 @@ namespace gui
 
 	Animation* Widget::createAnimation(Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time)
 	{
-		animations.push_back(Animation(this, master, beg, goal, time));
-		return &animations.back();
+		animations.push_back(std::make_unique<Animation>(this, master, beg, goal, time));
+		return animations.back().get();
 	}
 }

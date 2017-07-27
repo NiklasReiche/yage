@@ -7,16 +7,17 @@
 
 namespace gui
 {
-	struct LabelTemplate : public WidgetTemplate
-	{
-		gml::Vec2f padding = 2.0f;
-	};
-	struct TextLayout
+	struct TextTemplate
 	{
 		std::string text = "";
 		std::string font = "arial";
 		int size = 16;
 		unsigned int color = gl::Color::BLACK;
+	};
+	struct LabelTemplate : public WidgetTemplate
+	{
+		TextTemplate text;
+		gml::Vec2f padding = gml::Vec2f(2.0f);
 	};
 
 	class Label : public Widget
@@ -27,11 +28,11 @@ namespace gui
 		gml::Vec2f padding = gml::Vec2f(2.0f);
 
 	public:
-		Label(Widget * parent, MasterInterface master, LabelTemplate layout, TextLayout text);
+		Label(Widget * parent, MasterInterface master, LabelTemplate labelTemplate);
 
 		font::Text* getText() { return &text; }
 
-		void setText(TextLayout text);
+		void setText(TextTemplate text);
 		void setTextColor(unsigned int color) { text.setColor(color); }
 
 		void updateGeometry();

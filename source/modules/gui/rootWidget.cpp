@@ -6,6 +6,7 @@ namespace gui
 		: Widget(nullptr, MasterInterface(), WidgetTemplate())
 	{
 		layout = std::make_unique<AbsoluteLayout>();
+		parentSizeHint = gml::Vec2<ParentSizeHint>(ParentSizeHint::WRAP_CHILDREN_FIXED);
 	}
 
 	void RootWidget::relayout()

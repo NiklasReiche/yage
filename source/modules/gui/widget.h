@@ -32,7 +32,7 @@ namespace gui
 		Widget* parent = nullptr;
 		std::vector<std::unique_ptr<Widget>> children;
 
-		std::vector<Animation> animations;
+		std::vector<std::unique_ptr<Animation>> animations;
 
 		int level = 0; /* position of the widget in the widget tree hirachy */
 		bool isActive = true;

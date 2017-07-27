@@ -14,7 +14,7 @@ namespace gui
 {
 	struct ButtonTemplate : public WidgetTemplate
 	{
-		TextLayout text;
+		TextTemplate text;
 		unsigned int clickColor = color;
 		unsigned int hoverColor = color;
 		std::function<void()> command;
@@ -40,7 +40,7 @@ namespace gui
 		virtual void onCancel();
 
 		void setCallback(std::function<void(void)> command) { this->command = command; }
-		void setText(TextLayout text) { label->setText(text); }
+		void setText(TextTemplate text) { label->setText(text); }
 		void setTextColor(unsigned int color) { label->setTextColor(color); }
 	};
 

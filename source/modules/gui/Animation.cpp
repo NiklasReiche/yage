@@ -9,7 +9,10 @@ namespace gui
 
 	void Animation::start()
 	{
-		master->activateAnimation(this);
+		if (isFinished) {
+			master->activateAnimation(this);
+			isFinished = false;
+		}
 	}
 	void Animation::update(double dt)
 	{
@@ -20,11 +23,16 @@ namespace gui
 		}
 		else {
 			isFinished = true;
+			reset();
 		}
 	}
 	void Animation::stop()
 	{
-		master->deactivateAnimation(this);
+		if (!isFinished) {
+			master->deactivateAnimation(this);
+			isFinished = true;
+			reset();
+		}
 	}
 	void Animation::reset()
 	{
@@ -34,5 +42,22 @@ namespace gui
 	bool Animation::is_finished()
 	{
 		return isFinished;
+	}
+
+
+	void MoveAnimation::update(Widget* widget)
+	{
+		if (widget->getSize().x < gml::Vec2f(100).x && grow == true) {
+			widget->resize(widget->getSize() + gml::Vec2f(1));
+		}
+		if (widget->getSize().x >= gml::Vec2f(100).x) {
+			grow = false;
+		}
+		if (widget->getSize().x > gml::Vec2f(50).x && grow == false) {
+			widget->resize(widget->getSize() - gml::Vec2f(1));
+		}
+		if (widget->getSize().x <= gml::Vec2f(50).x) {
+			grow = true;
+		}
 	}
 }

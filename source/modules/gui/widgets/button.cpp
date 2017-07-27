@@ -16,8 +16,9 @@ namespace gui
 		labelLayout.color = 0x00000000u;
 		labelLayout.shadow.offset = 0;
 		labelLayout.border.size = 0;
+		labelLayout.text = layout.text;
 
-		label = this->createWidget<Label>(master, labelLayout, layout.text);
+		label = this->createWidget<Label>(master, labelLayout);
 
 		this->layout = std::make_unique<VListLayout>();
 		parentSizeHint = gml::Vec2<ParentSizeHint>(ParentSizeHint::WRAP_AROUND);

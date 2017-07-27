@@ -19,7 +19,7 @@ namespace gui
 		gml::Vec2<float> beg;
 		gml::Vec2<float> goal;
 
-		bool isFinished = false;
+		bool isFinished = true;
 
 	public:
 		Animation(Widget* widget, Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time);
@@ -30,5 +30,17 @@ namespace gui
 		void reset();
 
 		bool is_finished();
+	};
+
+	class MoveAnimation
+	{
+	public:
+		bool grow = true;
+		void update(Widget* widget);
+	};
+
+	class SizeAnimation : public Animation
+	{
+
 	};
 }
