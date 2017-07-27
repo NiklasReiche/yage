@@ -24,6 +24,7 @@ namespace gui
 	{
 	private:
 		font::Text text;
+		std::string font = "arial";
 
 		gml::Vec2f padding = gml::Vec2f(2.0f);
 
@@ -33,6 +34,7 @@ namespace gui
 		font::Text* getText() { return &text; }
 
 		void setText(TextTemplate text);
+		void setText(std::string text);
 		void setTextColor(unsigned int color) { text.setColor(color); }
 
 		void updateGeometry();

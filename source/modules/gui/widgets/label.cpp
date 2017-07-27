@@ -3,7 +3,7 @@
 namespace gui
 {	
 	Label::Label(Widget * parent, MasterInterface master, LabelTemplate labelTemplate)
-		: Widget(parent, master, labelTemplate), padding(labelTemplate.padding)
+		: Widget(parent, master, labelTemplate), padding(labelTemplate.padding), font(labelTemplate.text.font)
 	{
 		if (labelTemplate.text.text == "") {
 			labelTemplate.text.text = " ";
@@ -31,6 +31,20 @@ namespace gui
 		gml::Vec2f textPosition = this->position + gml::Vec2f(borderSize) + padding;
 
 		this->text = font::Text(master.glContext, text.text, mFont, textPosition, text.color, text.size);
+
+		if (size == gml::Vec2f(0.0f)) {
+			prefSize = this->text.getSize() + padding * 2;
+		}
+		else {
+			prefSize = this->text.getSize() + padding * 2;
+		}
+		parent->relayout();
+	}
+
+	void Label::setText(std::string text)
+	{
+		font::Font & mFont = master.fontManager->getFont(font);
+		this->text.setText(text, mFont);
 
 		if (size == gml::Vec2f(0.0f)) {
 			prefSize = this->text.getSize() + padding * 2;

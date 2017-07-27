@@ -422,10 +422,7 @@ int main()
 		double dt = platformHandle.getTimeStep();
 
 		double frameRate = 1.0 / dt;
-		gui::TextTemplate fpslabelTemplate;
-		fpslabelTemplate.size = 14;
-		fpslabelTemplate.text = std::to_string((int)frameRate);
-		guiTest.fpsCounter->setText(fpslabelTemplate);
+		guiTest.fpsCounter->setText(clib::to_string((int)frameRate));
 
 		anim.update(guiTest.testLabel);
 

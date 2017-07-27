@@ -142,7 +142,7 @@ namespace font
 		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices, font);
 		this->textureAtlas = font.textureAtlas;
-		bufferSubData(0, vertices);
+		glContext->createDrawable(*this, vertices, std::vector<int> { 2, 2, 4 }, gl::DrawMode::DRAW_DYNAMIC, gl::VertexFormat::BATCHED);
 	}
 
 	void Text::appendText(std::string text, const Font & font)
