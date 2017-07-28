@@ -23,7 +23,7 @@ namespace gui
 		this->layout = std::make_unique<VListLayout>();
 		parentSizeHint = gml::Vec2<ParentSizeHint>(ParentSizeHint::WRAP_AROUND);
 		childSizeHint = gml::Vec2<ChildSizeHint>(ChildSizeHint::MIN);
-		prefSize = this->layout->calcParentPrefSize(this) + gml::Vec2f(borderSize);
+		prefSize = this->layout->calcParentPrefSize(this) + gml::Vec2f((float)borderSize);
 	}
 
 	void PushButton::onClick()
