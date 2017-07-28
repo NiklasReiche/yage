@@ -82,6 +82,13 @@ namespace gui
 			relayout();
 			return (Element*)children.back().get();
 		}
+
+		template <typename Element, typename... Args>
+		Animation* createAnimation(Master* master, Args... args)
+		{
+			animations.push_back( std::make_unique<Element>(this, master, std::forward<Args>(args)...) );
+			return (Element*)animations.back().get();
+		}
 		
 		virtual void onHover() {}
 		virtual void onHoverRelease() {}
@@ -134,6 +141,6 @@ namespace gui
 		gml::Vec2f getPreferredSize() { return prefSize; }
 		void setPreferredSize(gml::Vec2f size) { prefSize = size; }
 
-		Animation* createAnimation(Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time);
+		//Animation* createAnimation(Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time);
 	};
 }

@@ -1,5 +1,3 @@
-#define DESKTOP
-#define GL3
 #include <graphics/Graphics.h>
 #include <platform/Platform.h>
 
@@ -35,6 +33,8 @@ public:
 	gui::Label* testLabel;
 	gui::Animation* animation_1 = nullptr;
 	gui::Animation* animation_2 = nullptr;
+	gui::Animation* animation_3 = nullptr;
+	gui::Animation* animation_4 = nullptr;
 
 	GuiTest(platform::PlatformHandle * platform, gl::GraphicsContext * gl, input::InputController * inputController)
 		: platform(platform), gl(gl), input(inputController)
@@ -241,8 +241,15 @@ public:
 		master->createWidget<gui::Label>(frame_3, animationElementTemplate);
 
 		
-		animation_1 = frame_3->createAnimation(master, frame_3->getPosition(), frame_3->getPosition() + gml::Vec2<float>(200, 0), 2);
-		animation_2 = frame_3->createAnimation(master, frame_3->getPosition() + gml::Vec2<float>(200, 0), frame_3->getPosition(), 2);
+		animation_1 = frame_3->createAnimation<gui::MoveAnimation>(master, frame_3->getPosition(), frame_3->getPosition() + gml::Vec2<float>(200, 0), 2);
+		animation_1->setOnAnimationStop(std::bind(&GuiTest::onAnimation1stop, this));
+		animation_2 = frame_3->createAnimation<gui::MoveAnimation>(master, frame_3->getPosition() + gml::Vec2<float>(200, 0), frame_3->getPosition(), 2);
+		animation_2->setOnAnimationStop(std::bind(&GuiTest::onAnimation2stop, this));
+
+		animation_3 = testLabel->createAnimation<gui::SizeAnimation>(master, testLabel->getSize(), testLabel->getSize() + gml::Vec2<float>(50, 25), 2);
+		animation_3->setOnAnimationStop(std::bind(&GuiTest::onAnimation3stop, this));
+		animation_4 = testLabel->createAnimation<gui::SizeAnimation>(master, testLabel->getSize() + gml::Vec2<float>(50, 25), testLabel->getSize(), 2);
+		animation_4->setOnAnimationStop(std::bind(&GuiTest::onAnimation4stop, this));
 
 
 		/*
@@ -386,18 +393,29 @@ public:
 		textLayout.text = "state: " + clib::to_string(radioGroup->getState());
 		label_radio->setText(textLayout);
 	}
+
+	void onAnimation1stop()
+	{
+		animation_2->start();
+	}
+	void onAnimation2stop()
+	{
+		animation_1->start();
+	}
+	void onAnimation3stop()
+	{
+		animation_4->start();
+	}
+	void onAnimation4stop()
+	{
+		animation_3->start();
+	}
 };
 
-void handleAnimation(GuiTest& gui, int& current)
+void displayFPS(GuiTest& gui, double dt)
 {
-	if (gui.animation_1->is_finished() && current == 1) {
-		gui.animation_2->start();
-		current = 2;
-	} 
-	if (gui.animation_2->is_finished() && current == 2) {
-		gui.animation_1->start();
-		current = 1;
-	}
+	double frameRate = 1.0 / dt;
+	gui.fpsCounter->setText(clib::to_string((int)frameRate));
 }
 
 int main()
@@ -408,10 +426,8 @@ int main()
 
 	GuiTest guiTest(&platformHandle, &glContext, &inputController);
 
-	int currentAnimation = 1;
 	guiTest.animation_1->start();
-
-	gui::MoveAnimation anim;
+	guiTest.animation_3->start();
 
 
 	glContext.disableVSync();
@@ -421,14 +437,9 @@ int main()
 	{
 		double dt = platformHandle.getTimeStep();
 
-		double frameRate = 1.0 / dt;
-		guiTest.fpsCounter->setText(clib::to_string((int)frameRate));
+		displayFPS(guiTest, dt);
 
-		anim.update(guiTest.testLabel);
-
-		handleAnimation(guiTest, currentAnimation);
 		guiTest.master->update(dt);
-
 		glContext.swapBuffers();
 		inputController.poll();
 	}

@@ -7,23 +7,16 @@ namespace gui
 	Animation::Animation(Widget* widget, Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time)
 		: widget(widget), master(master), beg(beg), goal(goal), timeEnd(time) {}
 
+	void Animation::setOnAnimationStop(std::function<void()> callback)
+	{
+		onAnimationStop = callback;
+	}
+
 	void Animation::start()
 	{
 		if (isFinished) {
 			master->activateAnimation(this);
 			isFinished = false;
-		}
-	}
-	void Animation::update(double dt)
-	{
-		if (timeCurrent < timeEnd) {
-			timeCurrent += dt;
-			float time = timeCurrent / timeEnd;
-			widget->move(gml::lerp<gml::Vec2<float>>(beg, goal, time));
-		}
-		else {
-			isFinished = true;
-			reset();
 		}
 	}
 	void Animation::stop()
@@ -32,6 +25,7 @@ namespace gui
 			master->deactivateAnimation(this);
 			isFinished = true;
 			reset();
+			onAnimationStop();
 		}
 	}
 	void Animation::reset()
@@ -45,19 +39,37 @@ namespace gui
 	}
 
 
-	void MoveAnimation::update(Widget* widget)
+	MoveAnimation::MoveAnimation(Widget* widget, Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time)
+		: Animation(widget, master, beg, goal, time) {}
+
+	void MoveAnimation::update(double dt)
 	{
-		if (widget->getSize().x < gml::Vec2f(100).x && grow == true) {
-			widget->resize(widget->getSize() + gml::Vec2f(1));
+		if (!isFinished) {
+			if (timeCurrent < timeEnd) {
+				timeCurrent += dt;
+				float time = (float)(timeCurrent / timeEnd);
+				widget->move(gml::lerp<gml::Vec2<float>>(beg, goal, time));
+			}
+			else {
+				stop();
+			}
 		}
-		if (widget->getSize().x >= gml::Vec2f(100).x) {
-			grow = false;
-		}
-		if (widget->getSize().x > gml::Vec2f(50).x && grow == false) {
-			widget->resize(widget->getSize() - gml::Vec2f(1));
-		}
-		if (widget->getSize().x <= gml::Vec2f(50).x) {
-			grow = true;
+	}
+
+	SizeAnimation::SizeAnimation(Widget* widget, Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time)
+		: Animation(widget, master, beg, goal, time) {}
+
+	void SizeAnimation::update(double dt)
+	{
+		if (!isFinished) {
+			if (timeCurrent < timeEnd) {
+				timeCurrent += dt;
+				float time = (float)(timeCurrent / timeEnd);
+				widget->resize(gml::lerp<gml::Vec2<float>>(beg, goal, time));
+			}
+			else {
+				stop();
+			}
 		}
 	}
 }

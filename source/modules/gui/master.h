@@ -27,6 +27,7 @@ namespace gui
 
 		RootWidget root;
 		std::vector<Animation*> animations;
+		std::vector<Animation*> finishedAnimations;
 
 		void sortWidgets(std::vector<gl::Drawable*> & vector_widget, std::vector<font::Text*> & vector_text, Widget & widget);
 

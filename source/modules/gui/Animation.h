@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "core.h"
 #include <math/Interpolation.h>
 
@@ -10,9 +12,11 @@ namespace gui
 
 	class Animation
 	{
-	private:
+	protected:
 		Master* master;
 		Widget* widget;
+
+		std::function<void()> onAnimationStop;
 
 		double timeCurrent = 0.0;
 		double timeEnd;
@@ -26,21 +30,25 @@ namespace gui
 
 		void start();
 		void stop();
-		void update(double dt);
 		void reset();
 
+		virtual void update(double dt){}
+
+		void setOnAnimationStop(std::function<void()> callback);
 		bool is_finished();
 	};
 
-	class MoveAnimation
+	class MoveAnimation : public Animation
 	{
 	public:
-		bool grow = true;
-		void update(Widget* widget);
+		MoveAnimation(Widget* widget, Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time);
+		void update(double dt);
 	};
 
 	class SizeAnimation : public Animation
 	{
-
+	public:
+		SizeAnimation(Widget* widget, Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time);
+		void update(double dt);
 	};
 }

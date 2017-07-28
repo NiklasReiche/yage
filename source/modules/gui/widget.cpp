@@ -18,8 +18,8 @@ namespace gui
 		shadowOffset(wTemplate.shadow.offset),
 		shadowHardness(wTemplate.shadow.hardness)
 	{
-		innerPosition = position + gml::Vec2f(borderSize);
-		innerSize = size - gml::Vec2f(borderSize * 2);
+		innerPosition = position + gml::Vec2f((float)borderSize);
+		innerSize = size - gml::Vec2f((float)borderSize * 2);
 
 		layout = std::make_unique<Layout>();
 
@@ -336,7 +336,7 @@ namespace gui
 	{
 		if (size != this->size) {
 			this->size = size;
-			this->innerSize = size - gml::Vec2f(borderSize);
+			this->innerSize = size - gml::Vec2f((float)borderSize);
 			updateGeometry();
 			layout->update(this);
 		}
@@ -391,7 +391,7 @@ namespace gui
 				break;
 			}
 
-			innerPosition = position + gml::Vec2f(borderSize);
+			innerPosition = position + gml::Vec2f((float)borderSize);
 		}
 
 		for (auto & child : children)
@@ -402,9 +402,11 @@ namespace gui
 		updateParams();
 	}
 
+	/*
 	Animation* Widget::createAnimation(Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time)
 	{
 		animations.push_back(std::make_unique<Animation>(this, master, beg, goal, time));
 		return animations.back().get();
 	}
+	*/
 }

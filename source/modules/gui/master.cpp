@@ -9,7 +9,7 @@ namespace gui
 		renderer(GuiRenderer(platform, glContext, gl::Viewport(0, 0, glContext->getWidth(), glContext->getHeight())))
 	{
 		//root.resize(gml::Vec2<float>(glContext->getWidth(), glContext->getHeight()));
-		root.setSize(gml::Vec2<float>(glContext->getWidth(), glContext->getHeight()));
+		root.setSize(gml::Vec2<float>((float)glContext->getWidth(), (float)glContext->getHeight()));
 	}
 
 	void Master::sortWidgets(std::vector<gl::Drawable*> & vector_widget, std::vector<font::Text*> & vector_text, Widget & widget)
@@ -29,17 +29,19 @@ namespace gui
 
 	void Master::update(double dt)
 	{
-		auto it = animations.begin();
-		while (it != animations.end())
+		for (unsigned int i = 0; i < finishedAnimations.size(); ++i)
 		{
-			if ((*it)->is_finished()) {
-				it = animations.erase(it);
-			}
-			else {
-				(*it)->update(dt);
-				++it;
-			}
+			Animation* animation = finishedAnimations.at(i);
+			animations.erase(std::remove(animations.begin(), animations.end(), animation), animations.end());
 		}
+		finishedAnimations.clear();
+
+		for (unsigned int i = 0; i < animations.size(); ++i) 
+		{
+			animations.at(i)->update(dt);
+		}
+
+
 
 		inputManager.update(root);
 
@@ -60,6 +62,6 @@ namespace gui
 	}
 	void Master::deactivateAnimation(Animation * animation)
 	{
-		animations.erase(std::remove(animations.begin(), animations.end(), animation), animations.end());
+		finishedAnimations.push_back(animation);
 	}
 }
