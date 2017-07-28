@@ -21,5 +21,6 @@ namespace gl3
 
 	public:
 		void bufferSubData(int offset, std::vector<GLfloat> & vertices);
+		void bufferData(std::vector<GLfloat> & vertices, int nVertices);
 	};
 }
