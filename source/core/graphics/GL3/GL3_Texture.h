@@ -13,6 +13,7 @@ namespace gl3
 	private:
 		friend class GL3_Context;
 
+		GLuint texture;
 		int width, height;
 		TextureType target;
 		InternalFormat format;
@@ -22,6 +23,11 @@ namespace gl3
 		int nChannels;
 
 	public:
+		GL3_Texture();
+		GL3_Texture(const GL3_Texture& copy);
+		virtual ~GL3_Texture();
+		GL3_Texture& operator=(const GL3_Texture& copy);
+
 		void bufferSubData(int x_offset, int y_offset, int width, int height, std::vector<unsigned char> & data);
 		void getTextureImage(std::vector<unsigned char> & data, int level = 0);
 

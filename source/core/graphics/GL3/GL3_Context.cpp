@@ -307,7 +307,12 @@ namespace gl3
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+		drawable.id = drawable.VAO;
+		drawable.glContext = this;
 		drawable.nVertices = nVertices;
+		drawable.vertexSize = vertexSize;
+		drawable.layout = vertexLayout;
+		drawable.format = format;
 		drawable.usage = usage;
 		drawable.primitive = PrimitiveType::TRIANGLES;
 		return drawable;
@@ -343,6 +348,7 @@ namespace gl3
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		// Build Texture
+		texture.texture = texture.id;
 		texture.glContext = this;
 
 		texture.height = height;

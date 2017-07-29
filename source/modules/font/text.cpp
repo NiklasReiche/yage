@@ -17,6 +17,7 @@ namespace font
 
 	void Text::constructVertices(std::vector<gl::Gfloat>& vertices, const Font & font)
 	{
+		size = gml::Vec2f(0.0f);
 		std::vector<gl::Gfloat> coords;
 		constructVertexCoords(coords, font);
 		vertices.insert(std::end(vertices), std::begin(coords), std::end(coords));
@@ -141,10 +142,8 @@ namespace font
 
 		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices, font);
-		this->textureAtlas = font.textureAtlas;
-		this->bufferData(vertices, (int)vertices.size() / 8);
-		
-		//glContext->createDrawable(*this, vertices, std::vector<int> { 2, 2, 4 }, gl::DrawMode::DRAW_DYNAMIC, gl::VertexFormat::BATCHED);
+		textureAtlas = font.textureAtlas;
+		bufferData(vertices);
 	}
 
 	void Text::appendText(std::string text, const Font & font)
@@ -153,9 +152,8 @@ namespace font
 
 		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices, font);
-		bufferSubData(0, vertices);
-
-
+		textureAtlas = font.textureAtlas;
+		bufferData(vertices);
 	}
 
 
@@ -173,7 +171,7 @@ namespace font
 		this->position = position;
 		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices, font);
-		this->bufferSubData(0, vertices);
+		bufferSubData(0, vertices);
 	}
 
 	gl::Texture Text::getTexture()

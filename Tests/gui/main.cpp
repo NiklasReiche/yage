@@ -371,27 +371,21 @@ public:
 	void on_button_1_click()
 	{
 		clicks++;
-		gui::TextTemplate textLayout;
-		textLayout.text = "clicks: " + clib::to_string(clicks);
-		label_clicks->setText(textLayout);
+		label_clicks->setText("clicks: " + clib::to_string(clicks));
 		
 	}
 	void on_button_2_click()
 	{
-		gui::TextTemplate textLayout;
 		if (button_check->getState()) {
-			textLayout.text = "state: selected";
+			label_check->setText("state: selected");
 		}
 		else {
-			textLayout.text = "state: unselected";
+			label_check->setText("state: unselected");
 		}
-		label_check->setText(textLayout);
 	}
 	void on_radio_click()
 	{
-		gui::TextTemplate textLayout;
-		textLayout.text = "state: " + clib::to_string(radioGroup->getState());
-		label_radio->setText(textLayout);
+		label_radio->setText("state: " + clib::to_string(radioGroup->getState()));
 	}
 
 	void onAnimation1stop()
