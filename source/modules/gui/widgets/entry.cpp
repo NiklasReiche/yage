@@ -3,38 +3,58 @@
 
 namespace gui
 {
-#if 0
-	TextEntry::TextEntry(Widget * parent, MasterInterface master, W_Geometry geometry, W_Border border, unsigned int color)
-		: Widget(parent, master, geometry, color, border, W_Shadow{ 0, 0.0f })
+	TextEntry::TextEntry(Widget * parent, MasterInterface master, TextEntryTemplate entryTemplate)
+		: Widget(parent, master, entryTemplate), defaultText(entryTemplate.defaultText.text)
 	{
-		geometry.position = gml::Vec2<float>();
-		color = 0x00u;
-		//label = this->createWidget<Label>(master, geometry, color, W_Border{ 0, 0x00u }, TextLayout());
+		this->isInteractable = true;
+		this->keepFocus = true;
 
-		if (size == gml::Vec2<float>(0.0f)) {
-			this->size = label->getSize();
-			updateParams();
-		}
+		LabelTemplate labelTemplate;
+		labelTemplate.geometry.offset = gml::Vec2f();
+		labelTemplate.geometry.size = gml::Vec2f();
+		labelTemplate.color = 0x00000000u;
+		labelTemplate.shadow.offset = 0;
+		labelTemplate.border.size = 0;
+		labelTemplate.text = entryTemplate.defaultText;
+
+		label = this->createWidget<Label>(master, labelTemplate);
+
+		this->layout = std::make_unique<VListLayout>();
+		parentSizeHint = gml::Vec2<ParentSizeHint>(ParentSizeHint::WRAP_AROUND);
+		childSizeHint = gml::Vec2<ChildSizeHint>(ChildSizeHint::MIN);
+		prefSize = this->layout->calcParentPrefSize(this) + gml::Vec2f((float)borderSize);
 	}
 
-	void TextEntry::onClick()
+	void TextEntry::onFocus()
 	{
-		if (isFocused) {
-			isFocused = false;
-		}
-		else {
-			isFocused = true;
-		}
+		master.platform->enableCharInput();
+	}
+	void TextEntry::onFocusRelease()
+	{
+		master.platform->disableCharInput();
 	}
 
-	void TextEntry::update()
+	void TextEntry::onCharInput(char character)
 	{
-		//std::vector<int> & keys = masterInterface.inputManger->getPressedKeys();
-
-		for (unsigned int i = 0; i < 1/*keys.size()*/; ++i)
+		text += character;
+		label->setText(text);
+	}
+	void TextEntry::onKeyPress(input::KeyCode key)
+	{
+		switch (key)
 		{
-			//text += glfwGetKeyName(keys[i]);
+		case input::KeyCode::KEY_BACKSPACE:
+			if (text.length() == 1) {
+				text = defaultText;
+			}
+			else {
+				text.pop_back();
+			}
+			label->setText(text);
+			break;
+
+		case input::KeyCode::KEY_ENTER:
+			break;
 		}
 	}
-#endif
 }

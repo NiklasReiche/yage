@@ -361,6 +361,12 @@ public:
 		radioGroup->addButton("Radio Button 1", 1, true);
 		radioGroup->addButton("Radio Button 2", 2);
 		radioGroup->addButton("Radio Button 3", 3);
+
+		gui::TextEntryTemplate textEntryTemplate;
+		textEntryTemplate.border.size = 1;
+		textEntryTemplate.defaultText.text = "entry";
+
+		master->createWidget<gui::TextEntry>(frame_radio, textEntryTemplate);
 		
 	}
 	~GuiTest()
@@ -412,11 +418,13 @@ void displayFPS(GuiTest& gui, double dt)
 	gui.fpsCounter->setText(clib::to_string((int)frameRate));
 }
 
+
 int main()
 {
 	platform::PlatformHandle platformHandle;
 	gl::GraphicsContext glContext(&platformHandle, 1000, 500);
 	input::InputController inputController(&platformHandle);
+	input::InputListener* listener = inputController.addListener();
 
 	GuiTest guiTest(&platformHandle, &glContext, &inputController);
 

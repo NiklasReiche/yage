@@ -12,22 +12,25 @@
 
 namespace gui
 {
-#if 0
+	struct TextEntryTemplate : public WidgetTemplate 
+	{
+		TextTemplate defaultText;
+	};
+
 	class TextEntry : public Widget
 	{
 	private:
 		Label * label;
 		bool isFocused = false;
-		std::string text;
+		std::string defaultText = "";
+		std::string text = "";
 
 	public:
-		TextEntry(Widget * parent, MasterInterface master, W_Geometry geometry, W_Border border, unsigned int color);
+		TextEntry(Widget * parent, MasterInterface master, TextEntryTemplate entryTemplate);
 
-		virtual void onClick();
-		virtual void update();
-
-		void setText(TextLayout text) { label->setText(text); }
-		void setTextColor(unsigned int color) { label->setTextColor(color); }
+		void onFocus();
+		void onFocusRelease();
+		void onCharInput(char character);
+		void onKeyPress(input::KeyCode key);
 	};
-#endif
 }

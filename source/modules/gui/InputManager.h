@@ -14,6 +14,7 @@ namespace gui
 		Widget* rootWidget;
 		Widget* selectedWidget = nullptr;
 		Widget* activeWidget = nullptr;
+		Widget* focusedWidget = nullptr;
 
 		Widget* searchSelected(Widget * widget, float xpos, float ypos);
 
@@ -22,6 +23,8 @@ namespace gui
 
 		void update(Widget & root);
 
+		void onKeyEvent(input::KeyCode key, input::KeyAction action);
+		void onCharEvent(char character);
 		void onMousePosEvent(float x, float y);
 		void onMouseEvent(input::MouseKeyCode, input::KeyAction);
 		void onTouchEvent(float x, float y, input::TouchIndexCode, input::TouchAction);

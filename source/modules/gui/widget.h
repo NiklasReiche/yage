@@ -37,6 +37,7 @@ namespace gui
 		int level = 0; /* position of the widget in the widget tree hirachy */
 		bool isActive = true;
 		bool isInteractable = false;
+		bool keepFocus = false;
 		bool isHovered = false;
 		bool hasText = false;
 
@@ -95,6 +96,10 @@ namespace gui
 		virtual void onClick() {}
 		virtual void onClickRelease() {}
 		virtual void onCancel() {}
+		virtual void onFocus() {}
+		virtual void onFocusRelease() {}
+		virtual void onCharInput(char character) {}
+		virtual void onKeyPress(input::KeyCode key) {}
 
 		virtual void update() {};
 		//virtual void del() {}
