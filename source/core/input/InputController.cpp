@@ -5,6 +5,7 @@ namespace input
 	InputController::InputController(platform::PlatformHandle* systemHandle)
 		: systemHandle(systemHandle)
 	{
+		systemHandle->setOnCharModsEvent(std::bind(&InputController::onKeyCharEvent, this, std::placeholders::_1, std::placeholders::_2));
 		systemHandle->setOnKeyEvent(std::bind(&InputController::onKeyEvent, this, std::placeholders::_1, std::placeholders::_2));
 		systemHandle->setOnMouseButtonEvent(std::bind(&InputController::onMouseButtonEvent, this, std::placeholders::_1, std::placeholders::_2));
 		systemHandle->setOnMousePosEvent(std::bind(&InputController::onMousePosEvent, this, std::placeholders::_1, std::placeholders::_2));
@@ -31,6 +32,21 @@ namespace input
 		listeners.erase(listener->id);
 	}
 
+	void InputController::onKeyCharEvent(unsigned int codepoint, int mods)
+	{
+#ifdef DESKTOP
+		char character = (char)codepoint;
+		
+		for (auto const &listener : listeners)
+		{
+			try {
+				listener.second.onCharEventCallback(character);
+			}
+			catch (std::bad_function_call) {}
+		}
+#endif
+	}
+
 	void InputController::onKeyEvent(int _key, int _action)
 	{
 #ifdef DESKTOP
@@ -52,6 +68,16 @@ namespace input
 		}
 		else if (action == KeyAction::PRESS && lastState == KeyState::DOWN) {
 			newState = KeyState::DOWN; /* this gets called in the simulated key event, so that both key and last key are DOWN */
+		}
+		else if (action == KeyAction::REPEAT) {
+			for (auto const &listener : listeners)
+			{
+				try {
+					listener.second.onKeyEventCallback(key, action);
+				}
+				catch (std::bad_function_call) {}
+			}
+			newState = KeyState::DOWN;
 		}
 		else if (action == KeyAction::RELEASE && lastState == KeyState::DOWN) {
 			newState = KeyState::UP;

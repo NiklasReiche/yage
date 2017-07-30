@@ -16,6 +16,7 @@ namespace input
 		InputController* controller;
 		int id;
 
+		std::function<void(char)> onCharEventCallback;
 		std::function<void(KeyCode, KeyAction)> onKeyEventCallback;
 		std::function<void(float, float)> onMousePosEventCallback;
 		std::function<void(MouseKeyCode, KeyAction)> onMouseButtonEventCallback;
@@ -26,6 +27,7 @@ namespace input
 		InputListener() {}
 		InputListener(int id);
 
+		void setOnCharEventCallback(std::function<void(char)> callback) { onCharEventCallback = callback; }
 		void setOnKeyEvent(std::function<void(KeyCode, KeyAction)> callback) { onKeyEventCallback = callback; }
 		void setOnMousePosEvent(std::function<void(float, float)> callback) { onMousePosEventCallback = callback; }
 		void setOnMouseButtonEvent(std::function<void(MouseKeyCode, KeyAction)> callback) { onMouseButtonEventCallback = callback; }

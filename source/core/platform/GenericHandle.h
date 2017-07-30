@@ -16,6 +16,9 @@ namespace platform
 
 		virtual int shouldDestroy() { return 0; }
 
+		virtual void enableCharInput() {}
+		virtual void disableCharInput() {}
+
 		virtual double getTime() { return 0; }
 
 		virtual void setOnKeyEvent(std::function<void(int, int)> callback) {}

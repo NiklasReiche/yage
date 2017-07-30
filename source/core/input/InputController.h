@@ -31,10 +31,13 @@ namespace input
 		InputListener* addListener();
 		void removeListener(InputListener* listener);
 
+		void onKeyCharEvent(unsigned int codepoint, int mods);
 		void onKeyEvent(int key, int action);
 		void onMousePosEvent(float xpos, float ypos);
 		void onMouseWheelEvent(float xoffset, float yoffset);
 		void onMouseButtonEvent(int key, int action);
+
+		//void onCharTouchEvent();
 		void onTouchEvent(float xpos, float ypos, int index, int action);
 	};
 }

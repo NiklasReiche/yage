@@ -36,6 +36,7 @@ namespace glfw
 		glfwMakeContextCurrent(glfwWindow);
 		glfwSwapInterval(1);
 
+		glfwSetCharModsCallback(glfwWindow, char_mods_callback);
 		glfwSetKeyCallback(glfwWindow, key_callback);
 		glfwSetCursorPosCallback(glfwWindow, mouse_callback);
 		glfwSetMouseButtonCallback(glfwWindow, mouse_button_callback);
@@ -70,6 +71,23 @@ namespace glfw
 		return glfwWindowShouldClose(glfwWindow);
 	}
 
+	void GLFWHandle::enableCharInput()
+	{
+		isCharInputEnabled = true;
+	}
+	void GLFWHandle::disableCharInput()
+	{
+		isCharInputEnabled = false;
+	}
+	void GLFWHandle::enableKeyInput()
+	{
+		isKeyInputEnabled = true;
+	}
+	void GLFWHandle::disableKeyInput()
+	{
+		isKeyInputEnabled = false;
+	}
+
 	double GLFWHandle::getTime()
 	{
 		return glfwGetTime();
@@ -82,12 +100,23 @@ namespace glfw
 		return step;
 	}
 
+	void GLFWHandle::onCharModsEvent(unsigned int codepoint, int mods)
+	{
+		if (isCharInputEnabled) {
+			try {
+				onCharModsEventCallback(codepoint, mods);
+			}
+			catch (std::bad_function_call) {}
+		}
+	}
 	void GLFWHandle::onKeyEvent(int key, int scancode, int action, int mode)
 	{
-		try {
-			onKeyEventCallback(key, action);
+		if (isKeyInputEnabled) {
+			try {
+				onKeyEventCallback(key, action);
+			}
+			catch (std::bad_function_call) {}
 		}
-		catch (std::bad_function_call) {}
 	}
 	void GLFWHandle::onMousePosEvent(float xpos, float ypos)
 	{

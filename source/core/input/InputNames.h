@@ -42,6 +42,7 @@ namespace input
 	enum class KeyAction
 	{
 		PRESS,
+		RELEASE,
 		RELEASE
 	};
 
@@ -204,7 +205,8 @@ namespace input
 	enum class KeyAction
 	{
 		PRESS = GLFW_PRESS,
-		RELEASE = GLFW_RELEASE
+		RELEASE = GLFW_RELEASE,
+		REPEAT = GLFW_REPEAT,
 	};
 	enum class KeyState
 	{

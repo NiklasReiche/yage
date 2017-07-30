@@ -8,6 +8,11 @@ namespace glfw
 		//throw GlfwException(GLFW_ERROR, description);
 	}
 
+	void char_mods_callback(GLFWwindow* window, unsigned int codepoint, int mods)
+	{
+		GLFWHandle* handle = (GLFWHandle*)glfwGetWindowUserPointer(window);
+		handle->onCharModsEvent(codepoint, mods);
+	}
 	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 	{
 		GLFWHandle* handle = (GLFWHandle*)glfwGetWindowUserPointer(window);
