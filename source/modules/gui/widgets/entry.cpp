@@ -57,4 +57,9 @@ namespace gui
 			break;
 		}
 	}
+
+	std::string TextEntry::getString()
+	{
+		return text;
+	}
 }

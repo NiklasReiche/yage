@@ -32,5 +32,7 @@ namespace gui
 		void onFocusRelease();
 		void onCharInput(char character);
 		void onKeyPress(input::KeyCode key);
+
+		std::string getString();
 	};
 }
