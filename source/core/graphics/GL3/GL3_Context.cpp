@@ -445,6 +445,7 @@ namespace gl3
 		}
 
 		shader.glContext = this;
+		shader.program = shader.id;
 
 		// Save uniform locations
 		GLint count;

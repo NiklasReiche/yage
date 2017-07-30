@@ -24,9 +24,9 @@ namespace gl3
 
 	public:
 		GL3_Texture();
-		GL3_Texture(const GL3_Texture& copy);
+		GL3_Texture(const GL3_Texture& other);
 		virtual ~GL3_Texture();
-		GL3_Texture& operator=(const GL3_Texture& copy);
+		GL3_Texture& operator=(const GL3_Texture& other);
 
 		void bufferSubData(int x_offset, int y_offset, int width, int height, std::vector<unsigned char> & data);
 		void getTextureImage(std::vector<unsigned char> & data, int level = 0);

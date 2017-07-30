@@ -5,42 +5,42 @@ namespace gl3
 {
 	GL3_Texture::GL3_Texture()
 		: GL3_Object() {}
+	GL3_Texture::GL3_Texture(const GL3_Texture& other)
+		: GL3_Object(other)
+	{
+		this->texture = other.texture;
+		this->width = other.width;
+		this->height = other.height;
+		this->target = other.target;
+		this->format = other.format;
+		this->px_format = other.px_format;
+		this->px_type = other.px_type;
+		this->rowAlignment = other.rowAlignment;
+		this->nChannels = other.nChannels;
+	}
 	GL3_Texture::~GL3_Texture()
 	{
 		if (*refCount == 1) {
 			glDeleteTextures(1, &texture);
 		}
 	}
-	GL3_Texture::GL3_Texture(const GL3_Texture& copy)
-		: GL3_Object(copy)
+	GL3_Texture& GL3_Texture::operator=(const GL3_Texture& other)
 	{
-		this->texture = copy.texture;
-		this->width = copy.width;
-		this->height = copy.height;
-		this->target = copy.target;
-		this->format = copy.format;
-		this->px_format = copy.px_format;
-		this->px_type = copy.px_type;
-		this->rowAlignment = copy.rowAlignment;
-		this->nChannels = copy.nChannels;
-	}
-	GL3_Texture& GL3_Texture::operator=(const GL3_Texture& copy)
-	{
-		GL3_Object::operator=(copy);
+		GL3_Object::operator=(other);
 		if (shouldDelete) {
 			glDeleteTextures(1, &texture);
 			shouldDelete = false;
 		}
 
-		this->texture = copy.texture;
-		this->width = copy.width;
-		this->height = copy.height;
-		this->target = copy.target;
-		this->format = copy.format;
-		this->px_format = copy.px_format;
-		this->px_type = copy.px_type;
-		this->rowAlignment = copy.rowAlignment;
-		this->nChannels = copy.nChannels;
+		this->texture = other.texture;
+		this->width = other.width;
+		this->height = other.height;
+		this->target = other.target;
+		this->format = other.format;
+		this->px_format = other.px_format;
+		this->px_type = other.px_type;
+		this->rowAlignment = other.rowAlignment;
+		this->nChannels = other.nChannels;
 
 		return *this;
 	}

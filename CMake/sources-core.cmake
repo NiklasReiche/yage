@@ -23,11 +23,13 @@ set( YAGE_GRAPHICS_GL3_SOURCE
 	"${YAGE_CORE_PATH}/graphics/GL3/GL3_Exception.h"
 	"${YAGE_CORE_PATH}/graphics/GL3/GL3_Enum.h"
 	"${YAGE_CORE_PATH}/graphics/GL3/GL3_Object.h"
-	
+	"${YAGE_CORE_PATH}/graphics/GL3/GL3_Object.cpp"
+
 	"${YAGE_CORE_PATH}/graphics/GL3/GL3_Drawable.h"
 	"${YAGE_CORE_PATH}/graphics/GL3/GL3_Drawable.cpp"
 
 	"${YAGE_CORE_PATH}/graphics/GL3/GL3_Framebuffer.h"
+	"${YAGE_CORE_PATH}/graphics/GL3/GL3_Framebuffer.cpp"
 
 	"${YAGE_CORE_PATH}/graphics/GL3/GL3_Shader.h"
 	"${YAGE_CORE_PATH}/graphics/GL3/GL3_Shader.cpp"

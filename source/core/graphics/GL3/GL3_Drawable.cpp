@@ -5,42 +5,42 @@ namespace gl3
 {
 	GL3_Drawable::GL3_Drawable()
 		: GL3_Object() {}
+	GL3_Drawable::GL3_Drawable(const GL3_Drawable& other)
+		: GL3_Object(other)
+	{
+		this->VAO = other.VAO;
+		this->VBO = other.VBO;
+		this->primitive = other.primitive;
+		this->usage = other.usage;
+		this->nVertices = other.nVertices;
+		this->layout = other.layout;
+		this->vertexSize = other.vertexSize;
+		this->format = other.format;
+	}
 	GL3_Drawable::~GL3_Drawable()
 	{
 		if (*refCount == 1) {
-			glDeleteBuffers(1, &VAO);
+			glDeleteVertexArrays(1, &VAO);
 			glDeleteBuffers(1, &VBO);
 		}
 	}
-	GL3_Drawable::GL3_Drawable(const GL3_Drawable& copy)
-		: GL3_Object(copy)
+	GL3_Drawable& GL3_Drawable::operator=(const GL3_Drawable& other)
 	{
-		this->VAO = copy.VAO;
-		this->VBO = copy.VBO;
-		this->primitive = copy.primitive;
-		this->usage = copy.usage;
-		this->nVertices = copy.nVertices;
-		this->layout = copy.layout;
-		this->vertexSize = copy.vertexSize;
-		this->format = copy.format;
-	}
-	GL3_Drawable& GL3_Drawable::operator=(const GL3_Drawable& copy)
-	{
-		GL3_Object::operator=(copy);
+		GL3_Object::operator=(other);
 		if (shouldDelete) {
 			glDeleteVertexArrays(1, &VAO);
 			glDeleteBuffers(1, &VBO);
 			shouldDelete = false;
 		}
 
-		this->VAO = copy.VAO;
-		this->VBO = copy.VBO;
-		this->primitive = copy.primitive;
-		this->usage = copy.usage;
-		this->nVertices = copy.nVertices;
-		this->layout = copy.layout;
-		this->vertexSize = copy.vertexSize;
-		this->format = copy.format;
+		this->VAO = other.VAO;
+		this->VBO = other.VBO;
+		this->primitive = other.primitive;
+		this->usage = other.usage;
+		this->nVertices = other.nVertices;
+		this->layout = other.layout;
+		this->vertexSize = other.vertexSize;
+		this->format = other.format;
 
 		return *this;
 	}

@@ -24,9 +24,9 @@ namespace gl3
 
 	public:
 		GL3_Drawable();
-		GL3_Drawable(const GL3_Drawable& copy);
+		GL3_Drawable(const GL3_Drawable& other);
 		virtual ~GL3_Drawable();
-		GL3_Drawable& operator=(const GL3_Drawable& copy);
+		GL3_Drawable& operator=(const GL3_Drawable& other);
 
 		void bufferSubData(int offset, std::vector<GLfloat> & vertices);
 		void bufferData(std::vector<GLfloat> & vertices);

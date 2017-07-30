@@ -15,9 +15,15 @@ namespace gl3
 	private:
 		friend class GL3_Context;
 
+		GLuint program = 0;
 		std::map<std::string, GLint> uniformLocations;
 
 	public:
+		GL3_Shader();
+		GL3_Shader(const GL3_Shader& other);
+		~GL3_Shader();
+		GL3_Shader& operator=(const GL3_Shader& other);
+
 		void setUniform(std::string name, int value);
 		void setUniform(std::string name, bool value);
 		void setUniform(std::string name, float value);

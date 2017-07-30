@@ -3,6 +3,34 @@
 
 namespace gl3
 {
+	GL3_Shader::GL3_Shader()
+		: GL3_Object() {}
+	GL3_Shader::GL3_Shader(const GL3_Shader& other)
+		: GL3_Object(other)
+	{
+		this->program = other.program;
+		this->uniformLocations = other.uniformLocations;
+	}
+	GL3_Shader::~GL3_Shader()
+	{
+		if (*refCount == 1) {
+			glDeleteProgram(program);
+		}
+	}
+	GL3_Shader& GL3_Shader::operator=(const GL3_Shader& other)
+	{
+		GL3_Object::operator=(other);
+		if (shouldDelete) {
+			glDeleteProgram(program);
+			shouldDelete = false;
+		}
+
+		this->program = other.program;
+		this->uniformLocations = other.uniformLocations;
+
+		return *this;
+	}
+
 	void GL3_Shader::setUniform(std::string name, int value)
 	{
 		glContext->useShader(*this);
