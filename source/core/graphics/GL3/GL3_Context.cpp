@@ -473,9 +473,11 @@ namespace gl3
 
 	void GL3_Context::draw(const GL3_Drawable & drawable)
 	{
-		glBindVertexArray(drawable.VAO);
-		glDrawArrays((GLenum)drawable.primitive, 0, drawable.nVertices);
-		glBindVertexArray(0);
+		if (drawable.id != 0) {
+			glBindVertexArray(drawable.VAO);
+			glDrawArrays((GLenum)drawable.primitive, 0, drawable.nVertices);
+			glBindVertexArray(0);
+		}
 	}
 	void GL3_Context::draw(const GL3_Framebuffer & buffer)
 	{

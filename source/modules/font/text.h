@@ -29,7 +29,6 @@ namespace font
 
 		std::string text;
 		int fontSize = 16;
-		int linePitch = 5;
 
 		int VERTEX_SIZE_COORDS = 12;
 		int VERTEX_SIZE_TEXCOORDS = 12;
@@ -43,6 +42,7 @@ namespace font
 		void constructVertexCoords(std::vector<GLfloat> & vertices, const Font & font);
 		void constructVertexTexCoords(std::vector<GLfloat> & vertices, const Font & font);
 		void constructVertexColors(std::vector<GLfloat> & vertices);
+
 	public:
 		Text(){}
 		Text(gl::GraphicsContext* glContext, std::string text, const Font & font, gml::Vec2<float> position = gml::Vec2<float>(0.0f), unsigned int color = 0x000000FFu, int size = 14);
@@ -53,11 +53,15 @@ namespace font
 
 		void setText(std::string text, const Font & font);
 		void appendText(std::string text, const Font & font);
+		void insertText(std::string text, const Font & font, int offset = 0);
 
 		void setColor(unsigned int color);
 
 		void setPosition(gml::Vec2<float> position);
 
 		gl::Texture getTexture();
+		std::string getString();
+		gml::Vec2f getMaxDimensions();
+		gml::Vec2f getOffset(int index);
 	};
 }

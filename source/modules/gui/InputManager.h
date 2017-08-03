@@ -23,6 +23,8 @@ namespace gui
 
 		void update(Widget & root);
 
+		void unFocus();
+
 		void onKeyEvent(input::KeyCode key, input::KeyAction action);
 		void onCharEvent(char character);
 		void onMousePosEvent(float x, float y);

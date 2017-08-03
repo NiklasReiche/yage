@@ -365,6 +365,7 @@ public:
 		gui::TextEntryTemplate textEntryTemplate;
 		textEntryTemplate.border.size = 1;
 		textEntryTemplate.defaultText.text = "entry";
+		textEntryTemplate.defaultText.color = gl::Color::GREY;
 
 		master->createWidget<gui::TextEntry>(frame_radio, textEntryTemplate);
 		

@@ -5,12 +5,16 @@ namespace gui
 {
 	AbsoluteLayout::AbsoluteLayout()
 		: Layout(LayoutType::ABSOLUTE_LAYOUT) {}
+	gml::Vec2f AbsoluteLayout::calcParentPrefSize(Widget* parent)
+	{
+		return parent->toAbs(parent->getPreferredSize());
+	}
 	void AbsoluteLayout::update(Widget* widget)
 	{
 		for (unsigned int i = 0; i < widget->getChildrenCount(); ++i)
 		{
 			Widget & child = widget->getChild(i);
-			child.setSize(child.getPreferredSize());
+			child.setSize(child.toAbs(child.getPreferredSize()));
 		}
 	}
 
@@ -24,8 +28,9 @@ namespace gui
 		for (unsigned int i = 0; i < parent->getChildrenCount(); ++i)
 		{
 			Widget & child = parent->getChild(i);
-			gml::Vec2<ChildSizeHint> sizeHint = child.getChildSizeHint();
+
 			gml::Vec2f childPrefSize = child.getPreferredSize() + child.getCellMargin();
+			gml::Vec2<ChildSizeHint> sizeHint = child.getChildSizeHint();
 
 			switch (sizeHint.x)
 			{
@@ -125,6 +130,9 @@ namespace gui
 			case ChildSizeHint::MIN:
 				parentPrefSize.y = std::max(childPrefSize.y, parentPrefSize.y);
 				break;
+			case ChildSizeHint::MIN_EXPAND:
+				parentPrefSize.y = std::max(childPrefSize.y, parentPrefSize.y);
+				break;
 			}
 
 			switch (sizeHint.x)
@@ -133,6 +141,9 @@ namespace gui
 				parentPrefSize.x += childPrefSize.x;
 				break;
 			case ChildSizeHint::MIN:
+				parentPrefSize.x += childPrefSize.x;
+				break;
+			case ChildSizeHint::MIN_EXPAND:
 				parentPrefSize.x += childPrefSize.x;
 				break;
 			}

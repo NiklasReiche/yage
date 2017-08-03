@@ -46,6 +46,7 @@ namespace font
 		std::string name = "arial";
 		FontMetrics metrics;
 		GlyphMetrics maxGlyph;
+		//gml::Vec2f dimensions;
 		gl::Texture textureAtlas;
 		std::map<unsigned char, Character> characters;
 	};

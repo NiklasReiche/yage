@@ -15,8 +15,8 @@ namespace gl3
 		int* refCount = nullptr;
 		bool shouldDelete = false;
 
-		GLuint id;
-		GL3_Context* glContext;
+		GLuint id = 0;
+		GL3_Context* glContext = nullptr;
 
 	public:
 		GL3_Object();

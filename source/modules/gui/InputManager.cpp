@@ -17,6 +17,14 @@ namespace gui
 		input = inputListener->getInput();
 	}
 
+	void InputManager::unFocus()
+	{
+		if (focusedWidget != nullptr) {
+			focusedWidget->onFocusRelease();
+			focusedWidget = nullptr;
+		}
+	}
+
 	Widget* InputManager::searchSelected(Widget * widget, float xpos, float ypos)
 	{
 		if (xpos > widget->position.x && xpos < widget->position.x + widget->size.x && ypos > widget->position.y && ypos < widget->position.y + widget->size.y) {

@@ -44,6 +44,7 @@ namespace gui
 		std::unique_ptr<Layout> layout;
 		gml::Vec2<ParentSizeHint> parentSizeHint = gml::Vec2<ParentSizeHint>(ParentSizeHint::WRAP_CHILDREN_RESIZE);
 		gml::Vec2<ChildSizeHint> childSizeHint = gml::Vec2<ChildSizeHint>(ChildSizeHint::MIN);
+
 		Anchor anchor = Anchor::TOP_LEFT;
 		/* offset from parent widget */
 		gml::Vec2f offset;
@@ -51,6 +52,8 @@ namespace gui
 		gml::Vec2f cellMargin;
 		/* padding for layouts */
 		gml::Vec2f layoutMargin;
+		/* prefered size for layouts */
+		gml::Vec2f prefSize;
 
 		/* absolute position of the outer top left edge */
 		gml::Vec2f position;
@@ -60,14 +63,10 @@ namespace gui
 		gml::Vec2f innerPosition;
 		/* absolute size of the widget interior space - equal to size for borderless widgets */
 		gml::Vec2f innerSize;
-		/* prefered size for layouters */
-		gml::Vec2f prefSize;
 
 		gml::Vec4<float> color;
-
 		int borderSize = 0;
 		gml::Vec4<float> borderColor;
-		
 		int shadowOffset = 0;
 		float shadowHardness = 0.0f;
 
@@ -91,6 +90,7 @@ namespace gui
 			return (Element*)animations.back().get();
 		}
 		
+
 		virtual void onHover() {}
 		virtual void onHoverRelease() {}
 		virtual void onClick() {}
@@ -101,51 +101,52 @@ namespace gui
 		virtual void onCharInput(char character) {}
 		virtual void onKeyPress(input::KeyCode key) {}
 
-		virtual void update() {};
-		//virtual void del() {}
+		virtual font::Text* getText() { return nullptr; }
+
+
+		void hide() { isActive = false; }
+		void show() { isActive = true; }
 
 		/* Getter */
 		bool is_Active() { return isActive; }
 		bool is_Interactable() { return isInteractable; }
-		bool isHoverActive() { return isHovered; }
 		bool has_Text() { return hasText; }
 
 		Widget* getParent() { return parent; }
 		Widget& getChild(int i) { return *children[i].get(); }
 		unsigned int getChildrenCount() { return children.size(); }
 
-		virtual font::Text* getText() { return nullptr; }
 
+		gml::Vec2<ParentSizeHint> getParentSizeHint() { return parentSizeHint; }
+		gml::Vec2<ChildSizeHint> getChildSizeHint() { return childSizeHint; }
+		gml::Vec2f getPreferredSize() { return prefSize; }
 		gml::Vec2f getCellMargin() { return cellMargin; }
 		gml::Vec2f getLayoutMargin() { return layoutMargin; }
+		gml::Vec2f getOffset() { return offset; }
 		gml::Vec2f getPosition() { return position; }
 		gml::Vec2f getInnerPosition() { return innerPosition; }
 		gml::Vec2f getSize() { return size; }
 		gml::Vec2f getInnerSize() { return innerSize; }
 		gml::Vec4f getColor() { return color; }
+		
 
 		/* Setter */
-		void hide() { isActive = false; }
-		void show() { isActive = true; }
-
 		void setColor(int color) { this->color = gl::toVec4(color); }
 		void setColor(gml::Vec4<float> color) { this->color = color; }
+		
 
 		/* update semantics */
 		void updateParams();
 		virtual void updateGeometry();
-
 		virtual void relayout();
+
 		virtual void setSize(gml::Vec2f size);
+		virtual void setPreferredSize(gml::Vec2f size) { prefSize = size; }
+		virtual void setAnchor(Anchor anchor);
 		virtual void resize(gml::Vec2f size);
 		virtual void move(gml::Vec2f position);
-		virtual void setAnchor(Anchor anchor);
 
-		gml::Vec2<ParentSizeHint> getParentSizeHint() { return parentSizeHint; }
-		gml::Vec2<ChildSizeHint> getChildSizeHint() { return childSizeHint; }
-		gml::Vec2f getPreferredSize() { return prefSize; }
-		void setPreferredSize(gml::Vec2f size) { prefSize = size; }
 
-		//Animation* createAnimation(Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time);
+		gml::Vec2f toAbs(GeoVec geoVec);
 	};
 }

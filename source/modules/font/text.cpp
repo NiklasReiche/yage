@@ -9,10 +9,12 @@ namespace font
 	Text::Text(gl::GraphicsContext* glContext, std::string text, const Font & font, gml::Vec2<float> position, unsigned int color, int size)
 		: text(text), position(position), color(gl::toVec4(color)), fontSize(size), font(font)
 	{
-		std::vector<gl::Gfloat> vertices;
-		constructVertices(vertices, font);
 		this->textureAtlas = font.textureAtlas;
-		glContext->createDrawable(*this, vertices, std::vector<int> { 2, 2, 4 }, gl::DrawMode::DRAW_DYNAMIC, gl::VertexFormat::BATCHED);
+		if (text.length() > 0) {
+			std::vector<gl::Gfloat> vertices;
+			constructVertices(vertices, font);
+			glContext->createDrawable(*this, vertices, std::vector<int> { 2, 2, 4 }, gl::DrawMode::DRAW_DYNAMIC, gl::VertexFormat::BATCHED);
+		}
 	}
 
 	void Text::constructVertices(std::vector<gl::Gfloat>& vertices, const Font & font)
@@ -87,24 +89,24 @@ namespace font
 		{
 			const Character & ch = font.characters.at(text[i]);
 
-			gl::Gfloat texLeft = ch.texCoords.left;
-			gl::Gfloat texRight = ch.texCoords.right;
-			gl::Gfloat texBottom = ch.texCoords.bottom;
-			gl::Gfloat texTop = ch.texCoords.top;
+gl::Gfloat texLeft = ch.texCoords.left;
+gl::Gfloat texRight = ch.texCoords.right;
+gl::Gfloat texBottom = ch.texCoords.bottom;
+gl::Gfloat texTop = ch.texCoords.top;
 
-			// Generate glyph quad for each character
-			std::array<gl::Gfloat, 12> localTexCoords = {
-				texLeft, texTop,
-				texLeft, texBottom,
-				texRight, texBottom,
+// Generate glyph quad for each character
+std::array<gl::Gfloat, 12> localTexCoords = {
+	texLeft, texTop,
+	texLeft, texBottom,
+	texRight, texBottom,
 
-				texRight, texBottom,
-				texRight, texTop,
-				texLeft, texTop
-			};
+	texRight, texBottom,
+	texRight, texTop,
+	texLeft, texTop
+};
 
-			// Append to global tex coords
-			texCoords.insert(std::end(texCoords), std::begin(localTexCoords), std::end(localTexCoords));
+// Append to global tex coords
+texCoords.insert(std::end(texCoords), std::begin(localTexCoords), std::end(localTexCoords));
 		}
 
 		// Append to global vertices
@@ -138,14 +140,24 @@ namespace font
 
 	void Text::setText(std::string text, const Font & font)
 	{
+		std::string oldText = this->text;
 		this->text = text;
 
-		std::vector<gl::Gfloat> vertices;
-		constructVertices(vertices, font);
-		textureAtlas = font.textureAtlas;
-		bufferData(vertices);
+		if (text.length() > 0) {
+			std::vector<gl::Gfloat> vertices;
+			constructVertices(vertices, font);
+			textureAtlas = font.textureAtlas;
+			if (oldText.length() == 0) {
+				glContext->createDrawable(*this, vertices, std::vector<int> { 2, 2, 4 }, gl::DrawMode::DRAW_DYNAMIC, gl::VertexFormat::BATCHED);
+			}
+			else {
+				bufferData(vertices);
+			}
+		}
+		else {
+			this->id = 0;
+		}
 	}
-
 	void Text::appendText(std::string text, const Font & font)
 	{
 		this->text += text;
@@ -155,7 +167,15 @@ namespace font
 		textureAtlas = font.textureAtlas;
 		bufferData(vertices);
 	}
+	void Text::insertText(std::string text, const Font & font, int offset)
+	{
+		this->text.insert(offset, text);
 
+		std::vector<gl::Gfloat> vertices;
+		constructVertices(vertices, font);
+		textureAtlas = font.textureAtlas;
+		bufferData(vertices);
+	}
 
 	void Text::setColor(unsigned int icolor)
 	{
@@ -165,7 +185,6 @@ namespace font
 		constructVertexColors(vertices);
 		bufferSubData(vertexOffsetColors, vertices);
 	}
-
 	void Text::setPosition(gml::Vec2<float> position)
 	{
 		this->position = position;
@@ -177,5 +196,39 @@ namespace font
 	gl::Texture Text::getTexture()
 	{
 		return textureAtlas;
+	}
+	std::string Text::getString()
+	{
+		return text;
+	}
+	gml::Vec2f Text::getMaxDimensions()
+	{
+		float scale = fontSize / (float)font.metrics.PT_size;
+		GlyphMetrics& maxGlyph = font.maxGlyph;
+
+		gml::Vec2f dimensions;
+		dimensions.x = font.maxGlyph.size.x * scale;
+		dimensions.y = (font.maxGlyph.size.y + (font.maxGlyph.size.y - font.maxGlyph.bearing.y)) * scale;
+
+		return dimensions;
+	}
+	gml::Vec2f Text::getOffset(int index)
+	{
+		if (index > text.length()){
+			return gml::Vec2f(-1.0f);
+		}
+		
+		gml::Vec2f offset(0.0f);
+		float scale = fontSize / (float)font.metrics.PT_size;
+
+		for (unsigned int i = 0; i < index; ++i) {
+			const Character & ch = font.characters.at(text[i]);
+			offset.x += ch.glyph.advance * scale;
+		}
+
+		//const Character & ch = font.characters.at(text[index]);
+		//offset.y = font.maxGlyph.bearing.y * scale - ch.glyph.bearing.y * scale;
+
+		return offset;
 	}
 }

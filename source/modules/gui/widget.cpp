@@ -11,23 +11,23 @@ namespace gui
 		anchor(wTemplate.geometry.anchor),
 		offset(wTemplate.geometry.offset),
 		cellMargin(wTemplate.geometry.offset),
-		size(wTemplate.geometry.size),
+		prefSize(wTemplate.geometry.size),
 		color(gl::toVec4(wTemplate.color)),
 		borderSize(wTemplate.border.size),
 		borderColor(gl::toVec4(wTemplate.border.color)),
 		shadowOffset(wTemplate.shadow.offset),
 		shadowHardness(wTemplate.shadow.hardness)
 	{
-		innerPosition = position + gml::Vec2f((float)borderSize);
-		innerSize = size - gml::Vec2f((float)borderSize * 2);
+		this->innerPosition = position + gml::Vec2f((float)borderSize);
+		this->innerSize = size - gml::Vec2f((float)borderSize * 2);
 
-		layout = std::make_unique<Layout>();
+		this->layout = std::make_unique<Layout>();
+		this->childSizeHint = wTemplate.childSizeHint;
 
 		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices);
 		master.glContext->createDrawable(*this, vertices, std::vector<int> { 2, 4 }, gl::DrawMode::DRAW_DYNAMIC, gl::VertexFormat::BATCHED);
 
-		prefSize = layout->calcParentPrefSize(this);
 		updateGeometry();
 	}
 	
@@ -317,6 +317,20 @@ namespace gui
 		vertices.insert(std::end(vertices), std::begin(colors), std::end(colors));
 	}
 
+	gml::Vec2f Widget::toAbs(GeoVec geoVec)
+	{
+		if (geoVec.type == ValueType::ABSOLUTE) {
+			return geoVec.value;
+		}
+		else if (geoVec.type == ValueType::RELATIVE) {
+			gml::Vec2f vec;
+			gml::Vec2f & parentSize = parent->getSize();
+			vec.x = geoVec.value.x * parentSize.x;
+			vec.y = geoVec.value.y * parentSize.y;
+			return vec;
+		}
+	}
+
 	void Widget::updateParams()
 	{
 		std::vector<gl::Gfloat> vertices;
@@ -327,7 +341,7 @@ namespace gui
 	void Widget::relayout()
 	{
 		if (parentSizeHint.x == ParentSizeHint::WRAP_AROUND || parentSizeHint.y == ParentSizeHint::WRAP_AROUND) {
-			prefSize = layout->calcParentPrefSize(this);
+			prefSize = layout->calcParentPrefSize(this) + gml::Vec2f((float)borderSize);
 			parent->relayout();
 		}
 		layout->update(this);
@@ -341,11 +355,13 @@ namespace gui
 			layout->update(this);
 		}
 	}
-	void Widget::resize(gml::Vec2f size) 
+	void Widget::resize(gml::Vec2f size)
 	{
-		prefSize = size;
-		parent->relayout();
-		layout->update(this);
+		if (this->prefSize != size) {
+			prefSize = size;
+			parent->relayout();
+			layout->update(this);
+		}
 	}
 	void Widget::move(gml::Vec2f position)
 	{
@@ -368,26 +384,26 @@ namespace gui
 			switch (anchor)
 			{
 			case Anchor::TOP_LEFT:
-				position = parent->getInnerPosition() + offset;
+				position = parent->getInnerPosition() + (offset);
 				break;
 
 			case Anchor::BOTTOM_LEFT:
-				position.x = parent->getInnerPosition().x + offset.x;
-				position.y = (parent->getInnerPosition().y + parent->getInnerSize().y) - (offset.y + size.y);
+				position.x = parent->getInnerPosition().x + (offset).x;
+				position.y = (parent->getInnerPosition().y + parent->getInnerSize().y) - ((offset).y + size.y);
 				break;
 
 			case Anchor::TOP_RIGHT:
-				position.x = (parent->getInnerPosition().x + parent->getInnerSize().x) - (offset.x + size.x);
-				position.y = parent->getInnerPosition().y + offset.y;
+				position.x = (parent->getInnerPosition().x + parent->getInnerSize().x) - ((offset).x + size.x);
+				position.y = parent->getInnerPosition().y + (offset).y;
 				break;
 
 			case Anchor::BOTTOM_RIGHT:
-				position.x = (parent->getInnerPosition().x + parent->getInnerSize().x) - (offset.x + size.x);
-				position.y = (parent->getInnerPosition().y + parent->getInnerSize().y) - (offset.y + size.y);
+				position.x = (parent->getInnerPosition().x + parent->getInnerSize().x) - ((offset).x + size.x);
+				position.y = (parent->getInnerPosition().y + parent->getInnerSize().y) - ((offset).y + size.y);
 				break;
 
 			case Anchor::CENTER:
-				position = parent->getInnerPosition() + parent->getInnerSize() / 2 + offset;
+				position = parent->getInnerPosition() + parent->getInnerSize() / 2 + (offset);
 				break;
 			}
 
@@ -401,12 +417,4 @@ namespace gui
 
 		updateParams();
 	}
-
-	/*
-	Animation* Widget::createAnimation(Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time)
-	{
-		animations.push_back(std::make_unique<Animation>(this, master, beg, goal, time));
-		return animations.back().get();
-	}
-	*/
 }

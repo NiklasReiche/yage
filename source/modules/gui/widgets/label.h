@@ -28,12 +28,15 @@ namespace gui
 
 		gml::Vec2f padding = gml::Vec2f(2.0f);
 
+		gml::Vec2f calcPrefSize();
+
 	public:
 		Label(Widget * parent, MasterInterface master, LabelTemplate labelTemplate);
 
 		font::Text* getText() { return &text; }
 
 		void setText(TextTemplate text);
+		void setText(font::Text text);
 		void setText(std::string text);
 		void setTextColor(unsigned int color) { text.setColor(color); }
 

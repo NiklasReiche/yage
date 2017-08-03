@@ -17,7 +17,8 @@ namespace gui
 		MIN,
 		MIN_EXPAND,
 		FIXED,
-		ASPECT
+		ASPECT,
+		INFINITE
 	};
 	enum class LayoutType
 	{
@@ -46,6 +47,7 @@ namespace gui
 	{
 	public:
 		AbsoluteLayout();
+		gml::Vec2f calcParentPrefSize(Widget* parent);
 		void update(Widget* parent);
 	};
 
