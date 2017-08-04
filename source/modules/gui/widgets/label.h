@@ -28,8 +28,6 @@ namespace gui
 
 		gml::Vec2f padding = gml::Vec2f(2.0f);
 
-		gml::Vec2f calcPrefSize();
-
 	public:
 		Label(Widget * parent, MasterInterface master, LabelTemplate labelTemplate);
 
@@ -41,5 +39,7 @@ namespace gui
 		void setTextColor(unsigned int color) { text.setColor(color); }
 
 		void updateGeometry();
+
+		gml::Vec2f calcPrefSize();
 	};
 }

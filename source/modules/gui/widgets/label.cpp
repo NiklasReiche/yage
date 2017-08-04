@@ -14,30 +14,18 @@ namespace gui
 		gml::Vec2f textPosition = this->innerPosition + padding;
 		this->text = font::Text(master.glContext, labelTemplate.text.text, mFont, textPosition, labelTemplate.text.color, labelTemplate.text.size);
 
-		if (size == gml::Vec2f(0.0f)) {
-			parentSizeHint = gml::Vec2<ParentSizeHint>(ParentSizeHint::WRAP_AROUND);
+		if (prefSize == gml::Vec2f(0.0f)) {
+			fitChildren = true;
+			prefSize = calcPrefSize();
+			sizeHint = gml::Vec2<SizeHint>(SizeHint::EXPANDING);
 		}
-
-		prefSize = calcPrefSize();
-
-		childSizeHint = gml::Vec2<ChildSizeHint>(ChildSizeHint::MIN);
 	}
 
 	gml::Vec2f Label::calcPrefSize()
 	{
-		gml::Vec2f vec(0.0f);
-		if (parentSizeHint.x == ParentSizeHint::WRAP_AROUND) {
-			vec.x = this->text.getSize().x + (float)this->borderSize * 2 + padding.x * 2;
-		}
-		else {
-			vec.x = size.x;
-		}
-		if (parentSizeHint.y == ParentSizeHint::WRAP_AROUND) {
-			vec.y = this->text.getMaxDimensions().y + (float)this->borderSize * 2 + padding.y * 2;
-		}
-		else {
-			vec.y = size.y;
-		}
+		gml::Vec2f vec;
+		vec.x = this->text.getSize().x + (float)this->borderSize * 2 + padding.x * 2;
+		vec.y = this->text.getMaxDimensions().y + (float)this->borderSize * 2 + padding.y * 2;
 		return vec;
 	}
 
@@ -51,13 +39,10 @@ namespace gui
 		gml::Vec2f textPosition = innerPosition + padding;
 		this->text = font::Text(master.glContext, textTemplate.text, mFont, textPosition, textTemplate.color, textTemplate.size);
 
-		if (parentSizeHint.x == ParentSizeHint::WRAP_AROUND) {
-			prefSize.x = this->text.getSize().x + (float)this->borderSize * 2 + padding.x * 2;
+		if (fitChildren) {
+			prefSize = calcPrefSize();
+			parent->relayout();
 		}
-		if (parentSizeHint.y == ParentSizeHint::WRAP_AROUND) {
-			prefSize.y = this->text.getMaxDimensions().y + (float)this->borderSize * 2 + padding.y * 2;
-		}
-		parent->relayout();
 	}
 
 	void Label::setText(std::string text)
@@ -71,13 +56,10 @@ namespace gui
 			this->text.setText(text, mFont);
 		}
 
-		if (parentSizeHint.x == ParentSizeHint::WRAP_AROUND) {
-			prefSize.x = this->text.getSize().x + (float)this->borderSize * 2 + padding.x * 2;
+		if (fitChildren) {
+			prefSize = calcPrefSize();
+			parent->relayout();
 		}
-		if (parentSizeHint.y == ParentSizeHint::WRAP_AROUND) {
-			prefSize.y = this->text.getMaxDimensions().y + (float)this->borderSize * 2 + padding.y * 2;
-		}
-		parent->relayout();
 	}
 
 

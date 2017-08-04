@@ -6,18 +6,12 @@ namespace gui
 {
 	class Widget;
 
-	enum class ParentSizeHint
+	enum class SizeHint
 	{
-		WRAP_CHILDREN_RESIZE,
-		WRAP_CHILDREN_FIXED,
-		WRAP_AROUND
-	};
-	enum class ChildSizeHint
-	{
-		MIN,
-		MIN_EXPAND,
 		FIXED,
-		ASPECT,
+		EXPANDING,
+		SHRINKING,
+		RECOMMENDED,
 		INFINITE
 	};
 	enum class LayoutType
@@ -38,7 +32,8 @@ namespace gui
 		Layout(LayoutType type)
 			: type(type) {}
 		virtual ~Layout() {}
-		virtual gml::Vec2f calcParentPrefSize(Widget* parent) { return gml::Vec2f(); }
+		virtual float calcPrefSizeX(Widget* parent) { return 0.0f; }
+		virtual float calcPrefSizeY(Widget* parent) { return 0.0f; }
 		virtual void update(Widget* widget) {}
 	};
 
@@ -47,7 +42,6 @@ namespace gui
 	{
 	public:
 		AbsoluteLayout();
-		gml::Vec2f calcParentPrefSize(Widget* parent);
 		void update(Widget* parent);
 	};
 
@@ -56,7 +50,8 @@ namespace gui
 	{
 	public:
 		VListLayout();
-		gml::Vec2f calcParentPrefSize(Widget* parent);
+		float calcPrefSizeX(Widget* parent);
+		float calcPrefSizeY(Widget* parent);
 		void update(Widget* parent);
 	};
 
@@ -65,7 +60,8 @@ namespace gui
 	{
 	public:
 		HListLayout();
-		gml::Vec2f calcParentPrefSize(Widget* parent);
+		float calcPrefSizeX(Widget* parent);
+		float calcPrefSizeY(Widget* parent);
 		void update(Widget* parent);
 	};
 
@@ -74,6 +70,5 @@ namespace gui
 	{
 	public:
 		GridLayout();
-		//void update(Widget* parent);
 	};
 }

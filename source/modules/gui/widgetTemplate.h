@@ -15,44 +15,7 @@ namespace gui
 		BOTTOM_RIGHT,
 		CENTER
 	};
-	enum class ValueType
-	{
-		ABSOLUTE,
-		RELATIVE
-	};
-	
-	class GeoVec
-	{
-	public:
-		gml::Vec2f value;
-		ValueType type;
 
-		GeoVec()
-			: value(gml::Vec2f(0.0f)), type(ValueType::ABSOLUTE) {}
-		GeoVec(gml::Vec2f value, ValueType type = ValueType::ABSOLUTE)
-			: value(value), type(type) {}
-		GeoVec(float x, float y, ValueType type = ValueType::ABSOLUTE)
-			: value(gml::Vec2f(x, y)), type(type) {}
-
-		friend bool operator==(GeoVec & left, GeoVec & right);
-		friend bool operator!=(GeoVec & left, GeoVec & right);
-	};
-	inline bool operator==(GeoVec & left, GeoVec & right)
-	{
-		return (left.value == right.value && left.type == right.type);
-	}
-	inline bool operator!=(GeoVec & left, GeoVec & right)
-	{
-		return !(left == right);
-	}
-
-
-	struct WidgetLayoutTemplate
-	{
-		LayoutType layout;
-		gml::Vec2<ParentSizeHint> parentSizeHint = gml::Vec2<ParentSizeHint>(ParentSizeHint::WRAP_CHILDREN_RESIZE);
-		gml::Vec2<ChildSizeHint> childSizeHint = gml::Vec2<ChildSizeHint>(ChildSizeHint::MIN);
-	};
 	struct WidgetGeometryTemplate
 	{
 		Anchor anchor = Anchor::TOP_LEFT;
@@ -76,6 +39,6 @@ namespace gui
 		WidgetBorderTemplate border;
 		WidgetShadowTemplate shadow;
 		unsigned int color = gl::Color::WHITE;
-		gml::Vec2<ChildSizeHint> childSizeHint = gml::Vec2<ChildSizeHint>(ChildSizeHint::MIN);
+		gml::Vec2<SizeHint> sizeHint = gml::Vec2<SizeHint>(SizeHint::EXPANDING);
 	};
 }

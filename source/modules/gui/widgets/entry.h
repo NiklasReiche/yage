@@ -59,5 +59,7 @@ namespace gui
 		void onKeyPress(input::KeyCode key);
 
 		std::string getString();
+
+		gml::Vec2f calcPrefSize();
 	};
 }

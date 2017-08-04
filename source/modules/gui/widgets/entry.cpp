@@ -6,8 +6,8 @@ namespace gui
 	TextCursor::TextCursor(Widget* parent, MasterInterface master, WidgetTemplate widgetTemplate)
 		: Widget(parent, master, widgetTemplate)
 	{
-		childSizeHint.x = ChildSizeHint::FIXED;
-		childSizeHint.y = ChildSizeHint::MIN_EXPAND;
+		sizeHint.x = SizeHint::FIXED;
+		sizeHint.y = SizeHint::FIXED;
 		prefSize = widgetTemplate.geometry.size;
 	}
 
@@ -54,9 +54,11 @@ namespace gui
 		cursor->hide();
 
 		layout = std::make_unique<AbsoluteLayout>();
-		parentSizeHint = gml::Vec2<ParentSizeHint>(ParentSizeHint::WRAP_CHILDREN_FIXED);
-		childSizeHint = gml::Vec2<ChildSizeHint>(ChildSizeHint::MIN);
-		prefSize = label->getPreferredSize() + padding * 2;
+
+		if (prefSize == gml::Vec2f(0.0f)) {
+			prefSize = calcPrefSize();
+			sizeHint = gml::Vec2<SizeHint>(SizeHint::EXPANDING);
+		}
 	}
 
 	void TextEntry::onFocus()
@@ -82,7 +84,7 @@ namespace gui
 		inputText.insert(cursorPosition, std::string(1, character));
 		label->setText(inputText);
 
-		if (cursorPosition < inputText.length()) {
+		if (cursorPosition < (int)inputText.length()) {
 			cursorPosition++;
 			moveCursor();
 		}
@@ -129,5 +131,10 @@ namespace gui
 	std::string TextEntry::getString()
 	{
 		return inputText;
+	}
+
+	gml::Vec2f TextEntry::calcPrefSize()
+	{
+		return label->getPreferredSize() + padding * 2;
 	}
 }

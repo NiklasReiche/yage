@@ -58,7 +58,7 @@ public:
 		*
 		* Design Frame
 		*
-		*/
+		*/ 
 
 		gui::FrameTemplate frameTemplate;
 		frameTemplate.geometry.anchor = gui::Anchor::TOP_LEFT;
@@ -66,8 +66,6 @@ public:
 		frameTemplate.border.size = 1;
 		frameTemplate.color = gl::Color::TRANSPARENT;
 		frameTemplate.layoutType = gui::LayoutType::V_LIST_LAYOUT;
-		frameTemplate.parentSizeHint.x = gui::ParentSizeHint::WRAP_AROUND;
-		frameTemplate.parentSizeHint.y = gui::ParentSizeHint::WRAP_AROUND;
 		frameTemplate.layoutMargin = gml::Vec2f(5.0f);
 		
 		gui::Frame* frame_1 = master->createWidget<gui::Frame>(nullptr, frameTemplate);
@@ -85,8 +83,6 @@ public:
 		designsFrameTemplate.geometry.offset.y = 5.0f;
 		designsFrameTemplate.color = gl::Color::TRANSPARENT;
 		designsFrameTemplate.layoutType = gui::LayoutType::H_LIST_LAYOUT;
-		designsFrameTemplate.parentSizeHint.x = gui::ParentSizeHint::WRAP_AROUND;
-		designsFrameTemplate.parentSizeHint.y = gui::ParentSizeHint::WRAP_AROUND;
 
 		gui::Frame* designFrame = master->createWidget<gui::Frame>(frame_1, designsFrameTemplate);
 
@@ -127,8 +123,6 @@ public:
 		frameTemplate2.border.size = 1;
 		frameTemplate2.color = gl::Color::TRANSPARENT;
 		frameTemplate2.layoutType = gui::LayoutType::V_LIST_LAYOUT;
-		frameTemplate2.parentSizeHint.x = gui::ParentSizeHint::WRAP_AROUND;
-		frameTemplate2.parentSizeHint.y = gui::ParentSizeHint::WRAP_AROUND;
 		frameTemplate2.layoutMargin = gml::Vec2f(5.0f);
 
 		gui::Frame* frame_2 = master->createWidget<gui::Frame>(nullptr, frameTemplate2);
@@ -153,8 +147,6 @@ public:
 		frameTemplateVList.geometry.offset = gml::Vec2<float>(20, 0);
 		frameTemplateVList.color = gl::Color::TRANSPARENT;
 		frameTemplateVList.layoutType = gui::LayoutType::V_LIST_LAYOUT;
-		frameTemplateVList.parentSizeHint.x = gui::ParentSizeHint::WRAP_AROUND;
-		frameTemplateVList.parentSizeHint.y = gui::ParentSizeHint::WRAP_AROUND;
 		frameTemplateVList.layoutMargin = gml::Vec2f(5.0f);
 
 		gui::Frame* vListFrame = master->createWidget<gui::Frame>(frame_2, frameTemplateVList);
@@ -180,8 +172,6 @@ public:
 		frameTemplateHList.geometry.offset = gml::Vec2<float>(20, 0);
 		frameTemplateHList.color = gl::Color::TRANSPARENT;
 		frameTemplateHList.layoutType = gui::LayoutType::H_LIST_LAYOUT;
-		frameTemplateHList.parentSizeHint.x = gui::ParentSizeHint::WRAP_AROUND;
-		frameTemplateHList.parentSizeHint.y = gui::ParentSizeHint::WRAP_AROUND;
 		frameTemplateHList.layoutMargin = gml::Vec2f(5.0f);
 
 		gui::Frame* hListFrame = master->createWidget<gui::Frame>(frame_2, frameTemplateHList);
@@ -221,8 +211,6 @@ public:
 		frameTemplate3.border.size = 1;
 		frameTemplate3.color = gl::Color::TRANSPARENT;
 		frameTemplate3.layoutType = gui::LayoutType::H_LIST_LAYOUT;
-		frameTemplate3.parentSizeHint.x = gui::ParentSizeHint::WRAP_AROUND;
-		frameTemplate3.parentSizeHint.y = gui::ParentSizeHint::WRAP_AROUND;
 		frameTemplate3.layoutMargin = gml::Vec2f(5.0f);
 
 		gui::Frame* frame_3 = master->createWidget<gui::Frame>(nullptr, frameTemplate3);
@@ -264,8 +252,6 @@ public:
 		frameTemplate4.border.size = 1;
 		frameTemplate4.color = gl::Color::TRANSPARENT;
 		frameTemplate4.layoutType = gui::LayoutType::V_LIST_LAYOUT;
-		frameTemplate4.parentSizeHint.x = gui::ParentSizeHint::WRAP_AROUND;
-		frameTemplate4.parentSizeHint.y = gui::ParentSizeHint::WRAP_AROUND;
 		frameTemplate4.layoutMargin = gml::Vec2f(5.0f);
 
 		gui::Frame* frame_4 = master->createWidget<gui::Frame>(nullptr, frameTemplate4);
@@ -282,8 +268,6 @@ public:
 		frameTemplateButtons.border.size = 1;
 		frameTemplateButtons.color = gl::Color::TRANSPARENT;
 		frameTemplateButtons.layoutType = gui::LayoutType::H_LIST_LAYOUT;
-		frameTemplateButtons.parentSizeHint.x = gui::ParentSizeHint::WRAP_AROUND;
-		frameTemplateButtons.parentSizeHint.y = gui::ParentSizeHint::WRAP_AROUND;
 		frameTemplateButtons.layoutMargin = gml::Vec2f(5.0f);
 
 		gui::Frame* frame_buttons = master->createWidget<gui::Frame>(frame_4, frameTemplateButtons);
@@ -292,8 +276,6 @@ public:
 		gui::FrameTemplate frameTemplateClicks;
 		frameTemplateClicks.color = gl::Color::TRANSPARENT;
 		frameTemplateClicks.layoutType = gui::LayoutType::V_LIST_LAYOUT;
-		frameTemplateClicks.parentSizeHint.x = gui::ParentSizeHint::WRAP_AROUND;
-		frameTemplateClicks.parentSizeHint.y = gui::ParentSizeHint::WRAP_AROUND;
 
 		frame_clicks = master->createWidget<gui::Frame>(frame_buttons, frameTemplateClicks);
 
@@ -301,8 +283,6 @@ public:
 		frameTemplateCheck.geometry.offset = gml::Vec2f(25.0f, 0.0f);
 		frameTemplateCheck.color = gl::Color::TRANSPARENT;
 		frameTemplateCheck.layoutType = gui::LayoutType::V_LIST_LAYOUT;
-		frameTemplateCheck.parentSizeHint.x = gui::ParentSizeHint::WRAP_AROUND;
-		frameTemplateCheck.parentSizeHint.y = gui::ParentSizeHint::WRAP_AROUND;
 
 		frame_check = master->createWidget<gui::Frame>(frame_buttons, frameTemplateCheck);
 
@@ -310,8 +290,6 @@ public:
 		frameTemplateRadio.geometry.offset = gml::Vec2f(25.0f, 0.0f);
 		frameTemplateRadio.color = gl::Color::TRANSPARENT;
 		frameTemplateRadio.layoutType = gui::LayoutType::V_LIST_LAYOUT;
-		frameTemplateRadio.parentSizeHint.x = gui::ParentSizeHint::WRAP_AROUND;
-		frameTemplateRadio.parentSizeHint.y = gui::ParentSizeHint::WRAP_AROUND;
 
 		frame_radio = master->createWidget<gui::Frame>(frame_buttons, frameTemplateRadio);
 

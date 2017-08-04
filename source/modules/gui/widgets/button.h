@@ -42,6 +42,8 @@ namespace gui
 		void setCallback(std::function<void(void)> command) { this->command = command; }
 		void setText(TextTemplate text) { label->setText(text); }
 		void setTextColor(unsigned int color) { label->setTextColor(color); }
+
+		gml::Vec2f calcPrefSize();
 	};
 
 	class CheckButton : public PushButton
@@ -109,8 +111,6 @@ namespace gui
 		RadioGroup(Widget * parent, MasterInterface master, const FrameTemplate & layout, const ButtonTemplate & buttonLayout, T defaultValue)
 			: Frame(parent, master, layout), buttonLayout(buttonLayout), state(defaultValue) 
 		{
-			this->parentSizeHint = gml::Vec2<ParentSizeHint>(ParentSizeHint::WRAP_AROUND);
-			this->childSizeHint = gml::Vec2<ChildSizeHint>(ChildSizeHint::MIN);
 			this->buttonLayout.geometry.offset = gml::Vec2<float>();
 		}
 

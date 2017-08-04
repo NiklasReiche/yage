@@ -2,28 +2,31 @@
 
 namespace gui
 {
-	PushButton::PushButton(Widget * parent, MasterInterface master, const ButtonTemplate & layout)
-		: Widget(parent, master, layout), command(layout.command)
+	PushButton::PushButton(Widget * parent, MasterInterface master, const ButtonTemplate & buttonTemplate)
+		: Widget(parent, master, buttonTemplate), command(buttonTemplate.command)
 	{
 		this->isInteractable = true;
-		this->idleColor = gl::toVec4(layout.color);
-		this->hoverColor = gl::toVec4(layout.hoverColor);
-		this->clickColor = gl::toVec4(layout.clickColor);
+		this->idleColor = gl::toVec4(buttonTemplate.color);
+		this->hoverColor = gl::toVec4(buttonTemplate.hoverColor);
+		this->clickColor = gl::toVec4(buttonTemplate.clickColor);
 
-		LabelTemplate labelLayout;
-		labelLayout.geometry.offset = gml::Vec2f();
-        labelLayout.geometry.size = gml::Vec2f();
-		labelLayout.color = 0x00000000u;
-		labelLayout.shadow.offset = 0;
-		labelLayout.border.size = 0;
-		labelLayout.text = layout.text;
+		LabelTemplate labelTemplate;
+		labelTemplate.geometry.offset = gml::Vec2f(0.0f);
+		labelTemplate.geometry.size = prefSize;
+		labelTemplate.color = 0x00000000u;
+		labelTemplate.shadow.offset = 0;
+		labelTemplate.border.size = 0;
+		labelTemplate.text = buttonTemplate.text;
 
-		label = this->createWidget<Label>(master, labelLayout);
+		label = this->createWidget<Label>(master, labelTemplate);
 
 		this->layout = std::make_unique<VListLayout>();
-		parentSizeHint = gml::Vec2<ParentSizeHint>(ParentSizeHint::WRAP_AROUND);
-		childSizeHint = gml::Vec2<ChildSizeHint>(ChildSizeHint::MIN);
-		prefSize = this->layout->calcParentPrefSize(this) + gml::Vec2f((float)borderSize);
+
+		if (prefSize == gml::Vec2f(0.0f)) {
+			fitChildren = true;
+			prefSize = calcPrefSize();
+			sizeHint = gml::Vec2<SizeHint>(SizeHint::EXPANDING);
+		}
 	}
 
 	void PushButton::onClick()
@@ -59,6 +62,11 @@ namespace gui
 	{
 		setColor(idleColor);
 		updateParams();
+	}
+
+	gml::Vec2f PushButton::calcPrefSize()
+	{
+		return label->getPreferredSize();
 	}
 
 

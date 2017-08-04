@@ -12,6 +12,7 @@ namespace gui
 		offset(wTemplate.geometry.offset),
 		cellMargin(wTemplate.geometry.offset),
 		prefSize(wTemplate.geometry.size),
+		sizeHint(wTemplate.sizeHint),
 		color(gl::toVec4(wTemplate.color)),
 		borderSize(wTemplate.border.size),
 		borderColor(gl::toVec4(wTemplate.border.color)),
@@ -22,7 +23,6 @@ namespace gui
 		this->innerSize = size - gml::Vec2f((float)borderSize * 2);
 
 		this->layout = std::make_unique<Layout>();
-		this->childSizeHint = wTemplate.childSizeHint;
 
 		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices);
@@ -317,19 +317,6 @@ namespace gui
 		vertices.insert(std::end(vertices), std::begin(colors), std::end(colors));
 	}
 
-	gml::Vec2f Widget::toAbs(GeoVec geoVec)
-	{
-		if (geoVec.type == ValueType::ABSOLUTE) {
-			return geoVec.value;
-		}
-		else if (geoVec.type == ValueType::RELATIVE) {
-			gml::Vec2f vec;
-			gml::Vec2f & parentSize = parent->getSize();
-			vec.x = geoVec.value.x * parentSize.x;
-			vec.y = geoVec.value.y * parentSize.y;
-			return vec;
-		}
-	}
 
 	void Widget::updateParams()
 	{
@@ -340,8 +327,8 @@ namespace gui
 
 	void Widget::relayout()
 	{
-		if (parentSizeHint.x == ParentSizeHint::WRAP_AROUND || parentSizeHint.y == ParentSizeHint::WRAP_AROUND) {
-			prefSize = layout->calcParentPrefSize(this) + gml::Vec2f((float)borderSize);
+		if (fitChildren) {
+			prefSize = calcPrefSize();
 			parent->relayout();
 		}
 		layout->update(this);
@@ -350,7 +337,7 @@ namespace gui
 	{
 		if (size != this->size) {
 			this->size = size;
-			this->innerSize = size - gml::Vec2f((float)borderSize);
+			this->innerSize = size - gml::Vec2f((float)borderSize) * 2;
 			updateGeometry();
 			layout->update(this);
 		}
@@ -416,5 +403,23 @@ namespace gui
 		}
 
 		updateParams();
+	}
+
+
+	gml::Vec2f Widget::toAbs(gml::Vec2f value)
+	{
+		gml::Vec2f vec;
+		gml::Vec2f & parentSize = parent->getSize();
+		vec.x = value.x * parentSize.x;
+		vec.y = value.y * parentSize.y;
+		return vec;
+	}
+	float Widget::toAbsX(float value)
+	{
+		return value * parent->getSize().x;
+	}
+	float Widget::toAbsY(float value)
+	{
+		return value * parent->getSize().y;
 	}
 }

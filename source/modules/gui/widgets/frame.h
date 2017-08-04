@@ -12,7 +12,6 @@ namespace gui
 	{
 		LayoutType layoutType;
 		gml::Vec2f layoutMargin;
-		gml::Vec2<ParentSizeHint> parentSizeHint = gml::Vec2<ParentSizeHint>(ParentSizeHint::WRAP_CHILDREN_RESIZE);
 	};
 
 	class Frame : public Widget
@@ -21,5 +20,7 @@ namespace gui
 		
 	public:
 		Frame(Widget * parent, MasterInterface master, FrameTemplate frameTemplate);
+
+		gml::Vec2f calcPrefSize();
 	};
 }

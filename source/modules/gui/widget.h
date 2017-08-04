@@ -40,10 +40,10 @@ namespace gui
 		bool keepFocus = false;
 		bool isHovered = false;
 		bool hasText = false;
+		bool fitChildren = false;
 
 		std::unique_ptr<Layout> layout;
-		gml::Vec2<ParentSizeHint> parentSizeHint = gml::Vec2<ParentSizeHint>(ParentSizeHint::WRAP_CHILDREN_RESIZE);
-		gml::Vec2<ChildSizeHint> childSizeHint = gml::Vec2<ChildSizeHint>(ChildSizeHint::MIN);
+		gml::Vec2<SizeHint> sizeHint = gml::Vec2<SizeHint>(SizeHint::EXPANDING);
 
 		Anchor anchor = Anchor::TOP_LEFT;
 		/* offset from parent widget */
@@ -103,6 +103,8 @@ namespace gui
 
 		virtual font::Text* getText() { return nullptr; }
 
+		virtual gml::Vec2f calcPrefSize() { return prefSize; }
+
 
 		void hide() { isActive = false; }
 		void show() { isActive = true; }
@@ -117,8 +119,9 @@ namespace gui
 		unsigned int getChildrenCount() { return children.size(); }
 
 
-		gml::Vec2<ParentSizeHint> getParentSizeHint() { return parentSizeHint; }
-		gml::Vec2<ChildSizeHint> getChildSizeHint() { return childSizeHint; }
+		gml::Vec2<SizeHint> getSizeHint() { return sizeHint; }
+		gml::Vec2f getSizeMin();
+		gml::Vec2f getSizeMax();
 		gml::Vec2f getPreferredSize() { return prefSize; }
 		gml::Vec2f getCellMargin() { return cellMargin; }
 		gml::Vec2f getLayoutMargin() { return layoutMargin; }
@@ -133,6 +136,7 @@ namespace gui
 		/* Setter */
 		void setColor(int color) { this->color = gl::toVec4(color); }
 		void setColor(gml::Vec4<float> color) { this->color = color; }
+		void setSizeHint(gml::Vec2<SizeHint> sizeHint) { this->sizeHint = sizeHint; }
 		
 
 		/* update semantics */
@@ -147,6 +151,8 @@ namespace gui
 		virtual void move(gml::Vec2f position);
 
 
-		gml::Vec2f toAbs(GeoVec geoVec);
+		gml::Vec2f toAbs(gml::Vec2f value);
+		float toAbsX(float value);
+		float toAbsY(float value);
 	};
 }
