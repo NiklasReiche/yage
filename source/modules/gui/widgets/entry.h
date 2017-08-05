@@ -14,10 +14,15 @@ namespace gui
 {
 	class TextCursor : public Widget
 	{
-	private:
-
 	public:
 		TextCursor(Widget* parent, MasterInterface master, WidgetTemplate widgetTemplate);
+	};
+
+	class CursorAnimation : public Animation
+	{
+	public:
+		CursorAnimation(Widget* widget, Master* master, double time);
+		void update(double dt);
 	};
 
 
@@ -36,6 +41,7 @@ namespace gui
 	private:
 		Label * label;
 		TextCursor* cursor;
+		CursorAnimation* cursorAnimation;
 
 		gml::Vec2f padding = gml::Vec2f(2.0f);
 		std::function<void()> callback;
@@ -51,7 +57,7 @@ namespace gui
 		void moveCursor();
 
 	public:
-		TextEntry(Widget * parent, MasterInterface master, TextEntryTemplate entryTemplate);
+		TextEntry(Widget * parent, MasterInterface master, TextEntryTemplate entryTemplate, Master* m);
 
 		void onFocus();
 		void onFocusRelease();

@@ -39,9 +39,9 @@ int main()
 
 	gui::FrameTemplate frameTemplate;
 	frameTemplate.geometry.offset = gml::Vec2f(10, 50);
-	//frameTemplate.geometry.size = gml::Vec2f(200, 200);
-	//frameTemplate.sizeHint.x = gui::SizeHint::FIXED;
-	//frameTemplate.sizeHint.y = gui::SizeHint::FIXED;
+	frameTemplate.geometry.size = gml::Vec2f(0.5f, 0.5f);
+	frameTemplate.sizeHint.x = gui::SizeHint::INFINITE;
+	frameTemplate.sizeHint.y = gui::SizeHint::INFINITE;
 	frameTemplate.color = gl::Color::LIGHT_BLUE;
 	frameTemplate.layoutType = gui::LayoutType::V_LIST_LAYOUT;
 	frameTemplate.layoutMargin = gml::Vec2f(5);
@@ -50,6 +50,8 @@ int main()
 	gui::LabelTemplate label2Template;
 	label2Template.border.size = 1;
 	label2Template.text.text = "Label";
+	label2Template.offsetHint.x = gui::OffsetHint::INFINITE;
+	label2Template.geometry.offset.x = 0.5f;
 	label2Template.text.size = 20;
 	master->createWidget<gui::Label>(frame_1, label2Template);
 

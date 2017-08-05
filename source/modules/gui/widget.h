@@ -44,10 +44,9 @@ namespace gui
 
 		std::unique_ptr<Layout> layout;
 		gml::Vec2<SizeHint> sizeHint = gml::Vec2<SizeHint>(SizeHint::EXPANDING);
+		gml::Vec2<OffsetHint> offsetHint = gml::Vec2<OffsetHint>(OffsetHint::FIXED);
 
 		Anchor anchor = Anchor::TOP_LEFT;
-		/* offset from parent widget */
-		gml::Vec2f offset;
 		/* offset value used by layouts */
 		gml::Vec2f cellMargin;
 		/* padding for layouts */
@@ -55,6 +54,8 @@ namespace gui
 		/* prefered size for layouts */
 		gml::Vec2f prefSize;
 
+		/* absolute offset from parent widget */
+		gml::Vec2f offset;
 		/* absolute position of the outer top left edge */
 		gml::Vec2f position;
 		/* absolute total size of the widget */
@@ -84,7 +85,7 @@ namespace gui
 		}
 
 		template <typename Element, typename... Args>
-		Animation* createAnimation(Master* master, Args... args)
+		Element* createAnimation(Master* master, Args... args)
 		{
 			animations.push_back( std::make_unique<Element>(this, master, std::forward<Args>(args)...) );
 			return (Element*)animations.back().get();
@@ -120,6 +121,7 @@ namespace gui
 
 
 		gml::Vec2<SizeHint> getSizeHint() { return sizeHint; }
+		gml::Vec2<OffsetHint> getOffsetHint() { return offsetHint; }
 		gml::Vec2f getSizeMin();
 		gml::Vec2f getSizeMax();
 		gml::Vec2f getPreferredSize() { return prefSize; }
@@ -137,18 +139,20 @@ namespace gui
 		void setColor(int color) { this->color = gl::toVec4(color); }
 		void setColor(gml::Vec4<float> color) { this->color = color; }
 		void setSizeHint(gml::Vec2<SizeHint> sizeHint) { this->sizeHint = sizeHint; }
-		
+		void setPreferredSize(gml::Vec2f size) { prefSize = size; }
+
 
 		/* update semantics */
 		void updateParams();
 		virtual void updateGeometry();
 		virtual void relayout();
 
-		virtual void setSize(gml::Vec2f size);
-		virtual void setPreferredSize(gml::Vec2f size) { prefSize = size; }
 		virtual void setAnchor(Anchor anchor);
+
+		virtual void setSize(gml::Vec2f size);
 		virtual void resize(gml::Vec2f size);
-		virtual void move(gml::Vec2f position);
+		virtual void setOffset(gml::Vec2f offset);
+		virtual void move(gml::Vec2f offset);
 
 
 		gml::Vec2f toAbs(gml::Vec2f value);

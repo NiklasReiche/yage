@@ -345,7 +345,7 @@ public:
 		textEntryTemplate.defaultText.text = "entry";
 		textEntryTemplate.defaultText.color = gl::Color::GREY;
 
-		master->createWidget<gui::TextEntry>(frame_radio, textEntryTemplate);
+		master->createWidget<gui::TextEntry>(frame_radio, textEntryTemplate, master);
 		
 	}
 	~GuiTest()
@@ -397,7 +397,6 @@ void displayFPS(GuiTest& gui, double dt)
 	gui.fpsCounter->setText(clib::to_string((int)frameRate));
 }
 
-
 int main()
 {
 	platform::PlatformHandle platformHandle;
@@ -407,18 +406,23 @@ int main()
 
 	GuiTest guiTest(&platformHandle, &glContext, &inputController);
 
-	guiTest.animation_1->start();
-	guiTest.animation_3->start();
+	//guiTest.animation_1->start();
+	//guiTest.animation_3->start();
 
 
 	glContext.disableVSync();
 	glContext.showWindow();
 	platformHandle.getTimeStep();
+	double timer = 0.0;
 	while (!glContext.getCloseFlag())
 	{
 		double dt = platformHandle.getTimeStep();
+		timer += dt;
 
-		displayFPS(guiTest, dt);
+		if (timer > 0.2) {
+			displayFPS(guiTest, dt);
+			timer = 0.0;
+		}
 
 		guiTest.master->update(dt);
 		glContext.swapBuffers();

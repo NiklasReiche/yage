@@ -9,10 +9,10 @@ namespace gui
 	Widget::Widget(Widget * parent, MasterInterface master, const WidgetTemplate & wTemplate)
 		: parent(parent), master(master), 
 		anchor(wTemplate.geometry.anchor),
-		offset(wTemplate.geometry.offset),
 		cellMargin(wTemplate.geometry.offset),
 		prefSize(wTemplate.geometry.size),
 		sizeHint(wTemplate.sizeHint),
+		offsetHint(wTemplate.offsetHint),
 		color(gl::toVec4(wTemplate.color)),
 		borderSize(wTemplate.border.size),
 		borderColor(gl::toVec4(wTemplate.border.color)),
@@ -335,7 +335,7 @@ namespace gui
 	}
 	void Widget::setSize(gml::Vec2f size)
 	{
-		if (size != this->size) {
+		if (this->size != size) {
 			this->size = size;
 			this->innerSize = size - gml::Vec2f((float)borderSize) * 2;
 			updateGeometry();
@@ -350,11 +350,19 @@ namespace gui
 			layout->update(this);
 		}
 	}
-	void Widget::move(gml::Vec2f position)
+	void Widget::setOffset(gml::Vec2f offset)
 	{
-		if (this->offset != position) {
-			this->offset = position;
+		if (this->offset != offset) {
+			this->offset = offset;
 			updateGeometry();
+		}
+	}
+	void Widget::move(gml::Vec2f cellMargin)
+	{
+		if (this->cellMargin != cellMargin) {
+			this->cellMargin = cellMargin;
+			parent->relayout();
+			layout->update(this);
 		}
 	}
 	void Widget::setAnchor(Anchor anchor) 
@@ -367,6 +375,8 @@ namespace gui
 
 	void Widget::updateGeometry()
 	{
+		gml::Vec2f lastPosition = position;
+
 		if (parent != nullptr) {
 			switch (anchor)
 			{
@@ -397,9 +407,10 @@ namespace gui
 			innerPosition = position + gml::Vec2f((float)borderSize);
 		}
 
-		for (auto & child : children)
-		{
-			child->updateGeometry();
+		if (lastPosition != position) {
+			for (auto & child : children) {
+				child->updateGeometry();
+			}
 		}
 
 		updateParams();

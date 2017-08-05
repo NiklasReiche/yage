@@ -14,6 +14,11 @@ namespace gui
 		RECOMMENDED,
 		INFINITE
 	};
+	enum class OffsetHint
+	{
+		FIXED,
+		INFINITE
+	};
 	enum class LayoutType
 	{
 		ABSOLUTE_LAYOUT,

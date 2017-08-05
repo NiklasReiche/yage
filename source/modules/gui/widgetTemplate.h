@@ -40,5 +40,6 @@ namespace gui
 		WidgetShadowTemplate shadow;
 		unsigned int color = gl::Color::WHITE;
 		gml::Vec2<SizeHint> sizeHint = gml::Vec2<SizeHint>(SizeHint::EXPANDING);
+		gml::Vec2<OffsetHint> offsetHint = gml::Vec2<OffsetHint>(OffsetHint::FIXED);
 	};
 }

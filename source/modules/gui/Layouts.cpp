@@ -10,7 +10,24 @@ namespace gui
 		for (unsigned int i = 0; i < widget->getChildrenCount(); ++i)
 		{
 			Widget & child = widget->getChild(i);
-			child.setSize(child.getPreferredSize());
+			gml::Vec2f childPrefSize = child.getPreferredSize();
+			gml::Vec2f childCellMargin = child.getCellMargin();
+
+			if (child.getSizeHint().x == SizeHint::INFINITE) {
+				childPrefSize.x = child.toAbsX(childPrefSize.x);
+			}
+			if (child.getSizeHint().y == SizeHint::INFINITE) {
+				childPrefSize.y = child.toAbsY(childPrefSize.y);
+			}
+			if (child.getOffsetHint().x == OffsetHint::INFINITE) {
+				childCellMargin.x = child.toAbsX(childCellMargin.x);
+			}
+			if (child.getOffsetHint().y == OffsetHint::INFINITE) {
+				childCellMargin.y = child.toAbsY(childCellMargin.y);
+			}
+
+			child.setSize(childPrefSize);
+			child.setOffset(childCellMargin);
 		}
 	}
 
@@ -25,9 +42,16 @@ namespace gui
 		{
 			Widget & child = parent->getChild(i);
 
-			float childPrefSize = child.getPreferredSize().x + child.getCellMargin().x;
 			SizeHint childSizeHint = child.getSizeHint().x;
+			float childPrefSize = 0.0f;
 
+			if (child.getOffsetHint().x == OffsetHint::FIXED) {
+				childPrefSize = child.getPreferredSize().x + child.getCellMargin().x;
+			}
+			else if (child.getOffsetHint().x == OffsetHint::INFINITE) {
+				childPrefSize = child.getPreferredSize().x;
+			}
+			
 			switch (childSizeHint)
 			{
 			case SizeHint::FIXED:
@@ -60,8 +84,15 @@ namespace gui
 		{
 			Widget & child = parent->getChild(i);
 
-			float childPrefSize = child.getPreferredSize().y + child.getCellMargin().y;
 			SizeHint childSizeHint = child.getSizeHint().y;
+			float childPrefSize = 0.0f;
+
+			if (child.getOffsetHint().y == OffsetHint::FIXED) {
+				childPrefSize = child.getPreferredSize().y + child.getCellMargin().y;
+			}
+			else if (child.getOffsetHint().y == OffsetHint::INFINITE) {
+				childPrefSize = child.getPreferredSize().y;
+			}
 
 			switch (childSizeHint)
 			{
@@ -101,14 +132,24 @@ namespace gui
 		for (unsigned int i = 0; i < widget->getChildrenCount(); ++i)
 		{
 			Widget & child = widget->getChild(i);
+
+			gml::Vec2f childCellMargin = child.getCellMargin();
+			if (child.getOffsetHint().x == OffsetHint::INFINITE) {
+				childCellMargin.x = child.toAbsX(childCellMargin.x);
+			}
+			if (child.getOffsetHint().y == OffsetHint::INFINITE) {
+				childCellMargin.y = child.toAbsY(childCellMargin.y);
+			}
+
 			if (child.getSizeHint().y == SizeHint::INFINITE) {
-				totalSize.y -= child.toAbsY(child.getPreferredSize().y) + child.getCellMargin().y;
+				totalSize.y -= child.toAbsY(child.getPreferredSize().y) + childCellMargin.y;
 			}
 			else {
-				totalSize.y -= child.getPreferredSize().y + child.getCellMargin().y;
+				totalSize.y -= child.getPreferredSize().y + childCellMargin.y;
 
 				if (child.getSizeHint().y == SizeHint::SHRINKING) {
 					totalShrinkingSize += child.getPreferredSize().y;
+					// needs to be implemented as prefSize - minSize
 				}
 				if (child.getSizeHint().y == SizeHint::EXPANDING) {
 					++nExpanding;
@@ -130,10 +171,18 @@ namespace gui
 			
 			gml::Vec2<SizeHint> childSizeHint = child.getSizeHint();
 			gml::Vec2f childPrefSize = child.getPreferredSize();
+			gml::Vec2f childCellMargin = child.getCellMargin();
 			gml::Vec2f childSize(0.0f);
 
-			offset += child.getCellMargin();
-			child.move(offset);
+			if (child.getOffsetHint().x == OffsetHint::INFINITE) {
+				childCellMargin.x = child.toAbsX(childCellMargin.x);
+			}
+			if (child.getOffsetHint().y == OffsetHint::INFINITE) {
+				childCellMargin.y = child.toAbsY(childCellMargin.y);
+			}
+
+			offset += childCellMargin;
+			child.setOffset(offset);
 
 			switch (childSizeHint.x)
 			{
@@ -144,13 +193,13 @@ namespace gui
 				childSize.x = child.toAbsX(childPrefSize.x);
 				break;
 			case SizeHint::EXPANDING:
-				childSize.x = totalSize.x - child.getCellMargin().x;
+				childSize.x = totalSize.x - childCellMargin.x;
 				break;
 			case SizeHint::SHRINKING:
-				childSize.x = totalSize.x - child.getCellMargin().x;
+				childSize.x = totalSize.x - childCellMargin.x;
 				break;
 			case SizeHint::RECOMMENDED:
-				childSize.x = totalSize.x - child.getCellMargin().x;
+				childSize.x = totalSize.x - childCellMargin.x;
 				break;
 			}
 
@@ -188,7 +237,6 @@ namespace gui
 	}
 
 
-
 	HListLayout::HListLayout()
 		: Layout(LayoutType::H_LIST_LAYOUT) {}
 	float HListLayout::calcPrefSizeX(Widget* parent)
@@ -199,8 +247,15 @@ namespace gui
 		{
 			Widget & child = parent->getChild(i);
 
-			float childPrefSize = child.getPreferredSize().x + child.getCellMargin().x;
 			SizeHint childSizeHint = child.getSizeHint().x;
+			float childPrefSize = 0.0f;
+
+			if (child.getOffsetHint().x == OffsetHint::FIXED) {
+				childPrefSize = child.getPreferredSize().x + child.getCellMargin().x;
+			}
+			else if (child.getOffsetHint().y == OffsetHint::INFINITE) {
+				childPrefSize = child.getPreferredSize().x;
+			}
 
 			switch (childSizeHint)
 			{
@@ -234,8 +289,15 @@ namespace gui
 		{
 			Widget & child = parent->getChild(i);
 
-			float childPrefSize = child.getPreferredSize().y + child.getCellMargin().y;
 			SizeHint childSizeHint = child.getSizeHint().y;
+			float childPrefSize = 0.0f;
+
+			if (child.getOffsetHint().y == OffsetHint::FIXED) {
+				childPrefSize = child.getPreferredSize().y + child.getCellMargin().y;
+			}
+			else if (child.getOffsetHint().y == OffsetHint::INFINITE) {
+				childPrefSize = child.getPreferredSize().y;
+			}
 
 			switch (childSizeHint)
 			{
@@ -275,11 +337,20 @@ namespace gui
 		for (unsigned int i = 0; i < widget->getChildrenCount(); ++i)
 		{
 			Widget & child = widget->getChild(i);
+
+			gml::Vec2f childCellMargin = child.getCellMargin();
+			if (child.getOffsetHint().x == OffsetHint::INFINITE) {
+				childCellMargin.x = child.toAbsX(childCellMargin.x);
+			}
+			if (child.getOffsetHint().y == OffsetHint::INFINITE) {
+				childCellMargin.y = child.toAbsY(childCellMargin.y);
+			}
+
 			if (child.getSizeHint().x == SizeHint::INFINITE) {
-				totalSize.x -= child.toAbsX(child.getPreferredSize().x) + child.getCellMargin().x;
+				totalSize.x -= child.toAbsX(child.getPreferredSize().x) + childCellMargin.x;
 			}
 			else {
-				totalSize.x -= child.getPreferredSize().x + child.getCellMargin().x;
+				totalSize.x -= child.getPreferredSize().x + childCellMargin.x;
 
 				if (child.getSizeHint().x == SizeHint::SHRINKING) {
 					totalShrinkingSize += child.getPreferredSize().x;
@@ -304,10 +375,18 @@ namespace gui
 
 			gml::Vec2<SizeHint> childSizeHint = child.getSizeHint();
 			gml::Vec2f childPrefSize = child.getPreferredSize();
+			gml::Vec2f childCellMargin = child.getCellMargin();
 			gml::Vec2f childSize(0.0f);
 
-			offset += child.getCellMargin();
-			child.move(offset);
+			if (child.getOffsetHint().x == OffsetHint::INFINITE) {
+				childCellMargin.x = child.toAbsX(childCellMargin.x);
+			}
+			if (child.getOffsetHint().y == OffsetHint::INFINITE) {
+				childCellMargin.y = child.toAbsY(childCellMargin.y);
+			}
+
+			offset += childCellMargin;
+			child.setOffset(offset);
 
 			switch (childSizeHint.y)
 			{
@@ -318,13 +397,13 @@ namespace gui
 				childSize.y = child.toAbsY(childPrefSize.y);
 				break;
 			case SizeHint::EXPANDING:
-				childSize.y = totalSize.y - child.getCellMargin().y;
+				childSize.y = totalSize.y - childCellMargin.y;
 				break;
 			case SizeHint::SHRINKING:
-				childSize.y = totalSize.y - child.getCellMargin().y;
+				childSize.y = totalSize.y - childCellMargin.y;
 				break;
 			case SizeHint::RECOMMENDED:
-				childSize.y = totalSize.y - child.getCellMargin().y;
+				childSize.y = totalSize.y - childCellMargin.y;
 				break;
 			}
 
@@ -361,7 +440,6 @@ namespace gui
 		}
 	}
 	
-
 
 	GridLayout::GridLayout()
 		: Layout(LayoutType::GRID_LAYOUT) {}

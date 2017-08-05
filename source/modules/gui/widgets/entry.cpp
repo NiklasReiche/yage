@@ -11,6 +11,29 @@ namespace gui
 		prefSize = widgetTemplate.geometry.size;
 	}
 
+	CursorAnimation::CursorAnimation(Widget* widget, Master* master, double time)
+		: Animation(widget, master, gml::Vec2f(), gml::Vec2f(), time)
+	{
+
+	}
+	void CursorAnimation::update(double dt)
+	{
+		if (!isFinished) {
+			if (timeCurrent < timeEnd) {
+				timeCurrent += dt;
+			}
+			else {
+				if (widget->is_Active()) {
+					widget->hide();
+				}
+				else {
+					widget->show();
+				}
+				timeCurrent = 0.0;
+			}
+		}
+	}
+
 	void TextEntry::moveCursor()
 	{
 		gml::Vec2f cursorOffset;
@@ -19,7 +42,7 @@ namespace gui
 		cursor->move(cursorOffset);
 	}
 
-	TextEntry::TextEntry(Widget * parent, MasterInterface master, TextEntryTemplate entryTemplate)
+	TextEntry::TextEntry(Widget * parent, MasterInterface master, TextEntryTemplate entryTemplate, Master* m)
 		: Widget(parent, master, entryTemplate), 
 		defaultTextTemplate(entryTemplate.defaultText), 
 		inputTextTemplate(entryTemplate.inputText),
@@ -51,13 +74,15 @@ namespace gui
 		cursorTemplate.color = cursorColor;
 
 		cursor = this->createWidget<TextCursor>(master, cursorTemplate);
+		cursorAnimation = cursor->createAnimation<CursorAnimation>(m, 0.5);
 		cursor->hide();
 
 		layout = std::make_unique<AbsoluteLayout>();
 
 		if (prefSize == gml::Vec2f(0.0f)) {
 			prefSize = calcPrefSize();
-			sizeHint = gml::Vec2<SizeHint>(SizeHint::EXPANDING);
+			sizeHint.x = SizeHint::EXPANDING;
+			sizeHint.y = SizeHint::FIXED;
 		}
 	}
 
@@ -65,6 +90,7 @@ namespace gui
 	{
 		master.platform->enableCharInput();
 		cursor->show();
+		cursorAnimation->start();
 		if (inputText.length() == 0) {
 			inputTextTemplate.text = "";
 			label->setText(inputTextTemplate);
@@ -74,6 +100,7 @@ namespace gui
 	{
 		master.platform->disableCharInput();
 		cursor->hide();
+		cursorAnimation->stop();
 		if (inputText.length() == 0) {
 			label->setText(defaultTextTemplate);
 		}
@@ -88,9 +115,6 @@ namespace gui
 			cursorPosition++;
 			moveCursor();
 		}
-
-		prefSize.x = label->getPreferredSize().x;
-		parent->relayout();
 	}
 	void TextEntry::onKeyPress(input::KeyCode key)
 	{
