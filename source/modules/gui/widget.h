@@ -53,6 +53,10 @@ namespace gui
 		gml::Vec2f layoutMargin;
 		/* prefered size for layouts */
 		gml::Vec2f prefSize;
+		/* minimal size for layouts */
+		gml::Vec2f minSize;
+		/* maximal size for layouts */
+		gml::Vec2f maxSize;
 
 		/* absolute offset from parent widget */
 		gml::Vec2f offset;
@@ -122,8 +126,8 @@ namespace gui
 
 		gml::Vec2<SizeHint> getSizeHint() { return sizeHint; }
 		gml::Vec2<OffsetHint> getOffsetHint() { return offsetHint; }
-		gml::Vec2f getSizeMin();
-		gml::Vec2f getSizeMax();
+		gml::Vec2f getMinSize() { return minSize; }
+		gml::Vec2f getMaxSize() { return maxSize; }
 		gml::Vec2f getPreferredSize() { return prefSize; }
 		gml::Vec2f getCellMargin() { return cellMargin; }
 		gml::Vec2f getLayoutMargin() { return layoutMargin; }

@@ -21,6 +21,10 @@ namespace gui
 		Anchor anchor = Anchor::TOP_LEFT;
 		gml::Vec2f offset;
 		gml::Vec2f size;
+		gml::Vec2f minSize = gml::Vec2f(0.0f);
+		gml::Vec2f maxSize = gml::Vec2f(0.0f);
+		gml::Vec2<SizeHint> sizeHint = gml::Vec2<SizeHint>(SizeHint::EXPANDING);
+		gml::Vec2<OffsetHint> offsetHint = gml::Vec2<OffsetHint>(OffsetHint::FIXED);
 	};
 	struct WidgetBorderTemplate
 	{
@@ -39,7 +43,5 @@ namespace gui
 		WidgetBorderTemplate border;
 		WidgetShadowTemplate shadow;
 		unsigned int color = gl::Color::WHITE;
-		gml::Vec2<SizeHint> sizeHint = gml::Vec2<SizeHint>(SizeHint::EXPANDING);
-		gml::Vec2<OffsetHint> offsetHint = gml::Vec2<OffsetHint>(OffsetHint::FIXED);
 	};
 }

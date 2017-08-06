@@ -7,6 +7,9 @@ namespace gui
 	{
 		this->hasText = true;
 
+		alignX = labelTemplate.text.alignX;
+		alignY = labelTemplate.text.alignY;
+
 		if (labelTemplate.text.text.length() == 0) {
 			labelTemplate.text.text = " ";
 		}
@@ -66,7 +69,35 @@ namespace gui
 	void Label::updateGeometry()
 	{
 		Widget::updateGeometry();
-		gml::Vec2f textPosition = innerPosition + padding;
+
+		gml::Vec2f availableSize = innerSize - padding - text.getSize();
+		gml::Vec2f textPosition(0.0f);
+
+		switch (alignX)
+		{
+		case TextAlignmentX::LEFT:
+			textPosition.x = innerPosition.x + padding.x;
+			break;
+		case TextAlignmentX::RIGHT:
+			textPosition.x = innerPosition.x + availableSize.x;
+			break;
+		case TextAlignmentX::CENTER:
+			textPosition.x = innerPosition.x + availableSize.x / 2;
+			break;
+		}
+		switch (alignY)
+		{
+		case TextAlignmentY::TOP:
+			textPosition.y = innerPosition.y + padding.y;
+			break;
+		case TextAlignmentY::BOTTOM:
+			textPosition.y = innerPosition.y + availableSize.y;
+			break;
+		case TextAlignmentY::CENTER:
+			textPosition.y = innerPosition.y + availableSize.y / 2;
+			break;
+		}
+
 		text.setPosition(textPosition);
 	}
 }

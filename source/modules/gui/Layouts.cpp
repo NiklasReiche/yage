@@ -44,12 +44,15 @@ namespace gui
 
 			SizeHint childSizeHint = child.getSizeHint().x;
 			float childPrefSize = 0.0f;
+			float childMinSize = 0.0f;
 
 			if (child.getOffsetHint().x == OffsetHint::FIXED) {
 				childPrefSize = child.getPreferredSize().x + child.getCellMargin().x;
+				childMinSize = child.getMinSize().x + child.getCellMargin().x;
 			}
 			else if (child.getOffsetHint().x == OffsetHint::INFINITE) {
 				childPrefSize = child.getPreferredSize().x;
+				childMinSize = child.getMinSize().x;
 			}
 			
 			switch (childSizeHint)
@@ -58,18 +61,16 @@ namespace gui
 				parentPrefSize = std::max(parentPrefSize, childPrefSize);
 				break;
 			case SizeHint::INFINITE:
-				// probably going to use minSize once thats implemented
+				parentPrefSize = std::max(parentPrefSize, childMinSize);
 				break;
 			case SizeHint::EXPANDING:
 				parentPrefSize = std::max(parentPrefSize, childPrefSize);
 				break;
 			case SizeHint::SHRINKING:
-				parentPrefSize = std::max(parentPrefSize, childPrefSize);
-				// probably going to use minSize once thats implemented
+				parentPrefSize = std::max(parentPrefSize, childMinSize);
 				break;
 			case SizeHint::RECOMMENDED:
-				parentPrefSize = std::max(parentPrefSize, childPrefSize);
-				// probably going to use minSize once thats implemented
+				parentPrefSize = std::max(parentPrefSize, childMinSize);
 				break;
 			}
 		}
@@ -86,12 +87,15 @@ namespace gui
 
 			SizeHint childSizeHint = child.getSizeHint().y;
 			float childPrefSize = 0.0f;
+			float childMinSize = 0.0f;
 
 			if (child.getOffsetHint().y == OffsetHint::FIXED) {
 				childPrefSize = child.getPreferredSize().y + child.getCellMargin().y;
+				childMinSize = child.getMinSize().y + child.getCellMargin().y;
 			}
 			else if (child.getOffsetHint().y == OffsetHint::INFINITE) {
 				childPrefSize = child.getPreferredSize().y;
+				childMinSize = child.getMinSize().y;
 			}
 
 			switch (childSizeHint)
@@ -100,18 +104,16 @@ namespace gui
 				parentPrefSize += childPrefSize;
 				break;
 			case SizeHint::INFINITE:
-				// probably going to use minSize once thats implemented
+				parentPrefSize += childMinSize;
 				break;
 			case SizeHint::EXPANDING:
 				parentPrefSize += childPrefSize;
 				break;
 			case SizeHint::SHRINKING:
-				parentPrefSize += childPrefSize;
-				// probably going to use minSize once thats implemented
+				parentPrefSize += childMinSize;
 				break;
 			case SizeHint::RECOMMENDED:
-				parentPrefSize += childPrefSize;
-				// probably going to use minSize once thats implemented
+				parentPrefSize += childMinSize;
 				break;
 			}
 		}
@@ -147,11 +149,10 @@ namespace gui
 			else {
 				totalSize.y -= child.getPreferredSize().y + childCellMargin.y;
 
-				if (child.getSizeHint().y == SizeHint::SHRINKING) {
-					totalShrinkingSize += child.getPreferredSize().y;
-					// needs to be implemented as prefSize - minSize
+				if (child.getSizeHint().y == SizeHint::SHRINKING || child.getSizeHint().y == SizeHint::RECOMMENDED) {
+					totalShrinkingSize += child.getPreferredSize().y - child.getMinSize().y;
 				}
-				if (child.getSizeHint().y == SizeHint::EXPANDING) {
+				if (child.getSizeHint().y == SizeHint::EXPANDING || child.getSizeHint().y == SizeHint::RECOMMENDED) {
 					++nExpanding;
 				}
 			}
@@ -171,6 +172,7 @@ namespace gui
 			
 			gml::Vec2<SizeHint> childSizeHint = child.getSizeHint();
 			gml::Vec2f childPrefSize = child.getPreferredSize();
+			gml::Vec2f childMinSize = child.getMinSize();
 			gml::Vec2f childCellMargin = child.getCellMargin();
 			gml::Vec2f childSize(0.0f);
 
@@ -215,11 +217,11 @@ namespace gui
 				childSize.y = childPrefSize.y + expandSize;
 				break;
 			case SizeHint::SHRINKING:
-				childSize.y = childPrefSize.y - (childPrefSize.y * shrinkPercent);
+				childSize.y = childPrefSize.y - ((childPrefSize.y - childMinSize.y) * shrinkPercent);
 				break;
 			case SizeHint::RECOMMENDED:
 				if (shrinkPercent > 0) {
-					childSize.y = childPrefSize.y - (childPrefSize.y * shrinkPercent);
+					childSize.y = childPrefSize.y - ((childPrefSize.y - childMinSize.y) * shrinkPercent);
 				}
 				else if (expandSize > 0) {
 					childSize.y = childPrefSize.y + expandSize;
@@ -249,12 +251,15 @@ namespace gui
 
 			SizeHint childSizeHint = child.getSizeHint().x;
 			float childPrefSize = 0.0f;
+			float childMinSize = 0.0f;
 
 			if (child.getOffsetHint().x == OffsetHint::FIXED) {
 				childPrefSize = child.getPreferredSize().x + child.getCellMargin().x;
+				childMinSize = child.getMinSize().x + child.getCellMargin().x;
 			}
 			else if (child.getOffsetHint().y == OffsetHint::INFINITE) {
 				childPrefSize = child.getPreferredSize().x;
+				childMinSize = child.getMinSize().x;
 			}
 
 			switch (childSizeHint)
@@ -263,18 +268,16 @@ namespace gui
 				parentPrefSize += childPrefSize;
 				break;
 			case SizeHint::INFINITE:
-				// probably going to use minSize once thats implemented
+				parentPrefSize += childMinSize;
 				break;
 			case SizeHint::EXPANDING:
 				parentPrefSize += childPrefSize;
 				break;
 			case SizeHint::SHRINKING:
-				parentPrefSize += childPrefSize;
-				// probably going to use minSize once thats implemented
+				parentPrefSize += childMinSize;
 				break;
 			case SizeHint::RECOMMENDED:
-				parentPrefSize += childPrefSize;
-				// probably going to use minSize once thats implemented
+				parentPrefSize += childMinSize;
 				break;
 			}
 		}
@@ -291,12 +294,15 @@ namespace gui
 
 			SizeHint childSizeHint = child.getSizeHint().y;
 			float childPrefSize = 0.0f;
+			float childMinSize = 0.0f;
 
 			if (child.getOffsetHint().y == OffsetHint::FIXED) {
 				childPrefSize = child.getPreferredSize().y + child.getCellMargin().y;
+				childMinSize = child.getMinSize().y + child.getCellMargin().y;
 			}
 			else if (child.getOffsetHint().y == OffsetHint::INFINITE) {
 				childPrefSize = child.getPreferredSize().y;
+				childMinSize = child.getMinSize().y;
 			}
 
 			switch (childSizeHint)
@@ -305,18 +311,16 @@ namespace gui
 				parentPrefSize = std::max(parentPrefSize, childPrefSize);
 				break;
 			case SizeHint::INFINITE:
-				// probably going to use minSize once thats implemented
+				parentPrefSize = std::max(parentPrefSize, childMinSize);
 				break;
 			case SizeHint::EXPANDING:
 				parentPrefSize = std::max(parentPrefSize, childPrefSize);
 				break;
 			case SizeHint::SHRINKING:
-				parentPrefSize = std::max(parentPrefSize, childPrefSize);
-				// probably going to use minSize once thats implemented
+				parentPrefSize = std::max(parentPrefSize, childMinSize);
 				break;
 			case SizeHint::RECOMMENDED:
-				parentPrefSize = std::max(parentPrefSize, childPrefSize);
-				// probably going to use minSize once thats implemented
+				parentPrefSize = std::max(parentPrefSize, childMinSize);
 				break;
 			}
 		}
@@ -352,10 +356,10 @@ namespace gui
 			else {
 				totalSize.x -= child.getPreferredSize().x + childCellMargin.x;
 
-				if (child.getSizeHint().x == SizeHint::SHRINKING) {
-					totalShrinkingSize += child.getPreferredSize().x;
+				if (child.getSizeHint().x == SizeHint::SHRINKING || child.getSizeHint().x == SizeHint::RECOMMENDED) {
+					totalShrinkingSize += child.getPreferredSize().x - child.getMinSize().x;
 				}
-				if (child.getSizeHint().x == SizeHint::EXPANDING) {
+				if (child.getSizeHint().x == SizeHint::EXPANDING || child.getSizeHint().x == SizeHint::RECOMMENDED) {
 					++nExpanding;
 				}
 			}
@@ -375,6 +379,7 @@ namespace gui
 
 			gml::Vec2<SizeHint> childSizeHint = child.getSizeHint();
 			gml::Vec2f childPrefSize = child.getPreferredSize();
+			gml::Vec2f childMinSize = child.getMinSize();
 			gml::Vec2f childCellMargin = child.getCellMargin();
 			gml::Vec2f childSize(0.0f);
 
@@ -419,11 +424,11 @@ namespace gui
 				childSize.x = childPrefSize.x + expandSize;
 				break;
 			case SizeHint::SHRINKING:
-				childSize.x = childPrefSize.x - (childPrefSize.x * shrinkPercent);
+				childSize.x = childPrefSize.x - ((childPrefSize.x - childMinSize.x) * shrinkPercent);
 				break;
 			case SizeHint::RECOMMENDED:
 				if (shrinkPercent > 0) {
-					childSize.x = childPrefSize.x - (childPrefSize.x * shrinkPercent);
+					childSize.x = childPrefSize.x - ((childPrefSize.x - childMinSize.x) * shrinkPercent);
 				}
 				else if (expandSize > 0) {
 					childSize.x = childPrefSize.x + expandSize;

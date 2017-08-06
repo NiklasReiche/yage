@@ -11,8 +11,8 @@ namespace gui
 		anchor(wTemplate.geometry.anchor),
 		cellMargin(wTemplate.geometry.offset),
 		prefSize(wTemplate.geometry.size),
-		sizeHint(wTemplate.sizeHint),
-		offsetHint(wTemplate.offsetHint),
+		sizeHint(wTemplate.geometry.sizeHint),
+		offsetHint(wTemplate.geometry.offsetHint),
 		color(gl::toVec4(wTemplate.color)),
 		borderSize(wTemplate.border.size),
 		borderColor(gl::toVec4(wTemplate.border.color)),
@@ -23,6 +23,8 @@ namespace gui
 		this->innerSize = size - gml::Vec2f((float)borderSize * 2);
 
 		this->layout = std::make_unique<Layout>();
+
+		
 
 		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices);

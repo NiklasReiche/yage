@@ -305,6 +305,8 @@ public:
 		buttonTemplateClicks.clickColor = gl::Color::GREY;
 		buttonTemplateClicks.border.size = 1;
 		buttonTemplateClicks.text.text = "Push Button";
+		buttonTemplateClicks.text.alignY = gui::TextAlignmentY::CENTER;
+		buttonTemplateClicks.text.alignX = gui::TextAlignmentX::CENTER;
 		buttonTemplateClicks.command = std::bind(&GuiTest::on_button_1_click, this);
 
 		button_clicks = master->createWidget<gui::PushButton>(frame_clicks, buttonTemplateClicks);
