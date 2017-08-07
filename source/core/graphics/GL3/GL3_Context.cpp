@@ -369,13 +369,20 @@ namespace gl3
 		texture = create2DTexture(image, width, height, format, rowAlignment);
 	}
 
-	GL3_Texture GL3_Context::createCubemapTexture(std::array<unsigned char*, 6> images, int width, int height)
+	GL3_Texture GL3_Context::createCubemapTexture(std::array<unsigned char*, 6> images, int width, int height, ImageFormat format, int rowAlignment)
 	{
 		// Generate & Bind
 		GL3_Texture texture;
 		glGenTextures(1, &texture.id);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, texture.id);
 
+		// Select pixel pack format
+		InternalFormat internalFormat = convertToInternalFormat(format);
+
+		// Set unpack alignment
+		setUnpackAlignment(rowAlignment);
+
+		// Attach Textures
 		for (GLuint i = 0; i < 6; i++) {
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, images[i]);
 		}
@@ -391,16 +398,26 @@ namespace gl3
 		// Unbind
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
+		// Build Texture
+		texture.texture = texture.id;
 		texture.glContext = this;
-		texture.target = TextureType::TEXTURE_CUBEMAP;
+		
 		texture.height = height;
 		texture.width = width;
 
+		texture.target = TextureType::TEXTURE_CUBEMAP;
+		texture.format = internalFormat;
+
+		texture.px_type = PixelType::U_BYTE;
+		texture.px_format = format;
+		texture.rowAlignment = rowAlignment;
+		texture.nChannels = convertToChannelSize(format);
+
 		return texture;
 	}
-	void GL3_Context::createCubemapTexture(GL3_Texture & texture, std::array<unsigned char*, 6> images, int width, int height)
+	void GL3_Context::createCubemapTexture(GL3_Texture & texture, std::array<unsigned char*, 6> images, int width, int height, ImageFormat format, int rowAlignment)
 	{
-		texture = createCubemapTexture(images, width, height);
+		texture = createCubemapTexture(images, width, height, format, rowAlignment);
 	}
 
 	GL3_Shader GL3_Context::compileShader(std::string vertexCode, std::string fragmentCode, std::string geometryCode)

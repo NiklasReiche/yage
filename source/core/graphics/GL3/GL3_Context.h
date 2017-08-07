@@ -129,12 +129,16 @@ namespace gl3
 		GL3_Texture createCubemapTexture(
 			std::array<unsigned char*, 6> images,
 			int width,
-			int height);
+			int height,
+			ImageFormat format,
+			int rowAlignment = 4);
 		void createCubemapTexture(
 			GL3_Texture & texture,
 			std::array<unsigned char*, 6> images,
 			int width,
-			int height);
+			int height,
+			ImageFormat format,
+			int rowAlignment = 4);
 
 		GL3_Shader compileShader(
 			std::string vertexCode,
