@@ -6,7 +6,7 @@
 #include <gui/Animation.h>
 
 
-platform::PlatformHandle* platformHandle;
+sys::PlatformHandle* platformHandle;
 gl::GraphicsContext* glContext;
 input::InputController* inputController;
 
@@ -19,7 +19,7 @@ void displayFPS(double dt);
 
 int main()
 {
-	platformHandle = new platform::PlatformHandle();
+	platformHandle = new sys::PlatformHandle();
 	glContext = new gl::GraphicsContext(platformHandle, 1000, 500);
 	inputController = new input::InputController(platformHandle);
 

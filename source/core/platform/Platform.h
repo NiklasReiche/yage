@@ -13,12 +13,13 @@
 #include "clib.h"
 #include "Exception.h"
 
-namespace platform
+namespace sys
 {
 #ifdef DESKTOP
 	typedef glfw::GLFWHandle PlatformHandle;
 	typedef glfw::Desktop_File File;
 	typedef glfw::SeekOffset SeekOffset;
+	typedef glfw::AccessMode AccesMode;
 #endif
 
 #ifdef ANDROID

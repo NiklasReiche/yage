@@ -85,10 +85,10 @@ namespace bmp
 	**					Helper				**
 	*****************************************/
 
-	void Bitmap::readVersion(std::ifstream & file)
+	void Bitmap::readVersion(sys::File & file)
 	{
 		uint32_t biSize;
-		file.seekg(14, std::ios::beg);
+		file.seek(14, sys::SeekOffset::BEG);
 		file.read((char*)&biSize, sizeof(biSize));
 
 		switch (biSize)
@@ -110,16 +110,9 @@ namespace bmp
 		}
 	}
 
-	int Bitmap::checkError(std::ifstream & file)
+	int Bitmap::checkError(sys::File & file)
 	{
-		if (file.eof() || file.bad() || file.fail()) {
-			return 1;
-		}
-		return 0;
-	}
-	int Bitmap::checkError(std::ofstream & file)
-	{
-		if (file.eof() || file.bad() || file.fail()) {
+		if (file.get_error()) {
 			return 1;
 		}
 		return 0;
@@ -130,22 +123,22 @@ namespace bmp
 	**				Read Helper				**
 	*****************************************/
 
-	void Bitmap::readMagicNumber(std::ifstream & file)
+	void Bitmap::readMagicNumber(sys::File & file)
 	{
-		file.seekg(0, std::ios::beg);
+		file.seek(0, sys::SeekOffset::BEG);
 		file.read((char*)&magicNumber, sizeof(magicNumber));
 	}
-	void Bitmap::readBmpFileHeader(std::ifstream & file)
+	void Bitmap::readBmpFileHeader(sys::File & file)
 	{
-		file.seekg(2, std::ios::beg);
+		file.seek(2, sys::SeekOffset::BEG);
 		file.read((char*)&fileheader.bfSize, sizeof(fileheader.bfSize));
 		file.read((char*)&fileheader.bfReserved1, sizeof(fileheader.bfReserved1));
 		file.read((char*)&fileheader.bfReserved2, sizeof(fileheader.bfReserved2));
 		file.read((char*)&fileheader.bfOffBits, sizeof(fileheader.bfOffBits));
 	}
-	void Bitmap::readBmpInfoHeader(std::ifstream & file)
+	void Bitmap::readBmpInfoHeader(sys::File & file)
 	{
-		file.seekg(14, std::ios::beg);
+		file.seek(14, sys::SeekOffset::BEG);
 		file.read((char*)&infoheader.biSize, sizeof(infoheader.biSize));
 		file.read((char*)&infoheader.biWidth, sizeof(infoheader.biWidth));
 		file.read((char*)&infoheader.biHeight, sizeof(infoheader.biHeight));
@@ -158,19 +151,19 @@ namespace bmp
 		file.read((char*)&infoheader.biClrUsed, sizeof(infoheader.biClrUsed));
 		file.read((char*)&infoheader.biClrImportant, sizeof(infoheader.biClrImportant));
 	}
-	void Bitmap::readBmpV4Header(std::ifstream & file)
+	void Bitmap::readBmpV4Header(sys::File & file)
 	{
-		file.seekg(54, std::ios::beg);
+		file.seek(54, sys::SeekOffset::BEG);
 		file.read((char*)&v4header, sizeof(v4header));
 	}
-	void Bitmap::readBitmask(std::ifstream & file)
+	void Bitmap::readBitmask(sys::File & file)
 	{
-		file.seekg(54, std::ios::beg);
+		file.seek(54, sys::SeekOffset::BEG);
 		file.read((char*)&bitmask, sizeof(bitmask));
 	}
-	void Bitmap::readPalette(std::ifstream & file, int offset, int size)
+	void Bitmap::readPalette(sys::File & file, int offset, int size)
 	{
-		file.seekg(offset, std::ios::beg);
+		file.seek(offset, sys::SeekOffset::BEG);
 		palette.resize(0);
 		for (int i = 0; i < size; ++i)
 		{
@@ -180,7 +173,7 @@ namespace bmp
 		}
 	}
 
-	void Bitmap::readImageData(std::ifstream & file)
+	void Bitmap::readImageData(sys::File & file)
 	{
 		int rows = infoheader.biHeight;
 		int width = infoheader.biWidth;
@@ -188,7 +181,7 @@ namespace bmp
 		int pad = 4 - (width * bytes) % 4;
 
 		int pointer = fileheader.bfOffBits;
-		file.seekg(pointer, std::ios::beg);
+		file.seek(pointer, sys::SeekOffset::BEG);
 
 		pixels.resize(0);
 
@@ -199,7 +192,7 @@ namespace bmp
 				std::vector<uint8_t> pixel(bytes);
 				for (int b = 0; b < bytes; ++b)
 				{
-					file.seekg(pointer, std::ios::beg);
+					file.seek(pointer, sys::SeekOffset::BEG);
 					file.read((char*)&pixel[b], 1);
 					++pointer;
 				}
@@ -211,7 +204,7 @@ namespace bmp
 			pointer += pad;
 		}
 	}
-	void Bitmap::readImageDataIndexed(std::ifstream & file)
+	void Bitmap::readImageDataIndexed(sys::File & file)
 	{
 		int rows = infoheader.biHeight;
 		int width = infoheader.biWidth;
@@ -219,7 +212,7 @@ namespace bmp
 		int pad = 4 - (width * bytes) % 4;
 
 		int pointer = fileheader.bfOffBits;
-		file.seekg(pointer, std::ios::beg);
+		file.seek(pointer, sys::SeekOffset::BEG);
 
 		pixels.resize(0);
 
@@ -230,7 +223,7 @@ namespace bmp
 				std::vector<uint8_t> pixel(bytes);
 				for (int b = 0; b < bytes; ++b)
 				{
-					file.seekg(pointer, std::ios::beg);
+					file.seek(pointer, sys::SeekOffset::BEG);
 					file.read((char*)&pixel[b], 1);
 					pixels.push_back(palette[pixel[b]].red);
 					pixels.push_back(palette[pixel[b]].green);
@@ -247,7 +240,7 @@ namespace bmp
 	**				Write Helper			**
 	*****************************************/
 
-	void Bitmap::writeImageData(std::ofstream & file)
+	void Bitmap::writeImageData(sys::File & file)
 	{
 		int rows = infoheader.biHeight;
 		int width = infoheader.biWidth;
@@ -265,7 +258,7 @@ namespace bmp
 		uint8_t emptyByte(0);
 
 		int pointer = fileheader.bfOffBits;
-		file.seekp(pointer, std::ios::beg);
+		file.seek(pointer, sys::SeekOffset::BEG);
 
 		for (int y = 0; y < rows; ++y)
 		{
@@ -275,14 +268,14 @@ namespace bmp
 				{
 					int index = ((y * width + x) * bytes) + (byteOrderOffset - b);
 					uint8_t spixel = pixels.at(index);
-					file.seekp(pointer, std::ios::beg);
+					file.seek(pointer, sys::SeekOffset::BEG);
 					file.write((char*)&spixel, sizeof(spixel));
 					++pointer;
 				}
 			}
 			for (int p = 0; p < pad; ++p)
 			{
-				file.seekp(pointer, std::ios::beg);
+				file.seek(pointer, sys::SeekOffset::BEG);
 				file.write((char*)&emptyByte, sizeof(emptyByte));
 				++pointer;
 			}
@@ -294,9 +287,9 @@ namespace bmp
 	**				Load / Save				**
 	*****************************************/
 
-	int Bitmap::load(std::string filename, FORCE_CHANNELS channel)
+	int Bitmap::load(sys::PlatformHandle* platform, std::string filename, FORCE_CHANNELS channel)
 	{
-		std::ifstream file(filename, std::ios::in | std::ios::binary);
+		sys::File file = platform->open(filename);
 
 		if (!file.is_open()) {
 			std::cout << "Could not open '" << filename << "'" << std::endl;
@@ -415,9 +408,9 @@ namespace bmp
 		return 0;
 	}
 
-	int Bitmap::save(std::string filename, FORCE_CHANNELS channel)
+	int Bitmap::save(sys::PlatformHandle* platform, std::string filename, FORCE_CHANNELS channel)
 	{
-		std::ofstream file(filename, std::ios::out | std::ios::binary);
+		sys::File file = platform->open(filename, sys::AccesMode::WRITE);
 
 		if (file.is_open() && isLoaded)
 		{
@@ -428,7 +421,7 @@ namespace bmp
 				toBit8();
 			}
 
-			file.seekp(0, std::ios::beg);
+			file.seek(0, sys::SeekOffset::BEG);
 			file.write((char*)&magicNumber, sizeof(magicNumber));
 			file.write((char*)&fileheader, sizeof(fileheader));
 			file.write((char*)&infoheader, sizeof(infoheader));
@@ -454,23 +447,20 @@ namespace bmp
 
 	void img::bmp::Bitmap::toImage(Image & image)
 	{
-		image.width = infoheader.biWidth;
-		image.height = std::abs(infoheader.biHeight);
-		image.channels = infoheader.biBitCount / 8;
-		image.data = std::move(pixels);
+		image = Image(infoheader.biWidth, std::abs(infoheader.biHeight), infoheader.biBitCount / 8, pixels);
 		if (infoheader.biHeight > 0) {
 			image.flip();
 		}
 	}
 	void Bitmap::fromImage(Image & image, bool moveData)
 	{
-		int pad = (image.width*image.channels) % (image.channels);
-		int sizeImage = image.height * (image.width * image.channels + pad);
+		int pad = (image.getWidth() * image.getChannels()) % (image.getChannels());
+		int sizeImage = image.getHeight() * (image.getWidth() * image.getChannels() + pad);
 		int colors = 0;
 		int bitOffset = SIZE_FILEHEADER + SIZE_INFOHEADER + SIZE_V4HEADER;
 		int fileSize = bitOffset + sizeImage;
 
-		if (image.channels == 1) {
+		if (image.getChannels() == 1) {
 			colors = 256;
 			bitOffset += PALETTE_ENTRIES * sizeof(PALETTE_ELEMENT);
 			fileSize += PALETTE_ENTRIES * sizeof(PALETTE_ELEMENT);
@@ -484,10 +474,10 @@ namespace bmp
 		fileheader.bfOffBits = bitOffset;
 
 		infoheader.biSize = 40;
-		infoheader.biWidth = image.width;
-		infoheader.biHeight = image.height;
+		infoheader.biWidth = image.getWidth();
+		infoheader.biHeight = image.getHeight();
 		infoheader.biPlanes = 1;
-		infoheader.biBitCount = image.channels * 8;
+		infoheader.biBitCount = image.getChannels() * 8;
 		infoheader.biCompression = 0;
 		infoheader.biSizeImage = sizeImage;
 		infoheader.biXPelsPerMeter = 2835;
@@ -513,17 +503,17 @@ namespace bmp
 		v4header.GammaGreen = 0;
 		v4header.GammaBlue = 0;
 
-		if (image.channels == 1) {
+		if (image.getChannels() == 1) {
 			createPalette(PALETTE_ENTRIES);
 			loadFlags.hasPalette = true;
 		}
 
 		image.flip();
 		if (moveData) {
-			pixels = std::move(image.data);
+			pixels = *std::move(image.getData());
 		}
 		else {
-			pixels = image.data;
+			pixels = *image.getData();
 		}
 
 		loadFlags.hasMagicNumber = true;

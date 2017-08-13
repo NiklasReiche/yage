@@ -10,7 +10,7 @@ namespace gui
 
 	struct MasterInterface
 	{
-		platform::PlatformHandle * platform;
+		sys::PlatformHandle * platform;
 		gl::GraphicsContext* glContext;
 
 		FontManager* fontManager;

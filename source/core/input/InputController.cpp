@@ -2,7 +2,7 @@
 
 namespace input
 {
-	InputController::InputController(platform::PlatformHandle* systemHandle)
+	InputController::InputController(sys::PlatformHandle* systemHandle)
 		: systemHandle(systemHandle)
 	{
 		systemHandle->setOnCharModsEvent(std::bind(&InputController::onKeyCharEvent, this, std::placeholders::_1, std::placeholders::_2));

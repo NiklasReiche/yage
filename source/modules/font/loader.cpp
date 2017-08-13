@@ -21,19 +21,19 @@ namespace font
 		return gml::Vector2D<float>(scale_x, scale_y);
 	}
 
-	FontLoader::FontLoader(platform::PlatformHandle* platform, gl::GraphicsContext* glContext)
+	FontLoader::FontLoader(sys::PlatformHandle* platform, gl::GraphicsContext* glContext)
 		: platform(platform), glContext(glContext) {}
 
 	Font FontLoader::loadFont(std::string filename, int ptsize, int dpi)
 	{
 		Fontfile fontfile;
 
-		platform::File file = platform->open(filename);
+		sys::File file = platform->open(filename);
 		if (!file.is_open()) {
 			throw FileException(filename);
 		}
 
-		file.seek(0, platform::SeekOffset::BEG);
+		file.seek(0, sys::SeekOffset::BEG);
 		file.read((char*)&fontfile.fileheader, sizeof(fontfile.fileheader));
 		file.read((char*)&fontfile.fontinfo, sizeof(fontfile.fontinfo));
 		file.read((char*)&fontfile.sdfinfo, sizeof(fontfile.sdfinfo));

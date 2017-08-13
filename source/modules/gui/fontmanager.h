@@ -10,12 +10,12 @@ namespace gui
 	class FontManager
 	{
 	private:
-		platform::PlatformHandle* platform;
+		sys::PlatformHandle* platform;
 		font::FontLoader fontLoader;
 		std::map<std::string, font::Font> fonts;
 
 	public:
-		FontManager(platform::PlatformHandle* platform, gl::GraphicsContext * glContext);
+		FontManager(sys::PlatformHandle* platform, gl::GraphicsContext * glContext);
 
 		void addFont(std::string filename);
 		void removeFont(std::string name);

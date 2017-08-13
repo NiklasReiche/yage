@@ -2,13 +2,27 @@
 
 namespace glfw
 {
-	Desktop_File::Desktop_File(std::string & filename) 
+	Desktop_File::Desktop_File(std::string & filename, AccessMode mode)
+		: mode(mode), path(filename)
 	{
-		fstream = std::make_unique<std::ifstream>(std::ifstream(filename, std::ios::binary));
+		switch (mode)
+		{
+		case AccessMode::READ:
+			fstream = std::make_unique<std::fstream>(filename, std::ios::in | std::ios::binary);
+			break;
+		case AccessMode::WRITE:
+			fstream = std::make_unique<std::fstream>(filename, std::ios::out | std::ios::binary);
+			break;
+		case AccessMode::READ_WRITE:
+			fstream = std::make_unique<std::fstream>(filename, std::ios::in | std::ios::out | std::ios::binary);
+			break;
+		}
 	}
-	Desktop_File::Desktop_File(Desktop_File & desktopFile)
+	Desktop_File::Desktop_File(Desktop_File & other)
 	{
-		fstream = std::move(desktopFile.fstream);
+		this->fstream = std::move(other.fstream);
+		this->mode = other.mode;
+		this->path = other.path;
 	}
 	Desktop_File::~Desktop_File()
 	{
@@ -22,7 +36,12 @@ namespace glfw
 
 	void Desktop_File::read(void* buffer, size_t size)
 	{
-		fstream->read((char*)buffer, size);
+		if (mode == AccessMode::READ || mode == AccessMode::READ_WRITE) {
+			fstream->read((char*)buffer, size);
+		}
+		else {
+			throw FileException(FileError::ACCESS_VIOLATION, path);
+		}
 	}
 	void Desktop_File::read(std::stringstream & output)
 	{
@@ -48,6 +67,16 @@ namespace glfw
 		delete[] fileContent;
 	}
 
+	void Desktop_File::write(void* buffer, size_t size)
+	{
+		if (mode == AccessMode::WRITE || mode == AccessMode::READ_WRITE) {
+			fstream->write((char*)buffer, size);
+		}
+		else {
+			throw FileException(FileError::ACCESS_VIOLATION, path);
+		}
+	}
+
 	void Desktop_File::close()
 	{
 		fstream->close();
@@ -56,5 +85,10 @@ namespace glfw
 	bool Desktop_File::is_open()
 	{
 		return fstream->is_open();
+	}
+
+	bool Desktop_File::get_error()
+	{
+		return (fstream->eof() || fstream->bad() || fstream->fail());
 	}
 }

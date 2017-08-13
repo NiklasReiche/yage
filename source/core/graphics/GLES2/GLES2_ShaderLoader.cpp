@@ -2,7 +2,7 @@
 
 namespace gles2
 {
-	GLES2_ShaderLoader::GLES2_ShaderLoader(platform::PlatformHandle* systemHandle, GLES2_Context* glContext)
+	GLES2_ShaderLoader::GLES2_ShaderLoader(sys::PlatformHandle* systemHandle, GLES2_Context* glContext)
 		: systemHandle(systemHandle), glContext(glContext) {}
 
 	GLES2_Shader GLES2_ShaderLoader::loadShader(std::string vertex_path, std::string fragment_path)
@@ -13,8 +13,8 @@ namespace gles2
 		// File Handle
 		try {
 			std::stringstream vertexFile, fragmentFile;
-            platform::File vertexFileHandle = systemHandle->open(vertex_path);
-            platform::File fragmentFileHandle = systemHandle->open(fragment_path);
+            sys::File vertexFileHandle = systemHandle->open(vertex_path);
+            sys::File fragmentFileHandle = systemHandle->open(fragment_path);
             vertexFileHandle.read(vertexFile);
             fragmentFileHandle.read(fragmentFile);
 

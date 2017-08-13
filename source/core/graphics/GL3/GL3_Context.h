@@ -31,7 +31,7 @@ namespace gl3
 	class GL3_Context
 	{
 	private:
-		platform::PlatformHandle* systemHandle;
+		sys::PlatformHandle* systemHandle;
 
 		GLuint width;
 		GLuint height;
@@ -47,7 +47,7 @@ namespace gl3
 		int convertToChannelSize(ImageFormat format);
 
 	public:
-		GL3_Context(platform::PlatformHandle* systemHandle, int width, int height, std::string title = "OpenGL");
+		GL3_Context(sys::PlatformHandle* systemHandle, int width, int height, std::string title = "OpenGL");
 		~GL3_Context();
 
 

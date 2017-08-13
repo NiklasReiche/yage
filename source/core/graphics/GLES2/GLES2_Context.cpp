@@ -69,7 +69,7 @@ namespace gles2
 	}
 
 
-	GLES2_Context::GLES2_Context(platform::PlatformHandle* systemHandle)
+	GLES2_Context::GLES2_Context(sys::PlatformHandle* systemHandle)
 		: systemHandle(systemHandle)
 	{
 		systemHandle->createContext(&width, &height);

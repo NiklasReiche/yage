@@ -5,7 +5,7 @@
 
 int main()
 {
-	platform::PlatformHandle platform;
+	sys::PlatformHandle platform;
 	gl::GraphicsContext glContext(&platform, 250, 250);
 	input::InputController controller(&platform);
 

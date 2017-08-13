@@ -15,11 +15,11 @@ namespace gles2
 	class GLES2_ShaderLoader
 	{
 	private:
-		platform::PlatformHandle* systemHandle;
+		sys::PlatformHandle* systemHandle;
 		GLES2_Context* glContext;
 
 	public:
-		GLES2_ShaderLoader(platform::PlatformHandle* systemHandle, GLES2_Context* glContext);
+		GLES2_ShaderLoader(sys::PlatformHandle* systemHandle, GLES2_Context* glContext);
 
 		GLES2_Shader loadShader(std::string vertex_path, std::string fragment_path);
 	};

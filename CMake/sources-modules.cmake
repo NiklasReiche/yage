@@ -11,6 +11,8 @@ set( YAGE_IMAGE_SOURCE
 	"${YAGE_MODULES_PATH}/image/image.cpp"
 	"${YAGE_MODULES_PATH}/image/img.h"
 	"${YAGE_MODULES_PATH}/image/img.cpp"
+	"${YAGE_MODULES_PATH}/image/imageLoader.h"
+	"${YAGE_MODULES_PATH}/image/imageLoader.cpp"
 	
 )
 
@@ -72,4 +74,18 @@ set( YAGE_GUI_SOURCE
 	"${YAGE_MODULES_PATH}/gui/Layouts.h"
 	"${YAGE_MODULES_PATH}/gui/Layouts.cpp"
 	
+)
+
+set( YAGE_GRAPHICS_SOURCE
+
+	"${YAGE_MODULES_PATH}/graphics3d/camera.h"
+	"${YAGE_MODULES_PATH}/graphics3d/camera.cpp"
+
+	"${YAGE_MODULES_PATH}/graphics3d/skybox.h"
+	"${YAGE_MODULES_PATH}/graphics3d/skybox.cpp"
+
+	"${YAGE_MODULES_PATH}/graphics3d/scene.h"
+	"${YAGE_MODULES_PATH}/graphics3d/sceneRenderer.h"
+	"${YAGE_MODULES_PATH}/graphics3d/sceneRenderer.cpp"
+
 )

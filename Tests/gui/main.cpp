@@ -8,7 +8,7 @@
 class GuiTest
 {
 private:
-	platform::PlatformHandle* platform;
+	sys::PlatformHandle* platform;
 	gl::GraphicsContext* gl;
 	input::InputController* input;
 
@@ -36,7 +36,7 @@ public:
 	gui::Animation* animation_3 = nullptr;
 	gui::Animation* animation_4 = nullptr;
 
-	GuiTest(platform::PlatformHandle * platform, gl::GraphicsContext * gl, input::InputController * inputController)
+	GuiTest(sys::PlatformHandle * platform, gl::GraphicsContext * gl, input::InputController * inputController)
 		: platform(platform), gl(gl), input(inputController)
 	{
 		master = new gui::Master(platform, gl, inputController);
@@ -401,7 +401,7 @@ void displayFPS(GuiTest& gui, double dt)
 
 int main()
 {
-	platform::PlatformHandle platformHandle;
+	sys::PlatformHandle platformHandle;
 	gl::GraphicsContext glContext(&platformHandle, 1000, 500);
 	input::InputController inputController(&platformHandle);
 	input::InputListener* listener = inputController.addListener();

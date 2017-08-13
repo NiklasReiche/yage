@@ -2,7 +2,7 @@
 
 namespace gui
 {
-	Master::Master(platform::PlatformHandle * platform, gl::GraphicsContext * glContext, input::InputController * inputController)
+	Master::Master(sys::PlatformHandle * platform, gl::GraphicsContext * glContext, input::InputController * inputController)
 		: platform(platform), glContext(glContext), 
 		fontManager(FontManager(platform, glContext)),
 		inputManager(InputManager(inputController->addListener(), &root)),

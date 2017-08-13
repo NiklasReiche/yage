@@ -14,7 +14,7 @@
 
 namespace glfw
 {
-	class GLFWHandle : public platform::GenericPlatformHandle
+	class GLFWHandle : public sys::GenericPlatformHandle
 	{
 	private:
 		GLFWwindow* glfwWindow;
@@ -54,7 +54,7 @@ namespace glfw
 		double getTimeStep();
 
 		void log(std::string msg);
-		Desktop_File open(std::string filename);
+		Desktop_File open(std::string filename, AccessMode mode = AccessMode::READ);
 
 
 		void onCharModsEvent(unsigned int codepoint, int mods);

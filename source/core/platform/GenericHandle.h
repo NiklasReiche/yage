@@ -2,7 +2,7 @@
 
 #include <functional>
 
-namespace platform
+namespace sys
 {
 	class GenericPlatformHandle
 	{

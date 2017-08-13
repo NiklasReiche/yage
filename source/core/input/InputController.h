@@ -14,7 +14,7 @@ namespace input
 	class InputController
 	{
 	private:
-		platform::PlatformHandle* systemHandle;
+		sys::PlatformHandle* systemHandle;
 
 		InputState input;
 		std::vector<std::function<void()>> funcs;
@@ -23,7 +23,7 @@ namespace input
 		std::map<int, InputListener> listeners;
 
 	public:
-		InputController(platform::PlatformHandle* systemHandle);
+		InputController(sys::PlatformHandle* systemHandle);
 
 		void poll();
 		InputState* getInput() { return &input; }

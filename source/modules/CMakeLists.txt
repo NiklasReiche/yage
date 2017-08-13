@@ -42,8 +42,6 @@ elseif(WIN32)
 	endif()
 	target_link_libraries( YAGEfont PUBLIC ${YAGEfont-linklibs} )
 
-	#target_compile_definitions(YAGEfont PUBLIC "GL3")
-
 
 	add_library(YAGEgui STATIC ${YAGE_GUI_SOURCE})
 
@@ -51,6 +49,11 @@ elseif(WIN32)
 								  PUBLIC YAGEimage
 								  PUBLIC YAGEfont)
 
-	#target_compile_definitions(YAGEgui PUBLIC "GL3")
+
+	add_library(YAGEgraphics3d STATIC ${YAGE_GRAPHICS_SOURCE})
+
+	target_link_libraries(YAGEgraphics3d PUBLIC YAGEcore
+										 PUBLIC YAGEimage)
+
 
 endif()

@@ -140,9 +140,9 @@ namespace glfw
 		catch (std::bad_function_call) {}
 	}
 
-	Desktop_File GLFWHandle::open(std::string filename)
+	Desktop_File GLFWHandle::open(std::string filename, AccessMode mode)
 	{
-		return Desktop_File(filename);
+		return Desktop_File(filename, mode);
 	}
 
 	void GLFWHandle::log(std::string msg)

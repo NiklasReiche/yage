@@ -13,7 +13,7 @@ namespace gui
 	class GuiRenderer : public gl::Renderer
 	{
 	private:
-		platform::PlatformHandle* platform;
+		sys::PlatformHandle* platform;
 		gl::Shader guiShader;
 		gl::Shader textShader;
 
@@ -22,7 +22,7 @@ namespace gui
 		std::vector<font::Text*> text;
 
 		GuiRenderer() {}
-		GuiRenderer(platform::PlatformHandle * platform, gl::GraphicsContext* glContext, gl::Viewport viewport);
+		GuiRenderer(sys::PlatformHandle * platform, gl::GraphicsContext* glContext, gl::Viewport viewport);
 
 		void render();
 

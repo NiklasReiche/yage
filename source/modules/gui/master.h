@@ -18,7 +18,7 @@ namespace gui
 	class Master
 	{
 	private:
-		platform::PlatformHandle * platform;
+		sys::PlatformHandle * platform;
 		gl::GraphicsContext * glContext;
 
 		FontManager fontManager;
@@ -32,7 +32,7 @@ namespace gui
 		void sortWidgets(std::vector<gl::Drawable*> & vector_widget, std::vector<font::Text*> & vector_text, Widget & widget);
 
 	public:
-		Master(platform::PlatformHandle * platform, gl::GraphicsContext * glContext, input::InputController * inputController);
+		Master(sys::PlatformHandle * platform, gl::GraphicsContext * glContext, input::InputController * inputController);
 
 		void update(double dt);
 

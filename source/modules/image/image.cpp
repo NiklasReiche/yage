@@ -3,17 +3,43 @@
 
 namespace img
 {
-	void Image::move(Image & image)
+	Image::Image(int width, int height, int channels, unsigned char* data)
+		: width(width), height(height), channels(channels)
 	{
-		image.height = height;
-		image.width = width;
-		image.channels = channels;
-		image.data = std::move(data);
+		this->data->assign(data, data + (width * height * channels));
+	}
+	Image::Image(int width, int height, int channels, std::vector<unsigned char>& data)
+		: width(width), height(height), channels(channels)
+	{
+		this->data = std::make_shared<std::vector<unsigned char>>(data);
 	}
 
-	Image Image::copy()
+	Image::Image(const Image& other)
 	{
-		return Image{ width, height, channels, data };
+		this->width = other.width;
+		this->height = other.height;
+		this->channels = other.channels;
+		this->data = std::make_shared<std::vector<unsigned char>>(*other.data);
+	}
+
+	Image::Image(Image&& other)
+	{
+		this->width = other.width;
+		other.width = 0;
+		this->height = other.height;
+		other.height = 0;
+		this->channels = other.channels;
+		other.channels = 0;
+		this->data = std::move(other.data);
+	}
+
+	Image& Image::operator=(const Image& other)
+	{
+		this->width = other.width;
+		this->height = other.height;
+		this->channels = other.channels;
+		this->data = std::make_shared<std::vector<unsigned char>>(*other.data);
+		return *this;
 	}
 
 	void Image::flip()
@@ -27,9 +53,9 @@ namespace img
 					int top_index = (i * width + j) * channels + k;
 					int bottom_index = ((height - 1 - i) * width + j) * channels + k;
 					// swap values
-					unsigned char top_value = data.at(top_index);
-					data.at(top_index) = data.at(bottom_index);
-					data.at(bottom_index) = top_value;
+					unsigned char top_value = data->at(top_index);
+					data->at(top_index) = data->at(bottom_index);
+					data->at(bottom_index) = top_value;
 				}
 			}
 		}
@@ -46,7 +72,7 @@ namespace img
 				for (int k = 0; k < image.channels; ++k)
 				{
 					std::string pad = "";
-					int value = (int)image.data.at(i * image.width * image.channels + j * image.channels + k);
+					int value = (int)image.data->at(i * image.width * image.channels + j * image.channels + k);
 
 					if (value < 10) {
 						pad = "  ";

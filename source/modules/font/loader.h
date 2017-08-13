@@ -15,13 +15,13 @@ namespace font
 	class FontLoader
 	{
 	private:
-		platform::PlatformHandle* platform;
+		sys::PlatformHandle* platform;
 		gl::GraphicsContext* glContext;
 
 		gml::Vector2D<float> calcScale(int ptSize, int EM_size, int dpiHori = 0, int dpiVert = 0);
 
 	public:
-		FontLoader(platform::PlatformHandle* platform, gl::GraphicsContext * glContext);
+		FontLoader(sys::PlatformHandle* platform, gl::GraphicsContext * glContext);
 
 		Font loadFont(std::string filename, int ptsize = 16, int dpi = 96);
 	};

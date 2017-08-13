@@ -15,7 +15,7 @@ namespace gl3
 
 		vertexFile.open(vertex_path);
 		if (!vertexFile.is_open()) {
-			throw FileException(vertex_path);
+			throw FileException(FileError::PATH_VIOLATION, vertex_path);
 		}
 			
 		while (getline(vertexFile, vertexCodeLine))
@@ -28,7 +28,7 @@ namespace gl3
 
 		fragmentFile.open(fragment_path);
 		if (!fragmentFile.is_open()) {
-			throw FileException(fragment_path);
+			throw FileException(FileError::PATH_VIOLATION, fragment_path);
 		}
 
 		while (getline(fragmentFile, fragmentCodeLine))
@@ -42,7 +42,7 @@ namespace gl3
 		if (geometry_path != "") {
 			geometryFile.open(geometry_path);
 			if (!geometryFile.is_open()) {
-				throw FileException(geometry_path);
+				throw FileException(FileError::PATH_VIOLATION, geometry_path);
 			}
 
 			while (getline(geometryFile, geometryCodeLine))

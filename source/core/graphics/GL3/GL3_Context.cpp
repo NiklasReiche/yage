@@ -79,7 +79,7 @@ namespace gl3
 	}
 
 
-	GL3_Context::GL3_Context(platform::PlatformHandle* systemHandle, int width, int height, std::string title)
+	GL3_Context::GL3_Context(sys::PlatformHandle* systemHandle, int width, int height, std::string title)
 		: systemHandle(systemHandle), width(width), height(height), title(title)
 	{
 		systemHandle->createContext(width, height, title);

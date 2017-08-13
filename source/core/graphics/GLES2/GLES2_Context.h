@@ -23,7 +23,7 @@ namespace gles2
 	class GLES2_Context
 	{
 	private:
-		platform::PlatformHandle* systemHandle;
+		sys::PlatformHandle* systemHandle;
 
 		int width, height;
 
@@ -37,7 +37,7 @@ namespace gles2
 		int checkShaderCompilationError(GLuint program, std::string type);
 
 	public:
-		GLES2_Context(platform::PlatformHandle* systemHandle);
+		GLES2_Context(sys::PlatformHandle* systemHandle);
 		~GLES2_Context();
 
 		/*****************************************

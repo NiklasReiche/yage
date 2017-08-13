@@ -7,6 +7,7 @@
 #include <fstream>
 #include <cstdint>
 
+#include <platform/Platform.h>
 #include "image.h"
 #include "enum.h"
 
@@ -118,25 +119,24 @@ namespace bmp
 		int toBit8();
 		int toBit24();
 
-		void readVersion(std::ifstream & file);
+		void readVersion(sys::File & file);
 		void createPalette(int size);
 
-		int checkError(std::ifstream & file);
-		int checkError(std::ofstream & file);
+		int checkError(sys::File & file);
 
-		void readMagicNumber(std::ifstream & file);
-		void readBmpFileHeader(std::ifstream & file);
-		void readBmpInfoHeader(std::ifstream & file);
-		void readBmpV4Header(std::ifstream & file);
-		void readBitmask(std::ifstream & file);
-		void readPalette(std::ifstream & file, int offset, int size);
-		void readImageData(std::ifstream & file);
-		void readImageDataIndexed(std::ifstream & file);
+		void readMagicNumber(sys::File & file);
+		void readBmpFileHeader(sys::File & file);
+		void readBmpInfoHeader(sys::File & file);
+		void readBmpV4Header(sys::File & file);
+		void readBitmask(sys::File & file);
+		void readPalette(sys::File & file, int offset, int size);
+		void readImageData(sys::File & file);
+		void readImageDataIndexed(sys::File & file);
 
-		void writeImageData(std::ofstream & file);
+		void writeImageData(sys::File & file);
 	public:
-		int load(std::string filename, FORCE_CHANNELS channel = FORCE_CHANNELS::AUTO);
-		int save(std::string filename, FORCE_CHANNELS channel = FORCE_CHANNELS::AUTO);
+		int load(sys::PlatformHandle* platform, std::string filename, FORCE_CHANNELS channel = FORCE_CHANNELS::AUTO);
+		int save(sys::PlatformHandle* platform, std::string filename, FORCE_CHANNELS channel = FORCE_CHANNELS::AUTO);
 		void toImage(Image & image);
 		void fromImage(Image & image, bool moveData = false);
 	};

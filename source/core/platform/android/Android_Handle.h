@@ -36,7 +36,7 @@ namespace android
 		std::function<void(float, float, int, int)> onTouchEvent;
 	};
 
-	class Android_Handle : public platform::GenericPlatformHandle
+	class Android_Handle : public sys::GenericPlatformHandle
 	{
 	private:
 		android_app * app;

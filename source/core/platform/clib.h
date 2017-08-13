@@ -25,6 +25,7 @@ namespace clib
 			string.erase(0, pos + delimiter.length());
 			out.push_back(token);
 		}
+		out.push_back(string);
 	}
 	inline std::vector<std::string> strip(std::string string, std::string delimiter)
 	{

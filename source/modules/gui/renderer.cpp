@@ -7,7 +7,7 @@ namespace gui
 	** Basic Gui Renderer
 	*************************************************/
 
-	GuiRenderer::GuiRenderer(platform::PlatformHandle * platform, gl::GraphicsContext* glContext, gl::Viewport viewport)
+	GuiRenderer::GuiRenderer(sys::PlatformHandle * platform, gl::GraphicsContext* glContext, gl::Viewport viewport)
 		: Renderer(glContext, viewport), platform(platform)
 	{
 		gui::ShaderTemplate guiShaderTemplate;

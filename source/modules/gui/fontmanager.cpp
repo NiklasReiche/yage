@@ -2,7 +2,7 @@
 
 namespace gui
 {
-	FontManager::FontManager(platform::PlatformHandle* platform, gl::GraphicsContext * glContext)
+	FontManager::FontManager(sys::PlatformHandle* platform, gl::GraphicsContext * glContext)
 		: fontLoader(font::FontLoader(platform, glContext)), platform(platform) {}
 
 	void FontManager::addFont(std::string filename)

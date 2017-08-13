@@ -59,21 +59,4 @@ namespace img
 		}
 	}
 
-
-	int readBMP(std::string filename, Image & image, FORCE_CHANNELS channel)
-	{
-		int err;
-		bmp::Bitmap bitmap;
-		err = bitmap.load(filename, channel);
-		bitmap.toImage(image);
-		return err;
-	}
-	int writeBMP(std::string filename, Image & image, FORCE_CHANNELS channel)
-	{
-		int err;
-		bmp::Bitmap bitmap;
-		bitmap.fromImage(image);
-		err = bitmap.save(filename, channel);
-		return err;
-	}
 }

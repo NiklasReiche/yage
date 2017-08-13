@@ -17,7 +17,4 @@ namespace img
 	void unpackBitmap(unsigned char* data, std::vector<unsigned char> & image, int rows, int width, int pitch);
 
 	void flip(std::vector<unsigned char> & image, int height, int width, int channels);
-
-	int readBMP(std::string filename, Image & image, FORCE_CHANNELS channel = FORCE_CHANNELS::AUTO);
-	int writeBMP(std::string filename, Image & image, FORCE_CHANNELS channel = FORCE_CHANNELS::AUTO);
 }
