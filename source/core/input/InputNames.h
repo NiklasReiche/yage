@@ -43,7 +43,7 @@ namespace input
 	{
 		PRESS,
 		RELEASE,
-		RELEASE
+		REPEAT
 	};
 
 	enum class KeyCode
