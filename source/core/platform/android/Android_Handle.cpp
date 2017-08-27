@@ -5,68 +5,77 @@ namespace android
 	void handleCommand(struct android_app* app, int32_t cmd)
 	{
 		Android_Handle* androidHandle = (Android_Handle*)app->userData;
-		try {
-			switch (cmd)
-			{
-			case APP_CMD_INPUT_CHANGED:
-				break;
+		switch (cmd)
+		{
+		case APP_CMD_INPUT_CHANGED:
+			break;
 
-			case APP_CMD_INIT_WINDOW:
-				if (app->window != NULL) {
-					androidHandle->callbacks.onWindowInit();
-				}
-				break;
-
-			case APP_CMD_TERM_WINDOW:
-				androidHandle->callbacks.onWindowTerm();
-				break;
-
-			case APP_CMD_WINDOW_RESIZED:
-				break;
-
-			case APP_CMD_WINDOW_REDRAW_NEEDED:
-				break;
-
-			case APP_CMD_CONTENT_RECT_CHANGED:
-				break;
-
-			case APP_CMD_GAINED_FOCUS:
-				break;
-
-			case APP_CMD_LOST_FOCUS:
-				break;
-
-			case APP_CMD_CONFIG_CHANGED:
-				break;
-
-			case APP_CMD_LOW_MEMORY:
-				break;
-
-			case APP_CMD_START:
-				androidHandle->callbacks.onAppStart();
-				break;
-
-			case APP_CMD_RESUME:
-				androidHandle->callbacks.onAppResume();
-				break;
-
-			case APP_CMD_SAVE_STATE:
-				break;
-
-			case APP_CMD_PAUSE:
-				androidHandle->callbacks.onAppPause();
-				break;
-
-			case APP_CMD_STOP:
-				androidHandle->callbacks.onAppStop();
-				break;
-
-			case APP_CMD_DESTROY:
-				androidHandle->callbacks.onAppDestroy();
-				break;
+		case APP_CMD_INIT_WINDOW:
+			if (app->window != NULL && androidHandle->callbacks.onWindowInit) {
+				androidHandle->callbacks.onWindowInit();
 			}
+			break;
+
+		case APP_CMD_TERM_WINDOW:
+			if (androidHandle->callbacks.onWindowTerm) {
+				androidHandle->callbacks.onWindowTerm();
+			}
+			break;
+
+		case APP_CMD_WINDOW_RESIZED:
+			break;
+
+		case APP_CMD_WINDOW_REDRAW_NEEDED:
+			break;
+
+		case APP_CMD_CONTENT_RECT_CHANGED:
+			break;
+
+		case APP_CMD_GAINED_FOCUS:
+			break;
+
+		case APP_CMD_LOST_FOCUS:
+			break;
+
+		case APP_CMD_CONFIG_CHANGED:
+			break;
+
+		case APP_CMD_LOW_MEMORY:
+			break;
+
+		case APP_CMD_START:
+			if (androidHandle->callbacks.onAppStart) {
+				androidHandle->callbacks.onAppStart();
+			}
+			break;
+
+		case APP_CMD_RESUME:
+			if (androidHandle->callbacks.onAppResume) {
+				androidHandle->callbacks.onAppResume();
+			}
+			break;
+
+		case APP_CMD_SAVE_STATE:
+			break;
+
+		case APP_CMD_PAUSE:
+			if (androidHandle->callbacks.onAppPause) {
+				androidHandle->callbacks.onAppPause();
+			}
+			break;
+
+		case APP_CMD_STOP:
+			if (androidHandle->callbacks.onAppStop) {
+				androidHandle->callbacks.onAppStop();
+			}
+			break;
+
+		case APP_CMD_DESTROY:
+			if (androidHandle->callbacks.onAppDestroy) {
+				androidHandle->callbacks.onAppDestroy();
+			}
+			break;
 		}
-		catch (std::bad_function_call) {}
 	}
 	int32_t handleInputEvent(struct android_app* app, AInputEvent* event)
 	{
@@ -84,10 +93,9 @@ namespace android
 			float x = AMotionEvent_getRawX(event, 0);
 			float y = AMotionEvent_getRawY(event, 0);
 
-			try {
+			if (androidHandle->callbacks.onTouchEvent) {
 				androidHandle->callbacks.onTouchEvent(x, y, pointerIndex, actionIdent);
 			}
-			catch (std::bad_function_call) {}
 			return 1;
 		}
 		return 0;
