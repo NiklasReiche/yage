@@ -64,6 +64,12 @@ namespace gui
 		updateParams();
 	}
 
+	void PushButton::onResume()
+	{
+		setColor(clickColor);
+		updateParams();
+	}
+
 	gml::Vec2f PushButton::calcPrefSize()
 	{
 		return label->getPreferredSize();

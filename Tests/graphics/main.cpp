@@ -54,11 +54,11 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 		controller.poll();
 		if (controller.getInput()->getKey(input::KeyCode::KEY_W) == input::KeyState::DOWN && controller.getInput()->getKeyLast(input::KeyCode::KEY_W) == input::KeyState::UP) {
-			drawable.bufferData(vertices1, 3);
+			drawable.bufferData(vertices1);
 			std::cout << "W" << std::endl;
 		}
 		if (controller.getInput()->getKey(input::KeyCode::KEY_Q) == input::KeyState::DOWN && controller.getInput()->getKeyLast(input::KeyCode::KEY_Q) == input::KeyState::UP) {
-			drawable.bufferData(vertices2, 6);
+			drawable.bufferData(vertices2);
 			std::cout << "Q" << std::endl;
 		}
 

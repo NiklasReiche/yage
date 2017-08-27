@@ -101,6 +101,7 @@ namespace gui
 		virtual void onClick() {}
 		virtual void onClickRelease() {}
 		virtual void onCancel() {}
+		virtual void onResume() {}
 		virtual void onFocus() {}
 		virtual void onFocusRelease() {}
 		virtual void onCharInput(char character) {}

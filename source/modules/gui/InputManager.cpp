@@ -62,12 +62,11 @@ namespace gui
 
 	void InputManager::onMousePosEvent(float x, float y) 
 	{
-		if (inputListener->getInput()->getMouseKey(input::MouseKeyCode::KEY_MOUSE_1) == input::KeyState::UP) {
+		Widget* lastSelectedWidget = selectedWidget;
+		selectedWidget = searchSelected(rootWidget, x, y);
 
-			Widget* lastSelectedWidget = selectedWidget;
-			selectedWidget = searchSelected(rootWidget, x, y);
-
-			if (selectedWidget != lastSelectedWidget) {
+		if (selectedWidget != lastSelectedWidget) {
+			if (activeWidget == nullptr && blockHover == false) {
 				if (selectedWidget != nullptr) {
 					selectedWidget->onHover();
 				}
@@ -75,43 +74,58 @@ namespace gui
 					lastSelectedWidget->onHoverRelease();
 				}
 			}
-		}
-		else if (inputListener->getInput()->getMouseKey(input::MouseKeyCode::KEY_MOUSE_1) == input::KeyState::DOWN) {
-
-			selectedWidget = searchSelected(rootWidget, x, y);
-
-			if (selectedWidget == activeWidget && activeWidget != nullptr) {
-				activeWidget->onClick();
+			else if (activeWidget == selectedWidget && activeWidget != nullptr) {
+				selectedWidget->onResume();
 			}
-			else if (activeWidget != nullptr) {
-				activeWidget->onCancel();
+			else if (activeWidget == lastSelectedWidget && activeWidget != nullptr) {
+				lastSelectedWidget->onHoverRelease();
 			}
 		}
 	}
 	void InputManager::onMouseEvent(input::MouseKeyCode key, input::KeyAction action)
 	{
-		if (selectedWidget != nullptr && key == input::MouseKeyCode::KEY_MOUSE_1 && action == input::KeyAction::PRESS) {
-			activeWidget = selectedWidget;
-			activeWidget->onClick();
-		}
-		else if (activeWidget == selectedWidget && activeWidget != nullptr && key == input::MouseKeyCode::KEY_MOUSE_1 && action == input::KeyAction::RELEASE) {
-			if (activeWidget->keepFocus) {
-				focusedWidget = activeWidget;
-				focusedWidget->onFocus();
+		if (key == input::MouseKeyCode::KEY_MOUSE_1 && action == input::KeyAction::PRESS) {
+			if (selectedWidget != nullptr) {
+				activeWidget = selectedWidget;
+				activeWidget->onClick();
+
+				if (selectedWidget != focusedWidget) {
+					if (focusedWidget != nullptr) {
+						focusedWidget->onFocusRelease();
+						focusedWidget = nullptr;
+					}
+					if (selectedWidget->keepFocus) {
+						focusedWidget = selectedWidget;
+						focusedWidget->onFocus();
+					}
+				}
 			}
-			else if (focusedWidget != nullptr){
-				focusedWidget->onFocusRelease();
-				focusedWidget = nullptr;
+			else {
+				blockHover = true;
+
+				if (focusedWidget != nullptr) {
+					focusedWidget->onFocusRelease();
+					focusedWidget = nullptr;
+				}
 			}
-			activeWidget->onClickRelease();
-			activeWidget = nullptr;
 		}
-		else if (selectedWidget == nullptr && focusedWidget != nullptr && key == input::MouseKeyCode::KEY_MOUSE_1 && action == input::KeyAction::RELEASE) {
-			focusedWidget->onFocusRelease();
-			focusedWidget = nullptr;
+		else if (key == input::MouseKeyCode::KEY_MOUSE_1 && action == input::KeyAction::RELEASE) {
+			if (selectedWidget == nullptr) {
+				if (activeWidget != nullptr) {
+					activeWidget->onCancel();
+					activeWidget = nullptr;
+				}
+			}
+			else {
+				if (activeWidget == selectedWidget) {
+					activeWidget->onClickRelease();
+					activeWidget = nullptr;
+				}
+			}
+			blockHover = false;
 		}
 	}
-
+	
 	void InputManager::onTouchEvent(float x, float y, input::TouchIndexCode index, input::TouchAction action)
 	{
 		selectedWidget = searchSelected(rootWidget, x, y);

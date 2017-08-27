@@ -15,6 +15,7 @@ namespace gui
 		Widget* selectedWidget = nullptr;
 		Widget* activeWidget = nullptr;
 		Widget* focusedWidget = nullptr;
+		bool blockHover = false;
 
 		Widget* searchSelected(Widget * widget, float xpos, float ypos);
 

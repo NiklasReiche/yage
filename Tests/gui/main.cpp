@@ -41,10 +41,10 @@ public:
 	{
 		master = new gui::Master(platform, gl, inputController);
 		try {
-			master->addFont("C:/Users/Niklas/Desktop/DEV/Projects/yage/Tests/gui/res/arial.font");
+			master->addFont("D:/DEV/Projects/yage/Tests/gui/res/arial.font");
 		}
 		catch (FileException& exception) {
-			platform->log("ERROR::FONT_LOADER: could not open file " + exception.what());
+			platform->log("ERROR::FONT_LOADER: could not open file " + exception.path());
 		}
 
 		gui::LabelTemplate fpslabelTemplate;

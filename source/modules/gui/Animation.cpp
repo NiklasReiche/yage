@@ -25,7 +25,9 @@ namespace gui
 			master->deactivateAnimation(this);
 			isFinished = true;
 			reset();
-			onAnimationStop();
+			if (onAnimationStop) {
+				onAnimationStop();
+			}
 		}
 	}
 	void Animation::reset()

@@ -38,6 +38,7 @@ namespace gui
 		virtual void onHover();
 		virtual void onHoverRelease();
 		virtual void onCancel();
+		virtual void onResume();
 
 		void setCallback(std::function<void(void)> command) { this->command = command; }
 		void setText(TextTemplate text) { label->setText(text); }
