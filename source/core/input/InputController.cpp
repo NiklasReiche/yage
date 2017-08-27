@@ -39,10 +39,9 @@ namespace input
 		
 		for (auto const &listener : listeners)
 		{
-			try {
+			if (listener.second.onCharEventCallback) {
 				listener.second.onCharEventCallback(character);
 			}
-			catch (std::bad_function_call) {}
 		}
 #endif
 	}
@@ -59,10 +58,9 @@ namespace input
 			newState = KeyState::DOWN;
 			for (auto const &listener : listeners)
 			{
-				try {
+				if (listener.second.onKeyEventCallback) {
 					listener.second.onKeyEventCallback(key, action);
 				}
-				catch (std::bad_function_call) {}
 			}
 			funcs.push_back(std::bind(&InputController::onKeyEvent, this, _key, _action)); /* store function call for next frame to simulate key event */
 		}
@@ -72,10 +70,9 @@ namespace input
 		else if (action == KeyAction::REPEAT) {
 			for (auto const &listener : listeners)
 			{
-				try {
+				if (listener.second.onKeyEventCallback) {
 					listener.second.onKeyEventCallback(key, action);
 				}
-				catch (std::bad_function_call) {}
 			}
 			newState = KeyState::DOWN;
 		}
@@ -83,10 +80,9 @@ namespace input
 			newState = KeyState::UP;
 			for (auto const &listener : listeners)
 			{
-				try {
+				if (listener.second.onKeyEventCallback) {
 					listener.second.onKeyEventCallback(key, action);
 				}
-				catch (std::bad_function_call) {}
 			}
 			funcs.push_back(std::bind(&InputController::onKeyEvent, this, _key, _action));
 		}
@@ -106,10 +102,9 @@ namespace input
 
 		for (auto const &listener : listeners)
 		{
-			try {
+			if (listener.second.onMousePosEventCallback) {
 				listener.second.onMousePosEventCallback(xpos, ypos);
 			}
-			catch (std::bad_function_call) {}
 		}
 	}
 
@@ -120,10 +115,9 @@ namespace input
 
 		for (auto const &listener : listeners)
 		{
-			try {
+			if (listener.second.onMouseWheelEventCallback){
 				listener.second.onMouseWheelEventCallback(xoffset, yoffset);
 			}
-			catch (std::bad_function_call) {}
 		}
 	}
 
@@ -139,10 +133,9 @@ namespace input
 			newState = KeyState::DOWN;
 			for (auto const &listener : listeners)
 			{
-				try {
+				if (listener.second.onMouseButtonEventCallback) {
 					listener.second.onMouseButtonEventCallback(key, action);
 				}
-				catch (std::bad_function_call) {}
 			}
 			funcs.push_back(std::bind(&InputController::onMouseButtonEvent, this, _key, _action));
 		}
@@ -153,10 +146,9 @@ namespace input
 			newState = KeyState::UP;
 			for (auto const &listener : listeners)
 			{
-				try {
+				if (listener.second.onMouseButtonEventCallback) {
 					listener.second.onMouseButtonEventCallback(key, action);
 				}
-				catch (std::bad_function_call) {}
 			}
 			funcs.push_back(std::bind(&InputController::onMouseButtonEvent, this, _key, _action));
 		}
