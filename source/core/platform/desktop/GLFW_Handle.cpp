@@ -102,42 +102,33 @@ namespace glfw
 
 	void GLFWHandle::onCharModsEvent(unsigned int codepoint, int mods)
 	{
-		if (isCharInputEnabled) {
-			try {
-				onCharModsEventCallback(codepoint, mods);
-			}
-			catch (std::bad_function_call) {}
+		if (isCharInputEnabled && onCharModsEventCallback) {
+			onCharModsEventCallback(codepoint, mods);
 		}
 	}
 	void GLFWHandle::onKeyEvent(int key, int scancode, int action, int mode)
 	{
-		if (isKeyInputEnabled) {
-			try {
-				onKeyEventCallback(key, action);
-			}
-			catch (std::bad_function_call) {}
+		if (isKeyInputEnabled && onKeyEventCallback) {
+			onKeyEventCallback(key, action);
 		}
 	}
 	void GLFWHandle::onMousePosEvent(float xpos, float ypos)
 	{
-		try {
+		if (onMousePosEventCallback) {
 			onMousePosEventCallback(xpos, ypos);
 		}
-		catch (std::bad_function_call) {}
 	}
 	void GLFWHandle::onMouseButtonEvent(int button, int action, int mods)
 	{
-		try {
+		if (onMouseButtonEventCallback) {
 			onMouseButtonEventCallback(button, action);
 		}
-		catch (std::bad_function_call) {}
 	}
 	void GLFWHandle::onMouseWheelEvent(float xoffset, float yoffset)
 	{
-		try {
+		if (onMouseWheelEventCallback) {
 			onMouseWheelEventCallback(xoffset, yoffset);
 		}
-		catch (std::bad_function_call) {}
 	}
 
 	Desktop_File GLFWHandle::open(std::string filename, AccessMode mode)
