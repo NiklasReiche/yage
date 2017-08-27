@@ -16,7 +16,7 @@ namespace input
 	private:
 		sys::PlatformHandle* systemHandle;
 
-		InputState input;
+		InputState inputState;
 		std::vector<std::function<void()>> funcs;
 
 		int listenerId = 0;
@@ -26,7 +26,7 @@ namespace input
 		InputController(sys::PlatformHandle* systemHandle);
 
 		void poll();
-		InputState* getInput() { return &input; }
+		InputState* getInput() { return &inputState; }
 
 		InputListener* addListener();
 		void removeListener(InputListener* listener);

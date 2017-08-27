@@ -52,53 +52,26 @@ namespace input
 		KeyAction action = KeyAction(_action);
 		KeyCode key = KeyCode(_key);
 
-		KeyState lastState = input.getKey(key);
-		KeyState newState;
-		if (action == KeyAction::PRESS && lastState == KeyState::UP) {
-			newState = KeyState::DOWN;
-			for (auto const &listener : listeners)
-			{
-				if (listener.second.onKeyEventCallback) {
-					listener.second.onKeyEventCallback(key, action);
-				}
+		if (action == KeyAction::PRESS) {
+			inputState.keyboardKeys[key] = KeyState::DOWN;
+		}
+		else if (action == KeyAction::RELEASE) {
+			inputState.keyboardKeys[key] = KeyState::UP;
+		}
+		
+		for (auto const &listener : listeners)
+		{
+			if (listener.second.onKeyEventCallback) {
+				listener.second.onKeyEventCallback(key, action);
 			}
-			funcs.push_back(std::bind(&InputController::onKeyEvent, this, _key, _action)); /* store function call for next frame to simulate key event */
 		}
-		else if (action == KeyAction::PRESS && lastState == KeyState::DOWN) {
-			newState = KeyState::DOWN; /* this gets called in the simulated key event, so that both key and last key are DOWN */
-		}
-		else if (action == KeyAction::REPEAT) {
-			for (auto const &listener : listeners)
-			{
-				if (listener.second.onKeyEventCallback) {
-					listener.second.onKeyEventCallback(key, action);
-				}
-			}
-			newState = KeyState::DOWN;
-		}
-		else if (action == KeyAction::RELEASE && lastState == KeyState::DOWN) {
-			newState = KeyState::UP;
-			for (auto const &listener : listeners)
-			{
-				if (listener.second.onKeyEventCallback) {
-					listener.second.onKeyEventCallback(key, action);
-				}
-			}
-			funcs.push_back(std::bind(&InputController::onKeyEvent, this, _key, _action));
-		}
-		else if (action == KeyAction::RELEASE && lastState == KeyState::UP) {
-			newState = KeyState::UP;
-		}
-
-		input.keyboardKeys[key] = newState;
-		input.keyboardKeysLast[key] = lastState;
 #endif
 	}
 
 	void InputController::onMousePosEvent(float xpos, float ypos)
 	{
-		input.mousePos.x = xpos;
-		input.mousePos.y = ypos;
+		inputState.mousePos.x = xpos;
+		inputState.mousePos.y = ypos;
 
 		for (auto const &listener : listeners)
 		{
@@ -110,8 +83,8 @@ namespace input
 
 	void InputController::onMouseWheelEvent(float xoffset, float yoffset)
 	{
-		input.mouseWheelOffset.x = xoffset;
-		input.mouseWheelOffset.y = yoffset;
+		inputState.mouseWheelOffset.x = xoffset;
+		inputState.mouseWheelOffset.y = yoffset;
 
 		for (auto const &listener : listeners)
 		{
@@ -127,37 +100,19 @@ namespace input
 		KeyAction action = KeyAction(_action);
 		MouseKeyCode key = MouseKeyCode(_key);
 
-		KeyState lastState = input.getMouseKey(key);
-		KeyState newState;
-		if (action == KeyAction::PRESS && lastState == KeyState::UP) {
-			newState = KeyState::DOWN;
-			for (auto const &listener : listeners)
-			{
-				if (listener.second.onMouseButtonEventCallback) {
-					listener.second.onMouseButtonEventCallback(key, action);
-				}
-			}
-			funcs.push_back(std::bind(&InputController::onMouseButtonEvent, this, _key, _action));
+		if (action == KeyAction::PRESS) {
+			inputState.mouseKeys[key] = KeyState::DOWN;
 		}
-		else if (action == KeyAction::PRESS && lastState == KeyState::DOWN) {
-			newState = KeyState::DOWN;
-		}
-		else if (action == KeyAction::RELEASE && lastState == KeyState::DOWN) {
-			newState = KeyState::UP;
-			for (auto const &listener : listeners)
-			{
-				if (listener.second.onMouseButtonEventCallback) {
-					listener.second.onMouseButtonEventCallback(key, action);
-				}
-			}
-			funcs.push_back(std::bind(&InputController::onMouseButtonEvent, this, _key, _action));
-		}
-		else if (action == KeyAction::RELEASE && lastState == KeyState::UP) {
-			newState = KeyState::UP;
+		else if (action == KeyAction::RELEASE) {
+			inputState.mouseKeys[key] = KeyState::UP;
 		}
 
-		input.mouseKeys[key] = newState;
-		input.mouseKeysLast[key] = lastState;
+		for (auto const &listener : listeners)
+		{
+			if (listener.second.onMouseButtonEventCallback) {
+				listener.second.onMouseButtonEventCallback(key, action);
+			}
+		}
 #endif
 	}
 

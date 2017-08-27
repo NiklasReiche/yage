@@ -15,20 +15,14 @@ namespace input
 
 		gml::Vec2<double> mousePos;
 		gml::Vec2<double> mouseWheelOffset;
-		std::map<TouchIndexCode, gml::Vec2<float>> touchPos;
-
 		std::map<KeyCode, KeyState> keyboardKeys;
-		std::map<KeyCode, KeyState> keyboardKeysLast;
-
 		std::map<MouseKeyCode, KeyState> mouseKeys;
-		std::map<MouseKeyCode, KeyState> mouseKeysLast;
+
+		std::map<TouchIndexCode, gml::Vec2<float>> touchPos;
+		std::map<TouchIndexCode, KeyState> touchAction;
 
 		// ToDo: joystick axis
 		std::map<JoystickKeyCode, KeyState> joystickKeys;
-		std::map<JoystickKeyCode, KeyState> joystickKeysLast;
-
-		std::map<TouchIndexCode, KeyState> touchAction;
-		std::map<TouchIndexCode, KeyState> touchActionLast;
 
 	public:
 		gml::Vec2<double> getMousePos() { return mousePos; }
@@ -40,18 +34,6 @@ namespace input
 			if (it == std::end(keyboardKeys))
 			{
 				keyboardKeys[key] = KeyState::UP;
-				return KeyState::UP;
-			}
-			else {
-				return it->second;
-			}
-		}
-		KeyState getKeyLast(KeyCode key)
-		{
-			std::map<KeyCode, KeyState>::iterator it = keyboardKeysLast.find(key);
-			if (it == std::end(keyboardKeysLast))
-			{
-				keyboardKeysLast[key] = KeyState::UP;
 				return KeyState::UP;
 			}
 			else {
@@ -71,18 +53,6 @@ namespace input
 				return it->second;
 			}
 		}
-		KeyState getMouseKeyLast(MouseKeyCode key)
-		{
-			std::map<MouseKeyCode, KeyState>::iterator it = mouseKeysLast.find(key);
-			if (it == std::end(mouseKeysLast))
-			{
-				mouseKeysLast[key] = KeyState::UP;
-				return KeyState::UP;
-			}
-			else {
-				return it->second;
-			}
-		}
 
 		KeyState getJoystickKey(JoystickKeyCode key)
 		{
@@ -96,18 +66,6 @@ namespace input
 				return it->second;
 			}
 		}
-		KeyState getJoystickKeyLast(JoystickKeyCode key)
-		{
-			std::map<JoystickKeyCode, KeyState>::iterator it = joystickKeysLast.find(key);
-			if (it == std::end(joystickKeysLast))
-			{
-				joystickKeysLast[key] = KeyState::UP;
-				return KeyState::UP;
-			}
-			else {
-				return it->second;
-			}
-		}
 
 		KeyState getTouchState(TouchIndexCode index)
 		{
@@ -115,18 +73,6 @@ namespace input
 			if (it == std::end(touchAction))
 			{
 				touchAction[index] = KeyState::UP;
-				return KeyState::UP;
-			}
-			else {
-				return it->second;
-			}
-		}
-		KeyState getTouchStateLast(TouchIndexCode index)
-		{
-			std::map<TouchIndexCode, KeyState>::iterator it = touchActionLast.find(index);
-			if (it == std::end(touchActionLast))
-			{
-				touchActionLast[index] = KeyState::UP;
 				return KeyState::UP;
 			}
 			else {
