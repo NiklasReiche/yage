@@ -44,4 +44,27 @@ namespace gles2
 
 		return glContext->compileShader(vertexCode, fragmentCode, attributes);
 	}
+
+	GLES2_Shader GLES2_ShaderLoader::loadFromString(std::string vertexCode, std::string fragmentCode)
+	{
+		std::vector<std::string> attributes;
+		std::stringstream vertexFile(vertexCode);
+		std::stringstream fragmentFile(fragmentCode);
+
+		std::string vertexCodeLine;
+		while (getline(vertexFile, vertexCodeLine))
+		{
+			std::stringstream line(vertexCodeLine);
+			std::string qualifier;
+			line >> qualifier;
+			if (qualifier == "attribute") {
+				std::string type, name;
+				line >> type;
+				line >> name;
+				attributes.push_back(name);
+			}
+		}
+
+		return glContext->compileShader(vertexCode, fragmentCode, attributes);
+	}
 }
