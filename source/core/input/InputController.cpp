@@ -122,60 +122,18 @@ namespace input
 		TouchAction action = TouchAction(_action);
 		TouchIndexCode key = TouchIndexCode(index);
 
-		input.touchPos[key].x = xpos;
-		input.touchPos[key].y = ypos;
-
-		if (action == TouchAction::PRESS || action == TouchAction::RELEASE) {
-
-			KeyState lastState = input.getTouchState(key);
-			KeyState newState;
-
-			if (action == TouchAction::PRESS && lastState == KeyState::UP) {
-				newState = KeyState::DOWN;
-				for (auto const &listener : listeners)
-				{
-					try {
-						listener.second.onTouchEventCallback(xpos, ypos, key, action);
-					}
-					catch (std::bad_function_call) {}
-				}
-				funcs.push_back(std::bind(&InputController::onTouchEvent, this, xpos, ypos, index, _action));
-			}
-			else if (action == TouchAction::PRESS && lastState == KeyState::DOWN) {
-				newState = KeyState::DOWN;
-			}
-			else if (action == TouchAction::RELEASE && lastState == KeyState::DOWN) {
-				newState = KeyState::UP;
-				for (auto const &listener : listeners)
-				{
-					try {
-						listener.second.onTouchEventCallback(xpos, ypos, key, action);
-					}
-					catch (std::bad_function_call) {}
-				}
-				funcs.push_back(std::bind(&InputController::onTouchEvent, this, xpos, ypos, index, _action));
-			}
-			else if (action == TouchAction::RELEASE && lastState == KeyState::UP) {
-				newState = KeyState::UP;
-			}
-
-			input.touchAction[key] = newState;
-			input.touchActionLast[key] = lastState;
+		if (action == TouchAction::PRESS) {
+			inputState.touchAction[key] = KeyState::DOWN;
 		}
-		else if (action == TouchAction::MOVE) {
-			TouchAction action = TouchAction(_action);
-			TouchIndexCode key = TouchIndexCode(index);
+		else if (action == TouchAction::RELEASE || action == TouchAction::CANCEL) {
+			inputState.touchAction[key] = KeyState::UP;
+		}
 
-			for (auto const &listener : listeners)
-			{
-				try {
-					listener.second.onTouchEventCallback(xpos, ypos, key, action);
-				}
-				catch (std::bad_function_call) {}
+		for (auto const &listener : listeners)
+		{
+			if (listener.second.onTouchEventCallback) {
+				listener.second.onTouchEventCallback(xpos, ypos, key, action);
 			}
-
-			input.touchAction[key] = KeyState::DOWN;
-			input.touchActionLast[key] = KeyState::DOWN;
 		}
 #endif
 	}
