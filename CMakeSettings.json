@@ -40,6 +40,14 @@
       "buildRoot": "${projectDir}\\build\\vs17\\${name}",
       "cmakeCommandArgs": "-DCMAKE_TOOLCHAIN_FILE=${projectDir}\\CMake\\toolchain-android-dummy.cmake",
       "buildCommandArgs": "-m -v:minimal"
+    },
+    {
+      "name": "Android-Release",
+      "generator": "Visual Studio 15 2017",
+      "configurationType": "Release",
+      "buildRoot": "${projectDir}\\build\\vs17\\${name}",
+      "cmakeCommandArgs": "-DCMAKE_TOOLCHAIN_FILE=${projectDir}\\CMake\\toolchain-android-dummy.cmake",
+      "buildCommandArgs": "-m -v:minimal"
     }
   ]
 }
