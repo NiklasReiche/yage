@@ -422,7 +422,7 @@ namespace gui
 	gml::Vec2f Widget::toAbs(gml::Vec2f value)
 	{
 		gml::Vec2f vec;
-		gml::Vec2f & parentSize = parent->getSize();
+		gml::Vec2f parentSize = parent->getSize();
 		vec.x = value.x * parentSize.x;
 		vec.y = value.y * parentSize.y;
 		return vec;
