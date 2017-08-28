@@ -62,6 +62,7 @@ set( YAGE_GRAPHICS_GLES2_SOURCE
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Drawable.cpp"
 
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Framebuffer.h"
+	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Framebuffer.cpp"
 
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Shader.h"
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Shader.cpp"

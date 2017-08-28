@@ -12,20 +12,19 @@ namespace gles2
 		friend class GLES2_Context;
 
 	protected:
-		GLuint id;
-		GLES2_Context* glContext;
+		int* refCount = nullptr;
+		bool shouldDelete = false;
+
+		GLuint id = 0;
+		GLES2_Context* glContext = nullptr;
 
 	public:
+		GLES2_Object();
+		GLES2_Object(const GLES2_Object& copy);
+		virtual ~GLES2_Object();
+		GLES2_Object& operator=(const GLES2_Object& copy);
+
 		friend bool operator==(const GLES2_Object & left, const GLES2_Object & right);
 		friend bool operator!=(const GLES2_Object & left, const GLES2_Object & right);
 	};
-
-	inline bool operator==(const GLES2_Object & left, const GLES2_Object & right)
-	{
-		return left.id == right.id;
-	}
-	inline bool operator!=(const GLES2_Object & left, const GLES2_Object & right)
-	{
-		return !(left.id == right.id);
-	}
 }

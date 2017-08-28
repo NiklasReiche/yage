@@ -109,12 +109,16 @@ namespace gles2
 		GLES2_Texture createCubemapTexture(
 			std::array<unsigned char*, 6> images,
 			int width,
-			int height);
+			int height,
+			ImageFormat format,
+			int rowAlignment = 4);
 		void createCubemapTexture(
 			GLES2_Texture & texture,
 			std::array<unsigned char*, 6> images,
 			int width,
-			int height);
+			int height,
+			ImageFormat format,
+			int rowAlignment = 4);
 
 		GLES2_Shader compileShader(
 			std::string vertexCode,

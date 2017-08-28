@@ -263,17 +263,19 @@ namespace gles2
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		drawable.glContext = this;
 		drawable.id = drawable.VBO;
-
+		drawable.glContext = this;
 		drawable.nVertices = nVertices;
+		drawable.vertexSize = vertexSize;
+		drawable.layout = vertexLayout;
+		drawable.format = format;
 		drawable.usage = usage;
 		drawable.primitive = PrimitiveType::TRIANGLES;
 		return drawable;
 	}
 	void GLES2_Context::createDrawable(GLES2_Drawable & drawable, std::vector<GLfloat> & vertices, std::vector<int> vertexLayout, DrawMode usage, VertexFormat format)
 	{
-		drawable = createDrawable(vertices, vertexLayout, usage, format);;
+		drawable = createDrawable(vertices, vertexLayout, usage, format);
 	}
 
 	GLES2_Texture GLES2_Context::create2DTexture(unsigned char * image, int width, int height, ImageFormat format, int rowAlignment)
@@ -303,6 +305,7 @@ namespace gles2
 
 		// Build Texture
 		texture.glContext = this;
+		texture.texture = texture.id;
 
 		texture.height = height;
 		texture.width = width;
@@ -322,13 +325,20 @@ namespace gles2
 		texture = create2DTexture(image, width, height, format, rowAlignment);
 	}
 
-	GLES2_Texture GLES2_Context::createCubemapTexture(std::array<unsigned char*, 6> images, int width, int height)
+	GLES2_Texture GLES2_Context::createCubemapTexture(std::array<unsigned char*, 6> images, int width, int height, ImageFormat format, int rowAlignment)
 	{
 		// Generate & Bind
 		GLES2_Texture texture;
 		glGenTextures(1, &texture.id);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, texture.id);
 
+		// Select pixel pack format
+		InternalFormat internalFormat = convertToInternalFormat(format);
+
+		// Set unpack alignment
+		setUnpackAlignment(rowAlignment);
+
+		// Attach Textures
 		for (GLuint i = 0; i < 6; i++) {
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, images[i]);
 		}
@@ -350,9 +360,9 @@ namespace gles2
 
 		return texture;
 	}
-	void GLES2_Context::createCubemapTexture(GLES2_Texture & texture, std::array<unsigned char*, 6> images, int width, int height)
+	void GLES2_Context::createCubemapTexture(GLES2_Texture & texture, std::array<unsigned char*, 6> images, int width, int height, ImageFormat format, int rowAlignment)
 	{
-		texture = createCubemapTexture(images, width, height);
+		texture = createCubemapTexture(images, width, height, format, rowAlignment);
 	}
 
 	GLES2_Shader GLES2_Context::compileShader(std::string vertexCode, std::string fragmentCode, const std::vector<std::string> & attributes)
@@ -392,6 +402,7 @@ namespace gles2
 		glDeleteShader(fragmentShader);
 
 		shader.glContext = this;
+		shader.program = shader.id;
 
 		// Save uniform locations
 		GLint count;
@@ -420,19 +431,21 @@ namespace gles2
 
 	void GLES2_Context::draw(const GLES2_Drawable & drawable)
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, drawable.VBO);
+		if (drawable.id != 0) {
+			glBindBuffer(GL_ARRAY_BUFFER, drawable.VBO);
 
-		for (auto &attrib : drawable.VAO.attributes)
-		{
-			glVertexAttribPointer(attrib.index, attrib.size, attrib.type, attrib.normalized, attrib.stride, (GLfloat*)attrib.pointer);
-			glEnableVertexAttribArray(attrib.index);
-		}
+			for (auto &attrib : drawable.VAO.attributes)
+			{
+				glVertexAttribPointer(attrib.index, attrib.size, attrib.type, attrib.normalized, attrib.stride, (GLfloat*)attrib.pointer);
+				glEnableVertexAttribArray(attrib.index);
+			}
 
-		glDrawArrays((GLenum)drawable.primitive, 0, drawable.nVertices);
+			glDrawArrays((GLenum)drawable.primitive, 0, drawable.nVertices);
 
-		for (auto &attrib : drawable.VAO.attributes)
-		{
-			glDisableVertexAttribArray(attrib.index);
+			for (auto &attrib : drawable.VAO.attributes)
+			{
+				glDisableVertexAttribArray(attrib.index);
+			}
 		}
 	}
 	void GLES2_Context::draw(const GLES2_Framebuffer & buffer)

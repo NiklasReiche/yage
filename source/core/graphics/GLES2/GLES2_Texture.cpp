@@ -3,6 +3,48 @@
 
 namespace gles2
 {
+	GLES2_Texture::GLES2_Texture()
+		: GLES2_Object() {}
+	GLES2_Texture::GLES2_Texture(const GLES2_Texture& other)
+		: GLES2_Object(other)
+	{
+		this->texture = other.texture;
+		this->width = other.width;
+		this->height = other.height;
+		this->target = other.target;
+		this->format = other.format;
+		this->px_format = other.px_format;
+		this->px_type = other.px_type;
+		this->rowAlignment = other.rowAlignment;
+		this->nChannels = other.nChannels;
+	}
+	GLES2_Texture::~GLES2_Texture()
+	{
+		if (*refCount == 1) {
+			glDeleteTextures(1, &texture);
+		}
+	}
+	GLES2_Texture& GLES2_Texture::operator=(const GLES2_Texture& other)
+	{
+		GLES2_Object::operator=(other);
+		if (shouldDelete) {
+			glDeleteTextures(1, &texture);
+			shouldDelete = false;
+		}
+
+		this->texture = other.texture;
+		this->width = other.width;
+		this->height = other.height;
+		this->target = other.target;
+		this->format = other.format;
+		this->px_format = other.px_format;
+		this->px_type = other.px_type;
+		this->rowAlignment = other.rowAlignment;
+		this->nChannels = other.nChannels;
+
+		return *this;
+	}
+
 	void GLES2_Texture::bufferSubData(int x_offset, int y_offset, int width, int height, std::vector<unsigned char> & data)
 	{
 		glContext->setUnpackAlignment(rowAlignment);

@@ -14,9 +14,15 @@ namespace gles2
 	private:
 		friend class GLES2_Context;
 
+		GLuint program = 0;
 		std::map<std::string, GLint> uniformLocations;
 
 	public:
+		GLES2_Shader();
+		GLES2_Shader(const GLES2_Shader& other);
+		~GLES2_Shader();
+		GLES2_Shader& operator=(const GLES2_Shader& other);
+
 		void setUniform(std::string name, int value);
 		void setUniform(std::string name, bool value);
 		void setUniform(std::string name, float value);

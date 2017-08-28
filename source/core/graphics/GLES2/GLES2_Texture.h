@@ -13,6 +13,7 @@ namespace gles2
 	private:
 		friend class GLES2_Context;
 
+		GLuint texture;
 		int width, height;
 		TextureType target;
 		InternalFormat format;
@@ -22,6 +23,11 @@ namespace gles2
 		int nChannels;
 
 	public:
+		GLES2_Texture();
+		GLES2_Texture(const GLES2_Texture& other);
+		virtual ~GLES2_Texture();
+		GLES2_Texture& operator=(const GLES2_Texture& other);
+
 		void bufferSubData(int x_offset, int y_offset, int width, int height, std::vector<unsigned char> & data);
 		void getTextureImage(std::vector<unsigned char> & data, int level = 0);
 

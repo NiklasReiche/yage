@@ -27,15 +27,22 @@ namespace gles2
 	private:
 		friend class GLES2_Context;
 
-
-
-	public:
-		GLuint VBO;
+		GLuint VBO = 0;
 		VertexArrayObject VAO;
-		GLint nVertices;
 		PrimitiveType primitive;
 		DrawMode usage;
+		GLint nVertices;
+		std::vector<int> layout;
+		int vertexSize;
+		VertexFormat format;
+
+	public:
+		GLES2_Drawable();
+		GLES2_Drawable(const GLES2_Drawable& other);
+		virtual ~GLES2_Drawable();
+		GLES2_Drawable& operator=(const GLES2_Drawable& other);
 
 		void bufferSubData(int offset, std::vector<GLfloat> & vertices);
+		void bufferData(std::vector<GLfloat> & vertices);
 	};
 }

@@ -3,6 +3,34 @@
 
 namespace gles2
 {
+	GLES2_Shader::GLES2_Shader()
+		: GLES2_Object() {}
+	GLES2_Shader::GLES2_Shader(const GLES2_Shader& other)
+		: GLES2_Object(other)
+	{
+		this->program = other.program;
+		this->uniformLocations = other.uniformLocations;
+	}
+	GLES2_Shader::~GLES2_Shader()
+	{
+		if (*refCount == 1) {
+			glDeleteProgram(program);
+		}
+	}
+	GLES2_Shader& GLES2_Shader::operator=(const GLES2_Shader& other)
+	{
+		GLES2_Object::operator=(other);
+		if (shouldDelete) {
+			glDeleteProgram(program);
+			shouldDelete = false;
+		}
+
+		this->program = other.program;
+		this->uniformLocations = other.uniformLocations;
+
+		return *this;
+	}
+
 	void GLES2_Shader::setUniform(std::string name, int value)
 	{
 		glContext->useShader(*this);
