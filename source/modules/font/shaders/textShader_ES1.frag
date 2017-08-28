@@ -17,7 +17,7 @@ void main()
 	width = 0.5;
 	edge = 0.1;
 	float smoothing = 1.0/6.0;
-	float dist = texture(text, TexCoords).r;
+	float dist = texture2D(text, TexCoords).r;
 	//float alpha = smoothstep(width, width + edge, dist);
 	float alpha = smoothstep(0.5 - smoothing, 0.5 + smoothing, dist); 
 
