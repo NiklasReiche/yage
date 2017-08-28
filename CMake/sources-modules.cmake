@@ -76,7 +76,7 @@ set( YAGE_GUI_SOURCE
 	
 )
 
-set( YAGE_GRAPHICS_SOURCE
+set( YAGE_GRAPHICS_3D_SOURCE
 
 	"${YAGE_MODULES_PATH}/graphics3d/camera.h"
 	"${YAGE_MODULES_PATH}/graphics3d/camera.cpp"

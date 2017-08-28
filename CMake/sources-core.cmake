@@ -56,6 +56,7 @@ set( YAGE_GRAPHICS_GLES2_SOURCE
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_State.h"
 
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Object.h"
+	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Object.cpp"
 
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Drawable.h"
 	"${YAGE_CORE_PATH}/graphics/GLES2/GLES2_Drawable.cpp"

@@ -50,7 +50,7 @@ elseif(WIN32)
 								  PUBLIC YAGEfont)
 
 
-	add_library(YAGEgraphics3d STATIC ${YAGE_GRAPHICS_SOURCE})
+	add_library(YAGEgraphics3d STATIC ${YAGE_GRAPHICS_3D_SOURCE})
 
 	target_link_libraries(YAGEgraphics3d PUBLIC YAGEcore
 										 PUBLIC YAGEimage)
