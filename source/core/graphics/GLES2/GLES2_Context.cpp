@@ -42,8 +42,7 @@ namespace gles2
 			glGetShaderiv(program, GL_COMPILE_STATUS, &success);
 			if (!success) {
 				glGetShaderInfoLog(program, 512, NULL, infoLog);
-				systemHandle->log(infoLog);
-				//std::cout << "ERROR: Vertex Shader Compilation Failed\n" << infoLog << std::endl;
+				systemHandle->log("ERROR: Vertex Shader Compilation Failed\n" + clib::to_string(infoLog));
 				return -1;
 			}
 		}
@@ -51,8 +50,7 @@ namespace gles2
 			glGetShaderiv(program, GL_COMPILE_STATUS, &success);
 			if (!success) {
 				glGetShaderInfoLog(program, 512, NULL, infoLog);
-				systemHandle->log(infoLog);
-				//std::cout << "ERROR: Fragment Shader Compilation Failed\n" << infoLog << std::endl;
+				systemHandle->log("ERROR: Fragment Shader Compilation Failed\n" + clib::to_string(infoLog));
 				return -1;
 			}
 		}
@@ -60,8 +58,7 @@ namespace gles2
 			glGetProgramiv(program, GL_LINK_STATUS, &success);
 			if (!success) {
 				glGetProgramInfoLog(program, 512, NULL, infoLog);
-				systemHandle->log(infoLog);
-				//std::cout << "ERROR: Shader Program Linking Failed\n" << infoLog << std::endl;
+				systemHandle->log("ERROR: Shader Program Linking Failed\n" + clib::to_string(infoLog));
 				return -1;
 			}
 		}
