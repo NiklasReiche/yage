@@ -89,24 +89,24 @@ namespace font
 		{
 			const Character & ch = font.characters.at(text[i]);
 
-gl::Gfloat texLeft = ch.texCoords.left;
-gl::Gfloat texRight = ch.texCoords.right;
-gl::Gfloat texBottom = ch.texCoords.bottom;
-gl::Gfloat texTop = ch.texCoords.top;
+			gl::Gfloat texLeft = ch.texCoords.left;
+			gl::Gfloat texRight = ch.texCoords.right;
+			gl::Gfloat texBottom = ch.texCoords.bottom;
+			gl::Gfloat texTop = ch.texCoords.top;
 
-// Generate glyph quad for each character
-std::array<gl::Gfloat, 12> localTexCoords = {
-	texLeft, texTop,
-	texLeft, texBottom,
-	texRight, texBottom,
+			// Generate glyph quad for each character
+			std::array<gl::Gfloat, 12> localTexCoords = {
+				texLeft, texTop,
+				texLeft, texBottom,
+				texRight, texBottom,
 
-	texRight, texBottom,
-	texRight, texTop,
-	texLeft, texTop
-};
+				texRight, texBottom,
+				texRight, texTop,
+				texLeft, texTop
+			};
 
-// Append to global tex coords
-texCoords.insert(std::end(texCoords), std::begin(localTexCoords), std::end(localTexCoords));
+			// Append to global tex coords
+			texCoords.insert(std::end(texCoords), std::begin(localTexCoords), std::end(localTexCoords));
 		}
 
 		// Append to global vertices
