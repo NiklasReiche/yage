@@ -20,7 +20,6 @@ namespace gl3
 		GL3_Framebuffer();
 		GL3_Framebuffer(const GL3_Framebuffer& other);
 		~GL3_Framebuffer();
-
 		GL3_Framebuffer& operator=(const GL3_Framebuffer& other);
 
 		int getWidth() const { return width; }
