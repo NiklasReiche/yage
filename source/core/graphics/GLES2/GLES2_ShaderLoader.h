@@ -21,7 +21,7 @@ namespace gles2
 	public:
 		GLES2_ShaderLoader(sys::PlatformHandle* systemHandle, GLES2_Context* glContext);
 
-		GLES2_Shader loadShader(std::string vertex_path, std::string fragment_path);
+		GLES2_Shader loadFromFile(std::string vertex_path, std::string fragment_path);
 		GLES2_Shader loadFromString(std::string vertexCode, std::string fragmentCode);
 	};
 }

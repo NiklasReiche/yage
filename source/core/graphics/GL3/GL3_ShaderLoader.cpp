@@ -2,57 +2,66 @@
 
 namespace gl3
 {
-	GL3_ShaderLoader::GL3_ShaderLoader(GL3_Context* glContext)
-		: glContext(glContext) {}
+	GL3_ShaderLoader::GL3_ShaderLoader(sys::PlatformHandle* systemHandle, GL3_Context* glContext)
+		: systemHandle(systemHandle), glContext(glContext) {}
 
-	GL3_Shader GL3_ShaderLoader::loadShader(std::string vertex_path, std::string fragment_path, std::string geometry_path)
+	GL3_Shader GL3_ShaderLoader::loadFromFile(std::string vertex_path, std::string fragment_path, std::string geometry_path)
 	{
 		std::string vertexCode(""), fragmentCode(""), geometryCode("");
 		std::string vertexCodeLine, fragmentCodeLine, geometryCodeLine;
-		// File Handle
 
-		std::ifstream vertexFile, fragmentFile, geometryFile;
 
-		vertexFile.open(vertex_path);
-		if (!vertexFile.is_open()) {
+		sys::File vertexFileHandle = systemHandle->open(vertex_path);
+		if (!vertexFileHandle.is_open()) {
 			throw FileException(FileError::PATH_VIOLATION, vertex_path);
 		}
-			
+
+		std::stringstream vertexFile;
+		vertexFileHandle.read(vertexFile);
 		while (getline(vertexFile, vertexCodeLine))
 		{
 			vertexCode += vertexCodeLine + "\n";
 		}
 
-		vertexFile.close();
+		vertexFileHandle.close();
 
 
-		fragmentFile.open(fragment_path);
-		if (!fragmentFile.is_open()) {
+		sys::File fragmentFileHandle = systemHandle->open(fragment_path);
+		if (!fragmentFileHandle.is_open()) {
 			throw FileException(FileError::PATH_VIOLATION, fragment_path);
 		}
 
+		std::stringstream fragmentFile;
+		fragmentFileHandle.read(fragmentFile);
 		while (getline(fragmentFile, fragmentCodeLine))
 		{
 			fragmentCode += fragmentCodeLine + "\n";
 		}
 
-		fragmentFile.close();
+		fragmentFileHandle.close();
 
 
 		if (geometry_path != "") {
-			geometryFile.open(geometry_path);
-			if (!geometryFile.is_open()) {
+			sys::File geometryFileHandle = systemHandle->open(geometry_path);
+			if (!geometryFileHandle.is_open()) {
 				throw FileException(FileError::PATH_VIOLATION, geometry_path);
 			}
 
+			std::stringstream geometryFile;
+			geometryFileHandle.read(geometryFile);
 			while (getline(geometryFile, geometryCodeLine))
 			{
 				geometryCode += geometryCodeLine + "\n";
 			}
 
-			geometryFile.close();
+			geometryFileHandle.close();
 		}
 
 		return glContext->compileShader(vertexCode, fragmentCode, geometryCode);
+	}
+
+	GL3_Shader GL3_ShaderLoader::loadFromString(std::string vertex_string, std::string fragment_string, std::string geometry_string)
+	{
+		return glContext->compileShader(vertex_string, fragment_string, geometry_string);
 	}
 }

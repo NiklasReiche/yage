@@ -5,7 +5,7 @@ namespace gles2
 	GLES2_ShaderLoader::GLES2_ShaderLoader(sys::PlatformHandle* systemHandle, GLES2_Context* glContext)
 		: systemHandle(systemHandle), glContext(glContext) {}
 
-	GLES2_Shader GLES2_ShaderLoader::loadShader(std::string vertex_path, std::string fragment_path)
+	GLES2_Shader GLES2_ShaderLoader::loadFromFile(std::string vertex_path, std::string fragment_path)
 	{
 		std::vector<std::string> attributes;
 		std::string vertexCode(""), fragmentCode("");
