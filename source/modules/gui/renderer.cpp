@@ -11,9 +11,12 @@ namespace gui
 		: Renderer(glContext, viewport), platform(platform)
 	{
 		gui::ShaderTemplate guiShaderTemplate;
-		guiShader = glContext->compileShader(guiShaderTemplate.guiShader_vert, guiShaderTemplate.guiShader_frag);
 		font::ShaderTemplate fontShaderTemplate;
-		textShader = glContext->compileShader(fontShaderTemplate.textShader_vert, fontShaderTemplate.textShader_frag);
+
+		gl::ShaderLoader loader(platform, glContext);
+
+		guiShader = loader.loadFromString(guiShaderTemplate.guiShader_vert, guiShaderTemplate.guiShader_frag);
+		textShader = loader.loadFromString(fontShaderTemplate.textShader_vert, fontShaderTemplate.textShader_frag);
 
 		gml::Matrix4D<float> projection = gml::orthographic<float>(0.0f, (float)viewport.width, (float)viewport.height, 0.0f, 0.1f, 100.0f);
 		guiShader.setUniform("projection", projection);
