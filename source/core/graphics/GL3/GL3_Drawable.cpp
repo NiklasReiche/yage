@@ -57,8 +57,7 @@ namespace gl3
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), &vertices[0], (GLenum)usage);
 		
-		int _nVertices = (int)vertices.size() / vertexSize;
-		this->nVertices = _nVertices;
+		this->nVertices = (int)vertices.size() / vertexSize;
 
 		if (format == VertexFormat::BATCHED) {
 			glBindVertexArray(VAO);
