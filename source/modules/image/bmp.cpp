@@ -178,7 +178,7 @@ namespace bmp
 		int rows = infoheader.biHeight;
 		int width = infoheader.biWidth;
 		int bytes = infoheader.biBitCount / 8;
-		int pad = 4 - (width * bytes) % 4;
+		int pad = (4 - (width * bytes) % 4) % 4;
 
 		int pointer = fileheader.bfOffBits;
 		file.seek(pointer, sys::SeekOffset::BEG);
@@ -192,8 +192,8 @@ namespace bmp
 				std::vector<uint8_t> pixel(bytes);
 				for (int b = 0; b < bytes; ++b)
 				{
-					file.seek(pointer, sys::SeekOffset::BEG);
 					file.read((char*)&pixel[b], 1);
+					checkError(file);
 					++pointer;
 				}
 				for (int b = bytes - 1; b > -1; --b)
@@ -202,6 +202,7 @@ namespace bmp
 				}
 			}
 			pointer += pad;
+			file.seek(pointer, sys::SeekOffset::BEG);
 		}
 	}
 	void Bitmap::readImageDataIndexed(sys::File & file)
@@ -209,7 +210,7 @@ namespace bmp
 		int rows = infoheader.biHeight;
 		int width = infoheader.biWidth;
 		int bytes = infoheader.biBitCount / 8;
-		int pad = 4 - (width * bytes) % 4;
+		int pad = (4 - (width * bytes) % 4) % 4;
 
 		int pointer = fileheader.bfOffBits;
 		file.seek(pointer, sys::SeekOffset::BEG);
@@ -223,7 +224,6 @@ namespace bmp
 				std::vector<uint8_t> pixel(bytes);
 				for (int b = 0; b < bytes; ++b)
 				{
-					file.seek(pointer, sys::SeekOffset::BEG);
 					file.read((char*)&pixel[b], 1);
 					pixels.push_back(palette[pixel[b]].red);
 					pixels.push_back(palette[pixel[b]].green);
@@ -232,7 +232,10 @@ namespace bmp
 				}
 			}
 			pointer += pad;
+			file.seek(pointer, sys::SeekOffset::BEG);
 		}
+
+		infoheader.biBitCount = 24;
 	}
 
 
@@ -245,7 +248,7 @@ namespace bmp
 		int rows = infoheader.biHeight;
 		int width = infoheader.biWidth;
 		int bytes = infoheader.biBitCount / 8;
-		int pad = 4 - (width * bytes) % 4;
+		int pad = (4 - (width * bytes) % 4) % 4;
 
 		int byteOrderOffset;
 		if (bytes == 3) {
@@ -257,8 +260,7 @@ namespace bmp
 
 		uint8_t emptyByte(0);
 
-		int pointer = fileheader.bfOffBits;
-		file.seek(pointer, sys::SeekOffset::BEG);
+		file.seek(fileheader.bfOffBits, sys::SeekOffset::BEG);
 
 		for (int y = 0; y < rows; ++y)
 		{
@@ -268,16 +270,12 @@ namespace bmp
 				{
 					int index = ((y * width + x) * bytes) + (byteOrderOffset - b);
 					uint8_t spixel = pixels.at(index);
-					file.seek(pointer, sys::SeekOffset::BEG);
 					file.write((char*)&spixel, sizeof(spixel));
-					++pointer;
 				}
 			}
 			for (int p = 0; p < pad; ++p)
 			{
-				file.seek(pointer, sys::SeekOffset::BEG);
 				file.write((char*)&emptyByte, sizeof(emptyByte));
-				++pointer;
 			}
 		}
 	}
@@ -383,10 +381,10 @@ namespace bmp
 		
 		/* read image data */
 		if (loadFlags.hasPalette) {
-			readImageData(file);
+			readImageDataIndexed(file);
 		}
 		else {
-			readImageDataIndexed(file);
+			readImageData(file);	
 		}
 		if (checkError(file)) {
 			std::cout << "Could not read image data '" << filename << "'" << std::endl;
