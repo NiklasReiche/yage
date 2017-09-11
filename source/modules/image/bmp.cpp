@@ -184,16 +184,17 @@ namespace bmp
 		file.seek(pointer, sys::SeekOffset::BEG);
 
 		pixels.resize(0);
+		pixels.reserve(rows * width * bytes);
+		std::vector<uint8_t> pixel(bytes);
 
 		for (int y = 0; y < rows; ++y)
 		{
 			for (int x = 0; x < width; ++x)
 			{
-				std::vector<uint8_t> pixel(bytes);
+				
 				for (int b = 0; b < bytes; ++b)
 				{
 					file.read((char*)&pixel[b], 1);
-					checkError(file);
 					++pointer;
 				}
 				for (int b = bytes - 1; b > -1; --b)
@@ -216,12 +217,13 @@ namespace bmp
 		file.seek(pointer, sys::SeekOffset::BEG);
 
 		pixels.resize(0);
+		pixels.reserve(rows * width * bytes);
+		std::vector<uint8_t> pixel(bytes);
 
 		for (int y = 0; y < rows; ++y)
 		{
 			for (int x = 0; x < width; ++x)
 			{
-				std::vector<uint8_t> pixel(bytes);
 				for (int b = 0; b < bytes; ++b)
 				{
 					file.read((char*)&pixel[b], 1);
