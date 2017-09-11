@@ -3,6 +3,7 @@
 #include <string>
 #include <platform/platform.h>
 #include "img.h"
+#include "png.h"
 
 namespace img
 {
@@ -11,7 +12,8 @@ namespace img
 	private:
 		sys::PlatformHandle* platform;
 
-		void readBMP(std::string filename, Image & image, FORCE_CHANNELS channel = FORCE_CHANNELS::AUTO);	
+		void readBMP(std::string filename, Image & image, FORCE_CHANNELS channel = FORCE_CHANNELS::AUTO);
+		void readPNG(std::string filename, Image & image);
 
 	public:
 		ImageReader(sys::PlatformHandle* platform)

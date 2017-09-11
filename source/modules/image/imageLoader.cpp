@@ -8,6 +8,13 @@ namespace img
 		bitmap.load(platform, filename, channel);
 		bitmap.toImage(image);
 	}
+	void ImageReader::readPNG(std::string filename, Image & image)
+	{
+		png::PNG png;
+		png.load(platform, filename);
+		png.toImage(image);
+		png.free();
+	}
 	
 	Image ImageReader::readFile(std::string path)
 	{
@@ -16,6 +23,9 @@ namespace img
 
 		if (type == "bmp") {
 			readBMP(path, image);
+		}
+		else if (type == "png") {
+			readPNG(path, image);
 		}
 		else {
 			throw FileException(FileError::PATH_VIOLATION, path);

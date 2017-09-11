@@ -6,6 +6,8 @@ set( YAGE_IMAGE_SOURCE
 
 	"${YAGE_MODULES_PATH}/image/bmp.h"
 	"${YAGE_MODULES_PATH}/image/bmp.cpp"
+	"${YAGE_MODULES_PATH}/image/png.h"
+	"${YAGE_MODULES_PATH}/image/png.cpp"
 	"${YAGE_MODULES_PATH}/image/enum.h"
 	"${YAGE_MODULES_PATH}/image/image.h"
 	"${YAGE_MODULES_PATH}/image/image.cpp"
