@@ -30,7 +30,9 @@ if(ANDROID)
 elseif(WIN32)
 	add_library(YAGEimage STATIC ${YAGE_IMAGE_SOURCE})
 
-	target_link_libraries(YAGEimage PUBLIC YAGEcore)
+	target_link_libraries(YAGEimage PUBLIC YAGEcore
+									PUBLIC zlib32s.lib
+									PUBLIC libpng32s.lib)
 
 
 	add_library(YAGEfont STATIC ${YAGE_FONT_SOURCE})
