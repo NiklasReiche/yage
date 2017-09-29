@@ -402,7 +402,7 @@ void displayFPS(GuiTest& gui, double dt)
 int main()
 {
 	sys::PlatformHandle platformHandle;
-	gl::GraphicsContext glContext(&platformHandle, 1000, 500);
+	gl::GraphicsContext glContext(&platformHandle, 800, 1000);
 	input::InputController inputController(&platformHandle);
 	input::InputListener* listener = inputController.addListener();
 
