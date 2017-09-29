@@ -14,8 +14,10 @@ namespace graphics3d
 	private:
 		friend class SkyboxLoader;
 
+	public:
 		gl::Drawable drawable;
 		gl::Texture cubemap;
+		gl::Shader shader;
 	};
 
 	class SkyboxLoader
@@ -28,6 +30,6 @@ namespace graphics3d
 		SkyboxLoader(sys::PlatformHandle* platform, gl::GraphicsContext* glContext)
 			: platform(platform), glContext(glContext){}
 
-		Skybox loadSkybox(std::string dirpath, float boxSize);
+		Skybox loadSkybox(std::array<std::string, 6> dirpath, float boxSize);
 	};
 }

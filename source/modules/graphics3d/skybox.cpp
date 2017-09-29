@@ -4,16 +4,8 @@
 
 namespace graphics3d
 {
-	Skybox SkyboxLoader::loadSkybox(std::string dirpath, float boxSize)
+	Skybox SkyboxLoader::loadSkybox(std::array<std::string, 6> paths, float boxSize)
 	{
-		std::vector<std::string> paths;
-		paths.push_back(dirpath + "\\right.bmp");
-		paths.push_back(dirpath + "\\left.bmp");
-		paths.push_back(dirpath + "\\top.bmp");
-		paths.push_back(dirpath + "\\bottom.bmp");
-		paths.push_back(dirpath + "\\back.bmp");
-		paths.push_back(dirpath + "\\front.bmp");
-
 		img::ImageReader imageReader(platform);
 		std::array<img::Image, 6> images;
 		std::array<unsigned char*, 6> faces;
@@ -22,7 +14,7 @@ namespace graphics3d
 			images[i] = imageReader.readFile(paths[i]);
 			faces[i] = images[0].getRawData();
 			if (images[i].getWidth() != images[0].getWidth() || images[i].getHeight() != images[0].getHeight()) {
-				throw FileException(FileError::UNKNOWN, dirpath);
+				throw FileException(FileError::UNKNOWN, paths[i]);
 			}
 		}
 
@@ -73,6 +65,16 @@ namespace graphics3d
 		Skybox skybox;
 		skybox.cubemap = glContext->createCubemapTexture(faces, images.at(0).getWidth(), images.at(0).getHeight(), gl::ImageFormat::RGB);
 		skybox.drawable = glContext->createDrawable(skyboxVertices, std::vector<int>{3}, gl::DrawMode::DRAW_STATIC);
+
+		std::string vertexShader =
+#include "shaders/skyboxShader.vert"
+			;
+		std::string fragmentShader =
+#include "shaders/skyboxShader.frag"
+			;
+
+		gl::ShaderLoader shaderLoader(platform, glContext);
+		skybox.shader = shaderLoader.loadFromString(vertexShader, fragmentShader);
 
 		return skybox;
 	}
