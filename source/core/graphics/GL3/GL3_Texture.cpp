@@ -52,6 +52,13 @@ namespace gl3
 
 		glTexSubImage2D(GL_TEXTURE_2D, 0, x_offset, y_offset, width, height, GLenum(px_format), (GLenum)px_type, &data[0]);
 	}
+	void GL3_Texture::bufferData(int width, int height, std::vector<unsigned char> & data)
+	{
+		glContext->setUnpackAlignment(rowAlignment);
+		glContext->bindTexture(*this);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GLenum(format), width, height, 0, (GLenum)px_format, (GLenum)px_type, &data[0]);
+	}
 
 	void GL3_Texture::getTextureImage(std::vector<unsigned char> & data, int level)
 	{

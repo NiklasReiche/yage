@@ -29,6 +29,7 @@ namespace gl3
 		GL3_Texture& operator=(const GL3_Texture& other);
 
 		void bufferSubData(int x_offset, int y_offset, int width, int height, std::vector<unsigned char> & data);
+		void bufferData(int width, int height, std::vector<unsigned char> & data);
 		void getTextureImage(std::vector<unsigned char> & data, int level = 0);
 
 		void configTextureWrapper(TextureWrapper x_option, TextureWrapper y_option);
