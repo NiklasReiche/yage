@@ -35,19 +35,31 @@ namespace gl
 
 	inline void setRed(uint32_t & color, uint32_t red)
 	{
-		color |= red << 24;
+		unsigned int g = (color >> 16) & 0xff;
+		unsigned int b = (color >> 8) & 0xff;
+		unsigned int a = (color) & 0xff;
+		color = (a) | (b << 8) | (g << 16) | (red << 24);
 	}
 	inline void setGreen(uint32_t & color, uint32_t green)
 	{
-		color |= green << 16;
+		unsigned int r = (color >> 24) & 0xff;
+		unsigned int b = (color >> 8) & 0xff;
+		unsigned int a = (color) & 0xff;
+		color = (a) | (b << 8) | (green << 16) | (r << 24);
 	}
 	inline void setBlue(uint32_t & color, uint32_t blue)
 	{
-		color |= blue << 8;
+		unsigned int r = (color >> 24) & 0xff;
+		unsigned int g = (color >> 16) & 0xff;
+		unsigned int a = (color) & 0xff;
+		color = (a) | (blue << 8) | (g << 16) | (r << 24);
 	}
 	inline void setAlpha(uint32_t & color, uint32_t alpha)
 	{
-		color |= alpha;
+		unsigned int r = (color >> 24) & 0xff;
+		unsigned int g = (color >> 16) & 0xff;
+		unsigned int b = (color >> 8) & 0xff;
+		color = (alpha) | (b << 8) | (g << 16) | (r << 24);
 	}
 
 	inline gml::Vec3<float> toVec3(uint32_t color)
