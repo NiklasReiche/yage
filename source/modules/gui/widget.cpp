@@ -24,11 +24,19 @@ namespace gui
 
 		this->layout = std::make_unique<Layout>();
 
-		
+		//gml::Vec4f texCoords;
+		if (wTemplate.texture.size() > 0) {
+			img::ImageReader reader(master.platform);
+			img::Image image = reader.readFile(wTemplate.texture);
+			texCoords = master.textureManager->addTexture(image);
+		}
+		else {
+			texCoords = gml::Vec4f(master.textureManager->getAlphaTexCoords().x, master.textureManager->getAlphaTexCoords().y, master.textureManager->getAlphaTexCoords().x, master.textureManager->getAlphaTexCoords().y);
+		}
 
 		std::vector<gl::Gfloat> vertices;
-		constructVertices(vertices);
-		master.glContext->createDrawable(*this, vertices, std::vector<int> { 2, 4 }, gl::DrawMode::DRAW_DYNAMIC, gl::VertexFormat::BATCHED);
+		constructVertices(vertices, texCoords);
+		master.glContext->createDrawable(*this, vertices, std::vector<int> { 2, 4, 2 }, gl::DrawMode::DRAW_DYNAMIC, gl::VertexFormat::BATCHED);
 
 		updateGeometry();
 	}
@@ -55,7 +63,7 @@ namespace gui
 				right + so,	top + so,
 				left + so,	top + so,
 			};
-			vertices.insert(std::begin(vertices), std::begin(pos_shadow), std::end(pos_shadow));
+			vertices.insert(std::end(vertices), std::begin(pos_shadow), std::end(pos_shadow));
 		}
 
 		if (bs != 0)
@@ -120,7 +128,7 @@ namespace gui
 		gml::Vec4<float> gl_bc = borderColor;
 		float sh = shadowHardness;
 
-		if (sh > 0)
+		if (shadowOffset != 0)
 		{
 			std::array<gl::Gfloat, 24> color_shadow = {
 				0.0f, 0.0f, 0.0f, sh,
@@ -130,7 +138,7 @@ namespace gui
 				0.0f, 0.0f, 0.0f, sh,
 				0.0f, 0.0f, 0.0f, sh,
 			};
-			vertices.insert(std::begin(vertices), std::begin(color_shadow), std::end(color_shadow));
+			vertices.insert(std::end(vertices), std::begin(color_shadow), std::end(color_shadow));
 		}
 
 		if (borderSize != 0)
@@ -178,152 +186,79 @@ namespace gui
 		vertices.insert(std::end(vertices), std::begin(color_plain), std::end(color_plain));
 	}
 
-	void Widget::constructVertices(std::vector<gl::Gfloat>& vertices)
+	void Widget::constructTexCoords(std::vector<gl::Gfloat> & vertices, gml::Vec4f texCoords)
 	{
-		std::vector<gl::Gfloat> coords;
-		std::vector<gl::Gfloat> colors;
+		gml::Vec2f alpha = master.textureManager->getAlphaTexCoords();
 
-		float left = position.x;
-		float top = position.y;
-		float right = position.x + size.x;
-		float bottom = position.y + size.y;
-
-		float sh = shadowHardness;
-		int so = shadowOffset;
-		int bs = borderSize;
-
-		gml::Vec4<float> gl_color = color;
-		gml::Vec4<float> gl_bc = borderColor;
-		
-
-		// Drop Shadow Effect
-		if (so != 0 && sh > 0)
+		if (shadowOffset != 0)
 		{
-			std::array<gl::Gfloat, 12> pos_shadow = {
-				left + so,	top + so,
-				left + so,	bottom + so,
-				right + so,	bottom + so,
-				right + so,	bottom + so,
-				right + so,	top + so,
-				left + so,	top + so,
+			std::array<gl::Gfloat, 12> tex_shadow = {
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
 			};
-			std::array<gl::Gfloat, 24> color_shadow = {
-				0.0f, 0.0f, 0.0f, sh,
-				0.0f, 0.0f, 0.0f, sh,
-				0.0f, 0.0f, 0.0f, sh,
-				0.0f, 0.0f, 0.0f, sh,
-				0.0f, 0.0f, 0.0f, sh,
-				0.0f, 0.0f, 0.0f, sh,
-			};
-			coords.insert(std::begin(coords), std::begin(pos_shadow), std::end(pos_shadow));
-			colors.insert(std::begin(colors), std::begin(color_shadow), std::end(color_shadow));
+			vertices.insert(std::end(vertices), std::begin(tex_shadow), std::end(tex_shadow));
 		}
 
-		// Border Effect
-		if (bs != 0)
-		{
-			// Check if inline border
-			bs *= -1;
-			if (bs < 0)
-			{
-				bs *= -1;
-				left += bs;
-				top += bs;
-				right -= bs;
-				bottom -= bs;
-			}
+		if (borderSize != 0) {
+			std::array<gl::Gfloat, 48> tex_border = {
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
 
-			std::array<gl::Gfloat, 48> pos_border = {
-				left,		top,
-				left - bs,	top - bs,
-				right + bs,	top - bs,
-				right + bs,	top - bs,
-				right,		top,
-				left,		top,
-				
-				right,		top,
-				right + bs,	top - bs,
-				right + bs,	bottom + bs,
-				right + bs,	bottom + bs,
-				right,		bottom,
-				right,		top,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
 
-				right,		bottom,
-				right + bs,	bottom + bs,
-				left - bs,	bottom + bs,
-				left - bs,	bottom + bs,
-				left,		bottom,
-				right,		bottom,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
 
-				left,		bottom,
-				left - bs,	bottom + bs,
-				left - bs,	top - bs,
-				left - bs,	top - bs,
-				left,		top,
-				left,		bottom
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
+				alpha.x,	alpha.y,
 			};
-			std::array<gl::Gfloat, 96> color_border = {
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w
-			};
-			coords.insert(std::end(coords), std::begin(pos_border), std::end(pos_border));
-			colors.insert(std::end(colors), std::begin(color_border), std::end(color_border));
+			vertices.insert(std::end(vertices), std::begin(tex_border), std::end(tex_border));
 		}
 
-		// Main geometry
-		std::array<gl::Gfloat, 12> pos_plain = {
-			left,	top,
-			left,	bottom,
-			right,	bottom,
-			right,	bottom,
-			right,	top,
-			left,	top,
+		std::array<gl::Gfloat, 12> tex_plain = {
+			texCoords.x,	texCoords.y,
+			texCoords.x,	texCoords.w,
+			texCoords.z,	texCoords.w,
+			texCoords.z,	texCoords.w,
+			texCoords.z,	texCoords.y,
+			texCoords.x,	texCoords.y,
 		};
-		std::array<gl::Gfloat, 24> color_plain = {
-			gl_color.x, gl_color.y, gl_color.z, gl_color.w,
-			gl_color.x, gl_color.y, gl_color.z, gl_color.w,
-			gl_color.x, gl_color.y, gl_color.z, gl_color.w,
-			gl_color.x, gl_color.y, gl_color.z, gl_color.w,
-			gl_color.x, gl_color.y, gl_color.z, gl_color.w,
-			gl_color.x, gl_color.y, gl_color.z, gl_color.w
-		};
-		coords.insert(std::end(coords), std::begin(pos_plain), std::end(pos_plain));
-		colors.insert(std::end(colors), std::begin(color_plain), std::end(color_plain));
+		vertices.insert(std::end(vertices), std::begin(tex_plain), std::end(tex_plain));
+	}
 
-		vertices.insert(std::end(vertices), std::begin(coords), std::end(coords));
-		vertices.insert(std::end(vertices), std::begin(colors), std::end(colors));
+	void Widget::constructVertices(std::vector<gl::Gfloat>& vertices, gml::Vec4f texCoords)
+	{
+		constructCoords(vertices);
+		constructColors(vertices);
+		constructTexCoords(vertices, texCoords);
 	}
 
 
 	void Widget::updateParams()
 	{
 		std::vector<gl::Gfloat> vertices;
-		constructVertices(vertices);
+		constructVertices(vertices, texCoords);
 		bufferSubData(0, vertices);
 	}
 

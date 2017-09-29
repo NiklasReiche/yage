@@ -43,5 +43,6 @@ namespace gui
 		WidgetBorderTemplate border;
 		WidgetShadowTemplate shadow;
 		unsigned int color = gl::Color::WHITE;
+		std::string texture = "";
 	};
 }

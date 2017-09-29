@@ -7,6 +7,7 @@ namespace gui
 	class FontManager;
 	class InputManager;
 	class GuiRenderer;
+	class TextureManager;
 
 	struct MasterInterface
 	{
@@ -14,6 +15,7 @@ namespace gui
 		gl::GraphicsContext* glContext;
 
 		FontManager* fontManager;
+		TextureManager* textureManager;
 		InputManager* inputManger;
 		GuiRenderer* renderer;
 	};

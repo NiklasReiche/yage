@@ -8,6 +8,7 @@
 #include "Renderer.h"
 #include "FontManager.h"
 #include "InputManager.h"
+#include "textureManager.h"
 #include "Interface.h"
 #include "Widget.h"
 #include "rootWidget.h"
@@ -22,6 +23,7 @@ namespace gui
 		gl::GraphicsContext * glContext;
 
 		FontManager fontManager;
+		TextureManager textureManager;
 		InputManager inputManager;
 		GuiRenderer renderer;
 
@@ -44,7 +46,7 @@ namespace gui
 		template <typename Element, typename... Args>
 		Element* createWidget(Widget* parent, Args... args)
 		{
-			MasterInterface master { platform, glContext, &fontManager, &inputManager, &renderer };
+			MasterInterface master { platform, glContext, &fontManager, &textureManager, &inputManager, &renderer };
 			if (parent == nullptr) {
 				return root.createWidget<Element>(master, args...);
 			}

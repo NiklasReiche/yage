@@ -54,6 +54,8 @@ set( YAGE_GUI_SOURCE
 	"${YAGE_MODULES_PATH}/gui/InputManager.cpp"
 	"${YAGE_MODULES_PATH}/gui/FontManager.h"
 	"${YAGE_MODULES_PATH}/gui/FontManager.cpp"
+	"${YAGE_MODULES_PATH}/gui/TextureManager.h"
+	"${YAGE_MODULES_PATH}/gui/TextureManager.cpp"
 
 	"${YAGE_MODULES_PATH}/gui/widgetTemplate.h"
 	"${YAGE_MODULES_PATH}/gui/rootWidget.h"

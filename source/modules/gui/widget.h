@@ -7,8 +7,10 @@
 #include <functional>
 
 #include "core.h"
+#include "image/imageLoader.h"
 #include "Interface.h"
 #include "FontManager.h"
+#include "textureManager.h"
 #include "Animation.h"
 #include "widgetTemplate.h"
 #include "Layouts.h"
@@ -25,7 +27,8 @@ namespace gui
 
 		void constructCoords(std::vector<gl::Gfloat> & vertices);
 		void constructColors(std::vector<gl::Gfloat> & vertices);
-		void constructVertices(std::vector<gl::Gfloat> & vertices);
+		void constructTexCoords(std::vector<gl::Gfloat> & vertices, gml::Vec4f texCoords);
+		void constructVertices(std::vector<gl::Gfloat> & vertices, gml::Vec4f texCoords);
 
 	protected:
 		MasterInterface master;
@@ -74,6 +77,8 @@ namespace gui
 		gml::Vec4<float> borderColor;
 		int shadowOffset = 0;
 		float shadowHardness = 0.0f;
+
+		gml::Vec4f texCoords;
 
 	public:
 		Widget();

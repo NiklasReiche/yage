@@ -3,6 +3,7 @@
 #include <vector>
 #include "core.h"
 #include "font/Shaders.h"
+#include "image/image.h"
 
 namespace gui
 {
@@ -16,6 +17,7 @@ namespace gui
 		sys::PlatformHandle* platform;
 		gl::Shader guiShader;
 		gl::Shader textShader;
+		gl::Texture guiTexture;
 
 	public:
 		std::vector<gl::Drawable*> widgets;
@@ -28,5 +30,7 @@ namespace gui
 
 		void drawWidget(gl::Drawable & widget);
 		void drawText(font::Text & text);
+
+		void setTexture(gl::Texture texture);
 	};
 }

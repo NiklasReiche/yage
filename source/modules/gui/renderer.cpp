@@ -20,6 +20,7 @@ namespace gui
 
 		gml::Matrix4D<float> projection = gml::orthographic<float>(0.0f, (float)viewport.width, (float)viewport.height, 0.0f, 0.1f, 100.0f);
 		guiShader.setUniform("projection", projection);
+		guiShader.setUniform("texture", 0);
 		textShader.setUniform("projection", projection);
 
 		clearColor = gml::Vec4<float>(1, 1, 1, 1);
@@ -32,6 +33,7 @@ namespace gui
 		glContext->enableBlending();
 
 		glContext->useShader(guiShader);
+		glContext->bindTexture(guiTexture);
 		for (unsigned int i = 0; i < widgets.size(); ++i)
 		{
 			glContext->draw(*widgets[i]);
@@ -63,5 +65,10 @@ namespace gui
 		glContext->draw(text);
 
 		glContext->disableBlending();
+	}
+
+	void GuiRenderer::setTexture(gl::Texture texture)
+	{
+		guiTexture = texture;
 	}
 }
