@@ -30,7 +30,7 @@ namespace font
 
 		sys::File file = platform->open(filename);
 		if (!file.is_open()) {
-			throw FileException(FileError::PATH_VIOLATION, filename);
+			throw sys::FileException(sys::FileError::FILE_NOT_FOUND, "", filename);
 		}
 
 		file.seek(0, sys::SeekOffset::BEG);

@@ -6,6 +6,7 @@
 #include <libpng/png.h>
 
 #include <platform/Platform.h>
+#include <platform/exception.h>
 
 #include "../image.h"
 #include "../enum.h"

@@ -13,7 +13,7 @@ namespace gl3
 
 		sys::File vertexFileHandle = systemHandle->open(vertex_path);
 		if (!vertexFileHandle.is_open()) {
-			throw FileException(FileError::PATH_VIOLATION, vertex_path);
+			throw sys::FileException(sys::FileError::FILE_NOT_FOUND, "", vertex_path);
 		}
 
 		std::stringstream vertexFile;
@@ -28,7 +28,7 @@ namespace gl3
 
 		sys::File fragmentFileHandle = systemHandle->open(fragment_path);
 		if (!fragmentFileHandle.is_open()) {
-			throw FileException(FileError::PATH_VIOLATION, fragment_path);
+			throw sys::FileException(sys::FileError::FILE_NOT_FOUND, "", fragment_path);
 		}
 
 		std::stringstream fragmentFile;
@@ -44,7 +44,7 @@ namespace gl3
 		if (geometry_path != "") {
 			sys::File geometryFileHandle = systemHandle->open(geometry_path);
 			if (!geometryFileHandle.is_open()) {
-				throw FileException(FileError::PATH_VIOLATION, geometry_path);
+				throw sys::FileException(sys::FileError::FILE_NOT_FOUND, "", geometry_path);
 			}
 
 			std::stringstream geometryFile;

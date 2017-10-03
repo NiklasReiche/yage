@@ -20,7 +20,7 @@ namespace img
 	
 	Image ImageReader::readFile(std::string path, FORCE_CHANNELS channel)
 	{
-		std::string type = clib::strip(path, ".").back();
+		std::string type = util::strip(path, ".").back();
 		Image image;
 
 		if (type == "bmp") {
@@ -30,7 +30,7 @@ namespace img
 			readPNG(path, image, channel);
 		}
 		else {
-			throw FileException(FileError::PATH_VIOLATION, path);
+			throw sys::FileException(sys::FileError::BAD_FILE, "file type not supported", path);
 		}
 
 		return image;

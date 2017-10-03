@@ -1,4 +1,5 @@
 #include "Desktop_File.h"
+#include <iostream>
 
 namespace glfw
 {
@@ -40,13 +41,12 @@ namespace glfw
 			fstream->read((char*)buffer, size);
 		}
 		else {
-			throw FileException(FileError::ACCESS_VIOLATION, path);
+			throw sys::FileException(sys::FileError::ACCESS_VIOLATION, "", path);
 		}
 	}
 	void Desktop_File::read(std::stringstream & output)
 	{
 		std::streampos fileLength = 0;
-
 		fstream->seekg(0, std::ios::beg);
 		fileLength = fstream->tellg();
 		fstream->seekg(0, std::ios::end);
@@ -66,6 +66,14 @@ namespace glfw
 		// Free the memoery you allocated earlier
 		delete[] fileContent;
 	}
+	void Desktop_File::read(std::vector<char> & output)
+	{
+		std::streampos fileLength = 0;
+		fstream->seekg(0, std::ios::beg);
+		fileLength = fstream->tellg();
+		fstream->seekg(0, std::ios::end);
+		fileLength = fstream->tellg() - fileLength;
+	}
 
 	void Desktop_File::write(void* buffer, size_t size)
 	{
@@ -73,7 +81,7 @@ namespace glfw
 			fstream->write((char*)buffer, size);
 		}
 		else {
-			throw FileException(FileError::ACCESS_VIOLATION, path);
+			throw sys::FileException(sys::FileError::ACCESS_VIOLATION, "", path);
 		}
 	}
 
@@ -89,6 +97,14 @@ namespace glfw
 
 	bool Desktop_File::get_error()
 	{
+
+		if (fstream->eof())
+			std::cout << "EOF" << std::endl;
+		if (fstream->bad())
+			std::cout << "BAD" << std::endl;
+		if (fstream->fail())
+			std::cout << "FAIL" << std::endl;
+
 		return (fstream->eof() || fstream->bad() || fstream->fail());
 	}
 }

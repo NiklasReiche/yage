@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <vector>
 #include <memory>
 
 #include "../Exception.h"
@@ -25,6 +26,7 @@ namespace glfw
 	{
 	private:
 		std::string path;
+		FILE* file_ptr;
 		std::unique_ptr<std::fstream> fstream;
 		AccessMode mode;
 
@@ -36,6 +38,7 @@ namespace glfw
 		void seek(int index, SeekOffset offset);
 		void read(void* buffer, size_t size);
 		void read(std::stringstream & output);
+		void read(std::vector<char> & output);
 		void write(void* buffer, size_t size);
 		void close();
 

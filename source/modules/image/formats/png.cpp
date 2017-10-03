@@ -7,9 +7,6 @@ namespace png
 	void user_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 	{
 		png_voidp io_ptr = png_get_io_ptr(png_ptr);
-		if (io_ptr == NULL)
-			return;   // add custom error handling here
-
 		sys::File& file = *(sys::File*)io_ptr;
 
 		file.read((void*)data, (size_t)length);
@@ -19,7 +16,7 @@ namespace png
 		PNG* png = (PNG*)png_get_error_ptr(png_ptr);
 		png->free();
 		std::cout << error_msg << std::endl;
-		throw FileException(FileError::UNKNOWN);
+		throw sys::FileException(sys::FileError::BAD_IO);
 	}
 	void user_warning_fn(png_structp png_ptr, png_const_charp warning_msg)
 	{
@@ -79,25 +76,25 @@ namespace png
 		sys::File file = platform->open(filename);
 
 		if (!isValid(file)) {
-			throw FileException(FileError::UNKNOWN, filename);
+			throw sys::FileException(sys::FileError::BAD_FILE, "not valid png", filename);
 		}
 
 		png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, (png_voidp)this, user_error_fn, user_warning_fn);
 		if (!png_ptr) {
 			this->free();
-			throw FileException(FileError::UNKNOWN, filename);
+			throw sys::FileException(sys::FileError::BAD_FILE, "file corrupted", filename);
 		}
 
 		info_ptr = png_create_info_struct(png_ptr);
 		if (!info_ptr) {
 			this->free();
-			throw FileException(FileError::UNKNOWN, filename);
+			throw sys::FileException(sys::FileError::BAD_FILE, "file corrupted", filename);
 		}
 
 		end_info = png_create_info_struct(png_ptr);
 		if (!end_info) {
 			this->free();
-			throw FileException(FileError::UNKNOWN, filename);
+			throw sys::FileException(sys::FileError::BAD_FILE, "file corrupted", filename);
 		}
 
 		png_set_read_fn(png_ptr, (png_voidp)&file, user_read_data);

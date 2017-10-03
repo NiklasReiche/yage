@@ -13,12 +13,12 @@ namespace img
 
 	void ImageWriter::writeFile(Image& image, std::string path)
 	{
-		std::string type = clib::strip(path, ".").back();
+		std::string type = util::strip(path, ".").back();
 		if (type == "bmp") {
 			writeBMP(path, image);
 		}
 		else {
-			throw FileException(FileError::PATH_VIOLATION, path);
+			throw sys::FileException(sys::FileError::BAD_FILE, "file type not supported", path);
 		}
 	}
 }

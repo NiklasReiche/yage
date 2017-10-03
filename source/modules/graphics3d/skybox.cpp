@@ -1,6 +1,6 @@
 #include "skybox.h"
-#include "image/imageLoader.h"
-#include "platform/Exception.h"
+#include <image/ImageReader.h>
+#include <platform/Exception.h>
 
 namespace graphics3d
 {
@@ -14,7 +14,7 @@ namespace graphics3d
 			images[i] = imageReader.readFile(paths[i]);
 			faces[i] = images[0].getRawData();
 			if (images[i].getWidth() != images[0].getWidth() || images[i].getHeight() != images[0].getHeight()) {
-				throw FileException(FileError::UNKNOWN, paths[i]);
+				throw sys::FileException(sys::FileError::UNKNOWN, "images not same size", paths[i]);
 			}
 		}
 

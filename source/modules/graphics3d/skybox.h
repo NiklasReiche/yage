@@ -5,7 +5,6 @@
 #include <string>
 
 #include <graphics/gl.h>
-#include <image/img.h>
 
 namespace graphics3d
 {
