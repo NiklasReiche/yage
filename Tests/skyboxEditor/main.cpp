@@ -41,12 +41,14 @@ int main()
 		double dt = platform.getTimeStep();
 		glContext.setActiveViewport(gl::Viewport(0,0,1000,700));
 		gui.update(dt);
+		
 		/*
 		glContext.setActiveViewport(gl::Viewport(500, 0, 500, 700));
 		glContext.useShader(skybox.shader);
 		glContext.bindTexture(skybox.cubemap);
 		glContext.draw(skybox.drawable);
 		*/
+
 		glContext.swapBuffers();
 		inputController.poll();
 	}

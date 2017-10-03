@@ -2,6 +2,8 @@
 #include <platform/Platform.h>
 #include <input/InputController.h>
 #include <graphics\Graphics.h>
+#include <image/imageLoader.h>
+
 
 int main()
 {
@@ -10,71 +12,24 @@ int main()
 	input::InputController controller(&platform);
 
 
-	std::vector<gl::Gfloat> vertices1 = {
-		0.0f, 0.0f,
-		0.0f, 1.0f,
-		1.0f, 1.0f
-	};
-	std::vector<gl::Gfloat> vertices2 = {
-		0.0f, 0.0f,
-		0.0f, 1.0f,
-		1.0f, 1.0f,
+	img::ImageReader reader(&platform);
+	img::Image image = reader.readFile("D:/DEV/projects/yage/tests/skyboxeditor/test.png");
+	gl::Texture tex = glContext.create2DTexture(image.getRawData(), image.getWidth(), image.getHeight(), gl::ImageFormat::RGBA);
 
-		0.0f, 0.0f,
-		0.0f, -1.0f,
-		1.0f, -1.0f
-	};
-	std::vector<gl::Gfloat> vertices3 = {
-		0.0f, 0.0f,
-		0.0f, -1.0f,
-		-1.0f, -1.0f
-	};
+	tex.resize(200, 200);
 
-	gl::Drawable drawable = glContext.createDrawable(vertices2, std::vector<int>{2}, gl::DrawMode::DRAW_STATIC);
-	gl::Drawable drawable2 = glContext.createDrawable(vertices3, std::vector<int>{2}, gl::DrawMode::DRAW_STREAM);
-
-	std::string vert =
-#include "shader.vert"
-		;
-	std::string frag =
-#include "shader.frag"
-		;
-	gl::Shader shader = glContext.compileShader(vert, frag);
-	glContext.useShader(shader);
-
-	gl::Framebuffer framebuffer = glContext.createFramebuffer(100, 100);
-	gl::Viewport viewport = gl::Viewport(0, 0, 100, 100);
-
-	
-	double timer = 0.0;
 	platform.getTimeStep();
 	glContext.showWindow();
 	while (!glContext.getCloseFlag())
 	{
+		glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		controller.poll();
-		if (controller.getInput()->getKey(input::KeyCode::KEY_W) == input::KeyState::DOWN && controller.getInput()->getKeyLast(input::KeyCode::KEY_W) == input::KeyState::UP) {
-			drawable.bufferData(vertices1);
-			std::cout << "W" << std::endl;
-		}
-		if (controller.getInput()->getKey(input::KeyCode::KEY_Q) == input::KeyState::DOWN && controller.getInput()->getKeyLast(input::KeyCode::KEY_Q) == input::KeyState::UP) {
-			drawable.bufferData(vertices2);
-			std::cout << "Q" << std::endl;
-		}
 
-		if (timer > 1) {
-			//drawable.bufferData(vertices1, 3);
-			timer = 0.0;
-			std::cout << "timer" << std::endl;
-		}
-
-
-		glContext.draw(drawable);
-		glContext.draw(drawable2);
+		glContext.setActiveViewport(gl::Viewport(0, 0, tex.getWidth(), tex.getHeight()));
+		glContext.draw(tex);
 
 		glContext.swapBuffers();
-
-		timer += platform.getTimeStep();
+		platform.pollEvents();
 	}
 
 	return 0;
