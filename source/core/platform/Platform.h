@@ -10,7 +10,7 @@
 #include "android/Android_File.h"
 #endif
 
-#include "clib.h"
+#include "util.h"
 #include "Exception.h"
 
 namespace sys

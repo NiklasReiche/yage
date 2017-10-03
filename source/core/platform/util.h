@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace clib
+namespace util
 {
 	template<typename T>
 	inline std::string to_string(T param)
@@ -32,5 +32,14 @@ namespace clib
 		std::vector<std::string> out;
 		strip(string, delimiter, out);
 		return out;
+	}
+
+	inline std::string& replaceAll(std::string& s, const std::string& find, const std::string& replace)
+	{
+		size_t pos = 0;
+		while ((pos = s.find(find)) != std::string::npos) {
+			s.replace(pos, find.length(), replace);
+		}
+		return s;
 	}
 }
