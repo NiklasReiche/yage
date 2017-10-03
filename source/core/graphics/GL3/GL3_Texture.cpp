@@ -1,5 +1,6 @@
 #include "GL3_Texture.h"
 #include "GL3_Context.h"
+#include "GL3_Framebuffer.h"
 
 namespace gl3
 {
@@ -91,5 +92,22 @@ namespace gl3
 		glGenerateMipmap((GLenum)target);
 		glTexParameteri((GLenum)target, GL_TEXTURE_MIN_FILTER, (GLenum)min_option);
 		glTexParameteri((GLenum)target, GL_TEXTURE_MAG_FILTER, (GLenum)mag_option);
+	}
+
+	void GL3_Texture::resize(int width, int height)
+	{
+		GLuint FBO = glContext->getGlState().renderTarget;
+		Viewport viewport = glContext->getGlState().viewport;
+
+		GL3_Framebuffer fbo = glContext->createFramebuffer(width, height, px_format);
+		glContext->setActiveRenderTarget(fbo);
+		glContext->setActiveViewport(Viewport(0, 0, width, height));
+
+		glContext->draw(*this);
+
+		operator=(fbo.getTexture());
+
+		glContext->setActiveRenderTarget(FBO);
+		glContext->setActiveViewport(viewport);
 	}
 }
