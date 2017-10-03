@@ -21,6 +21,7 @@ namespace sys
 
 		virtual double getTime() { return 0; }
 
+		virtual void setOnCharModsEvent(std::function<void(unsigned int, int)> callback) {}
 		virtual void setOnKeyEvent(std::function<void(int, int)> callback) {}
 		virtual void setOnMousePosEvent(std::function<void(float, float)> callback) {}
 		virtual void setOnMouseButtonEvent(std::function<void(int, int)> callback) {}
