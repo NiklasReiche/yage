@@ -5,6 +5,8 @@
 #include <iostream>
 #include <memory>
 
+#include <graphics/Graphics.h>
+
 namespace img
 {
 	class Image
@@ -21,11 +23,13 @@ namespace img
 		Image(int width, int height, int channels, std::vector<unsigned char>& data);
 		Image(const Image& other);
 		Image(Image&& other);
-
 		Image& operator=(const Image& other);
 		friend std::ostream& operator<<(std::ostream & os, const Image & image);
 
 		void flip();
+		void addAlpha();
+
+		gl::Texture toTexture(gl::GraphicsContext* glContext);
 
 		int getWidth() { return width; }
 		int getHeight() { return height; }

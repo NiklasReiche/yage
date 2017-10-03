@@ -401,7 +401,7 @@ namespace bmp
 		if (infoheader.biBitCount == 8 && channel == FORCE_CHANNELS::RGB) {
 			toBit24();
 		}
-		else if (infoheader.biBitCount == 24 && channel == FORCE_CHANNELS::R) {
+		else if (infoheader.biBitCount == 24 && channel == FORCE_CHANNELS::G) {
 			toBit8();
 		}
 
@@ -417,7 +417,7 @@ namespace bmp
 			if (infoheader.biBitCount == 8 && channel == FORCE_CHANNELS::RGB) {
 				toBit24();
 			}
-			else if (infoheader.biBitCount == 24 && channel == FORCE_CHANNELS::R) {
+			else if (infoheader.biBitCount == 24 && channel == FORCE_CHANNELS::G) {
 				toBit8();
 			}
 

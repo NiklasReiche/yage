@@ -1,9 +1,14 @@
+#pragma once
+
 #include <vector>
 #include <string>
+
 #include <libpng/png.h>
+
 #include <platform/Platform.h>
 
-#include "image.h"
+#include "../image.h"
+#include "../enum.h"
 
 namespace img 
 {
@@ -42,7 +47,7 @@ namespace png
 		void readImageData();
 
 	public:
-		void load(sys::PlatformHandle* platform, std::string filename);
+		void load(sys::PlatformHandle* platform, std::string filename, FORCE_CHANNELS channel = FORCE_CHANNELS::AUTO);
 		void toImage(Image & image);
 		void free();
 

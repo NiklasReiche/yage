@@ -5,7 +5,9 @@ namespace img
 	enum class FORCE_CHANNELS
 	{
 		AUTO,
-		R,
+		G,
+		GA,
 		RGB,
+		RGBA
 	};
 }

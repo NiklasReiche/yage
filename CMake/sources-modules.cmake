@@ -4,17 +4,18 @@
 
 set( YAGE_IMAGE_SOURCE
 
-	"${YAGE_MODULES_PATH}/image/bmp.h"
-	"${YAGE_MODULES_PATH}/image/bmp.cpp"
-	"${YAGE_MODULES_PATH}/image/png.h"
-	"${YAGE_MODULES_PATH}/image/png.cpp"
-	"${YAGE_MODULES_PATH}/image/enum.h"
 	"${YAGE_MODULES_PATH}/image/image.h"
 	"${YAGE_MODULES_PATH}/image/image.cpp"
-	"${YAGE_MODULES_PATH}/image/img.h"
-	"${YAGE_MODULES_PATH}/image/img.cpp"
-	"${YAGE_MODULES_PATH}/image/imageLoader.h"
-	"${YAGE_MODULES_PATH}/image/imageLoader.cpp"
+	"${YAGE_MODULES_PATH}/image/enum.h"
+	"${YAGE_MODULES_PATH}/image/imageReader.h"
+	"${YAGE_MODULES_PATH}/image/imageReader.cpp"
+	"${YAGE_MODULES_PATH}/image/imageWriter.h"
+	"${YAGE_MODULES_PATH}/image/imageWriter.cpp"
+
+	"${YAGE_MODULES_PATH}/image/formats/bmp.h"
+	"${YAGE_MODULES_PATH}/image/formats/bmp.cpp"
+	"${YAGE_MODULES_PATH}/image/formats/png.h"
+	"${YAGE_MODULES_PATH}/image/formats/png.cpp"
 	
 )
 
@@ -36,6 +37,8 @@ set( YAGE_FONT_CONVERTER_SOURCE
 	"${YAGE_MODULES_PATH}/font/converter/converter.cpp"
 	"${YAGE_MODULES_PATH}/font/converter/ftMath.h"
 	"${YAGE_MODULES_PATH}/font/converter/ftMath.cpp"
+	"${YAGE_MODULES_PATH}/font/converter/img.h"
+	"${YAGE_MODULES_PATH}/font/converter/img.cpp"
 	
 )
 

@@ -1,6 +1,5 @@
 #include "image.h"
 
-
 namespace img
 {
 	Image::Image(int width, int height, int channels, unsigned char* data)
@@ -59,6 +58,39 @@ namespace img
 				}
 			}
 		}
+	}
+
+	void Image::addAlpha()
+	{
+		if (channels == 1 || channels == 3) {
+			for (int i = 0; i < height; ++i) {
+				for (int j = 0; j < width; ++j) {
+					data->insert(data->begin() + ((i * width + j) * channels + channels + (i * width + j)), 255); /* add (i * width + j) to index to adjust for already inserted values*/
+				}
+			}
+			this->channels += 1;
+		}
+	}
+
+	gl::Texture Image::toTexture(gl::GraphicsContext* glContext)
+	{
+		gl::ImageFormat format;
+		switch (channels)
+		{
+		case 1:
+			format = gl::ImageFormat::R;
+			break;
+		case 2:
+			format = gl::ImageFormat::RG;
+			break;
+		case 3:
+			format = gl::ImageFormat::RGB;
+			break;
+		case 4:
+			format = gl::ImageFormat::RGBA;
+			break;
+		}
+		return glContext->create2DTexture(getRawData(), width, height, format);
 	}
 
 	std::ostream& operator<<(std::ostream & os, const Image & image)

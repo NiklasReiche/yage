@@ -8,9 +8,9 @@
 #include <cstdint>
 
 #include <platform/Platform.h>
-#include "image.h"
-#include "enum.h"
 
+#include "../image.h"
+#include "../enum.h"
 
 namespace img
 {

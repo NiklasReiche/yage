@@ -49,8 +49,6 @@ namespace png
 
 	void PNG::readInfoHeader()
 	{
-		png_read_info(png_ptr, info_ptr);
-
 		this->width = png_get_image_width(png_ptr, info_ptr);
 		this->height = png_get_image_height(png_ptr, info_ptr);
 		this->bitdepth = png_get_bit_depth(png_ptr, info_ptr);
@@ -76,7 +74,7 @@ namespace png
 		png_read_image(png_ptr, rowPtrs);
 	}
 
-	void PNG::load(sys::PlatformHandle* platform, std::string filename)
+	void PNG::load(sys::PlatformHandle* platform, std::string filename, FORCE_CHANNELS forceChannel)
 	{
 		sys::File file = platform->open(filename);
 
@@ -104,7 +102,22 @@ namespace png
 
 		png_set_read_fn(png_ptr, (png_voidp)&file, user_read_data);
 
+		png_read_info(png_ptr, info_ptr);
 		readInfoHeader();
+
+		if ((color == PNG_COLOR_TYPE_RGB || color == PNG_COLOR_TYPE_GRAY) && (forceChannel == FORCE_CHANNELS::RGBA || forceChannel == FORCE_CHANNELS::GA)) {
+			png_set_add_alpha(png_ptr, 0xff, PNG_FILLER_AFTER);
+		}
+		if ((color == PNG_COLOR_TYPE_GRAY || color == PNG_COLOR_TYPE_GRAY_ALPHA) && (forceChannel == FORCE_CHANNELS::RGB || forceChannel == FORCE_CHANNELS::RGBA)) {
+			png_set_gray_to_rgb(png_ptr);
+		}
+		if ((color == PNG_COLOR_TYPE_RGB || color == PNG_COLOR_TYPE_RGB_ALPHA) && (forceChannel == FORCE_CHANNELS::G || forceChannel == FORCE_CHANNELS::GA)) {
+			png_set_rgb_to_gray_fixed(png_ptr, 1, -1, -1);
+		}
+
+		png_read_update_info(png_ptr, info_ptr);
+		readInfoHeader();
+
 		readImageData();
 		
 		file.close();
