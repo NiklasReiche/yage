@@ -55,6 +55,7 @@ namespace glfw
 
 		void log(std::string msg);
 		Desktop_File open(std::string filename, AccessMode mode = AccessMode::READ);
+		std::string openFileDialog(std::string defaultPath = "");
 
 
 		void onCharModsEvent(unsigned int codepoint, int mods);

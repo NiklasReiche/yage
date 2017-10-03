@@ -109,6 +109,13 @@ set( YAGE_PLATFORM_DESKTOP_SOURCE
 	"${YAGE_CORE_PATH}/platform/desktop/Desktop_File.h"
 	"${YAGE_CORE_PATH}/platform/desktop/Desktop_File.cpp"
 
+	"${YAGE_CORE_PATH}/platform/desktop/nativefiledialog/nfd.h"
+	"${YAGE_CORE_PATH}/platform/desktop/nativefiledialog/common.h"
+	"${YAGE_CORE_PATH}/platform/desktop/nativefiledialog/nfd_common.h"
+	"${YAGE_CORE_PATH}/platform/desktop/nativefiledialog/nfd_common.c"
+	#"${YAGE_CORE_PATH}/platform/desktop/nativefiledialog/nfd_gtk.c"
+	"${YAGE_CORE_PATH}/platform/desktop/nativefiledialog/nfd_win.cpp"
+
 )
 set( YAGE_PLATFORM_ANDROID_SOURCE
 

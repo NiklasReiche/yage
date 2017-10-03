@@ -1,4 +1,6 @@
 #include "GLFW_Handle.h"
+#include "nativeFileDialog/nfd.h"
+#include "../util.h"
 
 namespace glfw
 {
@@ -131,13 +133,35 @@ namespace glfw
 		}
 	}
 
+	
+	void GLFWHandle::log(std::string msg)
+	{
+		std::cout << msg << std::endl;
+	}
 	Desktop_File GLFWHandle::open(std::string filename, AccessMode mode)
 	{
 		return Desktop_File(filename, mode);
 	}
-
-	void GLFWHandle::log(std::string msg)
+	std::string GLFWHandle::openFileDialog(std::string defaultPath)
 	{
-		std::cout << msg << std::endl;
+		nfdchar_t *outPath = nullptr;
+		const nfdchar_t *default = nullptr;
+		if (defaultPath.size() != 0) {
+			default = util::replaceAll(defaultPath, "/", "\\").c_str();
+		}
+		nfdresult_t result = NFD_OpenDialog(nullptr, default, &outPath);
+
+		switch (result)
+		{
+		case NFD_OKAY:
+			return util::replaceAll(std::string(outPath), "\\", "/");
+		case NFD_CANCEL:
+			return "";
+		case NFD_ERROR:
+			throw sys::Exception(0);
+		default:
+			return "";
+			break;
+		}
 	}
 }
