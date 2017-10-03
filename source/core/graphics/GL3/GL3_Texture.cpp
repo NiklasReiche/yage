@@ -46,19 +46,35 @@ namespace gl3
 		return *this;
 	}
 
-	void GL3_Texture::bufferSubData(int x_offset, int y_offset, int width, int height, std::vector<unsigned char> & data)
+	void GL3_Texture::bufferSubData(int x_offset, int y_offset, int width, int height, unsigned char* data)
 	{
 		glContext->setUnpackAlignment(rowAlignment);
 		glContext->bindTexture(*this);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, x_offset, y_offset, width, height, GLenum(px_format), (GLenum)px_type, data);
+	}
+	void GL3_Texture::bufferSubData(int x_offset, int y_offset, int width, int height, std::vector<unsigned char> & data)
+	{
+		bufferSubData(x_offset, y_offset, width, height, &data[0]);
+	}
+	void GL3_Texture::bufferSubData(int x_offset, int y_offset, GL3_Texture texture)
+	{
+		std::vector<unsigned char> data;
+		glGetTexImage((GLenum)texture.target, (GLint)0, (GLenum)texture.px_format, (GLenum)texture.px_type, &data[0]);
+		bufferSubData(x_offset, y_offset, texture.width, texture.height, data);
+	}
 
-		glTexSubImage2D(GL_TEXTURE_2D, 0, x_offset, y_offset, width, height, GLenum(px_format), (GLenum)px_type, &data[0]);
+	void GL3_Texture::bufferData(int width, int height, unsigned char* data)
+	{
+		glContext->setUnpackAlignment(rowAlignment);
+		glContext->bindTexture(*this);
+		glTexImage2D(GL_TEXTURE_2D, 0, GLenum(format), width, height, 0, (GLenum)px_format, (GLenum)px_type, data);
+
+		this->width = width;
+		this->height = height;
 	}
 	void GL3_Texture::bufferData(int width, int height, std::vector<unsigned char> & data)
 	{
-		glContext->setUnpackAlignment(rowAlignment);
-		glContext->bindTexture(*this);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GLenum(format), width, height, 0, (GLenum)px_format, (GLenum)px_type, &data[0]);
+		bufferData(width, height, &data[0]);
 	}
 
 	void GL3_Texture::getTextureImage(std::vector<unsigned char> & data, int level)
@@ -96,18 +112,18 @@ namespace gl3
 
 	void GL3_Texture::resize(int width, int height)
 	{
-		GLuint FBO = glContext->getGlState().renderTarget;
-		Viewport viewport = glContext->getGlState().viewport;
+		GLuint current_fbo = glContext->getGlState().renderTarget;
+		Viewport current_viewport = glContext->getGlState().viewport;
 
 		GL3_Framebuffer fbo = glContext->createFramebuffer(width, height, px_format);
+
 		glContext->setActiveRenderTarget(fbo);
 		glContext->setActiveViewport(Viewport(0, 0, width, height));
-
 		glContext->draw(*this);
 
 		operator=(fbo.getTexture());
 
-		glContext->setActiveRenderTarget(FBO);
-		glContext->setActiveViewport(viewport);
+		glContext->setActiveRenderTarget(current_fbo);
+		glContext->setActiveViewport(current_viewport);
 	}
 }

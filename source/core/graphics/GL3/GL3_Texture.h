@@ -28,8 +28,13 @@ namespace gl3
 		virtual ~GL3_Texture();
 		GL3_Texture& operator=(const GL3_Texture& other);
 
+		void bufferSubData(int x_offset, int y_offset, int width, int height, unsigned char* data);
 		void bufferSubData(int x_offset, int y_offset, int width, int height, std::vector<unsigned char> & data);
+		void bufferSubData(int x_offset, int y_offset, GL3_Texture texture);
+
+		void bufferData(int width, int height, unsigned char* data);
 		void bufferData(int width, int height, std::vector<unsigned char> & data);
+
 		void getTextureImage(std::vector<unsigned char> & data, int level = 0);
 
 		void configTextureWrapper(TextureWrapper x_option, TextureWrapper y_option);
