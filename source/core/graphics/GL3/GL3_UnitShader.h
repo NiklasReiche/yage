@@ -34,7 +34,7 @@ namespace gl3
 			"	out vec4 color;												\n"
 			"	uniform sampler2D screenTexture;							\n"
 			"	void main() {												\n"
-			"		color = vec4(texture(screenTexture, TexCoords));		\n"
+			"		color = vec4(texture(screenTexture, TexCoords));		\n"	
 			"	}															\n";
 		std::vector<int> vertexLayout = { 2, 2 };
 		DrawMode mode = DrawMode::DRAW_STATIC;

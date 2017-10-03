@@ -64,6 +64,8 @@ namespace gl3
 		int getHeight() { return height; }
 		int getCloseFlag() { return systemHandle->shouldDestroy(); }
 
+		GL3_State getGlState() { return glState; }
+
 
 		/*****************************************
 		**			Enable / Diable				**
@@ -98,7 +100,8 @@ namespace gl3
 
 		GL3_Framebuffer createFramebuffer(
 			GLint width,
-			GLint height);
+			GLint height,
+			ImageFormat format = ImageFormat::RGB);
 
 		GL3_Drawable createDrawable(
 			std::vector<GLfloat> & vertices,
@@ -152,6 +155,7 @@ namespace gl3
 
 		void draw(const GL3_Drawable & drawable);
 		void draw(const GL3_Framebuffer & buffer);
+		void draw(const GL3_Texture & texture);
 
 		void useShader(const GL3_Shader & shader);
 

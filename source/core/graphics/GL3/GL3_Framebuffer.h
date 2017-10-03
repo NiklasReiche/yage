@@ -3,6 +3,7 @@
 #include "gl3.h"
 #include "GL3_Object.h"
 #include "GL3_Drawable.h"
+#include "GL3_Texture.h"
 
 namespace gl3
 {
@@ -13,7 +14,7 @@ namespace gl3
 
 		GLuint FBO = 0;
 		GLuint RBO = 0;
-		GLuint colorTexture = 0;
+		GL3_Texture texture;
 		int width, height;
 
 	public:
@@ -24,5 +25,6 @@ namespace gl3
 
 		int getWidth() const { return width; }
 		int getHeight() const { return height; }
+		GL3_Texture getTexture() const { return texture; }
 	};
 }

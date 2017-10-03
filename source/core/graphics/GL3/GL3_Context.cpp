@@ -97,9 +97,12 @@ namespace gl3
 		GL3_UnitShaderTemplate UnitShaderTemplate;
 		unitDrawable = createDrawable(UnitShaderTemplate.vertices, UnitShaderTemplate.vertexLayout, UnitShaderTemplate.mode);
 		unitShader = compileShader(UnitShaderTemplate.vertexCode, UnitShaderTemplate.fragmentCode);
+		unitShader.setUniform("screenTexture", 0);
 
 		glState.window_width = width;
 		glState.window_height = height;
+		setActiveRenderTarget(0);
+		setActiveViewport(Viewport(0, 0, width, height));
 	}
 	GL3_Context::~GL3_Context()
 	{
@@ -233,7 +236,7 @@ namespace gl3
 	}
 
 
-	GL3_Framebuffer GL3_Context::createFramebuffer(GLint width, GLint height)
+	GL3_Framebuffer GL3_Context::createFramebuffer(GLint width, GLint height, ImageFormat format)
 	{
 		GL3_Framebuffer buffer;
 		// Create Framebuffer Object
@@ -241,21 +244,17 @@ namespace gl3
 		glBindFramebuffer(GL_FRAMEBUFFER, buffer.FBO);
 
 		// Create empty Texture
-		glGenTextures(1, &buffer.colorTexture);
-		glBindTexture(GL_TEXTURE_2D, buffer.colorTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		buffer.texture = create2DTexture(nullptr, width, height, format);
+		buffer.texture.configTextureFilter(TextureFilter::LINEAR, TextureFilter::LINEAR);
 
 		// Attach Texture to FBO
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, buffer.colorTexture, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, buffer.texture.texture, 0);
 
 		// Depth & Stencil Buffers
-		GLuint RBO;
-		glGenRenderbuffers(1, &RBO);
-		glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+		glGenRenderbuffers(1, &buffer.RBO);
+		glBindRenderbuffer(GL_RENDERBUFFER, buffer.RBO);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, buffer.RBO);
 
 		// Completeness check
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -502,10 +501,13 @@ namespace gl3
 		setActiveViewport(glState.viewport);
 
 		useShader(unitShader);
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, buffer.colorTexture);
-
+		bindTexture(buffer.texture);
+		draw(unitDrawable);
+	}
+	void GL3_Context::draw(const GL3_Texture & texture)
+	{
+		useShader(unitShader);
+		bindTexture(texture);
 		draw(unitDrawable);
 	}
 	void GL3_Context::useShader(const GL3_Shader & shader)

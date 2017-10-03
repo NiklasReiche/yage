@@ -10,7 +10,7 @@ namespace gl3
 	{
 		this->FBO = other.FBO;
 		this->RBO = other.RBO;
-		this->colorTexture = other.colorTexture;
+		this->texture = other.texture;
 		this->width = other.width;
 		this->height = other.height;
 	}
@@ -19,7 +19,6 @@ namespace gl3
 		if (*refCount == 1) {
 			glDeleteBuffers(1, &FBO);
 			glDeleteBuffers(1, &RBO);
-			glDeleteTextures(1, &colorTexture);
 		}
 	}
 
@@ -29,13 +28,12 @@ namespace gl3
 		if (shouldDelete) {
 			glDeleteBuffers(1, &FBO);
 			glDeleteBuffers(1, &RBO);
-			glDeleteTextures(1, &colorTexture);
 			shouldDelete = false;
 		}
 
 		this->FBO = other.FBO;
 		this->RBO = other.RBO;
-		this->colorTexture = other.colorTexture;
+		this->texture = other.texture;
 		this->width = other.width;
 		this->height = other.height;
 
