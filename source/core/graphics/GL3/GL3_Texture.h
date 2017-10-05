@@ -42,6 +42,7 @@ namespace gl3
 		void configTextureFilter(MipmapOption min_option, TextureFilter mag_option);
 
 		void resize(int width, int height);
+		void rotate(int level);
 
 		int getWidth() const { return width; }
 		int getHeight() const { return height; }

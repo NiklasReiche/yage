@@ -126,4 +126,23 @@ namespace gl3
 		glContext->setActiveRenderTarget(current_fbo);
 		glContext->setActiveViewport(current_viewport);
 	}
+	void GL3_Texture::rotate(int level)
+	{
+		GLuint current_fbo = glContext->getGlState().renderTarget;
+		Viewport current_viewport = glContext->getGlState().viewport;
+
+		GL3_Framebuffer fbo = glContext->createFramebuffer(width, height, px_format);
+
+		glContext->setActiveRenderTarget(fbo);
+		glContext->setActiveViewport(Viewport(0, 0, width, height));
+
+		glContext->useUnitTransformShader(gml::rotate(level * 90, gml::Vec3f(0.0f, 0.0f, 1.0f)));
+		glContext->bindTexture(*this);
+		glContext->drawUnitDrawable();
+
+		operator=(fbo.getTexture());
+
+		glContext->setActiveRenderTarget(current_fbo);
+		glContext->setActiveViewport(current_viewport);
+	}
 }
