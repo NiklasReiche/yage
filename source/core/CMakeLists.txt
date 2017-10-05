@@ -36,7 +36,6 @@ elseif(WIN32)
 								${YAGE_GRAPHICS_GL3_SOURCE})
 
 	target_link_libraries(YAGEcore PUBLIC opengl32.lib
-								   PUBLIC glew32sMD_d.lib 
 								   PUBLIC glfw32sMD_d.lib)
 
 	target_compile_definitions(YAGEcore PUBLIC "DESKTOP")
