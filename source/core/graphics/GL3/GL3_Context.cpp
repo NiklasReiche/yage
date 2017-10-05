@@ -98,6 +98,10 @@ namespace gl3
 		unitDrawable = createDrawable(UnitShaderTemplate.vertices, UnitShaderTemplate.vertexLayout, UnitShaderTemplate.mode);
 		unitShader = compileShader(UnitShaderTemplate.vertexCode, UnitShaderTemplate.fragmentCode);
 		unitShader.setUniform("screenTexture", 0);
+		GL3_UnitTransformShaderTemplate unitTransformShaderTemplate;
+		unitTransformShader = compileShader(unitTransformShaderTemplate.vertexCode, unitTransformShaderTemplate.fragmentCode);
+		unitTransformShader.setUniform("screenTexture", 0);
+		unitTransformShader.setUniform("transform", gml::Matrix4D<float>());
 
 		glState.window_width = width;
 		glState.window_height = height;
@@ -521,5 +525,19 @@ namespace gl3
 	{
 		glActiveTexture(GL_TEXTURE0 + unit);
 		glBindTexture((GLenum)texture.target, texture.id);
+	}
+
+	void GL3_Context::useUnitShader()
+	{
+		useShader(unitShader);
+	}
+	void GL3_Context::useUnitTransformShader(gml::Matrix4D<float> transform)
+	{
+		useShader(unitTransformShader);
+		unitTransformShader.setUniform("transform", transform);
+	}
+	void GL3_Context::drawUnitDrawable()
+	{
+		draw(unitDrawable);
 	}
 }

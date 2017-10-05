@@ -40,6 +40,7 @@ namespace gl3
 		GL3_State glState;
 
 		GL3_Shader unitShader;
+		GL3_Shader unitTransformShader;
 		GL3_Drawable unitDrawable;
 
 		int checkShaderCompilationError(GLuint program, std::string type);
@@ -160,5 +161,9 @@ namespace gl3
 		void useShader(const GL3_Shader & shader);
 
 		void bindTexture(const GL3_Texture & texture, int unit = 0);
+
+		void useUnitShader();
+		void useUnitTransformShader(gml::Matrix4D<float> transform);
+		void drawUnitDrawable();
 	};
 }
