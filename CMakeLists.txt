@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 
 project(YAGE CXX C)
 set(CMAKE_CXX_STANDARD 14)
+set(YAGE_GUI_CONVERTER 0)
 
 # output directories
 if(ANDROID)
@@ -15,6 +16,7 @@ endif()
 
 set( YAGE_CORE_PATH "${CMAKE_SOURCE_DIR}/source/core" )
 set( YAGE_MODULES_PATH "${CMAKE_SOURCE_DIR}/source/modules" )
+set( YAGE_TOOLS_PATH "${CMAKE_SOURCE_DIR}/source/tools" )
 set( YAGE_CMAKE_PATH "${CMAKE_SOURCE_DIR}/Cmake"  )
 
 # include directories
@@ -43,8 +45,9 @@ add_subdirectory(source/modules)
 if(WIN32 AND NOT ANDROID)
 	add_subdirectory(tests/graphics)
 	add_subdirectory(tests/image)
-	add_subdirectory(tests/font)
 	add_subdirectory(tests/gui)
 	add_subdirectory(tests/graphics3d)
-	add_subdirectory(tests/skyboxEditor)
+	add_subdirectory(tests/googletest)
+
+	add_subdirectory(source/tools/skyboxViewer)
 endif()
