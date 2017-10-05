@@ -34,7 +34,7 @@ namespace gl3
 		std::string buildMessage(GLenum err, std::string message) {
 			std::stringstream s;
 			s << message << std::endl;
-			s << (stderr, "Error: %s\n", glewGetErrorString(err)) << std::endl;
+			s << (stderr, "Error: %s\n", (err)) << std::endl;
 			return s.str();
 		}
 	public:
@@ -47,7 +47,7 @@ namespace gl3
 		std::string buildMessage(GlfwErrorCodes err, std::string message) {
 			std::stringstream s;
 			s << message << std::endl;
-			s << (stderr, "Error: %s\n", glewGetErrorString(err)) << std::endl;
+			s << (stderr, "Error: %s\n", (err)) << std::endl;
 			return s.str();
 		}
 	public:

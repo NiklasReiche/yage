@@ -19,6 +19,7 @@ set( YAGE_GRAPHICS_SOURCE
 )
 set( YAGE_GRAPHICS_GL3_SOURCE
 
+	"${YAGE_CORE_PATH}/graphics/GL3/glad.c"
 	"${YAGE_CORE_PATH}/graphics/GL3/gl3.h"
 	"${YAGE_CORE_PATH}/graphics/GL3/GL3_Exception.h"
 	"${YAGE_CORE_PATH}/graphics/GL3/GL3_Enum.h"
@@ -96,7 +97,7 @@ set( YAGE_PLATFORM_SOURCE
 
 	"${YAGE_CORE_PATH}/platform/Platform.h"
 	"${YAGE_CORE_PATH}/platform/GenericHandle.h"
-	"${YAGE_CORE_PATH}/platform/clib.h"
+	"${YAGE_CORE_PATH}/platform/util.h"
 	"${YAGE_CORE_PATH}/platform/Exception.h"
 
 )

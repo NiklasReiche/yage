@@ -2,6 +2,7 @@
 #include "nativeFileDialog/nfd.h"
 #include "../util.h"
 
+
 namespace glfw
 {
 	GLFWHandle::GLFWHandle()

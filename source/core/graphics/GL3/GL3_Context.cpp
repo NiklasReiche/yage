@@ -84,11 +84,11 @@ namespace gl3
 	{
 		systemHandle->createContext(width, height, title);
 
-		// --- GLEW ---
-		glewExperimental = GL_TRUE;
-		GLenum err = glewInit();
-		if (err != GLEW_OK) {
-			throw GlewException(err, "GL::ERROR: Failed to initialize GLEW");
+		// --- GLAD ---
+		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+		{
+			std::cout << "Failed to initialize GLAD" << std::endl;
+			throw GlewException(0, "GL::ERROR: Failed to initialize GLEW");
 		}
 
 		makeCurrent();
