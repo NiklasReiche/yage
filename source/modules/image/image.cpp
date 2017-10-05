@@ -18,7 +18,12 @@ namespace img
 		this->width = other.width;
 		this->height = other.height;
 		this->channels = other.channels;
-		this->data = std::make_shared<std::vector<unsigned char>>(*other.data);
+		if (other.data != nullptr) {
+			this->data = std::make_shared<std::vector<unsigned char>>(*other.data);
+		}
+		else{
+			this->data = other.data;
+		}
 	}
 
 	Image::Image(Image&& other)
@@ -37,7 +42,12 @@ namespace img
 		this->width = other.width;
 		this->height = other.height;
 		this->channels = other.channels;
-		this->data = std::make_shared<std::vector<unsigned char>>(*other.data);
+		if (other.data != nullptr) {
+			this->data = std::make_shared<std::vector<unsigned char>>(*other.data);
+		}
+		else {
+			this->data = other.data;
+		}
 		return *this;
 	}
 

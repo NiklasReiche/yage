@@ -36,7 +36,7 @@ namespace img
 		return image;
 	}
 
-	Image ImageReader::readTexture(gl::Texture& texture, FORCE_CHANNELS channel)
+	Image ImageReader::readTexture(const gl::Texture & texture, FORCE_CHANNELS channel)
 	{
 		std::vector<unsigned char> data;
 		texture.getTextureImage(data);

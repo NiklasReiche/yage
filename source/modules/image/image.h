@@ -15,7 +15,7 @@ namespace img
 		int width = 0;
 		int height = 0;
 		int channels = 0;
-		std::shared_ptr<std::vector<unsigned char>> data;
+		std::shared_ptr<std::vector<unsigned char>> data = nullptr;
 
 	public:		
 		Image() {}
@@ -31,11 +31,13 @@ namespace img
 
 		gl::Texture toTexture(gl::GraphicsContext* glContext);
 
-		int getWidth() { return width; }
-		int getHeight() { return height; }
-		int getChannels() { return channels; }
-		std::shared_ptr<std::vector<unsigned char>> getData() { return data; }
+		int getWidth() const { return width; }
+		int getHeight() const { return height; }
+		int getChannels() const { return channels; }
+		std::shared_ptr<std::vector<unsigned char>> getData() const { return data; }
 		unsigned char* getRawData() { return &(*data)[0]; }
+
+		bool isEmpty() const { return width == 0 || height == 0 || channels == 0; }
 	};
 
 	std::ostream& operator<<(std::ostream & os, const Image & image);

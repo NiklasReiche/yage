@@ -23,6 +23,6 @@ namespace img
 			: platform(platform){}
 		
 		Image readFile(std::string path, FORCE_CHANNELS channel = FORCE_CHANNELS::AUTO);
-		Image readTexture(gl::Texture& texture, FORCE_CHANNELS channel = FORCE_CHANNELS::AUTO);
+		Image readTexture(const gl::Texture & texture, FORCE_CHANNELS channel = FORCE_CHANNELS::AUTO);
 	};
 }
