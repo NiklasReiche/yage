@@ -77,7 +77,7 @@ namespace gl3
 		bufferData(width, height, &data[0]);
 	}
 
-	void GL3_Texture::getTextureImage(std::vector<unsigned char> & data, int level)
+	void GL3_Texture::getTextureImage(std::vector<unsigned char> & data, int level) const
 	{
 		glContext->setPackAlignment(rowAlignment);
 		glContext->bindTexture(*this);

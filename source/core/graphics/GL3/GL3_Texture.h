@@ -35,7 +35,7 @@ namespace gl3
 		void bufferData(int width, int height, unsigned char* data);
 		void bufferData(int width, int height, std::vector<unsigned char> & data);
 
-		void getTextureImage(std::vector<unsigned char> & data, int level = 0);
+		void getTextureImage(std::vector<unsigned char> & data, int level = 0) const;
 
 		void configTextureWrapper(TextureWrapper x_option, TextureWrapper y_option);
 		void configTextureFilter(TextureFilter min_option, TextureFilter mag_option);
@@ -46,5 +46,6 @@ namespace gl3
 		int getWidth() const { return width; }
 		int getHeight() const { return height; }
 		int getChannels() const { return nChannels; }
+		bool isEmpty() const { return (id == 0); }
 	};
 }
