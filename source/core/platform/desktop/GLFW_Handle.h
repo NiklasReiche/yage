@@ -44,6 +44,9 @@ namespace glfw
 		void showWindow();
 		void hideWindow();
 
+		void hideCursor();
+		void showCursor();
+
 		int shouldDestroy();
 
 		void enableCharInput();

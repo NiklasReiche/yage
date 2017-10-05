@@ -69,6 +69,15 @@ namespace glfw
 		glfwSwapBuffers(glfwWindow);
 	}
 
+	void GLFWHandle::hideCursor()
+	{
+		glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+	void GLFWHandle::showCursor()
+	{
+		glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
+
 	int GLFWHandle::shouldDestroy()
 	{
 		return glfwWindowShouldClose(glfwWindow);
