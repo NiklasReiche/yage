@@ -3,6 +3,8 @@
 set( YAGE_SKYBOX_VIEWER_SOURCE
 
 	"main.cpp"
+	"app.h"
+	"app.cpp"
 	"gui.h"
 	"gui.cpp"
 	
