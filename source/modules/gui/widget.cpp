@@ -24,15 +24,7 @@ namespace gui
 
 		this->layout = std::make_unique<Layout>();
 
-		//gml::Vec4f texCoords;
-		if (wTemplate.texture.size() > 0) {
-			img::ImageReader reader(master.platform);
-			img::Image image = reader.readFile(wTemplate.texture);
-			texCoords = master.textureManager->addTexture(image);
-		}
-		else {
-			texCoords = gml::Vec4f(master.textureManager->getAlphaTexCoords().x, master.textureManager->getAlphaTexCoords().y, master.textureManager->getAlphaTexCoords().x, master.textureManager->getAlphaTexCoords().y);
-		}
+		this->texCoords = loadTexture(wTemplate.texture);
 
 		std::vector<gl::Gfloat> vertices;
 		constructVertices(vertices, texCoords);
@@ -254,6 +246,24 @@ namespace gui
 		constructTexCoords(vertices, texCoords);
 	}
 
+	gml::Vec4f Widget::loadTexture(WidgetTextureTemplate tTemplate)
+	{
+		if (tTemplate.filename.size() > 0) {
+			img::ImageReader reader(master.platform);
+			img::Image image = reader.readFile(tTemplate.filename, img::FORCE_CHANNELS::RGBA);
+			return master.textureManager->addTexture(image);
+		}
+		else if (!tTemplate.image.isEmpty()) {
+			return master.textureManager->addTexture(tTemplate.image);
+		}
+		else if (!tTemplate.texture.isEmpty()) {
+			return master.textureManager->addTexture(tTemplate.texture);
+		}
+		else {
+			return gml::Vec4f(master.textureManager->getAlphaTexCoords().x, master.textureManager->getAlphaTexCoords().y, master.textureManager->getAlphaTexCoords().x, master.textureManager->getAlphaTexCoords().y);
+		}
+	}
+
 
 	void Widget::updateParams()
 	{
@@ -369,5 +379,49 @@ namespace gui
 	float Widget::toAbsY(float value)
 	{
 		return value * parent->getSize().y;
+	}
+
+	float Widget::fromAspect()
+	{
+		if (sizeHint.x == SizeHint::INFINITE) {
+			return toAbsX(prefSize.x) * prefSize.y;
+		}
+		else if (sizeHint.y == SizeHint::INFINITE) {
+			return prefSize.x * toAbsY(prefSize.y);
+		}
+		else {
+			return prefSize.x * prefSize.y;
+		}
+	}
+
+	void Widget::setTexture(WidgetTextureTemplate texture)
+	{
+		this->texCoords = loadTexture(texture);
+	}
+	void Widget::setTexture(std::string filename)
+	{
+		if (filename.size() > 0) {
+			img::ImageReader reader(master.platform);
+			img::Image image = reader.readFile(filename, img::FORCE_CHANNELS::RGBA);
+			this->texCoords = master.textureManager->addTexture(image);
+		}
+		else {
+			this->texCoords = gml::Vec4f(master.textureManager->getAlphaTexCoords().x, master.textureManager->getAlphaTexCoords().y, master.textureManager->getAlphaTexCoords().x, master.textureManager->getAlphaTexCoords().y);
+		}
+		updateParams();
+	}
+	void Widget::setTexture(img::Image image)
+	{
+		this->texCoords = master.textureManager->addTexture(image);
+		updateParams();
+	}
+	void Widget::setTexture(gl::Texture texture)
+	{
+		this->texCoords = master.textureManager->addTexture(texture);
+		updateParams();
+	}
+	void Widget::removeTexture() {
+		this->texCoords = gml::Vec4f(master.textureManager->getAlphaTexCoords().x, master.textureManager->getAlphaTexCoords().y, master.textureManager->getAlphaTexCoords().x, master.textureManager->getAlphaTexCoords().y);
+		updateParams();
 	}
 }

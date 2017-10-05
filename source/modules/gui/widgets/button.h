@@ -17,6 +17,8 @@ namespace gui
 		TextTemplate text;
 		unsigned int clickColor = color;
 		unsigned int hoverColor = color;
+		WidgetTextureTemplate clickTexture = texture;
+		WidgetTextureTemplate hoverTexture = texture;
 		std::function<void()> command;
 	};
 
@@ -28,6 +30,9 @@ namespace gui
 		gml::Vec4<float> idleColor;
 		gml::Vec4<float> hoverColor;
 		gml::Vec4<float> clickColor;
+		gml::Vec4<float> idleTexCoords;
+		gml::Vec4<float> hoverTexCoords;
+		gml::Vec4<float> clickTexCoords;
 
 	public:
 		PushButton(Widget * parent, MasterInterface master, const ButtonTemplate & layout);
@@ -44,7 +49,13 @@ namespace gui
 		void setText(TextTemplate text) { label->setText(text); }
 		void setTextColor(unsigned int color) { label->setTextColor(color); }
 
+		void setIdleTexture(WidgetTextureTemplate texture) { this->idleTexCoords = loadTexture(texture); /*setTexCoords(idleTexCoords); updateParams();*/ }
+		void setHoverTexture(WidgetTextureTemplate texture) { this->hoverTexCoords = loadTexture(texture); }
+		void setClickTexture(WidgetTextureTemplate texture) { this->clickTexCoords = loadTexture(texture); }
+
 		gml::Vec2f calcPrefSize();
+
+		void debug() { onHover(); }
 	};
 
 	class CheckButton : public PushButton

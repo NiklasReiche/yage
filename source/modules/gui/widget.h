@@ -6,8 +6,9 @@
 #include <tuple>
 #include <functional>
 
+#include <image/imageReader.h>
+
 #include "core.h"
-#include "image/imageLoader.h"
 #include "Interface.h"
 #include "FontManager.h"
 #include "textureManager.h"
@@ -80,6 +81,8 @@ namespace gui
 
 		gml::Vec4f texCoords;
 
+		gml::Vec4f loadTexture(WidgetTextureTemplate tTemplate);
+
 	public:
 		Widget();
 		Widget(Widget * parent, MasterInterface master, const WidgetTemplate & widgetTemplate);
@@ -149,7 +152,14 @@ namespace gui
 		void setColor(int color) { this->color = gl::toVec4(color); }
 		void setColor(gml::Vec4<float> color) { this->color = color; }
 		void setSizeHint(gml::Vec2<SizeHint> sizeHint) { this->sizeHint = sizeHint; }
-		void setPreferredSize(gml::Vec2f size) { prefSize = size; }
+		void setPreferredSize(gml::Vec2f size) { this->prefSize = size; }
+		void setTexCoords(gml::Vec4f texCoords) { this->texCoords = texCoords; }
+		
+		void setTexture(WidgetTextureTemplate texture);
+		void setTexture(std::string filename);
+		void setTexture(img::Image image);
+		void setTexture(gl::Texture texture);
+		void removeTexture();
 
 
 		/* update semantics */
@@ -168,5 +178,6 @@ namespace gui
 		gml::Vec2f toAbs(gml::Vec2f value);
 		float toAbsX(float value);
 		float toAbsY(float value);
+		float fromAspect();
 	};
 }

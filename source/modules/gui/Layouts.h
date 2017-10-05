@@ -12,7 +12,8 @@ namespace gui
 		EXPANDING,
 		SHRINKING,
 		RECOMMENDED,
-		INFINITE
+		INFINITE,
+		ASPECT
 	};
 	enum class OffsetHint
 	{

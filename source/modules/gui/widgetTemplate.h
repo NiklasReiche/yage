@@ -2,6 +2,7 @@
 
 #include "math/MVector.h"
 #include "graphics/Color.h"
+#include <graphics/Graphics.h>
 
 #include "Layouts.h"
 
@@ -36,6 +37,14 @@ namespace gui
 		int offset = 0;
 		float hardness = 0.5f;
 	};
+	struct WidgetTextureTemplate
+	{
+		std::string filename = "";
+		img::Image image;
+		gl::Texture texture;
+
+		float resizeFactor = 1.0f;
+	};
 
 	struct WidgetTemplate
 	{
@@ -43,6 +52,6 @@ namespace gui
 		WidgetBorderTemplate border;
 		WidgetShadowTemplate shadow;
 		unsigned int color = gl::Color::WHITE;
-		std::string texture = "";
+		WidgetTextureTemplate texture;
 	};
 }

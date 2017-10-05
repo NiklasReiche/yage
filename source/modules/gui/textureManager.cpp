@@ -1,18 +1,19 @@
 #include "textureManager.h"
+#include <image/imageReader.h>
 
 namespace gui 
 {
 	TextureManager::TextureManager(sys::PlatformHandle* platform, gl::GraphicsContext* glContext)
 		: platform(platform), glContext(glContext)
 	{
-		textures[0].texture = glContext->create2DTexture(nullptr, 2048, 2048, gl::ImageFormat::RGBA);
-		textures.at(0).texture.bufferSubData(0, 0, 2, 2, std::vector<unsigned char>(16, 100));
+		textures[0].texture = glContext->create2DTexture(nullptr, TEXTURE_SIZE, TEXTURE_SIZE, gl::ImageFormat::RGBA);
+		textures.at(0).texture.bufferSubData(0, 0, 2, 2, std::vector<unsigned char>(16, 0));
 		textures.at(0).cursor.x = 2;
 		textures.at(0).cursor.y = 0;
 		textures.at(0).y_nextOffset = 1;
 	}
 
-	gml::Vec4f TextureManager::addTexture(img::Image image)
+	gml::Vec4f TextureManager::addTexture(const img::Image & image)
 	{
 		gml::Vec2f& cursor = textures.at(textures.size()-1).cursor;
 		int& y_plus = textures.at(textures.size()-1).y_nextOffset;
@@ -49,5 +50,9 @@ namespace gui
 		texCoords.w = (0.5f + cursor.y + image.getHeight()) / float(texture.getHeight());
 
 		return texCoords;
+	}
+	gml::Vec4f TextureManager::addTexture(const gl::Texture & image)
+	{
+		return addTexture(img::ImageReader(platform).readTexture(image));
 	}
 }

@@ -60,6 +60,9 @@ namespace gui
 			case SizeHint::FIXED:
 				parentPrefSize = std::max(parentPrefSize, childPrefSize);
 				break;
+			case SizeHint::ASPECT:
+				parentPrefSize = std::max(parentPrefSize, childMinSize);
+				break;
 			case SizeHint::INFINITE:
 				parentPrefSize = std::max(parentPrefSize, childMinSize);
 				break;
@@ -103,6 +106,9 @@ namespace gui
 			case SizeHint::FIXED:
 				parentPrefSize += childPrefSize;
 				break;
+			case SizeHint::ASPECT:
+				parentPrefSize += childMinSize;
+				break;
 			case SizeHint::INFINITE:
 				parentPrefSize += childMinSize;
 				break;
@@ -145,6 +151,9 @@ namespace gui
 
 			if (child.getSizeHint().y == SizeHint::INFINITE) {
 				totalSize.y -= child.toAbsY(child.getPreferredSize().y) + childCellMargin.y;
+			}
+			else if (child.getSizeHint().y == SizeHint::ASPECT) {
+				totalSize.y -= child.fromAspect() + childCellMargin.y;
 			}
 			else {
 				totalSize.y -= child.getPreferredSize().y + childCellMargin.y;
@@ -194,6 +203,9 @@ namespace gui
 			case SizeHint::INFINITE:
 				childSize.x = child.toAbsX(childPrefSize.x);
 				break;
+			case SizeHint::ASPECT:
+				childSize.x = child.fromAspect();
+				break;
 			case SizeHint::EXPANDING:
 				childSize.x = totalSize.x - childCellMargin.x;
 				break;
@@ -212,6 +224,9 @@ namespace gui
 				break;
 			case SizeHint::INFINITE:
 				childSize.y = child.toAbsY(childPrefSize.y);
+				break;
+			case SizeHint::ASPECT:
+				childSize.y = child.fromAspect();
 				break;
 			case SizeHint::EXPANDING:
 				childSize.y = childPrefSize.y + expandSize;
@@ -267,6 +282,9 @@ namespace gui
 			case SizeHint::FIXED:
 				parentPrefSize += childPrefSize;
 				break;
+			case SizeHint::ASPECT:
+				parentPrefSize += childMinSize;
+				break;
 			case SizeHint::INFINITE:
 				parentPrefSize += childMinSize;
 				break;
@@ -310,6 +328,9 @@ namespace gui
 			case SizeHint::FIXED:
 				parentPrefSize = std::max(parentPrefSize, childPrefSize);
 				break;
+			case SizeHint::ASPECT:
+				parentPrefSize = std::max(parentPrefSize, childMinSize);
+				break;
 			case SizeHint::INFINITE:
 				parentPrefSize = std::max(parentPrefSize, childMinSize);
 				break;
@@ -352,6 +373,9 @@ namespace gui
 
 			if (child.getSizeHint().x == SizeHint::INFINITE) {
 				totalSize.x -= child.toAbsX(child.getPreferredSize().x) + childCellMargin.x;
+			}
+			else if (child.getSizeHint().y == SizeHint::ASPECT) {
+				totalSize.y -= child.fromAspect() + childCellMargin.x;
 			}
 			else {
 				totalSize.x -= child.getPreferredSize().x + childCellMargin.x;
@@ -401,6 +425,9 @@ namespace gui
 			case SizeHint::INFINITE:
 				childSize.y = child.toAbsY(childPrefSize.y);
 				break;
+			case SizeHint::ASPECT:
+				childSize.y = child.fromAspect();
+				break;
 			case SizeHint::EXPANDING:
 				childSize.y = totalSize.y - childCellMargin.y;
 				break;
@@ -419,6 +446,9 @@ namespace gui
 				break;
 			case SizeHint::INFINITE:
 				childSize.x = child.toAbsX(childPrefSize.x);
+				break;
+			case SizeHint::ASPECT:
+				childSize.x = child.fromAspect();
 				break;
 			case SizeHint::EXPANDING:
 				childSize.x = childPrefSize.x + expandSize;

@@ -26,7 +26,8 @@ namespace gui
 	public:
 		TextureManager(sys::PlatformHandle* platform, gl::GraphicsContext* glContext);
 
-		gml::Vec4f addTexture(img::Image image);
+		gml::Vec4f addTexture(const img::Image & image);
+		gml::Vec4f addTexture(const gl::Texture & image);
 
 		gml::Vec2f getAlphaTexCoords() { return gml::Vec2f(0.5f/float(2048), 0.5f / float(2048)); }
 		gl::Texture getTexture(int i) { return textures.at(i).texture; }

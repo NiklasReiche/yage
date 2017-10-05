@@ -54,5 +54,7 @@ namespace gui
 				return parent->createWidget<Element>(master, args...);
 			}
 		}
+
+		MasterInterface getInterface() { return MasterInterface{ platform, glContext, &fontManager, &textureManager, &inputManager, &renderer }; }
 	};
 }
