@@ -8,12 +8,15 @@ namespace graphics3d
 	class Camera
 	{
 	private:
-		gml::Vec3f position;
-		gml::Quaternion<float> rotation;
+		
 
 	public:
 		Camera();
 		Camera(gml::Vec3f position, gml::Quaternion<float> rotation);
+		void update();
 		gml::Matrix4D<float> getViewMatrix();
+
+		gml::Vec3f position;
+		gml::Quaternion<float> rotation;
 	};
 }
