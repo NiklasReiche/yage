@@ -12,7 +12,7 @@ namespace graphics3d
 		
 		for (unsigned int i = 0; i < paths.size(); ++i) {
 			images[i] = imageReader.readFile(paths[i]);
-			faces[i] = images[0].getRawData();
+			faces[i] = images[i].getRawData();
 			if (images[i].getWidth() != images[0].getWidth() || images[i].getHeight() != images[0].getHeight()) {
 				throw sys::FileException(sys::FileError::UNKNOWN, "images not same size", paths[i]);
 			}
