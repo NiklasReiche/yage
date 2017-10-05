@@ -17,17 +17,16 @@ namespace gl3
 	GL3_Framebuffer::~GL3_Framebuffer()
 	{
 		if (*refCount == 1) {
-			glDeleteBuffers(1, &FBO);
-			glDeleteBuffers(1, &RBO);
+			glDeleteFramebuffers(1, &FBO);
+			glDeleteRenderbuffers(1, &RBO);
 		}
 	}
-
 	GL3_Framebuffer& GL3_Framebuffer::operator=(const GL3_Framebuffer& other)
 	{
 		GL3_Object::operator=(other);
 		if (shouldDelete) {
-			glDeleteBuffers(1, &FBO);
-			glDeleteBuffers(1, &RBO);
+			glDeleteFramebuffers(1, &FBO);
+			glDeleteRenderbuffers(1, &RBO);
 			shouldDelete = false;
 		}
 
