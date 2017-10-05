@@ -12,11 +12,11 @@
 #include FT_FREETYPE_H 
 
 #include <graphics\Graphics.h>
-#include <image\img.h>
 
 #include "../fileformat.h"
 #include "../font.h"
 #include "ftMath.h"
+#include "img.h"
 
 
 namespace font
