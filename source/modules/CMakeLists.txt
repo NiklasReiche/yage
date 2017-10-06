@@ -31,15 +31,15 @@ elseif(WIN32)
 	add_library(YAGEimage STATIC ${YAGE_IMAGE_SOURCE})
 
 	target_link_libraries(YAGEimage PUBLIC YAGEcore
-									PUBLIC zlib32s.lib
-									PUBLIC libpng32s.lib)
+									PUBLIC zlibstatic
+									PUBLIC png_static)
 
 
 	
 
 	if( YAGE_GUI_CONVERTER )
 		add_library(YAGEfont STATIC ${YAGE_FONT_SOURCE} ${YAGE_FONT_CONVERTER_SOURCE})
-		set(YAGEfont-linklibs YAGEcore YAGEimage freetype32sMD_d.lib)
+		set(YAGEfont-linklibs YAGEcore YAGEimage freetype)
 	else()
 		add_library(YAGEfont STATIC ${YAGE_FONT_SOURCE})
 		set(YAGEfont-linklibs YAGEcore)
