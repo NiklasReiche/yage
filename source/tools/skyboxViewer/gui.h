@@ -1,7 +1,6 @@
 #include "gui/gui.h"
 #include <image/imageReader.h>
 
-
 class Gui
 {
 private:
@@ -26,7 +25,12 @@ private:
 	std::string path_back;
 	std::string path_front;
 
+#ifdef _WIN32
+	std::string installPath = "D:/dev/projects/yage/source/tools/skyboxViewer";
+#endif
+#ifdef __unix
 	std::string installPath = "/home/niklas/dev/yage/source/tools/skyboxViewer";
+#endif
 	std::string lastPath = installPath + "/assets/skybox";
 	int thumbnailSize = 0;
 
