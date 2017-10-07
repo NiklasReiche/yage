@@ -1,6 +1,6 @@
 #pragma once
 
-#include "math\MVector.h"
+#include "math/MVector.h"
 
 namespace gl
 {

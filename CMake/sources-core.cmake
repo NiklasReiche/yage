@@ -5,16 +5,16 @@
 set( YAGE_MATH_SOURCE
 
 	"${YAGE_CORE_PATH}/math/MVector.h"
-	"${YAGE_CORE_PATH}/math/Interpolation.h"
+	"${YAGE_CORE_PATH}/math/interpolation.h"
 	
 )
 
 set( YAGE_GRAPHICS_SOURCE
 
 	"${YAGE_CORE_PATH}/graphics/gl.h"
-	"${YAGE_CORE_PATH}/graphics/Color.h"
-	"${YAGE_CORE_PATH}/graphics/Renderer.h"
-	"${YAGE_CORE_PATH}/graphics/Graphics.h"
+	"${YAGE_CORE_PATH}/graphics/color.h"
+	"${YAGE_CORE_PATH}/graphics/renderer.h"
+	"${YAGE_CORE_PATH}/graphics/graphics.h"
 
 )
 set( YAGE_GRAPHICS_GL3_SOURCE
@@ -94,20 +94,20 @@ set( YAGE_INPUT_SOURCE
 
 set( YAGE_PLATFORM_SOURCE
 
-	"${YAGE_CORE_PATH}/platform/Platform.h"
-	"${YAGE_CORE_PATH}/platform/GenericHandle.h"
+	"${YAGE_CORE_PATH}/platform/platform.h"
+	"${YAGE_CORE_PATH}/platform/genericHandle.h"
 	"${YAGE_CORE_PATH}/platform/util.h"
-	"${YAGE_CORE_PATH}/platform/Exception.h"
+	"${YAGE_CORE_PATH}/platform/exception.h"
 
 )
 set( YAGE_PLATFORM_DESKTOP_SOURCE
 
-	"${YAGE_CORE_PATH}/platform/desktop/GLFW_Callback.h"
-	"${YAGE_CORE_PATH}/platform/desktop/GLFW_Callback.cpp"
-	"${YAGE_CORE_PATH}/platform/desktop/GLFW_Handle.h"
-	"${YAGE_CORE_PATH}/platform/desktop/GLFW_Handle.cpp"
-	"${YAGE_CORE_PATH}/platform/desktop/Desktop_File.h"
-	"${YAGE_CORE_PATH}/platform/desktop/Desktop_File.cpp"
+	"${YAGE_CORE_PATH}/platform/desktop/glfwCallback.h"
+	"${YAGE_CORE_PATH}/platform/desktop/glfwCallback.cpp"
+	"${YAGE_CORE_PATH}/platform/desktop/platformHandle_desktop.h"
+	"${YAGE_CORE_PATH}/platform/desktop/platformHandle_desktop.cpp"
+	"${YAGE_CORE_PATH}/platform/desktop/file_desktop.h"
+	"${YAGE_CORE_PATH}/platform/desktop/file_desktop.cpp"
 
 )
 set( YAGE_PLATFORM_ANDROID_SOURCE

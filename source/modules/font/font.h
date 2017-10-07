@@ -3,8 +3,8 @@
 #include <string>
 #include <map>
 
-#include <math\MVector.h>
-#include <graphics\Graphics.h>
+#include <math/MVector.h>
+#include <graphics/graphics.h>
 
 namespace font
 {

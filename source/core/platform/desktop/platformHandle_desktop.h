@@ -10,13 +10,12 @@
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h>
 
-#include "../GenericHandle.h"
-#include "GLFW_Callback.h"
-#include "Desktop_File.h"
+#include "../genericHandle.h"
+#include "file_desktop.h"
 
-namespace glfw
+namespace desktop
 {
-	class GLFWHandle : public sys::GenericPlatformHandle
+	class PlatformHandle : public sys::GenericPlatformHandle
 	{
 	private:
 		GLFWwindow* glfwWindow;
@@ -33,8 +32,8 @@ namespace glfw
 		std::function<void(float, float)> onMouseWheelEventCallback;
 
 	public:
-		GLFWHandle();
-		~GLFWHandle();
+		PlatformHandle();
+		~PlatformHandle();
 
 		void createContext(int width, int height, std::string title = "OpenGL", int versionMajor = 3, int versionMinor = 3);
 
@@ -59,7 +58,7 @@ namespace glfw
 		double getTimeStep();
 
 		void log(std::string msg);
-		Desktop_File open(std::string filename, AccessMode mode = AccessMode::READ);
+		File open(std::string filename, AccessMode mode = AccessMode::READ);
 		std::string openFileDialog(std::string defaultPath = "");
 
 

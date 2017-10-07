@@ -1,6 +1,6 @@
 #include "skybox.h"
-#include <image/ImageReader.h>
-#include <platform/Exception.h>
+#include <image/imageReader.h>
+#include <platform/exception.h>
 
 namespace graphics3d
 {

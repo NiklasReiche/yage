@@ -3,7 +3,7 @@
 #include <functional>
 
 #include "core.h"
-#include <math/Interpolation.h>
+#include <math/interpolation.h>
 
 namespace gui
 {

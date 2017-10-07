@@ -2,17 +2,17 @@
 
 #include "core.h"
 
-#include "Master.h"
+#include "master.h"
 
-#include "Renderer.h"
-#include "InputManager.h"
-#include "FontManager.h"
-#include "Interface.h"
+#include "renderer.h"
+#include "inputmanager.h"
+#include "fontmanager.h"
+#include "interface.h"
 
-#include "Widget.h"
-#include "widgets/Button.h"
-#include "widgets/Label.h"
-#include "widgets/Frame.h"
+#include "widget.h"
+#include "widgets/button.h"
+#include "widgets/label.h"
+#include "widgets/frame.h"
 #include "widgets/entry.h"
 
-#include "Animation.h"
+#include "animation.h"

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "GLFW_Handle.h"
+#include "platformHandle_desktop.h"
 
-namespace glfw
+namespace desktop
 {
 	void error_callback(int error, const char* description);
 

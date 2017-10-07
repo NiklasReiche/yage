@@ -26,7 +26,8 @@ private:
 	std::string path_back;
 	std::string path_front;
 
-	std::string lastPath = "D:/DEV/Projects/YAGE/source/tools/skyboxViewer/assets/skybox";
+	std::string installPath = "/home/niklas/dev/yage/source/tools/skyboxViewer";
+	std::string lastPath = installPath + "/assets/skybox";
 	int thumbnailSize = 0;
 
 	std::function<void(std::array<std::string, 6>)> loadCallback;

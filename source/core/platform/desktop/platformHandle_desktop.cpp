@@ -1,11 +1,11 @@
-#include "GLFW_Handle.h"
-#include "nativeFileDialog/nfd.h"
+#include "platformHandle_desktop.h"
+#include "glfwCallback.h"
 #include "../util.h"
+#include <nfd/nfd.h>
 
-
-namespace glfw
+namespace desktop
 {
-	GLFWHandle::GLFWHandle()
+	PlatformHandle::PlatformHandle()
 	{
 		glfwSetErrorCallback(error_callback);
 
@@ -13,12 +13,12 @@ namespace glfw
 			//throw GlfwException(GLFW_ERROR, "GL::ERROR: Failed to initialize GLFW");
 		}
 	}
-	GLFWHandle::~GLFWHandle()
+	PlatformHandle::~PlatformHandle()
 	{
 		glfwTerminate();
 	}
 
-	void GLFWHandle::createContext(int width, int height, std::string title, int versionMajor, int versionMinor)
+	void PlatformHandle::createContext(int width, int height, std::string title, int versionMajor, int versionMinor)
 	{
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, versionMajor);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, versionMinor);
@@ -48,63 +48,63 @@ namespace glfw
 		dpi = 96;
 	}
 
-	void GLFWHandle::showWindow()
+	void PlatformHandle::showWindow()
 	{
 		glfwShowWindow(glfwWindow);
 	}
-	void GLFWHandle::hideWindow()
+	void PlatformHandle::hideWindow()
 	{
 		glfwHideWindow(glfwWindow);
 	}
-	void GLFWHandle::makeCurrent()
+	void PlatformHandle::makeCurrent()
 	{
 		glfwMakeContextCurrent(glfwWindow);
 	}
-	void GLFWHandle::pollEvents()
+	void PlatformHandle::pollEvents()
 	{
 		glfwPollEvents();
 	}
-	void GLFWHandle::swapBuffers()
+	void PlatformHandle::swapBuffers()
 	{
 		glfwSwapBuffers(glfwWindow);
 	}
 
-	void GLFWHandle::hideCursor()
+	void PlatformHandle::hideCursor()
 	{
 		glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
-	void GLFWHandle::showCursor()
+	void PlatformHandle::showCursor()
 	{
 		glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 
-	int GLFWHandle::shouldDestroy()
+	int PlatformHandle::shouldDestroy()
 	{
 		return glfwWindowShouldClose(glfwWindow);
 	}
 
-	void GLFWHandle::enableCharInput()
+	void PlatformHandle::enableCharInput()
 	{
 		isCharInputEnabled = true;
 	}
-	void GLFWHandle::disableCharInput()
+	void PlatformHandle::disableCharInput()
 	{
 		isCharInputEnabled = false;
 	}
-	void GLFWHandle::enableKeyInput()
+	void PlatformHandle::enableKeyInput()
 	{
 		isKeyInputEnabled = true;
 	}
-	void GLFWHandle::disableKeyInput()
+	void PlatformHandle::disableKeyInput()
 	{
 		isKeyInputEnabled = false;
 	}
 
-	double GLFWHandle::getTime()
+	double PlatformHandle::getTime()
 	{
 		return glfwGetTime();
 	}
-	double GLFWHandle::getTimeStep()
+	double PlatformHandle::getTimeStep()
 	{
 		double now = glfwGetTime();
 		double step = now - lastTimeStep;
@@ -112,31 +112,31 @@ namespace glfw
 		return step;
 	}
 
-	void GLFWHandle::onCharModsEvent(unsigned int codepoint, int mods)
+	void PlatformHandle::onCharModsEvent(unsigned int codepoint, int mods)
 	{
 		if (isCharInputEnabled && onCharModsEventCallback) {
 			onCharModsEventCallback(codepoint, mods);
 		}
 	}
-	void GLFWHandle::onKeyEvent(int key, int scancode, int action, int mode)
+	void PlatformHandle::onKeyEvent(int key, int scancode, int action, int mode)
 	{
 		if (isKeyInputEnabled && onKeyEventCallback) {
 			onKeyEventCallback(key, action);
 		}
 	}
-	void GLFWHandle::onMousePosEvent(float xpos, float ypos)
+	void PlatformHandle::onMousePosEvent(float xpos, float ypos)
 	{
 		if (onMousePosEventCallback) {
 			onMousePosEventCallback(xpos, ypos);
 		}
 	}
-	void GLFWHandle::onMouseButtonEvent(int button, int action, int mods)
+	void PlatformHandle::onMouseButtonEvent(int button, int action, int mods)
 	{
 		if (onMouseButtonEventCallback) {
 			onMouseButtonEventCallback(button, action);
 		}
 	}
-	void GLFWHandle::onMouseWheelEvent(float xoffset, float yoffset)
+	void PlatformHandle::onMouseWheelEvent(float xoffset, float yoffset)
 	{
 		if (onMouseWheelEventCallback) {
 			onMouseWheelEventCallback(xoffset, yoffset);
@@ -144,27 +144,28 @@ namespace glfw
 	}
 
 	
-	void GLFWHandle::log(std::string msg)
+	void PlatformHandle::log(std::string msg)
 	{
 		std::cout << msg << std::endl;
 	}
-	Desktop_File GLFWHandle::open(std::string filename, AccessMode mode)
+	File PlatformHandle::open(std::string filename, AccessMode mode)
 	{
-		return Desktop_File(filename, mode);
+		return File(filename, mode);
 	}
-	std::string GLFWHandle::openFileDialog(std::string defaultPath)
+	std::string PlatformHandle::openFileDialog(std::string defaultPath)
 	{
 		nfdchar_t *outPath = nullptr;
-		const nfdchar_t *default = nullptr;
+		const nfdchar_t *defaultPathC = nullptr;
 		if (defaultPath.size() != 0) {
-			default = util::replaceAll(defaultPath, "/", "\\").c_str();
+			defaultPathC = util::replaceAll(defaultPath, "/", "\\").c_str();
 		}
-		nfdresult_t result = NFD_OpenDialog(nullptr, default, &outPath);
+		nfdresult_t result = NFD_OpenDialog(nullptr, defaultPathC, &outPath);
+		std::string outPathS = std::string(outPath);
 
 		switch (result)
 		{
 		case NFD_OKAY:
-			return util::replaceAll(std::string(outPath), "\\", "/");
+			return util::replaceAll(outPathS, "\\", "/");
 		case NFD_CANCEL:
 			return "";
 		case NFD_ERROR:

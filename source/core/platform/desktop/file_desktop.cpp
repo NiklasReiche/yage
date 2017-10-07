@@ -1,9 +1,8 @@
-#include "Desktop_File.h"
-#include <iostream>
+#include "file_desktop.h"
 
-namespace glfw
+namespace desktop
 {
-	Desktop_File::Desktop_File(std::string & filename, AccessMode mode)
+	File::File(std::string & filename, AccessMode mode)
 		: mode(mode), path(filename)
 	{
 		switch (mode)
@@ -19,23 +18,41 @@ namespace glfw
 			break;
 		}
 	}
-	Desktop_File::Desktop_File(Desktop_File & other)
+	File::File(File & other)
 	{
 		this->fstream = std::move(other.fstream);
+		this->file_ptr = other.file_ptr;
+		other.file_ptr = nullptr;
 		this->mode = other.mode;
 		this->path = other.path;
 	}
-	Desktop_File::~Desktop_File()
+	File::File(File && other)
+	{
+		this->fstream = std::move(other.fstream);
+		this->file_ptr = other.file_ptr;
+		other.file_ptr = nullptr;
+		this->mode = other.mode;
+		this->path = other.path;
+	}
+	File::~File()
 	{
 		fstream->close();
 	}
-
-	void Desktop_File::seek(int index, SeekOffset offset)
+	File& File::operator=(File & other)
 	{
-		fstream->seekg(index, (int)offset);
+		this->fstream = std::move(other.fstream);
+		this->file_ptr = other.file_ptr;
+		other.file_ptr = nullptr;
+		this->mode = other.mode;
+		this->path = other.path;
 	}
 
-	void Desktop_File::read(void* buffer, size_t size)
+	void File::seek(int index, SeekOffset offset)
+	{
+		fstream->seekg(index, std::ios_base::seekdir(offset));
+	}
+
+	void File::read(void* buffer, size_t size)
 	{
 		if (mode == AccessMode::READ || mode == AccessMode::READ_WRITE) {
 			fstream->read((char*)buffer, size);
@@ -44,7 +61,7 @@ namespace glfw
 			throw sys::FileException(sys::FileError::ACCESS_VIOLATION, "", path);
 		}
 	}
-	void Desktop_File::read(std::stringstream & output)
+	void File::read(std::stringstream & output)
 	{
 		std::streampos fileLength = 0;
 		fstream->seekg(0, std::ios::beg);
@@ -66,7 +83,7 @@ namespace glfw
 		// Free the memoery you allocated earlier
 		delete[] fileContent;
 	}
-	void Desktop_File::read(std::vector<char> & output)
+	void File::read(std::vector<char> & output)
 	{
 		std::streampos fileLength = 0;
 		fstream->seekg(0, std::ios::beg);
@@ -75,7 +92,7 @@ namespace glfw
 		fileLength = fstream->tellg() - fileLength;
 	}
 
-	void Desktop_File::write(void* buffer, size_t size)
+	void File::write(void* buffer, size_t size)
 	{
 		if (mode == AccessMode::WRITE || mode == AccessMode::READ_WRITE) {
 			fstream->write((char*)buffer, size);
@@ -85,26 +102,18 @@ namespace glfw
 		}
 	}
 
-	void Desktop_File::close()
+	void File::close()
 	{
 		fstream->close();
 	}
 
-	bool Desktop_File::is_open()
+	bool File::is_open()
 	{
 		return fstream->is_open();
 	}
 
-	bool Desktop_File::get_error()
+	bool File::get_error()
 	{
-
-		if (fstream->eof())
-			std::cout << "EOF" << std::endl;
-		if (fstream->bad())
-			std::cout << "BAD" << std::endl;
-		if (fstream->fail())
-			std::cout << "FAIL" << std::endl;
-
 		return (fstream->eof() || fstream->bad() || fstream->fail());
 	}
 }

@@ -21,8 +21,8 @@
 #include "GL3_Viewport.h"
 #include "GL3_Texture.h"
 
-#include <math\MVector.h>
-#include <platform\Platform.h>
+#include <math/MVector.h>
+#include <platform/platform.h>
 
 namespace gl3
 {

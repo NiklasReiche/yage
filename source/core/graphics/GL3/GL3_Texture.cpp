@@ -56,6 +56,10 @@ namespace gl3
 	{
 		bufferSubData(x_offset, y_offset, width, height, &data[0]);
 	}
+	void GL3_Texture::bufferSubData(int x_offset, int y_offset, int width, int height, std::vector<unsigned char> && data)
+	{
+		bufferSubData(x_offset, y_offset, width, height, &data[0]);
+	}
 	void GL3_Texture::bufferSubData(int x_offset, int y_offset, GL3_Texture texture)
 	{
 		std::vector<unsigned char> data;

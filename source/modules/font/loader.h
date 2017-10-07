@@ -4,8 +4,8 @@
 #include <vector>
 #include <iostream>
 
-#include <platform/Platform.h>
-#include <graphics/Graphics.h>
+#include <platform/platform.h>
+#include <graphics/graphics.h>
 
 #include "fileformat.h"
 #include "font.h"

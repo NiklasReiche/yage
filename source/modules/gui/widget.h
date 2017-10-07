@@ -9,12 +9,12 @@
 #include <image/imageReader.h>
 
 #include "core.h"
-#include "Interface.h"
-#include "FontManager.h"
-#include "textureManager.h"
-#include "Animation.h"
-#include "widgetTemplate.h"
-#include "Layouts.h"
+#include "interface.h"
+#include "fontmanager.h"
+#include "texturemanager.h"
+#include "animation.h"
+#include "widgettemplate.h"
+#include "layouts.h"
 
 namespace gui
 {

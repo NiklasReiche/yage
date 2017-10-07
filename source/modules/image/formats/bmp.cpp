@@ -410,7 +410,7 @@ namespace bmp
 
 	int Bitmap::save(sys::PlatformHandle* platform, std::string filename, FORCE_CHANNELS channel)
 	{
-		sys::File file = platform->open(filename, sys::AccesMode::WRITE);
+		sys::File file = platform->open(filename, sys::AccessMode::WRITE);
 
 		if (file.is_open() && isLoaded)
 		{

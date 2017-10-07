@@ -1,5 +1,5 @@
-#include "Renderer.h"
-#include "Shaders.h"
+#include "renderer.h"
+#include "shaders.h"
 
 namespace gui
 {

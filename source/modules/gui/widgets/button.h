@@ -6,8 +6,8 @@
 #include <functional>
 
 #include "../core.h"
-#include "../Widget.h"
-#include "Label.h"
+#include "../widget.h"
+#include "label.h"
 #include "frame.h"
 
 namespace gui

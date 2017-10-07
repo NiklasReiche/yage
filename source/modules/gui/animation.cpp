@@ -1,6 +1,6 @@
-#include "Animation.h"
-#include "Widget.h"
-#include "Master.h"
+#include "animation.h"
+#include "widget.h"
+#include "master.h"
 
 namespace gui
 {

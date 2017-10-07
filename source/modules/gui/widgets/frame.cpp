@@ -1,4 +1,4 @@
-﻿#include "Frame.h"
+﻿#include "frame.h"
 
 namespace gui
 {

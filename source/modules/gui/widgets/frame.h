@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "../core.h"
-#include "../Widget.h"
+#include "../widget.h"
 
 
 namespace gui

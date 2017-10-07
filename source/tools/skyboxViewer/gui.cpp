@@ -1,6 +1,6 @@
 #include "gui.h"
-#include "platform/Platform.h"
-#include <graphics/Graphics.h>
+#include "platform/platform.h"
+#include <graphics/graphics.h>
 
 
 Gui::Gui(sys::PlatformHandle* platform, gl::GraphicsContext* gl, input::InputController* input)
@@ -8,10 +8,11 @@ Gui::Gui(sys::PlatformHandle* platform, gl::GraphicsContext* gl, input::InputCon
 {
 	master = new gui::Master(platform, gl, input);
 	try {
-		master->addFont("D:/DEV/Projects/yage/Tests/gui/res/arial.font");
+		master->addFont(installPath + "/assets/fonts/arial.font");
 	}
 	catch (sys::FileException& exception) {
 		platform->log("ERROR::FONT_LOADER: could not open file " + exception.file());
+		platform->log(util::to_string(exception.error()));
 	}
 
 	gui::FrameTemplate frameTemplate;
@@ -64,8 +65,8 @@ Gui::Gui(sys::PlatformHandle* platform, gl::GraphicsContext* gl, input::InputCon
 	buttonTemplate.text.size = 14;
 	buttonTemplate.text.alignX = gui::TextAlignmentX::CENTER;
 	buttonTemplate.text.alignY = gui::TextAlignmentY::BOTTOM;
-	buttonTemplate.texture.filename = "D:/DEV/Projects/YAGE/source/tools/skyboxViewer/assets/gui/plus.png";
-	buttonTemplate.hoverTexture.filename = "D:/DEV/Projects/YAGE/source/tools/skyboxViewer/assets/gui/plus_large.png";
+	buttonTemplate.texture.filename = installPath + "/assets/gui/plus.png";
+	buttonTemplate.hoverTexture.filename = installPath + "/assets/gui/plus_large.png";
 	gui::PushButton* buttonDummy = master->createWidget<gui::PushButton>(frame1, buttonTemplate);
 	buttonDummy->hide();
 

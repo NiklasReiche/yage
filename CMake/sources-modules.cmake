@@ -28,7 +28,7 @@ set( YAGE_FONT_SOURCE
 	"${YAGE_MODULES_PATH}/font/loader.cpp"
 	"${YAGE_MODULES_PATH}/font/text.h"
 	"${YAGE_MODULES_PATH}/font/text.cpp"
-	"${YAGE_MODULES_PATH}/font/Shaders.h"
+	"${YAGE_MODULES_PATH}/font/shaders.h"
 	
 )
 set( YAGE_FONT_CONVERTER_SOURCE
@@ -47,22 +47,22 @@ set( YAGE_GUI_SOURCE
 	"${YAGE_MODULES_PATH}/gui/gui.h"
 	"${YAGE_MODULES_PATH}/gui/core.h"
 
-	"${YAGE_MODULES_PATH}/gui/Shaders.h"
+	"${YAGE_MODULES_PATH}/gui/shaders.h"
 
 	"${YAGE_MODULES_PATH}/gui/master.h"
 	"${YAGE_MODULES_PATH}/gui/master.cpp"
 	"${YAGE_MODULES_PATH}/gui/renderer.h"
 	"${YAGE_MODULES_PATH}/gui/renderer.cpp"
-	"${YAGE_MODULES_PATH}/gui/InputManager.h"
-	"${YAGE_MODULES_PATH}/gui/InputManager.cpp"
+	"${YAGE_MODULES_PATH}/gui/inputmanager.h"
+	"${YAGE_MODULES_PATH}/gui/inputmanager.cpp"
 	"${YAGE_MODULES_PATH}/gui/fontmanager.h"
 	"${YAGE_MODULES_PATH}/gui/fontmanager.cpp"
-	"${YAGE_MODULES_PATH}/gui/textureManager.h"
-	"${YAGE_MODULES_PATH}/gui/textureManager.cpp"
+	"${YAGE_MODULES_PATH}/gui/texturemanager.h"
+	"${YAGE_MODULES_PATH}/gui/texturemanager.cpp"
 
-	"${YAGE_MODULES_PATH}/gui/widgetTemplate.h"
-	"${YAGE_MODULES_PATH}/gui/rootWidget.h"
-	"${YAGE_MODULES_PATH}/gui/rootWidget.cpp"
+	"${YAGE_MODULES_PATH}/gui/widgettemplate.h"
+	"${YAGE_MODULES_PATH}/gui/root.h"
+	"${YAGE_MODULES_PATH}/gui/root.cpp"
 
 	"${YAGE_MODULES_PATH}/gui/widget.h"
 	"${YAGE_MODULES_PATH}/gui/widget.cpp"
@@ -76,10 +76,10 @@ set( YAGE_GUI_SOURCE
 	"${YAGE_MODULES_PATH}/gui/widgets/label.cpp"
 
 	"${YAGE_MODULES_PATH}/gui/interface.h"
-	"${YAGE_MODULES_PATH}/gui/Animation.h"
-	"${YAGE_MODULES_PATH}/gui/Animation.cpp"
-	"${YAGE_MODULES_PATH}/gui/Layouts.h"
-	"${YAGE_MODULES_PATH}/gui/Layouts.cpp"
+	"${YAGE_MODULES_PATH}/gui/animation.h"
+	"${YAGE_MODULES_PATH}/gui/animation.cpp"
+	"${YAGE_MODULES_PATH}/gui/layouts.h"
+	"${YAGE_MODULES_PATH}/gui/layouts.cpp"
 	
 )
 

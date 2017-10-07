@@ -1,5 +1,5 @@
-#include "Layouts.h"
-#include "Widget.h"
+#include "layouts.h"
+#include "widget.h"
 
 namespace gui
 {

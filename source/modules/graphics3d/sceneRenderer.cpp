@@ -1,8 +1,2 @@
-#pragma once
+#include "sceneRenderer.h"
 
-
-
-class SceneRenderer
-{
-
-};

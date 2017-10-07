@@ -6,9 +6,9 @@
 #include <functional>
 
 #include "../core.h"
-#include "../InputManager.h"
-#include "../Widget.h"
-#include "Label.h"
+#include "../inputmanager.h"
+#include "../widget.h"
+#include "label.h"
 
 namespace gui
 {

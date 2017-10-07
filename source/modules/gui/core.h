@@ -1,7 +1,7 @@
 #pragma once
 
 #include <math/MVector.h>
-#include <platform/Platform.h>
-#include <graphics/Graphics.h>
+#include <platform/platform.h>
+#include <graphics/graphics.h>
 #include <input/InputController.h>
 #include <font/fontHeader.h>

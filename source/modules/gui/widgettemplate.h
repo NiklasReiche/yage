@@ -1,10 +1,10 @@
 #pragma once
 
 #include "math/MVector.h"
-#include "graphics/Color.h"
-#include <graphics/Graphics.h>
+#include "graphics/color.h"
+#include <graphics/graphics.h>
 
-#include "Layouts.h"
+#include "layouts.h"
 
 namespace gui
 {

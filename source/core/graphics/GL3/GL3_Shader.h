@@ -3,7 +3,7 @@
 #include <string>
 #include <map>
 
-#include "math\MVector.h"
+#include "math/MVector.h"
 
 #include "gl3.h"
 #include "GL3_Object.h"

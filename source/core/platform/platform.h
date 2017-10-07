@@ -1,8 +1,8 @@
 #pragma once
 
 #ifdef DESKTOP
-#include "desktop/GLFW_Handle.h"
-#include "desktop/Desktop_File.h"
+#include "desktop/platformHandle_desktop.h"
+#include "desktop/file_desktop.h"
 #endif
 
 #ifdef ANDROID
@@ -11,15 +11,15 @@
 #endif
 
 #include "util.h"
-#include "Exception.h"
+#include "exception.h"
 
 namespace sys
 {
 #ifdef DESKTOP
-	typedef glfw::GLFWHandle PlatformHandle;
-	typedef glfw::Desktop_File File;
-	typedef glfw::SeekOffset SeekOffset;
-	typedef glfw::AccessMode AccesMode;
+	typedef desktop::PlatformHandle PlatformHandle;
+	typedef desktop::File File;
+	typedef desktop::SeekOffset SeekOffset;
+	typedef desktop::AccessMode AccessMode;
 #endif
 
 #ifdef ANDROID

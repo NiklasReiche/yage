@@ -1,32 +1,32 @@
 #pragma once
 
 #ifdef GL3
-#include "GL3\gl3.h"
-#include "GL3\GL3_Exception.h"
-#include "GL3\GL3_Enum.h"
+#include "GL3/gl3.h"
+#include "GL3/GL3_Exception.h"
+#include "GL3/GL3_Enum.h"
 
-#include "GL3\GL3_Drawable.h"
-#include "GL3\GL3_Texture.h"
-#include "GL3\GL3_Framebuffer.h"
-#include "GL3\GL3_Shader.h"
-#include "GL3\GL3_Viewport.h"
+#include "GL3/GL3_Drawable.h"
+#include "GL3/GL3_Texture.h"
+#include "GL3/GL3_Framebuffer.h"
+#include "GL3/GL3_Shader.h"
+#include "GL3/GL3_Viewport.h"
 
-#include "GL3\GL3_Context.h"
-#include "GL3\GL3_ShaderLoader.h"
+#include "GL3/GL3_Context.h"
+#include "GL3/GL3_ShaderLoader.h"
 #endif // GL3
 
 #ifdef GLES2
-#include "GLES2\gles2.h"
+#include "GLES2/gles2.h"
 
-#include "GLES2\GLES2_Enum.h"
-#include "GLES2\GLES2_Drawable.h"
-#include "GLES2\GLES2_Texture.h"
-#include "GLES2\GLES2_Framebuffer.h"
-#include "GLES2\GLES2_Shader.h"
-#include "GLES2\GLES2_Viewport.h"
+#include "GLES2/GLES2_Enum.h"
+#include "GLES2/GLES2_Drawable.h"
+#include "GLES2/GLES2_Texture.h"
+#include "GLES2/GLES2_Framebuffer.h"
+#include "GLES2/GLES2_Shader.h"
+#include "GLES2/GLES2_Viewport.h"
 
-#include "GLES2\GLES2_Context.h"
-#include "GLES2\GLES2_ShaderLoader.h"
+#include "GLES2/GLES2_Context.h"
+#include "GLES2/GLES2_ShaderLoader.h"
 #endif // GLES2
 
 namespace gl

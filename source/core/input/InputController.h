@@ -4,7 +4,7 @@
 #include <map>
 #include <vector>
 
-#include <platform/Platform.h>
+#include <platform/platform.h>
 #include "InputState.h"
 #include "InputNames.h"
 #include "InputListener.h"

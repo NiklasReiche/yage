@@ -1,5 +1,5 @@
-#include "platform/Platform.h"
-#include "graphics/gl.h"
+#include <platform/platform.h>
+#include <graphics/gl.h>
 #include "input/InputController.h"
 #include "math/MVector.h"
 #include "graphics3d/skybox.h"

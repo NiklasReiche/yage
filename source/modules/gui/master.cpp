@@ -1,4 +1,4 @@
-#include "Master.h"
+#include "master.h"
 
 namespace gui
 {

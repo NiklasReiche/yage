@@ -5,7 +5,7 @@
 #include <iostream>
 #include <memory>
 
-#include <graphics/Graphics.h>
+#include <graphics/graphics.h>
 
 namespace img
 {

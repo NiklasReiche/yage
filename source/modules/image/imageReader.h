@@ -3,7 +3,7 @@
 #include <string>
 
 #include <platform/platform.h>
-#include <platform/exception.h>
+#include <graphics/graphics.h>
 
 #include "image.h"
 #include "enum.h"

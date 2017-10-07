@@ -4,7 +4,7 @@
 #include <array>
 #include <string>
 
-#include <graphics/gl.h>
+#include <graphics/graphics.h>
 
 namespace graphics3d
 {

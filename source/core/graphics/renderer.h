@@ -1,7 +1,7 @@
 #pragma once
 
 #include "gl.h"
-#include "Color.h"
+#include "color.h"
 
 namespace gl
 {

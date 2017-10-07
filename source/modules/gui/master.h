@@ -5,14 +5,14 @@
 #include <memory>
 
 #include "core.h"
-#include "Renderer.h"
-#include "FontManager.h"
-#include "InputManager.h"
-#include "textureManager.h"
-#include "Interface.h"
-#include "Widget.h"
-#include "rootWidget.h"
-#include "Animation.h"
+#include "renderer.h"
+#include "fontmanager.h"
+#include "inputmanager.h"
+#include "texturemanager.h"
+#include "interface.h"
+#include "widget.h"
+#include "root.h"
+#include "animation.h"
 
 namespace gui
 {

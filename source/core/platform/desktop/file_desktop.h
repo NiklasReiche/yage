@@ -6,9 +6,9 @@
 #include <vector>
 #include <memory>
 
-#include "../Exception.h"
+#include "../exception.h"
 
-namespace glfw
+namespace desktop
 {
 	enum class AccessMode
 	{
@@ -22,7 +22,7 @@ namespace glfw
 		CUR = std::ios::cur
 	};
 
-	class Desktop_File
+	class File
 	{
 	private:
 		std::string path;
@@ -31,9 +31,11 @@ namespace glfw
 		AccessMode mode;
 
 	public:
-		Desktop_File(std::string & filename, AccessMode mode = AccessMode::READ);
-		Desktop_File(Desktop_File & desktopFile);
-		~Desktop_File();
+		File(std::string & filename, AccessMode mode = AccessMode::READ);
+		File(File & other);
+		File(File && other);
+		~File();
+		File& operator=(File & other);
 
 		void seek(int index, SeekOffset offset);
 		void read(void* buffer, size_t size);

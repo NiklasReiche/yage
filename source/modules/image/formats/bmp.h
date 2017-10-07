@@ -7,7 +7,7 @@
 #include <fstream>
 #include <cstdint>
 
-#include <platform/Platform.h>
+#include <platform/platform.h>
 
 #include "../image.h"
 #include "../enum.h"

@@ -1,4 +1,4 @@
-﻿#include "FontManager.h"
+﻿#include "fontmanager.h"
 
 namespace gui
 {
