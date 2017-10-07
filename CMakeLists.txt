@@ -73,3 +73,4 @@ add_subdirectory( source/modules/gui )
 add_subdirectory( source/modules/graphics3d )
 
 add_subdirectory( source/tools/skyboxViewer )
+add_subdirectory( source/tools/guiEditor )
