@@ -19,7 +19,6 @@ set( YAGE_GRAPHICS_SOURCE
 )
 set( YAGE_GRAPHICS_GL3_SOURCE
 
-	"${YAGE_CORE_PATH}/graphics/GL3/glad.c"
 	"${YAGE_CORE_PATH}/graphics/GL3/gl3.h"
 	"${YAGE_CORE_PATH}/graphics/GL3/GL3_Exception.h"
 	"${YAGE_CORE_PATH}/graphics/GL3/GL3_Enum.h"
@@ -108,14 +107,7 @@ set( YAGE_PLATFORM_DESKTOP_SOURCE
 	"${YAGE_CORE_PATH}/platform/desktop/GLFW_Handle.h"
 	"${YAGE_CORE_PATH}/platform/desktop/GLFW_Handle.cpp"
 	"${YAGE_CORE_PATH}/platform/desktop/Desktop_File.h"
-	"${YAGE_CORE_PATH}/platform/desktop/desktop_file.cpp"
-
-	"${YAGE_CORE_PATH}/platform/desktop/nativeFileDialog/nfd.h"
-	"${YAGE_CORE_PATH}/platform/desktop/nativeFileDialog/common.h"
-	"${YAGE_CORE_PATH}/platform/desktop/nativeFileDialog/nfd_common.h"
-	"${YAGE_CORE_PATH}/platform/desktop/nativeFileDialog/nfd_common.c"
-	"${YAGE_CORE_PATH}/platform/desktop/nativeFileDialog/nfd_gtk.c"
-	#"${YAGE_CORE_PATH}/platform/desktop/nativeFileDialog/nfd_win.cpp"
+	"${YAGE_CORE_PATH}/platform/desktop/Desktop_File.cpp"
 
 )
 set( YAGE_PLATFORM_ANDROID_SOURCE

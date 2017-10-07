@@ -2,5 +2,4 @@
 # GLAD	                                                          #
 ###################################################################
 
-add_library(glad INTERFACE)
-target_include_directories(glad INTERFACE glad)
+add_subdirectory( ${YAGE_EXTERNAL_PATH}/glad )
