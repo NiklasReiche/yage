@@ -1,3 +1,7 @@
+###################################################################
+# GLFW	                                                          #
+###################################################################
+
 option(BUILD_SHARED_LIBS "" OFF)
 
 option(GLFW_BUILD_EXAMPLES "" OFF)
@@ -10,3 +14,4 @@ if(WIN32)
 endif()
 
 add_subdirectory(${YAGE_EXTERNAL_PATH}/glfw)
+target_include_directories(glfw PUBLIC $<BUILD_INTERFACE:${YAGE_EXTERNAL_PATH}/glfw/include>)

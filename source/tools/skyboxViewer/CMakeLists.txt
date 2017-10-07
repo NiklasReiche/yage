@@ -17,3 +17,8 @@ target_link_libraries(skyboxViewer PUBLIC YAGEcore
 								   PUBLIC YAGEfont
 								   PUBLIC YAGEgui
 								   PUBLIC YAGEgraphics3d)
+
+target_include_directories(skyboxViewer PUBLIC ${YAGE_CORE_PATH})
+
+target_compile_definitions(skyboxViewer PUBLIC "DESKTOP")
+target_compile_definitions(skyboxViewer PUBLIC "GL3")

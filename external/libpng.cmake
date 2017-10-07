@@ -1,3 +1,6 @@
+###################################################################
+# LIBPNG                                                          #
+###################################################################
 
 option(PNG_BUILD_ZLIB "Custom zlib Location, else find_package is used" ON)
 
@@ -17,4 +20,4 @@ set(PNG_CUSTOM_EXPORT 0)
 
 add_subdirectory(${YAGE_EXTERNAL_PATH}/libpng)
 target_include_directories(png_static PUBLIC zlib 
-									  PUBLIC ${YAGE_EXTERNAL_PATH}/libpng/include)
+									  PUBLIC $<BUILD_INTERFACE:${YAGE_EXTERNAL_PATH}/libpng/include>)
