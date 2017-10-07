@@ -11,4 +11,6 @@ include( libpng.cmake )
 
 include( nfd.cmake )
 
+include( gtest.cmake )
+
 #include(freetype.cmake)
