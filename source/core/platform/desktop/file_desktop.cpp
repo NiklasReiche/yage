@@ -45,6 +45,7 @@ namespace desktop
 		other.file_ptr = nullptr;
 		this->mode = other.mode;
 		this->path = other.path;
+		return *this;
 	}
 
 	void File::seek(int index, SeekOffset offset)
