@@ -111,6 +111,9 @@ namespace png
 		if ((color == PNG_COLOR_TYPE_RGB || color == PNG_COLOR_TYPE_RGB_ALPHA) && (forceChannel == FORCE_CHANNELS::G || forceChannel == FORCE_CHANNELS::GA)) {
 			png_set_rgb_to_gray_fixed(png_ptr, 1, -1, -1);
 		}
+		if (color & PNG_COLOR_MASK_ALPHA && (forceChannel == FORCE_CHANNELS::RGB || forceChannel == FORCE_CHANNELS::G)) {
+			png_set_strip_alpha(png_ptr);
+		}
 
 		png_read_update_info(png_ptr, info_ptr);
 		readInfoHeader();
