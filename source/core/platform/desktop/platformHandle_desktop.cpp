@@ -160,11 +160,12 @@ namespace desktop
 			defaultPathC = util::replaceAll(defaultPath, "/", "\\").c_str();
 		}
 		nfdresult_t result = NFD_OpenDialog(nullptr, defaultPathC, &outPath);
-		std::string outPathS = std::string(outPath);
+		std::string outPathS;
 
 		switch (result)
 		{
 		case NFD_OKAY:
+			outPathS = std::string(outPath);
 			return util::replaceAll(outPathS, "\\", "/");
 		case NFD_CANCEL:
 			return "";
