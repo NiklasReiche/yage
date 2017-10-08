@@ -52,7 +52,7 @@ int App::run()
 
 void App::loadSkybox(std::array<std::string, 6> filenames)
 {
-	skybox = graphics3d::SkyboxLoader(platform, glContext).loadSkybox(filenames, 100);
+	skybox = graphics3d::SkyboxLoader(platform, glContext).loadSkybox(filenames, 100, 2048);
 	skybox.shader.setUniform("skybox", 0);
 	gml::Matrix4D<float> proj = gml::perspective<float>(45.0f, (float)(skyboxViewport.x + skyboxViewport.width)/ (float)(skyboxViewport.y + skyboxViewport.height), 0.1f, 1000.0f);
 	skybox.shader.setUniform("projection", proj);
