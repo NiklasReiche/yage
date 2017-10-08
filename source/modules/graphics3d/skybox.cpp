@@ -4,17 +4,25 @@
 
 namespace graphics3d
 {
-	Skybox SkyboxLoader::loadSkybox(std::array<std::string, 6> paths, float boxSize)
+	Skybox SkyboxLoader::loadSkybox(std::array<std::string, 6> paths, float boxSize, int textureSize)
 	{
 		img::ImageReader imageReader(platform);
 		std::array<img::Image, 6> images;
 		std::array<unsigned char*, 6> faces;
+		gl::Texture temp;
 		
 		for (unsigned int i = 0; i < paths.size(); ++i) {
-			images[i] = imageReader.readFile(paths[i]);
-			faces[i] = images[i].getRawData();
-			if (images[i].getWidth() != images[0].getWidth() || images[i].getHeight() != images[0].getHeight()) {
-				throw sys::FileException(sys::FileError::UNKNOWN, "images not same size", paths[i]);
+			if (paths.at(i).size() != 0) {
+				images[i] = imageReader.readFile(paths[i], img::FORCE_CHANNELS::RGB);
+				if (images.at(i).getWidth() != textureSize || images.at(i).getHeight() != textureSize) {
+					temp = images.at(i).toTexture(glContext);
+					temp.resize(textureSize, textureSize);
+					images[i] = imageReader.readTexture(temp);
+				}
+				faces[i] = images[i].getRawData();
+			}
+			else {
+				faces[i] = nullptr;
 			}
 		}
 
@@ -63,7 +71,7 @@ namespace graphics3d
 		};
 
 		Skybox skybox;
-		skybox.cubemap = glContext->createCubemapTexture(faces, images.at(0).getWidth(), images.at(0).getHeight(), gl::ImageFormat::RGB);
+		skybox.cubemap = glContext->createCubemapTexture(faces, textureSize, textureSize, gl::ImageFormat::RGB);
 		skybox.drawable = glContext->createDrawable(skyboxVertices, std::vector<int>{3}, gl::DrawMode::DRAW_STATIC);
 
 		std::string vertexShader =

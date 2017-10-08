@@ -29,6 +29,6 @@ namespace graphics3d
 		SkyboxLoader(sys::PlatformHandle* platform, gl::GraphicsContext* glContext)
 			: platform(platform), glContext(glContext){}
 
-		Skybox loadSkybox(std::array<std::string, 6> dirpath, float boxSize);
+		Skybox loadSkybox(std::array<std::string, 6> dirpath, float boxSize, int textureSize);
 	};
 }
