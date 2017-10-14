@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "vector.h"
+#include "math.h"
 
 namespace gml
 {
@@ -33,25 +34,40 @@ namespace gml
 
 		float getPitch()
 		{
-			float sinr = 2.0f * (w * x + y * z);
-			float cosr = 1.0f - 2.0f * (x * x + y * y);
-			return std::atan2(sinr, cosr);
+			float test = x*y + z*w;
+			if (test > 0.499) { // singularity at north pole
+				return 0;
+			}
+			if (test < -0.499) { // singularity at south pole
+				return 0;
+			}
+			float sqx = x*x;
+			float sqz = z*z;
+			return std::atan2(2 * x*w - 2 * y*z, 1 - 2 * sqx - 2 * sqz);
 		}
 		float getYaw()
 		{
-			float sinp = 2.0 * (w * y - z * x);
-			if (std::abs(sinp) >= 1) {
-				return std::copysign(PI / 2, sinp);
+			float test = x*y + z*w;
+			if (test > 0.499) { // singularity at north pole
+				return 2 * std::atan2(x, w);
 			}
-			else {
-				return std::asin(sinp);
+			if (test < -0.499) { // singularity at south pole
+				return -2 * std::atan2(x, w);
 			}
+			float sqy = y*y;
+			float sqz = z*z;
+			return std::atan2(2 * y*w - 2 * x*z, 1 - 2 * sqy - 2 * sqz);
 		}
 		float getRoll()
 		{
-			float siny = 2.0 * (w * z + x * y);
-			float cosy = 1.0 - 2.0 * (y * y + z * z);
-			return std::atan2(siny, cosy);
+			float test = x*y + z*w;
+			if (test > 0.499) { // singularity at north pole
+				return PI / 2;
+			}
+			if (test < -0.499) { // singularity at south pole
+				return -PI / 2;
+			}
+			return std::asin(2 * test);
 		}
 	};
 
@@ -126,10 +142,17 @@ namespace gml
 		return q;
 	}
 	template <typename T>
-	Quaternion<T> eulerAngle(float yaw, float pitch, float roll) {
-		//Quaternion qroll = Quaternion(std::cos(angle_y / 2), sin(angle_y / 2), 0, 0);
-		//Quaternion qpitch = Quaternion(std::cos(angle_x / 2), 0, sin(angle_x / 2), 0);
-		//Quaternion qyaw = Quaternion(std::cos(angle_z / 2), 0, 0, sin(angle_z / 2));
-		return Quaternion<T>();
+	Quaternion<T> eulerAngle(float pitch, float yaw, float roll) {
+		float c1 = std::cos(toRad(yaw) / 2);
+		float c2 = std::cos(toRad(roll) / 2);
+		float c3 = std::cos(toRad(pitch) / 2);
+		float s1 = std::sin(toRad(yaw) / 2);
+		float s2 = std::sin(toRad(roll) / 2);
+		float s3 = std::sin(toRad(pitch) / 2);
+		float w = c1 * c2 * c3 - s1 * s2 * s3;
+		float x = s1 * s2 * c3 + c1 * c2 * s3;
+		float y = s1 * c2 * c3 + c1 * s2 * s3;
+		float z = c1 * s2 * c3 - s1 * c2 * s3;
+		return Quaternion<T>(w, x, y, z);
 	}
 }
