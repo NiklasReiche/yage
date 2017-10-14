@@ -12,10 +12,10 @@ set( CMAKE_CXX_STANDARD 14 )
 # compiler flags     #
 ######################
 set( GCC_COMPILER_FLAGS 
-"-fdiagnostics-color=always"
+	"-fdiagnostics-color=always"
 )
 set( MSVC_COMPILER_FLAGS
-
+	"/MP"
 )
 
 if(WIN32)
