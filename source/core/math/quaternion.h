@@ -19,6 +19,26 @@ namespace gml
 		Quaternion(Vec3<T> vec) :
 			w(0), x(vec.x), y(vec.y), z(vec.z) {}
 
+		Quaternion& operator*=(float right)
+		{
+			this->x *= right;
+			this->y *= right;
+			this->z *= right;
+			this->w *= right;
+			return *this;
+		}
+		Quaternion& operator*=(Quaternion right)
+		{
+			Vec3<T> a = Vec3<T>(this->x, this->y, this->z);
+			Vec3<T> b = Vec3<T>(right.x, right.y, right.z);
+			Vec3<T> c = Vec3<T>(this->w * b) + Vec3<T>(right.w * a) + cross(a, b);
+			this->x = c.x;
+			this->y = c.y;
+			this->z = c.z;
+			this->w = this->w * right.w - dot(a, b);
+			return *this;
+		}
+
 		Vec3<T> getForward()
 		{
 			return normalize(Vec3<T>(-2 * (x * z + w * y), -2 * (y * z - w * x), -1 + 2 * (x * x + y * y)));
