@@ -1,4 +1,5 @@
 #include "app.h"
+#include <iomanip>
 
 App::App()
 {
@@ -79,23 +80,24 @@ void App::on_mouse_pos_event(float x, float y)
 		gml::Vec2f dist = mouse.pos - gml::Vec2f(x, y);
 		gml::Vec2f angle = dist * mouse.sensitivity;
 
-		
-		gml::Quaternion<float> q_yaw = gml::axisAngle<float>(angle.x, gml::Vec3f(0.0f, 1.0f, 0.0f));
-		gml::Quaternion<float> q_pitch = gml::axisAngle<float>(angle.y, gml::Vec3f(1.0f, 0.0f, 0.0f));
+		gml::Quaternion<float> q_yaw = gml::eulerAngle<float>(0, angle.x, 0);
+		gml::Quaternion<float> q_pitch = gml::eulerAngle<float>(angle.y, 0, 0);
 
-		gml::Quaternion<float> newRotation = gml::normalize<float>(q_yaw * camera.rotation * q_pitch);
+		//gml::Quaternion<float> newRotation = gml::normalize<float>(q_yaw * camera.rotation * q_pitch);
+		camera.rotateYaw(angle.x);
+		camera.rotatePitch(angle.y);
 
-		std::cout << "roll:  " << gml::toDeg(newRotation.getRoll()) << "\n";
-		std::cout << "pitch: " << gml::toDeg(newRotation.getPitch()) << "\n";
-		std::cout << "yaw:   " << gml::toDeg(newRotation.getYaw()) << "\n";
-		std::cout << "\r" << std::endl;
+		//std::cout << "r:  " << std::setw(15) << std::round(gml::toDeg(newRotation.getRoll())) << " | p: " << std::setw(15) << std::round(gml::toDeg(newRotation.getPitch())) << " | y: " << std::round(gml::toDeg(newRotation.getYaw()));
+		std::cout << "\r" << std::flush;
 
+		/*
 		if (getPitch(newRotation) > 50) {
 			camera.rotation = gml::normalize<float>(q_yaw * camera.rotation);
 		}
 		else {
 			camera.rotation = newRotation;
 		}
+		*/
 	}
 	mouse.pos = gml::Vec2f(x, y);
 }
@@ -120,5 +122,13 @@ void App::on_key_event(input::KeyCode code, input::KeyAction action)
 			platform->hideCursor();
 			mouse.isHidden = true;
 		}
+	}
+
+	if (code == input::KeyCode::KEY_E && (action == input::KeyAction::REPEAT || action == input::KeyAction::PRESS)) {
+		camera.rotateRoll(-1);
+	}
+
+	if (code == input::KeyCode::KEY_Q && (action == input::KeyAction::REPEAT || action == input::KeyAction::PRESS)) {
+		camera.rotateRoll(1);
 	}
 }
