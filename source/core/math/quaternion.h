@@ -49,8 +49,8 @@ namespace gml
 		}
 		float getRoll()
 		{
-			double siny = 2.0 * (w * z + x * y);
-			double cosy = 1.0 - 2.0 * (y * y + z * z);
+			float siny = 2.0 * (w * z + x * y);
+			float cosy = 1.0 - 2.0 * (y * y + z * z);
 			return std::atan2(siny, cosy);
 		}
 	};
