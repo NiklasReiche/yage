@@ -79,11 +79,16 @@ void App::on_mouse_pos_event(float x, float y)
 		gml::Vec2f dist = mouse.pos - gml::Vec2f(x, y);
 		gml::Vec2f angle = dist * mouse.sensitivity;
 
+		
 		gml::Quaternion<float> q_yaw = gml::axisAngle<float>(angle.x, gml::Vec3f(0.0f, 1.0f, 0.0f));
 		gml::Quaternion<float> q_pitch = gml::axisAngle<float>(angle.y, gml::Vec3f(1.0f, 0.0f, 0.0f));
 
 		gml::Quaternion<float> newRotation = gml::normalize<float>(q_yaw * camera.rotation * q_pitch);
 
+		std::cout << "roll:  " << gml::toDeg(newRotation.getRoll()) << "\n";
+		std::cout << "pitch: " << gml::toDeg(newRotation.getPitch()) << "\n";
+		std::cout << "yaw:   " << gml::toDeg(newRotation.getYaw()) << "\n";
+		std::cout << "\r" << std::endl;
 
 		if (getPitch(newRotation) > 50) {
 			camera.rotation = gml::normalize<float>(q_yaw * camera.rotation);
@@ -101,7 +106,7 @@ float App::getPitch(gml::Quaternion<float> quaternion)
 	gml::Vec3f right = quaternion.getRight();
 	gml::Vec3f worldForward = gml::cross(worldUp, right);
 	gml::Vec3f forward = quaternion.getForward();
-	return acos(gml::dot(worldForward, forward) / (gml::length(worldForward) * gml::length(forward))) * (180.0 / PI);
+	return acos(gml::dot(worldForward, forward) / (gml::length(worldForward) * gml::length(forward))) * (180.0 / gml::PI);
 }
 
 void App::on_key_event(input::KeyCode code, input::KeyAction action)
