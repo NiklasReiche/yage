@@ -18,7 +18,7 @@ namespace font
 		sys::PlatformHandle* platform;
 		gl::GraphicsContext* glContext;
 
-		gml::Vector2D<float> calcScale(int ptSize, int EM_size, int dpiHori = 0, int dpiVert = 0);
+		gml::Vec2<float> calcScale(int ptSize, int EM_size, int dpiHori = 0, int dpiVert = 0);
 
 	public:
 		FontLoader(sys::PlatformHandle* platform, gl::GraphicsContext * glContext);

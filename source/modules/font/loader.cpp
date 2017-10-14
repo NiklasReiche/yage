@@ -2,7 +2,7 @@
 
 namespace font
 {
-	gml::Vector2D<float> FontLoader::calcScale(int ptSize, int EM_size, int dpiHori, int dpiVert)
+	gml::Vec2<float> FontLoader::calcScale(int ptSize, int EM_size, int dpiHori, int dpiVert)
 	{
 		if (dpiVert == 0 && dpiHori != 0) {
 			dpiVert = dpiHori;
@@ -18,7 +18,7 @@ namespace font
 		float pixel_size_y = ptSize * dpiVert / 72.0f;
 		float scale_x = pixel_size_x / EM_size;
 		float scale_y = pixel_size_y / EM_size;
-		return gml::Vector2D<float>(scale_x, scale_y);
+		return gml::Vec2<float>(scale_x, scale_y);
 	}
 
 	FontLoader::FontLoader(sys::PlatformHandle* platform, gl::GraphicsContext* glContext)
