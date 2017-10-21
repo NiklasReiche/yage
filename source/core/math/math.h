@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 namespace gml
 {
 	const float PI = 3.141592653589793238463f;
