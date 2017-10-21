@@ -38,7 +38,7 @@ elseif(WIN32)
 	target_link_libraries(YAGEcore PUBLIC opengl32.lib
 								   PUBLIC glfw
 								   PUBLIC glad
-								   PUBLIC nfd )
+								   PUBLIC tfd )
 
 	target_include_directories(YAGEcore PUBLIC ${YAGE_CORE_PATH})
 
