@@ -51,7 +51,7 @@ elseif(UNIX)
 	target_link_libraries(YAGEcore PUBLIC libGL.so
 								   PUBLIC glfw
 								   PUBLIC glad
-								   PUBLIC nfd )
+								   PUBLIC tfd )
 
 	target_include_directories(YAGEcore PUBLIC ${YAGE_CORE_PATH})
 

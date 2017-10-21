@@ -1,7 +1,7 @@
 #include "platformHandle_desktop.h"
 #include "glfwCallback.h"
 #include "../util.h"
-#include <nfd/nfd.h>
+#include <tfd/tinyfiledialogs.h>
 
 namespace desktop
 {
@@ -143,7 +143,7 @@ namespace desktop
 		}
 	}
 
-	
+
 	void PlatformHandle::log(std::string msg)
 	{
 		std::cout << msg << std::endl;
@@ -152,28 +152,25 @@ namespace desktop
 	{
 		return File(filename, mode);
 	}
-	std::string PlatformHandle::openFileDialog(std::string defaultPath)
+	std::string PlatformHandle::openFileDialog(std::string defaultPath, std::vector<std::string> filterList, std::string filterName)
 	{
-		nfdchar_t *outPath = nullptr;
-		const nfdchar_t *defaultPathC = nullptr;
+		const char *defaultPathC = nullptr;
 		if (defaultPath.size() != 0) {
-			defaultPathC = util::replaceAll(defaultPath, "/", "\\").c_str();
+			defaultPathC = util::replaceAll(defaultPath, "\\", "/").c_str();
 		}
-		nfdresult_t result = NFD_OpenDialog(nullptr, defaultPathC, &outPath);
-		std::string outPathS;
 
-		switch (result)
-		{
-		case NFD_OKAY:
-			outPathS = std::string(outPath);
-			return util::replaceAll(outPathS, "\\", "/");
-		case NFD_CANCEL:
+		std::vector<const char*> filterListC;
+		for(unsigned int i = 0; i < filterList.size(); ++i) {
+			filterListC.push_back(filterList.at(i).c_str());
+		}
+
+		const char* result = tinyfd_openFileDialog("Open File", defaultPathC, filterListC.size(), &filterListC[0], filterName.c_str(), 0);
+
+		if (result == nullptr){
 			return "";
-		case NFD_ERROR:
-			throw sys::Exception(0);
-		default:
-			return "";
-			break;
+		}
+		else{
+			return std::string(result);
 		}
 	}
 }

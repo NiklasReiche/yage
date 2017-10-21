@@ -7,7 +7,7 @@
 #ifdef _WIN32
 #define APIENTRY __stdcall // See GLAD documentation -- prevents windows.h macros
 #endif
-#include <glad/glad.h> 
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "../genericHandle.h"
@@ -24,6 +24,7 @@ namespace desktop
 		bool isKeyInputEnabled = true;
 		float dpi;
 		double lastTimeStep = 0.0;
+
 
 		std::function<void(unsigned int, int)> onCharModsEventCallback;
 		std::function<void(int, int)> onKeyEventCallback;
@@ -59,7 +60,7 @@ namespace desktop
 
 		void log(std::string msg);
 		File open(std::string filename, AccessMode mode = AccessMode::READ);
-		std::string openFileDialog(std::string defaultPath = "");
+		std::string openFileDialog(std::string defaultPath = "", std::vector<std::string> filterList = {}, std::string filterName = "");
 
 
 		void onCharModsEvent(unsigned int codepoint, int mods);
@@ -67,7 +68,7 @@ namespace desktop
 		void onMousePosEvent(float xpos, float ypos);
 		void onMouseButtonEvent(int button, int action, int mods);
 		void onMouseWheelEvent(float xoffset, float yoffset);
-		
+
 		void setOnCharModsEvent(std::function<void(unsigned int, int)> callback) { onCharModsEventCallback = callback; }
 		void setOnKeyEvent(std::function<void(int, int)> callback) { onKeyEventCallback = callback; }
 		void setOnMousePosEvent(std::function<void(float, float)> callback) { onMousePosEventCallback = callback; }
