@@ -105,7 +105,7 @@ namespace bmp
 		palette.resize(0);
 		for (int i = 0; i < size; ++i)
 		{
-			PALETTE_ELEMENT element{ i, i, i, 0x00 };
+			PALETTE_ELEMENT element{ (uint8_t)i, (uint8_t)i, (uint8_t)i, 0x00 };
 			palette.push_back(element);
 		}
 	}
@@ -191,7 +191,7 @@ namespace bmp
 		{
 			for (int x = 0; x < width; ++x)
 			{
-				
+
 				for (int b = 0; b < bytes; ++b)
 				{
 					file.read((char*)&pixel[b], 1);
@@ -380,13 +380,13 @@ namespace bmp
 			std::cout << "BMP is not 8 or 24 bit" << std::endl;
 			return 1;
 		}
-		
+
 		/* read image data */
 		if (loadFlags.hasPalette) {
 			readImageDataIndexed(file);
 		}
 		else {
-			readImageData(file);	
+			readImageData(file);
 		}
 		if (checkError(file)) {
 			std::cout << "Could not read image data '" << filename << "'" << std::endl;
@@ -396,7 +396,7 @@ namespace bmp
 			loadFlags.hasPixels = true;
 		}
 		isLoaded = true;
-		
+
 		/* convert if force channels present */
 		if (infoheader.biBitCount == 8 && channel == FORCE_CHANNELS::RGB) {
 			toBit24();
@@ -465,7 +465,7 @@ namespace bmp
 			bitOffset += PALETTE_ENTRIES * sizeof(PALETTE_ELEMENT);
 			fileSize += PALETTE_ENTRIES * sizeof(PALETTE_ELEMENT);
 		}
-		
+
 		magicNumber = 0x4D42;
 
 		fileheader.bfSize = fileSize;
