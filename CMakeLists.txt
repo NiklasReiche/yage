@@ -7,11 +7,13 @@ set( YAGE_VERSION_MINOR 1 )
 
 set( CMAKE_CXX_STANDARD 14 )
 
+set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )
+
 
 ######################
 # compiler flags     #
 ######################
-set( GCC_COMPILER_FLAGS 
+set( GCC_COMPILER_FLAGS
 	"-fdiagnostics-color=always"
 )
 set( MSVC_COMPILER_FLAGS

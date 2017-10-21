@@ -153,7 +153,7 @@ void Gui::on_button_load_click()
 
 void Gui::on_button_top_click()
 {
-	std::string filename = platform->openFileDialog(lastPath);
+	std::string filename = platform->openFileDialog(lastPath, {"*.png"}, "Image Files (png, bmp)");
 	if (filename.size() > 0) {
 		setTexture(button_top, filename);
 		path_top = filename;
@@ -162,7 +162,7 @@ void Gui::on_button_top_click()
 }
 void Gui::on_button_left_click()
 {
-	std::string filename = platform->openFileDialog(lastPath);
+	std::string filename = platform->openFileDialog(lastPath, {"*.png"}, "Image Files (png, bmp)");
 	if (filename.size() > 0) {
 		setTexture(button_left, filename);
 		path_left = filename;
@@ -171,7 +171,7 @@ void Gui::on_button_left_click()
 }
 void Gui::on_button_front_click()
 {
-	std::string filename = platform->openFileDialog(lastPath);
+	std::string filename = platform->openFileDialog(lastPath, {"*.png"}, "Image Files (png, bmp)");
 	if (filename.size() > 0) {
 		setTexture(button_front, filename);
 		path_front = filename;
@@ -180,7 +180,7 @@ void Gui::on_button_front_click()
 }
 void Gui::on_button_right_click()
 {
-	std::string filename = platform->openFileDialog(lastPath);
+	std::string filename = platform->openFileDialog(lastPath, {"*.png"}, "Image Files (png, bmp)");
 	if (filename.size() > 0) {
 		setTexture(button_right, filename);
 		path_right = filename;
@@ -189,7 +189,7 @@ void Gui::on_button_right_click()
 }
 void Gui::on_button_back_click()
 {
-	std::string filename = platform->openFileDialog(lastPath);
+	std::string filename = platform->openFileDialog(lastPath, {"*.png"}, "Image Files (png, bmp)");
 	if (filename.size() > 0) {
 		setTexture(button_back, filename);
 		path_back = filename;
@@ -198,7 +198,7 @@ void Gui::on_button_back_click()
 }
 void Gui::on_button_bottom_click()
 {
-	std::string filename = platform->openFileDialog(lastPath);
+	std::string filename = platform->openFileDialog(lastPath, {"*.png"}, "Image Files (png, bmp)");
 	if (filename.size() > 0) {
 		setTexture(button_bottom, filename);
 		path_bottom = filename;

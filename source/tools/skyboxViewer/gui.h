@@ -1,4 +1,4 @@
-#include "gui/gui.h"
+#include <gui/gui.h>
 #include <image/imageReader.h>
 
 class Gui
