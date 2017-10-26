@@ -76,6 +76,7 @@ add_subdirectory( source/modules/graphics3d )
 
 add_subdirectory( source/tools/skyboxViewer )
 add_subdirectory( source/tools/guiEditor )
+add_subdirectory( source/tools/test )
 
 set(YAGE_BUILD_TESTS 1)
 

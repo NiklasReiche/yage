@@ -37,6 +37,9 @@ int App::run()
 	{
 		double dt = platform->getTimeStep();
 
+		glClearColor(0,0,0,1);
+		glClear(GL_COLOR_BUFFER_BIT);
+		
 		glContext->setActiveViewport(guiViewport);
 		gui->update(dt);
 
@@ -71,7 +74,7 @@ void App::drawSkybox()
 
 void App::updateCamera()
 {
-	
+
 }
 
 void App::on_mouse_pos_event(float x, float y)

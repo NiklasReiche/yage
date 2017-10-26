@@ -64,7 +64,7 @@ public:
 		*
 		* Design Frame
 		*
-		*/ 
+		*/
 
 		gui::FrameTemplate frameTemplate;
 		frameTemplate.geometry.anchor = gui::Anchor::TOP_LEFT;
@@ -73,7 +73,7 @@ public:
 		frameTemplate.color = gl::Color::TRANSPARENT;
 		frameTemplate.layoutType = gui::LayoutType::V_LIST_LAYOUT;
 		frameTemplate.layoutMargin = gml::Vec2f(5.0f);
-		
+
 		gui::Frame* frame_1 = master->createWidget<gui::Frame>(nullptr, frameTemplate);
 
 
@@ -234,7 +234,7 @@ public:
 		animationElementTemplate.text.text = "animations";
 		master->createWidget<gui::Label>(frame_3, animationElementTemplate);
 
-		
+
 		animation_1 = frame_3->createAnimation<gui::MoveAnimation>(master, frame_3->getPosition(), frame_3->getPosition() + gml::Vec2<float>(200, 0), 2);
 		animation_1->setOnAnimationStop(std::bind(&GuiTest::onAnimation1stop, this));
 		animation_2 = frame_3->createAnimation<gui::MoveAnimation>(master, frame_3->getPosition() + gml::Vec2<float>(200, 0), frame_3->getPosition(), 2);
@@ -307,8 +307,9 @@ public:
 
 		gui::ButtonTemplate buttonTemplateClicks;
 		buttonTemplateClicks.geometry.offset = gml::Vec2<float>(0, 5);
-		buttonTemplateClicks.hoverColor = 0xDDDDDDFF;
-		buttonTemplateClicks.clickColor = gl::Color::GREY;
+		buttonTemplateClicks.color = gl::Color::BLUE;
+		buttonTemplateClicks.hoverColor = 0xDDDDDDFFu;
+		buttonTemplateClicks.clickColor = gl::Color::BLUE;
 		buttonTemplateClicks.border.size = 1;
 		buttonTemplateClicks.text.text = "Push Button";
 		buttonTemplateClicks.text.alignY = gui::TextAlignmentY::CENTER;
@@ -327,7 +328,7 @@ public:
 		buttonTemplateClicks.command = std::bind(&GuiTest::on_button_2_click, this);
 
 		button_check = master->createWidget<gui::CheckButton>(frame_check, buttonTemplateClicks);
-		
+
 
 		gui::LabelTemplate labelTemplateRadio;
 		labelTemplateRadio.text.text = "state: 1";
@@ -354,7 +355,7 @@ public:
 		textEntryTemplate.defaultText.color = gl::Color::GREY;
 
 		master->createWidget<gui::TextEntry>(frame_radio, textEntryTemplate, master);
-		
+
 	}
 	~GuiTest()
 	{
@@ -365,7 +366,7 @@ public:
 	{
 		clicks++;
 		label_clicks->setText("clicks: " + util::to_string(clicks));
-		
+
 	}
 	void on_button_2_click()
 	{
@@ -414,8 +415,8 @@ int main()
 
 	GuiTest guiTest(&platformHandle, &glContext, &inputController);
 
-	//guiTest.animation_1->start();
-	//guiTest.animation_3->start();
+	guiTest.animation_1->start();
+	guiTest.animation_3->start();
 
 
 	glContext.disableVSync();
