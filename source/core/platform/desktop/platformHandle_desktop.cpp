@@ -10,6 +10,7 @@ namespace desktop
 		glfwSetErrorCallback(error_callback);
 
 		if (!glfwInit()) {
+			std::cout << "ups" << std::endl;
 			//throw GlfwException(GLFW_ERROR, "GL::ERROR: Failed to initialize GLFW");
 		}
 	}

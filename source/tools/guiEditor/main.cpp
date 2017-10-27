@@ -270,7 +270,6 @@ public:
 
 
 		gui::FrameTemplate frameTemplateButtons;
-		frameTemplateButtons.geometry.offset;
 		frameTemplateButtons.border.size = 1;
 		frameTemplateButtons.color = gl::Color::TRANSPARENT;
 		frameTemplateButtons.layoutType = gui::LayoutType::H_LIST_LAYOUT;

@@ -2,10 +2,20 @@
 
 namespace gl3
 {
-	void error_callback(int error, const char* description)
+	void glfw_error_callback(int error, const char* description)
 	{
-		throw GlfwException(GLFW_ERROR, description);
+		throw GlException(GLFW_ERROR, description);
 	}
+	void gl_error_callback(GLenum error)
+	{
+		throw GLException(error);
+	}
+
+	void error_callback(GLenum source​, GLenum type​, GLuint id​, GLenum severity​, GLsizei length​, const GLchar* message​, const void* userParam​)
+	{
+		throw GLException(source);
+	}
+
 	int GL3_Context::checkShaderCompilationError(GLuint program, std::string type)
 	{
 		int success;
@@ -88,8 +98,11 @@ namespace gl3
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		{
 			std::cout << "Failed to initialize GLAD" << std::endl;
-			throw GlewException(0, "GL::ERROR: Failed to initialize GLEW");
+			throw GlException(GLAD_ERROR, "GL::ERROR: Failed to initialize GLAD");
 		}
+
+		glEnable(GL_DEBUG_OUTPUT);
+		glDebugMessageCallback(error_callback​, nullptr);
 
 		makeCurrent();
 
@@ -110,7 +123,7 @@ namespace gl3
 	}
 	GL3_Context::~GL3_Context()
 	{
-		
+
 	}
 
 
@@ -404,7 +417,7 @@ namespace gl3
 		// Build Texture
 		texture.texture = texture.id;
 		texture.glContext = this;
-		
+
 		texture.height = height;
 		texture.width = width;
 
