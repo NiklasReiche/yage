@@ -8,13 +8,16 @@ namespace gl3
 	}
 	void gl_error_callback(GLenum error)
 	{
-		throw GLException(error);
+		throw GlException(error);
 	}
 
+	/*
 	void error_callback(GLenum source​, GLenum type​, GLuint id​, GLenum severity​, GLsizei length​, const GLchar* message​, const void* userParam​)
 	{
-		throw GLException(source);
+		throw GlException(source);
 	}
+	*/
+	
 
 	int GL3_Context::checkShaderCompilationError(GLuint program, std::string type)
 	{
@@ -92,7 +95,7 @@ namespace gl3
 	GL3_Context::GL3_Context(sys::PlatformHandle* systemHandle, int width, int height, std::string title)
 		: systemHandle(systemHandle), width(width), height(height), title(title)
 	{
-		systemHandle->createContext(width, height, title);
+		systemHandle->createContext(width, height, title, 4, 3);
 
 		// --- GLAD ---
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -102,7 +105,7 @@ namespace gl3
 		}
 
 		glEnable(GL_DEBUG_OUTPUT);
-		glDebugMessageCallback(error_callback​, nullptr);
+		glDebugMessageCallback((GLDEBUGPROC)error_callback, nullptr);
 
 		makeCurrent();
 

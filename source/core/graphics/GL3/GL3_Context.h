@@ -28,7 +28,15 @@ namespace gl3
 {
 	void glfw_error_callback(int error, const char* description);
 	void gl_error_callback(GLenum error);
-	void error_callback(GLenum source​, GLenum type​, GLuint id​, GLenum severity​, GLsizei length​, const GLchar* message​, const void* userParam​);
+	
+	inline void APIENTRY error_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
+	{
+		fprintf(stdout, "%s\n", message);
+		if (severity == GL_DEBUG_SEVERITY_HIGH) {
+			fprintf(stderr, "Aborting...\n");
+			abort();
+		}
+	}
 
 	class GL3_Context
 	{
