@@ -4,7 +4,7 @@ namespace gl3
 {
 	GL3_Object::GL3_Object()
 	{
-		refCount = new int(1);
+		this->refCount = new int(1);
 	}
 	GL3_Object::GL3_Object(const GL3_Object& copy)
 	{

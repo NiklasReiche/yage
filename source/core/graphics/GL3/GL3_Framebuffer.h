@@ -15,7 +15,8 @@ namespace gl3
 		GLuint FBO = 0;
 		GLuint RBO = 0;
 		GL3_Texture texture;
-		int width, height;
+		int width = 0;
+		int height = 0;
 
 	public:
 		GL3_Framebuffer();

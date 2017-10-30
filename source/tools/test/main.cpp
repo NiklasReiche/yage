@@ -12,8 +12,8 @@ int main()
 
   gui::Master* master = new gui::Master(platform, glContext, inputController);
 	try {
-		//master->addFont("/home/niklas/dev/yage/source/tools/skyboxViewer/assets/fonts/arial.font");
-		master->addFont("D:/dev/projects/yage/source/tools/skyboxViewer/assets/fonts/arial.font");
+		master->addFont("/home/niklas/dev/yage/source/tools/skyboxViewer/assets/fonts/arial.font");
+		//master->addFont("D:/dev/projects/yage/source/tools/skyboxViewer/assets/fonts/arial.font");
 	}
 	catch (sys::FileException& exception) {
 		platform->log("ERROR::FONT_LOADER: could not open file " + exception.file());

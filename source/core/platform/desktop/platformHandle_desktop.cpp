@@ -27,6 +27,7 @@ namespace desktop
 
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 
 		glfwWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 

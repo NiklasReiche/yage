@@ -17,9 +17,9 @@ namespace gl3
 		GLuint VBO = 0;
 		PrimitiveType primitive;
 		DrawMode usage;
-		GLint nVertices;
+		GLint nVertices = 0;
 		std::vector<int> layout;
-		int vertexSize;
+		int vertexSize = 0;
 		VertexFormat format;
 
 	public:

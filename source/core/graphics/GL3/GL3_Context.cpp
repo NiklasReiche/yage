@@ -11,13 +11,15 @@ namespace gl3
 		throw GlException(error);
 	}
 
-	/*
-	void error_callback(GLenum source​, GLenum type​, GLuint id​, GLenum severity​, GLsizei length​, const GLchar* message​, const void* userParam​)
+	void error_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 	{
-		throw GlException(source);
+		fprintf(stdout, "%s\n", message);
+		if (severity == GL_DEBUG_SEVERITY_HIGH) {
+			fprintf(stderr, "Aborting...\n");
+			throw GlException(id, std::string(message));
+		}
 	}
-	*/
-	
+
 
 	int GL3_Context::checkShaderCompilationError(GLuint program, std::string type)
 	{
@@ -105,6 +107,7 @@ namespace gl3
 		}
 
 		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageCallback((GLDEBUGPROC)error_callback, nullptr);
 
 		makeCurrent();

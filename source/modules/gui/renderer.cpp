@@ -38,7 +38,7 @@ namespace gui
 		{
 			glContext->draw(*widgets[i]);
 		}
-		
+
 		glContext->useShader(textShader);
 		for (unsigned int i = 0; i < text.size(); ++i)
 		{
