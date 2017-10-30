@@ -6,12 +6,7 @@ namespace gl3
 	{
 		throw GlException(GLFW_ERROR, description);
 	}
-	void gl_error_callback(GLenum error)
-	{
-		throw GlException(error);
-	}
-
-	void error_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
+	void APIENTRY error_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 	{
 		fprintf(stdout, "%s\n", message);
 		if (severity == GL_DEBUG_SEVERITY_HIGH) {
