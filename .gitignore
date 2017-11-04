@@ -11,3 +11,7 @@ lib/
 # Visual Studio cache/options directory
 .vs/
 .vscode/
+
+# Android Studio files
+.idea/
+*.iml
