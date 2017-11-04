@@ -5,7 +5,7 @@
 #include <sstream>
 #include <exception>
 
-#include "../clib.h"
+#include "../util.h"
 
 namespace android
 {
