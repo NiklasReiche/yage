@@ -27,7 +27,8 @@ if(ANDROID)
 								   libandroid.so
 								   liblog.so)
 
-	target_include_directories(YAGEcore PUBLIC ${YAGE_CORE_PATH})
+	target_include_directories(YAGEcore PUBLIC ${YAGE_CORE_PATH}
+	                                           ${CMAKE_ANDROID_NDK}/sysroot/usr/include )
 
 	target_compile_definitions(YAGEcore PUBLIC "ANDROID")
 	target_compile_definitions(YAGEcore PUBLIC "GLES2")

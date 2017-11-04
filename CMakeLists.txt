@@ -7,8 +7,24 @@ set( YAGE_VERSION_MINOR 1 )
 
 set( CMAKE_CXX_STANDARD 14 )
 
-set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )
 
+######################
+# Global options     #
+######################
+option( YAGE_BUILD_ANDROID "Cross compile for Android" OFF )
+
+
+######################
+# Android settings   #
+######################
+if(YAGE_BUILD_ANDROID)
+    set( CMAKE_SYSTEM_NAME Android )
+	set( WIN32 0 )
+    set( UNIX 0 )
+    set( YAGE_BUILD_TESTS FALSE )
+elseif()
+    set( YAGE_BUILD_TESTS TRUE )
+endif()
 
 
 ######################
@@ -31,9 +47,7 @@ endif()
 ######################
 # output directories #
 ######################
-if(ANDROID)
-	#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/android/${CMAKE_ANDROID_ARCH_ABI})
-elseif(WIN32)
+if(WIN32)
 	set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/win )
 	set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/win )
 	set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/win )
@@ -55,30 +69,26 @@ set( YAGE_TOOLS_PATH 	"${CMAKE_SOURCE_DIR}/source/tools" 		)
 
 
 ######################
-# ANDROID stuff 	 #
-######################
-if(ANDROID)
-	include_directories("${CMAKE_ANDROID_NDK}/sysroot/usr/include")
-	link_directories("${CMAKE_ANDROID_NDK}/platforms/android-${CMAKE_ANDROID_API}/arch-${CMAKE_ANDROID_ARCH_ABI}/usr/lib")
-endif()
-
-
-######################
 # subdirectories 	 #
 ######################
 add_subdirectory( external )
 
 add_subdirectory( source/core )
 
-add_subdirectory( source/modules/image )
-add_subdirectory( source/modules/font )
-add_subdirectory( source/modules/gui )
-add_subdirectory( source/modules/graphics3d )
+if(WIN32 OR UNIX)
+	add_subdirectory( source/modules/image )
+	add_subdirectory( source/modules/font )
+	add_subdirectory( source/modules/gui )
+	add_subdirectory( source/modules/graphics3d )
+endif()
 
-add_subdirectory( source/tools/skyboxViewer )
-add_subdirectory( source/tools/guiEditor )
+if(ANDROID)
+	add_subdirectory( source/tools/yageApp)
+elseif(WIN32 OR UNIX)
+	add_subdirectory( source/tools/skyboxViewer )
+	add_subdirectory( source/tools/guiEditor )
+endif()
 
-set(YAGE_BUILD_TESTS 1)
 
 if(YAGE_BUILD_TESTS)
 	add_subdirectory( tests )
