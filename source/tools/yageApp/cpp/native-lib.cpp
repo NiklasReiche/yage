@@ -2,12 +2,10 @@
 #include <vector>
 #include <memory>
 
-#include <platform/Platform.h>
-#include <graphics/Graphics.h>
+#include <platform/platform.h>
+#include <graphics/graphics.h>
 #include <input/InputController.h>
-#include <math/MVector.h>
 
-#include <graphics/GLES2/GLES2_Enum.h>
 
 class Game
 {
