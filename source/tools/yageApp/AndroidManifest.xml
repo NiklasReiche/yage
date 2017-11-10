@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.niklas.justatest">
+
+    package="com.example.niklas.yagetest">
 
     <application
         android:allowBackup="true"
@@ -7,5 +8,19 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" />
+        android:theme="@style/AppTheme"
+        android:hasCode="false" >
+
+        <activity
+          android:name="android.app.NativeActivity"
+          android:configChanges="orientation|keyboardHidden" >
+          <meta-data
+            android:name="android.app.lib_name"
+            android:value="native-lib" />
+          <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+          </intent-filter>
+        </activity>
+      </application>
 </manifest>
