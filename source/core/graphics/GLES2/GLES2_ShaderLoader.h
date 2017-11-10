@@ -4,7 +4,7 @@
 #include <sstream>
 #include <vector>
 
-#include <platform\Platform.h>
+#include <platform/platform.h>
 
 #include "gles2.h"
 #include "GLES2_Context.h"
