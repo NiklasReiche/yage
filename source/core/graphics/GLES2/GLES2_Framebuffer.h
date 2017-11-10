@@ -14,7 +14,8 @@ namespace gles2
 		GLuint RBO_D = 0; // Depth-Buffer
 		GLuint RBO_S = 0; // Stencil-Buffer
 		GLuint colorTexture = 0;
-		int width, height;
+		int width = 0;
+		int height = 0;
 
 	public:
 		GLES2_Framebuffer();

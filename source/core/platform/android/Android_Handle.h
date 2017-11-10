@@ -11,7 +11,7 @@
 #include <android/input.h>
 #include <jni.h>
 
-#include <platform/GenericHandle.h>
+#include <platform/genericHandle.h>
 
 #include "android_native_app_glue.h"
 #include "Android_File.h"

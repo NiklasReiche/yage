@@ -13,4 +13,5 @@ lib/
 .vscode/
 
 # Android Studio files
+.idea/
 *.iml

@@ -6,7 +6,7 @@
 #include <numeric>
 #include <sstream>
 
-#include <platform/Platform.h>
+#include <platform/platform.h>
 
 #include "gles2.h"
 #include "GLES2_Enum.h"

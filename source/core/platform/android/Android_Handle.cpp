@@ -274,7 +274,7 @@ namespace android
 
 	Android_File Android_Handle::open(std::string filename)
 	{
-		std::string folder = clib::strip(filename, "/").at(0);
+		std::string folder = util::strip(filename, "/").at(0);
 		if (folder == "assets") {
 			AAsset* asset = AAssetManager_open(assetManager, filename.substr(7, std::string::npos).c_str(), AASSET_MODE_BUFFER);
 			return Android_File(asset);

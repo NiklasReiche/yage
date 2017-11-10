@@ -36,7 +36,7 @@ namespace android
 		}
 		else if (file != nullptr) {
 			if (std::fread(buffer, size, 1, file) != 1) {
-				throw std::runtime_error("File error: could not read " + clib::to_string(size) + " bytes");
+				throw std::runtime_error("File error: could not read " + util::to_string(size) + " bytes");
 			};
 		}
 		else {

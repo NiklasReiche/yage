@@ -2,7 +2,8 @@
 
 #include <map>
 
-#include "math\MVector.h"
+#include <math/vector.h>
+#include <math/matrix.h>
 
 #include "gles2.h"
 #include "GLES2_Object.h"
