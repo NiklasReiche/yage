@@ -13,14 +13,15 @@ namespace gles2
 	private:
 		friend class GLES2_Context;
 
-		GLuint texture;
-		int width, height;
+		GLuint texture = 0;
+		int width = 0;
+		int height = 0;
 		TextureType target;
 		InternalFormat format;
 		ImageFormat px_format;
 		PixelType px_type;
 		int rowAlignment = 4;
-		int nChannels;
+		int nChannels = 0;
 
 	public:
 		GLES2_Texture();
