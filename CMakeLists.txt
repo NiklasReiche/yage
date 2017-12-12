@@ -87,6 +87,7 @@ if(ANDROID)
 elseif(WIN32 OR UNIX)
 	add_subdirectory( source/tools/skyboxViewer )
 	add_subdirectory( source/tools/guiEditor )
+	add_subdirectory( source/tools/sandbox )
 endif()
 
 
