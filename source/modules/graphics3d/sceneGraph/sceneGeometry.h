@@ -6,14 +6,21 @@
 
 namespace graphics3d
 {
-	struct SceneGeometry : SceneNode
+	class SceneGeometry : public SceneNode
 	{
 	public:
 		gl::Drawable drawable;
 
+ 	public:
 		SceneGeometry()
 		{
-			type = 2;
+			this->type = 2;
 		}
+		SceneGeometry(gl::Drawable drawable)
+			:drawable(drawable) 
+		{
+			this->type = 2;
+		}
+
 	};
 }

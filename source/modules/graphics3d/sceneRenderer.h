@@ -13,19 +13,15 @@ namespace graphics3d
 		gl::GraphicsContext* gl;
 		gl::Shader shader;
 
-		void renderGraph(SceneNode* node, gml::Matrix4D<float> transform)
+		void renderGraph(SceneNode* root, gml::Matrix4D<float> transform)
 		{
-			for (int i = 0; i < node->children.size(); ++i) {
-				if (node->children.at(i)->type == 1) {
-					SceneGroup* group = (SceneGroup*)node->children.at(i);
-					renderGraph(node->children.at(i), group->applyTransform(transform));
-				}
-				else if (node->children.at(i)->type == 2) {
-					SceneGeometry* geometry = (SceneGeometry*)node->children.at(i);
-					shader.setUniform("model", transform);
-					gl->draw(geometry->drawable);
-				}
-			}
+			auto drawGeometry = [this](SceneGeometry* node, gml::Matrix4D<float> transform)
+			{
+				this->shader.setUniform("model", transform);
+				this->gl->draw(node->drawable);
+			};
+
+			root->updateChildren(drawGeometry, transform);
 		}
 	};
 }

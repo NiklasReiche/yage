@@ -3,20 +3,24 @@
 #include "sceneNode.h"
 
 #include "math/matrix.h"
-#include "../material.h"
 
 namespace graphics3d
 {
-	struct SceneGroup : SceneNode
+	class SceneGroup : public SceneNode
 	{
 	private:
 		gml::Matrix4D<float> transform;
 
 	public:
 		SceneGroup()
-		{
-			type = 1;
-		}
+			{
+				this->type = 1;
+			}
+		SceneGroup(gml::Matrix4D<float> transform)
+			:transform(transform) 
+			{
+				this->type = 1;
+			}
 
 		gml::Matrix4D<float> applyTransform(gml::Matrix4D<float> transform)
 		{

@@ -1,14 +1,12 @@
 #pragma once
 
-#include <platform/platform.h>
-#include <graphics/gl.h>
-#include <input/InputController.h>
+#include "platform/platform.h"
+#include "graphics/gl.h"
+#include "input/InputController.h"
 #include "math/MVector.h"
 
 #include "graphics3d/camera.h"
 #include "graphics3d/sceneRenderer.h"
-
-
 
 class App
 {
@@ -110,7 +108,7 @@ public:
 
 		group.setTransform(gml::translate<float>(gml::Vec3f(0.0f, 1.5f, 0.0f)));
 		group.addChild(&geom);
-		
+
 		group2.setTransform(gml::translate<float>(gml::Vec3f(0.0f, 0.0f, -3.0f)));
 		group2.addChild(&geom2);
 
@@ -136,7 +134,7 @@ public:
 
 			coord += 0.1 * dt;
 			globalTransform = gml::translate<float>(gml::Vec3f(coord, 0.0f, -3.0f));
-			
+
 			group2.setTransform(globalTransform);
 			renderer.renderGraph(&scene, gml::Matrix4D<float>());
 
