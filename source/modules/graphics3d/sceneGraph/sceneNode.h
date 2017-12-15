@@ -9,20 +9,51 @@
 namespace graphics3d
 {
 	class SceneGeometry;
+	class SceneGroup;
+
+	enum class NodeType
+	{
+		NODE,
+		GROUP,
+		GEOMETRY,
+	};
 
 	class SceneNode
 	{
-	protected:
-		int type = 0;
-
-	public:
+	private:
 		std::vector<SceneNode*> children;
 
+	protected:
+		NodeType type = NodeType::NODE;
+
 	public:
-		void updateChildren(std::function<void(SceneGeometry*, gml::Matrix4D<float>)> func, gml::Matrix4D<float> transform);
+		// Func1: void (SceneGeometry*, gml::Matrix4D<float>)
+		// Func2: gml::Matrix4D<float> (SceneGeometry*, gml::Matrix4D<float>)
+		template <typename Func1, typename Func2>
+		void updateChildren(Func1&& func, Func2&& func2, gml::Matrix4D<float> transform)
+		{
+			for (SceneNode* child : children)
+			{
+				switch (child->getType())
+				{
+				case NodeType::GROUP:
+					child->updateChildren(func, func2, func2((SceneGroup*)child, transform));
+					break;
+				case NodeType::GEOMETRY:
+					func((SceneGeometry*)child, transform);
+					break;
+				}
+			}
+		}
 
-		void addChild(SceneNode* node);
+		void addChild(SceneNode* node)
+		{
+			children.push_back(node);
+		}
 
-		int getType();
+		NodeType getType()
+		{
+			return type;
+		}
 	};
 }

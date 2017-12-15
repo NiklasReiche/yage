@@ -1,8 +1,8 @@
 #pragma once
 
-#include "sceneNode.h"
-
 #include "math/matrix.h"
+
+#include "sceneNode.h"
 
 namespace graphics3d
 {
@@ -13,14 +13,14 @@ namespace graphics3d
 
 	public:
 		SceneGroup()
-			{
-				this->type = 1;
-			}
+		{
+			this->type = NodeType::GROUP;
+		}
 		SceneGroup(gml::Matrix4D<float> transform)
 			:transform(transform) 
-			{
-				this->type = 1;
-			}
+		{
+			this->type = NodeType::GROUP;
+		}
 
 		gml::Matrix4D<float> applyTransform(gml::Matrix4D<float> transform)
 		{

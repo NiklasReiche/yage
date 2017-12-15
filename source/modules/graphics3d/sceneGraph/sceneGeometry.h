@@ -14,12 +14,12 @@ namespace graphics3d
  	public:
 		SceneGeometry()
 		{
-			this->type = 2;
+			this->type = NodeType::GEOMETRY;
 		}
 		SceneGeometry(gl::Drawable drawable)
 			:drawable(drawable) 
 		{
-			this->type = 2;
+			this->type = NodeType::GEOMETRY;
 		}
 
 	};

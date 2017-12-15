@@ -92,7 +92,6 @@ set( YAGE_GRAPHICS_3D_SOURCE
 	"${YAGE_MODULES_PATH}/graphics3d/skybox.cpp"
 
 	"${YAGE_MODULES_PATH}/graphics3d/sceneGraph/sceneNode.h"
-	"${YAGE_MODULES_PATH}/graphics3d/sceneGraph/sceneNode.cpp"
 	"${YAGE_MODULES_PATH}/graphics3d/sceneGraph/sceneGroup.h"
 	"${YAGE_MODULES_PATH}/graphics3d/sceneGraph/sceneGroup.cpp"
 	"${YAGE_MODULES_PATH}/graphics3d/sceneGraph/sceneGeometry.h"

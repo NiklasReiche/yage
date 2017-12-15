@@ -7,21 +7,40 @@
 
 namespace graphics3d
 {
+	struct Geom
+	{
+		gl::Drawable drawable;
+		gml::Matrix4D<float> transform;
+	};
+
 	class SceneRenderer
 	{
 	public:
 		gl::GraphicsContext* gl;
 		gl::Shader shader;
 
-		void renderGraph(SceneNode* root, gml::Matrix4D<float> transform)
+		void renderGraph(SceneNode* root)
 		{
-			auto drawGeometry = [this](SceneGeometry* node, gml::Matrix4D<float> transform)
+			std::vector<Geom> drawables;
+
+			auto collectGeometry = [&drawables](SceneGeometry* node, gml::Matrix4D<float> transform)
 			{
-				this->shader.setUniform("model", transform);
-				this->gl->draw(node->drawable);
+				Geom geom = { node->drawable, transform };
+				drawables.push_back(geom);
 			};
 
-			root->updateChildren(drawGeometry, transform);
+			auto applyTransform = [](SceneGroup* node, gml::Matrix4D<float> transform)
+			{
+				return node->applyTransform(transform);
+			};
+
+			root->updateChildren(collectGeometry, applyTransform, gml::Matrix4D<float>());
+
+			for (Geom drawable : drawables)
+			{
+				this->shader.setUniform("model", drawable.transform);
+				this->gl->draw(drawable.drawable);
+			}
 		}
 	};
 }

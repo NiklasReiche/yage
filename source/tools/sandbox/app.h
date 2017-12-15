@@ -136,7 +136,7 @@ public:
 			globalTransform = gml::translate<float>(gml::Vec3f(coord, 0.0f, -3.0f));
 
 			group2.setTransform(globalTransform);
-			renderer.renderGraph(&scene, gml::Matrix4D<float>());
+			renderer.renderGraph(&scene);
 
 			glContext->swapBuffers();
 			inputController->poll();
