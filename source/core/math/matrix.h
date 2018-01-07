@@ -42,6 +42,10 @@ namespace gml
 				}
 			}
 		}
+		Vec3<T> getTranslation()
+		{
+			return Vec3<T>(value[0][3], value[1][3], value[2][3]);
+		}
 	};
 
 	template <typename T>
