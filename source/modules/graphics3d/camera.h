@@ -28,5 +28,6 @@ namespace graphics3d
 		void rotateRoll(float degree);
 
 		gml::Matrix4D<float> getViewMatrix();
+		gml::Vec3f getPosition();
 	};
 }

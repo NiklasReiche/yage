@@ -63,4 +63,7 @@ namespace graphics3d
 	gml::Matrix4D<float> Camera::getViewMatrix() {
 		return gml::inverse<float>(gml::translate<float>(position) * gml::rotate<float>(rotation));
 	}
+	gml::Vec3f Camera::getPosition() {
+		return position;
+	}
 }

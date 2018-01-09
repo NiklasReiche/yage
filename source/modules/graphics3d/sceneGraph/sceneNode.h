@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <vector>
 #include <memory>
 #include <functional>
@@ -8,27 +9,28 @@
 
 namespace graphics3d
 {
-	class SceneGeometry;
+	class SceneObject;
 	class SceneGroup;
 
 	enum class NodeType
 	{
 		NODE,
 		GROUP,
-		GEOMETRY,
+		OBJECT,
 	};
 
 	class SceneNode
 	{
 	private:
-		std::vector<SceneNode*> children;
+		std::string name;
 
 	protected:
+		std::vector<SceneNode*> children;
 		NodeType type = NodeType::NODE;
 
 	public:
-		// Func1: void (SceneGeometry*, gml::Matrix4D<float>)
-		// Func2: gml::Matrix4D<float> (SceneGeometry*, gml::Matrix4D<float>)
+		// Func1: void (SceneObject*, gml::Matrix4D<float>)
+		// Func2: gml::Matrix4D<float> (SceneGroup*, gml::Matrix4D<float>)
 		template <typename Func1, typename Func2>
 		void updateChildren(Func1&& func, Func2&& func2, gml::Matrix4D<float> transform)
 		{
@@ -39,16 +41,11 @@ namespace graphics3d
 				case NodeType::GROUP:
 					child->updateChildren(func, func2, func2((SceneGroup*)child, transform));
 					break;
-				case NodeType::GEOMETRY:
-					func((SceneGeometry*)child, transform);
+				case NodeType::OBJECT:
+					func(static_cast<SceneObject*>(child), transform);
 					break;
 				}
 			}
-		}
-
-		void addChild(SceneNode* node)
-		{
-			children.push_back(node);
 		}
 
 		NodeType getType()
