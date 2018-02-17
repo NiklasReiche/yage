@@ -1,15 +1,15 @@
 #include "sceneGroup.h"
 
-namespace graphics3d
+namespace gl3d
 {
 	SceneGroup::SceneGroup()
+		: SceneNode(NodeType::GROUP, "")
 	{
-		this->type = NodeType::GROUP;
 	}
-	SceneGroup::SceneGroup(gml::Matrix4D<float> transform)
-		:transform(transform)
+
+	SceneGroup::SceneGroup(const std::string name, const gml::Matrix4D<float> transform)
+		: SceneNode(NodeType::GROUP, name), transform(transform)
 	{
-		this->type = NodeType::GROUP;
 	}
 
 	void SceneGroup::addChild(SceneNode* node)
@@ -17,12 +17,12 @@ namespace graphics3d
 		children.push_back(node);
 	}
 
-	gml::Matrix4D<float> SceneGroup::applyTransform(gml::Matrix4D<float> transform)
+	gml::Matrix4D<float> SceneGroup::applyTransform(const gml::Matrix4D<float> transform) const
 	{
 		return transform * this->transform;
 	}
 
-	void SceneGroup::setTransform(gml::Matrix4D<float> tranform)
+	void SceneGroup::setTransform(const gml::Matrix4D<float> tranform)
 	{
 		this->transform = tranform;
 	}

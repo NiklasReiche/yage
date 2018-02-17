@@ -7,11 +7,15 @@
 
 #include "math/matrix.h"
 
-namespace graphics3d
+
+namespace gl3d
 {
 	class SceneObject;
 	class SceneGroup;
 
+	/**
+	 * @brief Represents the different node types.
+	 */
 	enum class NodeType
 	{
 		NODE,
@@ -19,38 +23,66 @@ namespace graphics3d
 		OBJECT,
 	};
 
+	/**
+	 * @brief Represents a basic node in a scene graph.
+	 */
 	class SceneNode
 	{
 	private:
+		/** @brief This node's type. Used for class identification. */
+		const NodeType type;
+		/** @brief This node's name. Used for object identification. */
 		std::string name;
 
 	protected:
 		std::vector<SceneNode*> children;
-		NodeType type = NodeType::NODE;
+
+		/**
+		 * @brief Constructs a new node of a specific type and a custom name.
+		 * 
+		 * @param type the type
+		 * @param name the name
+		 */
+		SceneNode(NodeType type, std::string name);
 
 	public:
-		// Func1: void (SceneObject*, gml::Matrix4D<float>)
-		// Func2: gml::Matrix4D<float> (SceneGroup*, gml::Matrix4D<float>)
-		template <typename Func1, typename Func2>
-		void updateChildren(Func1&& func, Func2&& func2, gml::Matrix4D<float> transform)
-		{
-			for (SceneNode* child : children)
-			{
-				switch (child->getType())
-				{
-				case NodeType::GROUP:
-					child->updateChildren(func, func2, func2((SceneGroup*)child, transform));
-					break;
-				case NodeType::OBJECT:
-					func(static_cast<SceneObject*>(child), transform);
-					break;
-				}
-			}
-		}
+		/**
+		 * @brief Constructs a new node with an empty name.
+		 */
+		SceneNode();
 
-		NodeType getType()
-		{
-			return type;
-		}
+		/**
+		 * @brief Assignment operator overload.
+		 * 
+		 * @param other assign object
+		 * @return this
+		 */
+		SceneNode& operator=(const SceneNode & other);
+
+		/**
+		 * @brief Traverses this node's child nodes and calls the given functions.
+		 * 
+		 * @param func function to handle a group node
+		 * @param func2 function to handle an object node
+		 * @param transform the node's transform
+		 */
+		void updateChildren(
+			std::function<void(SceneObject*, gml::Matrix4D<float>)> func,
+			std::function<gml::Matrix4D<float>(SceneGroup*, gml::Matrix4D<float>)> func2,
+			gml::Matrix4D<float> transform);
+
+		/**
+		 * @brief Returns the node's type.
+		 * 
+		 * @return the type
+		 */
+		NodeType getType() const;
+
+		/**
+		 * @brief Returns this node's custom name.
+		 * 
+		 * @return the name
+		 */
+		std::string getName() const;
 	};
 }
