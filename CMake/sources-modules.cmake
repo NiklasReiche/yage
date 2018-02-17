@@ -94,8 +94,11 @@ set( YAGE_GRAPHICS_3D_SOURCE
 	"${YAGE_MODULES_PATH}/graphics3d/light.h"
 	"${YAGE_MODULES_PATH}/graphics3d/material.h"
 	"${YAGE_MODULES_PATH}/graphics3d/material.cpp"
+	"${YAGE_MODULES_PATH}/graphics3d/mesh.h"
+	"${YAGE_MODULES_PATH}/graphics3d/mesh.cpp"
 
 	"${YAGE_MODULES_PATH}/graphics3d/sceneGraph/sceneNode.h"
+	"${YAGE_MODULES_PATH}/graphics3d/sceneGraph/sceneNode.cpp"
 	"${YAGE_MODULES_PATH}/graphics3d/sceneGraph/sceneGroup.h"
 	"${YAGE_MODULES_PATH}/graphics3d/sceneGraph/sceneGroup.cpp"
 	"${YAGE_MODULES_PATH}/graphics3d/sceneGraph/sceneObject.h"
@@ -103,5 +106,9 @@ set( YAGE_GRAPHICS_3D_SOURCE
 
 	"${YAGE_MODULES_PATH}/graphics3d/sceneRenderer.h"
 	"${YAGE_MODULES_PATH}/graphics3d/sceneRenderer.cpp"
+
+	"${YAGE_MODULES_PATH}/graphics3d/resourceCache.h"
+	"${YAGE_MODULES_PATH}/graphics3d/resourceManager.h"
+	"${YAGE_MODULES_PATH}/graphics3d/shader.h"
 
 )

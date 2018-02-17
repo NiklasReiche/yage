@@ -12,7 +12,8 @@ set( CMAKE_CXX_STANDARD 14 )
 # Global options     #
 ######################
 option( YAGE_BUILD_ANDROID "Cross compile for Android" OFF )
-
+option( YAGE_BUILD_TESTS "Build unit tests" ON )
+enable_testing()
 
 ######################
 # Android settings   #
@@ -22,8 +23,6 @@ if(YAGE_BUILD_ANDROID)
 	set( WIN32 0 )
     set( UNIX 0 )
     set( YAGE_BUILD_TESTS FALSE )
-elseif()
-    set( YAGE_BUILD_TESTS TRUE )
 endif()
 
 
@@ -71,6 +70,7 @@ set( YAGE_TOOLS_PATH 	"${CMAKE_SOURCE_DIR}/source/tools" 		)
 ######################
 # subdirectories 	 #
 ######################
+
 add_subdirectory( external )
 
 add_subdirectory( source/core )
