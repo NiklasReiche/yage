@@ -36,10 +36,10 @@ private:
 	gl::Viewport guiViewport;
 	gl::Viewport skyboxViewport;
 
-	graphics3d::Skybox skybox;
+	gl3d::Skybox skybox;
 	bool isLoaded = false;
 
-	graphics3d::Camera camera;
+	gl3d::Camera camera;
 	Mouse mouse;
 
 	void on_mouse_pos_event(float x, float y);

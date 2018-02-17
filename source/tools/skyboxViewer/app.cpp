@@ -18,7 +18,7 @@ App::App()
 	inputListener->setOnMousePosEvent(std::bind(&App::on_mouse_pos_event, this, std::placeholders::_1, std::placeholders::_2));
 	inputListener->setOnKeyEvent(std::bind(&App::on_key_event, this, std::placeholders::_1, std::placeholders::_2));
 
-	camera = graphics3d::Camera(gml::Vec3f(0.0f, 0.0f, 5.0f), gml::axisAngle<float>(0.0f, gml::Vec3f(0.0f, 0.0f, -1.0f)));
+	camera = gl3d::Camera(gml::Vec3f(0.0f, 0.0f, 5.0f), gml::axisAngle<float>(0.0f, gml::Vec3f(0.0f, 0.0f, -1.0f)));
 }
 App::~App()
 {
@@ -56,7 +56,7 @@ int App::run()
 
 void App::loadSkybox(std::array<std::string, 6> filenames)
 {
-	skybox = graphics3d::SkyboxLoader(platform, glContext).loadSkybox(filenames, 100, 2048);
+	skybox = gl3d::SkyboxLoader(platform, glContext).loadSkybox(filenames, 100, 2048);
 	skybox.shader.setUniform("skybox", 0);
 	gml::Matrix4D<float> proj = gml::perspective<float>(45.0f, (float)(skyboxViewport.x + skyboxViewport.width)/ (float)(skyboxViewport.y + skyboxViewport.height), 0.1f, 1000.0f);
 	skybox.shader.setUniform("projection", proj);
@@ -89,18 +89,6 @@ void App::on_mouse_pos_event(float x, float y)
 		//gml::Quaternion<float> newRotation = gml::normalize<float>(q_yaw * camera.rotation * q_pitch);
 		camera.rotateYaw(angle.x);
 		camera.rotatePitch(angle.y);
-
-		//std::cout << "r:  " << std::setw(15) << std::round(gml::toDeg(newRotation.getRoll())) << " | p: " << std::setw(15) << std::round(gml::toDeg(newRotation.getPitch())) << " | y: " << std::round(gml::toDeg(newRotation.getYaw()));
-		std::cout << "\r" << std::flush;
-
-		/*
-		if (getPitch(newRotation) > 50) {
-			camera.rotation = gml::normalize<float>(q_yaw * camera.rotation);
-		}
-		else {
-			camera.rotation = newRotation;
-		}
-		*/
 	}
 	mouse.pos = gml::Vec2f(x, y);
 }
