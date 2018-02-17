@@ -31,6 +31,11 @@ namespace gl3
 		return *this;
 	}
 
+	bool GL3_Shader::hasUniform(const std::string & name) const
+	{
+		return uniformLocations.count(name) > 0;
+	}
+
 	void GL3_Shader::setUniform(std::string name, int value)
 	{
 		glContext->useShader(*this);
