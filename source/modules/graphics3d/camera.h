@@ -2,7 +2,7 @@
 
 #include <math/MVector.h>
 
-namespace graphics3d
+namespace gl3d
 {
 	class Camera
 	{
@@ -29,5 +29,6 @@ namespace graphics3d
 
 		gml::Matrix4D<float> getViewMatrix();
 		gml::Vec3f getPosition();
+		gml::Quaternion<float> getRotation();
 	};
 }

@@ -1,6 +1,6 @@
 #include "camera.h"
 
-namespace graphics3d
+namespace gl3d
 {
 	Camera::Camera() {
 		this->position = gml::Vec3f(0.0f);
@@ -60,10 +60,16 @@ namespace graphics3d
 		this->rotation = gml::normalize<float>(this->rotation);
 	}
 
-	gml::Matrix4D<float> Camera::getViewMatrix() {
+	gml::Matrix4D<float> Camera::getViewMatrix() 
+	{
 		return gml::inverse<float>(gml::translate<float>(position) * gml::rotate<float>(rotation));
 	}
-	gml::Vec3f Camera::getPosition() {
+	gml::Vec3f Camera::getPosition() 
+	{
 		return position;
+	}
+	gml::Quaternion<float> Camera::getRotation()
+	{
+		return rotation;
 	}
 }
