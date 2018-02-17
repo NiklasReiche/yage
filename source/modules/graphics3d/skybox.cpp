@@ -2,7 +2,7 @@
 #include <image/imageReader.h>
 #include <platform/exception.h>
 
-namespace graphics3d
+namespace gl3d
 {
 	Skybox SkyboxLoader::loadSkybox(std::array<std::string, 6> paths, float boxSize, int textureSize)
 	{

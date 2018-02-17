@@ -6,7 +6,7 @@
 
 #include <graphics/graphics.h>
 
-namespace graphics3d
+namespace gl3d
 {
 	class Skybox
 	{
