@@ -7,6 +7,15 @@
 namespace gml
 {
 	template <typename T>
+	class Matrix4D;
+
+	typedef Matrix4D<int> Mat4i;
+	typedef Matrix4D<unsigned int> Mat4ui;
+
+	typedef Matrix4D<float> Mat4f;
+	typedef Matrix4D<double> Mat4d;
+
+	template <typename T>
 	class Matrix4D
 	{
 	public:
