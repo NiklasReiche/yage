@@ -3,8 +3,8 @@
 namespace gml
 {
 	template<typename T>
-	inline T lerp(T start, T end, float delta)
+	inline T lerp(T start, T end, double delta)
 	{
-		return (T)(start + (end - start) * delta);
+		return static_cast<T>(start + (end - start) * delta);
 	}
 }

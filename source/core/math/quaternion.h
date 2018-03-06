@@ -1,178 +1,174 @@
 #pragma once
-#include <iostream>
 
+#include <ostream>
+
+#include "maths.h"
 #include "vector.h"
-#include "math.h"
 
 namespace gml
 {
+	template <typename T>
+	class Quaternion;
+
+	typedef Quaternion<int> Quati;
+	typedef Quaternion<float> Quatf;
+	typedef Quaternion<double> Quatd;
+	typedef Quaternion<unsigned int> Quatui;
+
+	/**
+	 * @brief Represents a generic quaternion.
+	 * 
+	 * @tparam T the type
+	 */
 	template <typename T>
 	class Quaternion
 	{
 	public:
 		T w, x, y, z;
 
-		Quaternion() :
-			w(0), x(0), y(0), z(0) {}
-		Quaternion(T w, T x, T y, T z) :
-			w(w), x(x), y(y), z(z) {}
-		Quaternion(Vec3<T> vec) :
-			w(0), x(vec.x), y(vec.y), z(vec.z) {}
+	public:
+		/**
+		 * @brief Initializes an identity quaternion.
+		 */
+		Quaternion();
 
-		Quaternion& operator*=(float right)
-		{
-			this->x *= right;
-			this->y *= right;
-			this->z *= right;
-			this->w *= right;
-			return *this;
-		}
-		Quaternion& operator*=(Quaternion right)
-		{
-			Vec3<T> a = Vec3<T>(this->x, this->y, this->z);
-			Vec3<T> b = Vec3<T>(right.x, right.y, right.z);
-			Vec3<T> c = Vec3<T>(this->w * b) + Vec3<T>(right.w * a) + cross(a, b);
-			this->x = c.x;
-			this->y = c.y;
-			this->z = c.z;
-			this->w = this->w * right.w - dot(a, b);
-			return *this;
-		}
+		/**
+		 * @brief Initializes the given values.
+		 * 
+		 * @param w the w component
+		 * @param x the x component
+		 * @param y the y component
+		 * @param z the z component
+		 */
+		Quaternion(const T& w, const T& x, const T& y, const T& z);
 
-		Vec3<T> getForward()
-		{
-			return normalize(Vec3<T>(-2 * (x * z + w * y), -2 * (y * z - w * x), -1 + 2 * (x * x + y * y)));
-		}
-		Vec3<T> getRight()
-		{
-			return normalize(Vec3<T>(1 - 2 * (y * y + z * z), 2 * (x * y + w * z), 2 * (x * z - w * y)));
-		}
-		Vec3<T> getUp()
-		{
-			return normalize(Vec3<T>(2 * (x * y - w * z), 1 - 2 * (x * x + z * z), 2 * (y * z + w * x)));
-		}
+	public:
+		/**
+		 * @brief Returns this quaternion's length.
+		 * 
+		 * @return the length
+		 */
+		double length() const;
 
-		float getPitch()
-		{
-			float test = x*y + z*w;
-			if (test > 0.499) { // singularity at north pole
-				return 0;
-			}
-			if (test < -0.499) { // singularity at south pole
-				return 0;
-			}
-			float sqx = x*x;
-			float sqz = z*z;
-			return std::atan2(2 * x*w - 2 * y*z, 1 - 2 * sqx - 2 * sqz);
-		}
-		float getYaw()
-		{
-			float test = x*y + z*w;
-			if (test > 0.499) { // singularity at north pole
-				return 2 * std::atan2(x, w);
-			}
-			if (test < -0.499) { // singularity at south pole
-				return -2 * std::atan2(x, w);
-			}
-			float sqy = y*y;
-			float sqz = z*z;
-			return std::atan2(2 * y*w - 2 * x*z, 1 - 2 * sqy - 2 * sqz);
-		}
-		float getRoll()
-		{
-			float test = x*y + z*w;
-			if (test > 0.499) { // singularity at north pole
-				return PI / 2;
-			}
-			if (test < -0.499) { // singularity at south pole
-				return -PI / 2;
-			}
-			return std::asin(2 * test);
-		}
+		/**
+		 * @brief Normalizes this quaternion.
+		 * 
+		 * @return a reference to this quaternion
+		 */
+		Quaternion<T>& normalize();
+
+		/**
+		 * @brief Conjugates this quaternion.
+		 * 
+		 * @return a reference to this quaternion
+		 */
+		Quaternion<T>& conjugate();
+
+		/**
+		 * @brief Extracts the Forward vector of the rotation expressed by this
+		 * quaternion.
+		 * 
+		 * @return the Forward vector
+		 */
+		Vec3<T> getForward() const;
+
+		/**
+		 * @brief Extracts the Right vector of the rotation expressed by this
+		 * quaternion.
+		 * 
+		 * @return the Right vector
+		 */
+		Vec3<T> getRight() const;
+
+		/**
+		 * @brief Extracts the Up vector of the rotation expressed by this
+		 * quaternion.
+		 * 
+		 * @return the Up vector
+		 */
+		Vec3<T> getUp() const;
+
+		/**
+		 * @brief Extracts the pitch of the rotation expressed by this
+		 * quaternion.
+		 * 
+		 * @return the pitch in radians
+		 */
+		double getPitch() const;
+
+		/**
+		* @brief Extracts the yaw of the rotation expressed by this
+		* quaternion.
+		*
+		* @return the yaw in radians
+		*/
+		double getYaw() const;
+
+		/**
+		* @brief Extracts the roll of the rotation expressed by this
+		* quaternion.
+		*
+		* @return the roll in radians
+		*/
+		double getRoll() const;
+
+	public:
+		/**
+		 * @brief Constructs a quaterion from an axis angle representation.
+		 * 
+		 * @param angle the angle in degrees
+		 * @param axis the rotation axis
+		 * @return the quaternion
+		 */
+		static Quaternion<T> axisAngle(double angle, const Vec3<T>& axis);
+
+		/**
+		 * @brief Constructs a quaterion from an euler angle representation.
+		 * 
+		 * @param pitch the pitch component
+		 * @param yaw the yaw component
+		 * @param roll the roll component
+		 * @return the quaternion
+		 */
+		static Quaternion<T> eulerAngle(double pitch, double yaw, double roll);
+
+	public:
+		Quaternion<T>& operator*=(const T& rhs);
+		Quaternion<T>& operator*=(const Quaternion<T>& rhs);
 	};
 
+	/**
+	 * @brief Normalizes the given quaterion.
+	 * 
+	 * @tparam T the generic type
+	 * @param quaternion the quaterion to normalize
+	 * @return the normalized quaternion
+	 */
 	template <typename T>
-	std::ostream& operator<<(std::ostream& os, Quaternion<T> vec) {
-		os << vec.w << " " << vec.x << " " << vec.y << " " << vec.z;
-		return os;
-	}
+	Quaternion<T> normalize(const Quaternion<T>& quaternion);
 
-	/*  Quaternion Calculations */
+	/**
+	 * @brief Returns the conjugate of a given quaternion.
+	 * 
+	 * @tparam T the generic type
+	 * @param quaternion the quaterion to conjugate
+	 * @return the conjugate
+	 */
 	template <typename T>
-	Quaternion<T> operator*(Quaternion<T> A, Quaternion<T> B) {
-		Quaternion<T> out;
-		Vec3<T> a = Vec3<T>(A.x, A.y, A.z);
-		Vec3<T> b = Vec3<T>(B.x, B.y, B.z);
-		out.w = A.w * B.w - dot(a, b);
-		Vec3<T> c = Vec3<T>(A.w * b) + Vec3<T>(B.w * a) + cross(a, b);
-		out.x = c.x;
-		out.y = c.y;
-		out.z = c.z;
-		return out;
-	}
-	template <typename T>
-	Quaternion<T> operator*(Quaternion<T> quat, float s) {
-		Quaternion<T> out;
-		out.x = quat.x * s;
-		out.y = quat.y * s;
-		out.z = quat.z * s;
-		out.w = quat.w * s;
-		return out;
-	}
-	template <typename T>
-	Quaternion<T> operator*(float s, Quaternion<T> quat) {
-		Quaternion<T> out;
-		out.x = s * quat.x;
-		out.y = s * quat.y;
-		out.z = s * quat.z;
-		out.w = s * quat.w;
-		return out;
-	}
+	Quaternion<T> conjugate(const Quaternion<T>& quaternion);
+
 
 	template <typename T>
-	float length(Quaternion<T> quat) {
-		return sqrt(quat.x * quat.x + quat.y * quat.y + quat.z * quat.z + quat.w * quat.w);
-	}
-	template <typename T>
-	Quaternion<T> normalize(Quaternion<T> quat) {
-		if (length(quat) == 0) {
-			return quat;
-		}
-		return (1 / length(quat)) * quat;
-	}
-	template <typename T>
-	Quaternion<T> conjugate(Quaternion<T> quat) {
-		Quaternion<T> out;
-		out.w = quat.w;
-		out.x = -quat.x;
-		out.y = -quat.y;
-		out.z = -quat.z;
-		return out;
-	}
+	std::ostream& operator<<(std::ostream& os, const Quaternion<T>& rhs);
 
 	template <typename T>
-	Quaternion<T> axisAngle(float angle, Vec3<T> axis) {
-		Quaternion<T> q;
-		float rad = angle * (PI / 180);
-		float s = sin(rad / 2);
-		q.x = axis.x * s;
-		q.y = axis.y * s;
-		q.z = axis.z * s;
-		q.w = std::cos(rad / 2);
-		return q;
-	}
+	Quaternion<T> operator*(const Quaternion<T>& lhs, const Quaternion<T>& rhs);
+
 	template <typename T>
-	Quaternion<T> eulerAngle(float pitch, float yaw, float roll) {
-		float c1 = std::cos(toRad(yaw) / 2);
-		float c2 = std::cos(toRad(roll) / 2);
-		float c3 = std::cos(toRad(pitch) / 2);
-		float s1 = std::sin(toRad(yaw) / 2);
-		float s2 = std::sin(toRad(roll) / 2);
-		float s3 = std::sin(toRad(pitch) / 2);
-		float w = c1 * c2 * c3 - s1 * s2 * s3;
-		float x = s1 * s2 * c3 + c1 * c2 * s3;
-		float y = s1 * c2 * c3 + c1 * s2 * s3;
-		float z = c1 * s2 * c3 - s1 * c2 * s3;
-		return Quaternion<T>(w, x, y, z);
-	}
+	Quaternion<T> operator*(const Quaternion<T>& lhs, const T& rhs);
+
+	template <typename T>
+	Quaternion<T> operator*(const T& lhs, const Quaternion<T>& rhs);
 }
+
+#include "quaternion.tpp"

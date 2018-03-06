@@ -2,7 +2,7 @@
 
 #include <map>
 
-#include <math/MVector.h>
+#include <math/vector.h>
 
 #include "InputNames.h"
 
@@ -18,7 +18,7 @@ namespace input
 		std::map<KeyCode, KeyState> keyboardKeys;
 		std::map<MouseKeyCode, KeyState> mouseKeys;
 
-		std::map<TouchIndexCode, gml::Vec2<float>> touchPos;
+		std::map<TouchIndexCode, gml::Vec2f> touchPos;
 		std::map<TouchIndexCode, KeyState> touchAction;
 
 		// ToDo: joystick axis
@@ -80,13 +80,13 @@ namespace input
 			}
 		}
 
-		gml::Vec2<float> getTouchPos(TouchIndexCode index)
+		gml::Vec2f getTouchPos(TouchIndexCode index)
 		{
-			std::map<TouchIndexCode, gml::Vec2<float>>::iterator it = touchPos.find(index);
+			std::map<TouchIndexCode, gml::Vec2f>::iterator it = touchPos.find(index);
 			if (it == std::end(touchPos))
 			{
-				touchPos[index] = gml::Vec2<float>(0);
-				return gml::Vec2<float>(0);
+				touchPos[index] = gml::Vec2f(0.0f);
+				return touchPos.at(index);
 			}
 			else {
 				return it->second;

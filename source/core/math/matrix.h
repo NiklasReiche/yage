@@ -1,324 +1,225 @@
 #pragma once
-#include <iostream>
 
+#include "matrixBase.h"
 #include "vector.h"
 #include "quaternion.h"
 
 namespace gml
 {
 	template <typename T>
-	class Matrix4D;
+	class Mat1;
+	template <typename T>
+	class Mat2;
+	template <typename T>
+	class Mat3;
+	template <typename T>
+	class Mat4;
 
-	typedef Matrix4D<int> Mat4i;
-	typedef Matrix4D<unsigned int> Mat4ui;
+	template <typename T, size_t Rows, size_t Columns>
+	using Matrix = MatrixBase<T, Rows, Columns>;
 
-	typedef Matrix4D<float> Mat4f;
-	typedef Matrix4D<double> Mat4d;
+	typedef Mat1<int> Mat1i;
+	typedef Mat2<int> Mat2i;
+	typedef Mat3<int> Mat3i;
+	typedef Mat4<int> Mat4i;
+
+	typedef Mat1<unsigned int> Mat1ui;
+	typedef Mat2<unsigned int> Mat2ui;
+	typedef Mat3<unsigned int> Mat3ui;
+	typedef Mat4<unsigned int> Mat4ui;
+
+	typedef Mat1<float> Mat1f;
+	typedef Mat2<float> Mat2f;
+	typedef Mat3<float> Mat3f;
+	typedef Mat4<float> Mat4f;
+
+	typedef Mat1<double> Mat1d;
+	typedef Mat2<double> Mat2d;
+	typedef Mat3<double> Mat3d;
+	typedef Mat4<double> Mat4d;
+
 
 	template <typename T>
-	class Matrix4D
+	class Mat1 : public MatrixBase<T, 1, 1>
 	{
 	public:
-		T value[4][4];
+		/** Inherit Constructors from MatrixBase */
+		using MatrixBase<T, 1, 1>::MatrixBase;
 
-		Matrix4D()
-		{
-			for (int i = 0; i < 4; i++) {
-				for (int j = 0; j < 4; j++) {
-					if (i == j) {
-						value[i][j] = 1.0f;
-					}
-					else {
-						value[i][j] = 0.0f;
-					}
-				}
-			}
-		}
-		Matrix4D(T arr[])
-		{
-			for (int i = 0; i < 4; i++) {
-				for (int j = 0; j < 4; j++) {
-					value[i][j] = arr[i * 4 + j];
-				}
-			}
-		}
+		Mat1();
 
-		void convertToArray(T arr[])
-		{
-			for (int i = 0; i < 4; i++) {
-				for (int j = 0; j < 4; j++) {
-					arr[i * 4 + j] = this->value[i][j];
-				}
-			}
-		}
-		Vec3<T> getTranslation()
-		{
-			return Vec3<T>(value[0][3], value[1][3], value[2][3]);
-		}
+		Mat1(const Mat1<T>& other);
+
+		Mat1(const MatrixBase<T, 1, 1>& other);
 	};
 
 	template <typename T>
-	std::ostream& operator<<(std::ostream& os, Matrix4D<T> mat)
+	class Mat2 : public MatrixBase<T, 2, 2>
 	{
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				os << mat.value[i][j] << " ";
-			}
-			os << std::endl;
-		}
-		return os;
-	}
+	public:
+		/** Inherit Constructors from MatrixBase */
+		using MatrixBase<T, 2, 2>::MatrixBase;
+
+		Mat2();
+
+		Mat2(const Mat2<T>& other);
+
+		Mat2(const MatrixBase<T, 2, 2>& other);
+	};
 
 	template <typename T>
-	Matrix4D<T> operator+(Matrix4D<T> left, Matrix4D<T> right) {
-		Matrix4D<T> out;
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				out.value[i][j] = left.value[i][j] + right.value[i][j];
-			}
-		}
-		return out;
-	}
-	template <typename T>
-	Matrix4D<T> operator-(Matrix4D<T> left, Matrix4D<T> right) {
-		Matrix4D<T> out;
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				out.value[i][j] = left.value[i][j] - right.value[i][j];
-			}
-		}
-		return out;
-	}
+	class Mat3 : public MatrixBase<T, 3, 3>
+	{
+	public:
+		/** Inherit Constructors from MatrixBase */
+		using MatrixBase<T, 3, 3>::MatrixBase;
+
+		Mat3();
+
+		Mat3(const Mat3<T>& other);
+
+		Mat3(const MatrixBase<T, 3, 3>& other);
+	};
 
 	template <typename T>
-	Matrix4D<T> operator*(Matrix4D<T> mat1, Matrix4D<T> mat2) {
-		Matrix4D<T> mat3;
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				mat3.value[i][j] = mat1.value[i][0] * mat2.value[0][j] + mat1.value[i][1] * mat2.value[1][j] + mat1.value[i][2] * mat2.value[2][j] + mat1.value[i][3] * mat2.value[3][j];
-			}
-		}
-		return mat3;
-	}
-	template <typename T>
-	Matrix4D<T> operator*(Matrix4D<T> mat, float s) {
-		Matrix4D<T> res;
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				res.value[i][j] = mat.value[i][j] * s;
-			}
-		}
-		return res;
-	}
-	template <typename T>
-	Matrix4D<T> operator*(float s, Matrix4D<T> mat) {
-		Matrix4D<T> res;
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				res.value[i][j] = s * mat.value[i][j];
-			}
-		}
-		return res;
-	}
+	class Mat4 : public MatrixBase<T, 4, 4>
+	{
+	public:
+		/** Inherit Constructors from MatrixBase */
+		using MatrixBase<T, 4, 4>::MatrixBase;
 
-	template <typename T>
-	Vec3<T> operator*(Matrix4D<T> mat, Vec3<T> vec1) {
-		Vec3<T> vec2;
-		vec2.x = mat.value[0][0] * vec1.x + mat.value[0][1] * vec1.y + mat.value[0][2] * vec1.z;
-		vec2.y = mat.value[1][0] * vec1.x + mat.value[1][1] * vec1.y + mat.value[1][2] * vec1.z;
-		vec2.z = mat.value[2][0] * vec1.x + mat.value[2][1] * vec1.y + mat.value[2][2] * vec1.z;
-		return vec2;
-	}
-	template <typename T>
-	Vec4<T> operator*(Matrix4D<T> mat, Vec4<T> vec1) {
-		Vec4<T> vec2;
-		vec2.x = mat.value[0][0] * vec1.x + mat.value[0][1] * vec1.y + mat.value[0][2] * vec1.z + mat.value[0][3] * vec1.z;
-		vec2.y = mat.value[1][0] * vec1.x + mat.value[1][1] * vec1.y + mat.value[1][2] * vec1.z + mat.value[1][3] * vec1.z;
-		vec2.z = mat.value[2][0] * vec1.x + mat.value[2][1] * vec1.y + mat.value[2][2] * vec1.z + mat.value[2][3] * vec1.z;
-		vec2.w = mat.value[3][0] * vec1.x + mat.value[3][1] * vec1.y + mat.value[3][2] * vec1.z + mat.value[3][3] * vec1.z;
-		return vec2;
-	}
+		Mat4();
 
-	/*  Matrix Calculations */
-	template <typename T>
-	Matrix4D<T> strip(Matrix4D<T> m) {
-		Matrix4D<T> out;
+		Mat4(const Mat4<T>& other);
 
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				out.value[i][j] = m.value[i][j];
-			}
-		}
-		out.value[0][3] = 0.0f;
-		out.value[1][3] = 0.0f;
-		out.value[2][3] = 0.0f;
-		out.value[3][3] = 1.0f;
-		out.value[3][0] = 0.0f;
-		out.value[3][1] = 0.0f;
-		out.value[3][2] = 0.0f;
+		Mat4(const MatrixBase<T, 4, 4>& other);
 
-		return out;
-	}
+	public:
+		/**
+		 * @brief Returns the translation component of this matrix.
+		 * 
+		 * @return the translation vector
+		 */
+		Vec3<T> getTranslation();
 
-	template <typename T>
-	Matrix4D<T> transpose(Matrix4D<T> m) {
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				if (i < j) {
-					float temp = m.value[i][j];
-					m.value[i][j] = m.value[j][i];
-					m.value[j][i] = temp;
-				}
-			}
-		}
-		return m;
-	}
-	template <typename T>
-	Matrix4D<T> inverse(Matrix4D<T> m) {
-		m = transpose(m);
-		Matrix4D<T> res;
-		res.value[0][0] = m.value[1][1] * m.value[2][2] * m.value[3][3] + m.value[1][2] * m.value[2][3] * m.value[3][1] + m.value[1][3] * m.value[2][1] * m.value[3][2] - m.value[1][1] * m.value[2][3] * m.value[3][2] - m.value[1][2] * m.value[2][1] * m.value[3][3] - m.value[1][3] * m.value[2][2] * m.value[3][1];
-		res.value[0][1] = m.value[0][1] * m.value[2][3] * m.value[3][2] + m.value[0][2] * m.value[2][1] * m.value[3][3] + m.value[0][3] * m.value[2][2] * m.value[3][1] - m.value[0][1] * m.value[2][2] * m.value[3][3] - m.value[0][2] * m.value[2][3] * m.value[3][1] - m.value[0][3] * m.value[2][1] * m.value[3][2];
-		res.value[0][2] = m.value[0][1] * m.value[1][2] * m.value[3][3] + m.value[0][2] * m.value[1][3] * m.value[3][1] + m.value[0][3] * m.value[1][1] * m.value[3][2] - m.value[0][1] * m.value[1][3] * m.value[3][2] - m.value[0][2] * m.value[1][1] * m.value[3][3] - m.value[0][3] * m.value[1][2] * m.value[3][1];
-		res.value[0][3] = m.value[0][1] * m.value[1][3] * m.value[2][2] + m.value[0][2] * m.value[1][1] * m.value[2][3] + m.value[0][3] * m.value[1][2] * m.value[2][1] - m.value[0][1] * m.value[1][2] * m.value[2][3] - m.value[0][2] * m.value[1][3] * m.value[2][1] - m.value[0][3] * m.value[1][1] * m.value[2][2];
-		res.value[1][0] = m.value[1][0] * m.value[2][3] * m.value[3][2] + m.value[1][2] * m.value[2][0] * m.value[3][3] + m.value[1][3] * m.value[2][2] * m.value[3][0] - m.value[1][0] * m.value[2][2] * m.value[3][3] - m.value[1][2] * m.value[2][3] * m.value[3][0] - m.value[1][3] * m.value[2][0] * m.value[3][2];
-		res.value[1][1] = m.value[0][0] * m.value[2][2] * m.value[3][3] + m.value[0][2] * m.value[2][3] * m.value[3][0] + m.value[0][3] * m.value[2][0] * m.value[3][2] - m.value[0][0] * m.value[2][3] * m.value[3][2] - m.value[0][2] * m.value[2][0] * m.value[3][3] - m.value[0][3] * m.value[2][2] * m.value[3][0];
-		res.value[1][2] = m.value[0][0] * m.value[1][3] * m.value[3][2] + m.value[0][2] * m.value[1][0] * m.value[3][3] + m.value[0][3] * m.value[1][2] * m.value[3][0] - m.value[0][0] * m.value[1][2] * m.value[3][3] - m.value[0][2] * m.value[1][3] * m.value[3][0] - m.value[0][3] * m.value[1][0] * m.value[3][2];
-		res.value[1][3] = m.value[0][0] * m.value[1][2] * m.value[2][3] + m.value[0][2] * m.value[1][3] * m.value[2][0] + m.value[0][3] * m.value[1][0] * m.value[2][2] - m.value[0][0] * m.value[1][3] * m.value[2][2] - m.value[0][2] * m.value[1][0] * m.value[2][3] - m.value[0][3] * m.value[1][2] * m.value[2][0];
-		res.value[2][0] = m.value[1][0] * m.value[2][1] * m.value[3][3] + m.value[1][1] * m.value[2][3] * m.value[3][0] + m.value[1][3] * m.value[2][0] * m.value[3][1] - m.value[1][0] * m.value[2][3] * m.value[3][1] - m.value[1][1] * m.value[2][0] * m.value[3][3] - m.value[1][3] * m.value[2][1] * m.value[3][0];
-		res.value[2][1] = m.value[0][0] * m.value[2][3] * m.value[3][1] + m.value[0][1] * m.value[2][0] * m.value[3][3] + m.value[0][3] * m.value[2][1] * m.value[3][0] - m.value[0][0] * m.value[2][1] * m.value[3][3] - m.value[0][1] * m.value[2][3] * m.value[3][0] - m.value[0][3] * m.value[2][0] * m.value[3][1];
-		res.value[2][2] = m.value[0][0] * m.value[1][1] * m.value[3][3] + m.value[0][1] * m.value[1][3] * m.value[3][0] + m.value[0][3] * m.value[1][0] * m.value[3][1] - m.value[0][0] * m.value[1][3] * m.value[3][1] - m.value[0][1] * m.value[1][0] * m.value[3][3] - m.value[0][3] * m.value[1][1] * m.value[3][0];
-		res.value[2][3] = m.value[0][0] * m.value[1][3] * m.value[2][1] + m.value[0][1] * m.value[1][0] * m.value[2][3] + m.value[0][3] * m.value[1][1] * m.value[2][0] - m.value[0][0] * m.value[1][1] * m.value[2][3] - m.value[0][1] * m.value[1][3] * m.value[2][0] - m.value[0][3] * m.value[1][0] * m.value[2][1];
-		res.value[3][0] = m.value[1][0] * m.value[2][2] * m.value[3][1] + m.value[1][1] * m.value[2][0] * m.value[3][2] + m.value[1][2] * m.value[2][1] * m.value[3][0] - m.value[1][0] * m.value[2][1] * m.value[3][2] - m.value[1][1] * m.value[2][2] * m.value[3][0] - m.value[1][2] * m.value[2][0] * m.value[3][1];
-		res.value[3][1] = m.value[0][0] * m.value[2][1] * m.value[3][2] + m.value[0][1] * m.value[2][2] * m.value[3][0] + m.value[0][2] * m.value[2][0] * m.value[3][1] - m.value[0][0] * m.value[2][2] * m.value[3][1] - m.value[0][1] * m.value[2][0] * m.value[3][2] - m.value[0][2] * m.value[2][1] * m.value[3][0];
-		res.value[3][2] = m.value[0][0] * m.value[1][2] * m.value[3][1] + m.value[0][1] * m.value[1][0] * m.value[3][2] + m.value[0][2] * m.value[1][1] * m.value[3][0] - m.value[0][0] * m.value[1][1] * m.value[3][2] - m.value[0][1] * m.value[1][2] * m.value[3][0] - m.value[0][2] * m.value[1][0] * m.value[3][1];
-		res.value[3][3] = m.value[0][0] * m.value[1][1] * m.value[2][2] + m.value[0][1] * m.value[1][2] * m.value[2][0] + m.value[0][2] * m.value[1][0] * m.value[2][1] - m.value[0][0] * m.value[1][2] * m.value[2][1] - m.value[0][1] * m.value[1][0] * m.value[2][2] - m.value[0][2] * m.value[1][1] * m.value[2][0];
+		/**
+		 * @brief Returns the rotation component of this matrix as a matrix.
+		 * 
+		 * @return the rotation matrix
+		 */
+		Mat3<T> getRotation();
 
-		float det = m.value[0][0] * (m.value[1][1] * m.value[2][2] * m.value[3][3] - m.value[1][1] * m.value[2][3] * m.value[3][2] - m.value[1][2] * m.value[2][1] * m.value[3][3] + m.value[1][2] * m.value[2][3] * m.value[3][1] + m.value[1][3] * m.value[2][1] * m.value[3][2] - m.value[1][3] * m.value[2][2] * m.value[3][1]) +
-			m.value[0][1] * (m.value[1][0] * m.value[2][2] * m.value[3][3] - m.value[1][0] * m.value[2][3] * m.value[3][2] - m.value[1][2] * m.value[2][0] * m.value[3][3] + m.value[1][2] * m.value[2][3] * m.value[3][0] + m.value[1][3] * m.value[2][1] * m.value[3][2] - m.value[1][3] * m.value[2][2] * m.value[3][0]) +
-			m.value[0][2] * (m.value[1][0] * m.value[2][1] * m.value[3][3] - m.value[1][0] * m.value[2][3] * m.value[3][1] - m.value[1][1] * m.value[2][0] * m.value[3][3] + m.value[1][1] * m.value[2][3] * m.value[3][0] + m.value[1][3] * m.value[2][0] * m.value[3][1] - m.value[1][3] * m.value[2][1] * m.value[3][0]) +
-			m.value[0][3] * (m.value[1][0] * m.value[2][1] * m.value[3][2] - m.value[1][0] * m.value[2][2] * m.value[3][1] - m.value[1][1] * m.value[2][0] * m.value[3][2] + m.value[1][1] * m.value[2][2] * m.value[3][0] + m.value[1][2] * m.value[2][0] * m.value[3][1] - m.value[1][2] * m.value[2][1] * m.value[3][0]);
+	public:
+		/**
+		 * @brief Constructs a translation matrix.
+		 * 
+		 * @param x the x component
+		 * @param y the y component
+		 * @param z the z component
+		 * @return the translation matrix
+		 */
+		static Mat4<T> translate(double x, double y, double z);
 
-		if (det == 0) {
-			return NULL;
-		}
-		else if (det < 0) {
-			det = det * (-1.0f);
-		}
-		res = res * (1.0f / det);
+		/**
+		 * @brief Constructs a translation matrix from a single value.
+		 * 
+		 * @param translation the translation value
+		 * @return the translation matrix
+		 */
+		static Mat4<T> translate(const double translation);
 
-		res = transpose(res);
-		return res;
-	}
+		/**
+		 * @brief Constructs a translation matrix from a vector.
+		 * 
+		 * @param translation the translation vector
+		 * @return the translation matrix
+		 */
+		static Mat4<T> translate(const Vec3<T>& translation);
 
-	template <typename T>
-	Matrix4D<T> translate(Vec3<T> vec) {
-		Matrix4D<T> mat;
-		mat.value[0][3] = vec.x;
-		mat.value[1][3] = vec.y;
-		mat.value[2][3] = vec.z;
-		return mat;
-	}
-	template <typename T>
-	Matrix4D<T> scale(float scalar) {
-		Matrix4D<T> mat;
-		mat.value[0][0] *= scalar;
-		mat.value[1][1] *= scalar;
-		mat.value[2][2] *= scalar;
-		return mat;
-	}
-	template <typename T>
-	Matrix4D<T> scale(Vec3<T> vec) {
-		Matrix4D<T> mat;
-		mat.value[0][0] *= vec.x;
-		mat.value[1][1] *= vec.y;
-		mat.value[2][2] *= vec.z;
-		return mat;
-	}
-	template <typename T>
-	Matrix4D<T> rotate(float deg, Vec3<T> vec) {
-		Matrix4D<T> mat;
-		if (length(vec) == 0) {
-			return mat;
-		}
-		float rad = deg * (PI / 180);
-		vec = normalize(vec);
-		mat.value[0][0] = vec.x * vec.x * (1 - std::cos(rad)) + std::cos(rad);
-		mat.value[0][1] = vec.x * vec.y * (1 - std::cos(rad)) - vec.z * sin(rad);
-		mat.value[0][2] = vec.x * vec.z * (1 - std::cos(rad)) + vec.y * sin(rad);
+		/**
+		 * @brief Constructs a scaling matrix.
+		 * 
+		 * @param x the x component
+		 * @param y the y component
+		 * @param z the z component
+		 * @return the scaling matrix
+		 */
+		static Mat4<T> scale(const double x, const double y, const double z);
 
-		mat.value[1][0] = vec.y * vec.x * (1 - std::cos(rad)) + vec.z * sin(rad);
-		mat.value[1][1] = vec.y * vec.y * (1 - std::cos(rad)) + std::cos(rad);
-		mat.value[1][2] = vec.y * vec.z * (1 - std::cos(rad)) - vec.x * sin(rad);
+		/**
+		 * @brief Constructs a scaling matrix from a single value.
+		 * 
+		 * @param scale the scaling factor
+		 * @return the scaling matrix
+		 */
+		static Mat4<T> scale(const double scale);
 
-		mat.value[2][0] = vec.z * vec.x * (1 - std::cos(rad)) - vec.y * sin(rad);
-		mat.value[2][1] = vec.z * vec.y * (1 - std::cos(rad)) + vec.x * sin(rad);
-		mat.value[2][2] = vec.z * vec.z * (1 - std::cos(rad)) + std::cos(rad);
-		return mat;
-	}
-	template <typename T>
-	Matrix4D<T> rotate(Quaternion<T> q) {
-		Matrix4D<T> out;
-		q = normalize(q);
-		out.value[0][0] = 1 - 2 * q.y * q.y - 2 * q.z * q.z;
-		out.value[0][1] = 2 * q.x*q.y - 2 * q.z*q.w;
-		out.value[0][2] = 2 * q.x*q.z + 2 * q.y*q.w;
+		/**
+		 * @brief Constructs a scaling matrix from a vector.
+		 * 
+		 * @param scale the scaling vector
+		 * @return the scaling matrix
+		 */
+		static Mat4<T> scale(const Vec3<T>& scale);
 
-		out.value[1][0] = 2 * q.x*q.y + 2 * q.z*q.w;
-		out.value[1][1] = 1 - 2 * q.x*q.x - 2 * q.z*q.z;
-		out.value[1][2] = 2 * q.y*q.z - 2 * q.x*q.w;
+		/**
+		 * @brief Constructs a rotation matrix from an axis angle representation.
+		 * 
+		 * @param axis the rotation axis
+		 * @param angle the angle in degrees
+		 * @return the rotation matrix
+		 */
+		static Mat4<T> axisAngle(Vec3<T> axis, double angle);
 
-		out.value[2][0] = 2 * q.x*q.z - 2 * q.y*q.w;
-		out.value[2][1] = 2 * q.y*q.z + 2 * q.x*q.w;
-		out.value[2][2] = 1 - 2 * q.x*q.x - 2 * q.y*q.y;
-		return out;
-	}
+		/**
+		 * @brief Constructs a rotation matrix from a quaternion representation.
+		 * 
+		 * @return the rotation matrix
+		 */
+		static Mat4<T> quaternion(Quaternion<T> quaternion);
 
-	template <typename T>
-	Matrix4D<T> perspective(float fov, float aspect, float near, float far) {
-		Matrix4D<T> mat;
-		float top = near * tan((PI / 180) * (fov / 2));
-		float bottom = 0 - top;
-		float right = top * aspect;
-		float left = 0 - right;
-		mat.value[0][0] = (2 * near) / (right - left);
-		mat.value[0][2] = (right + left) / (right - left);
-		mat.value[1][1] = (2 * near) / (top - bottom);
-		mat.value[1][2] = (top + bottom) / (top - bottom);
-		mat.value[2][2] = 0 - ((far + near) / (far - near));
-		mat.value[2][3] = 0 - ((2 * far * near) / (far - near));
-		mat.value[3][2] = -1;
-		mat.value[3][3] = 0;
-		return mat;
-	}
-	template <typename T>
-	Matrix4D<T> orthographic(float left, float right, float bottom, float top, float near, float far) {
-		Matrix4D<T> mat;
-		mat.value[0][0] = 2 / (right - left);
-		mat.value[0][3] = -((right + left) / (right - left));
-		mat.value[1][1] = 2 / (top - bottom);
-		mat.value[1][3] = -((top + bottom) / (top - bottom));
-		mat.value[2][2] = -2 / (far - near);
-		mat.value[2][3] = -((far + near) / (far - near));
-		mat.value[3][3] = 1;
-		return mat;
-	}
-	template <typename T>
-	Matrix4D<T> lookAt(Vec3<T> position, Vec3<T> target, Vec3<T> up) {
-		Vec3<T> direction = position - target;
-		Vec3<T> right = normalize(cross(up, direction));
-		float arr[] = {
-			right.x,     right.y,     right.z,     0,
-			up.x,        up.y,        up.z,        0,
-			direction.x, direction.y, direction.z, 0,
-			0,           0,           0,           1
-		};
-		Matrix4D<T> mat1(arr);
+		/**
+		 * @brief Constructs a perspectiv view matrix.
+		 * 
+		 * @param fov the field of view in degrees
+		 * @param aspect the aspect ration
+		 * @param near the near plane
+		 * @param far the far plane
+		 * @return the view matrix
+		 */
+		static Mat4<T> perspective(
+			const double fov, const double aspect,
+			const double near, const double far);
 
-		Matrix4D<T> mat2;
-		mat2.value[0][3] = 0 - position.x;
-		mat2.value[1][3] = 0 - position.y;
-		mat2.value[2][3] = 0 - position.z;
-		return mat1 * mat2;
-	}
+		/**
+		 * @brief Constructs an orthographic view matrix.
+		 * 
+		 * @param left the left plane
+		 * @param right the right plane
+		 * @param bottom the bottom plane
+		 * @param top the top plane
+		 * @param near the near plane
+		 * @param far the far plane
+		 * @return the view matrix
+		 */
+		static Mat4<T> orthographic(
+			const double left, const double right,
+			const double bottom, const double top,
+			const double near, const double far);
+
+		/**
+		 * @brief Constructs a lookAt view matrix.
+		 * 
+		 * @param pos the camera position
+		 * @param target the view target position
+		 * @param up the camera up vector
+		 * @return the view matrix
+		 */
+		static Mat4<T> lookAt(
+			const Vec3<T>& pos,
+			const Vec3<T>& target,
+			const Vec3<T>& up);
+	};
 }
+
+#include "matrix.tpp"

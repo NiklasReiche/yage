@@ -1,6 +1,6 @@
 #pragma once
 
-#include "math/MVector.h"
+#include "math/vector.h"
 
 namespace gl
 {
@@ -62,12 +62,12 @@ namespace gl
 		color = (alpha) | (b << 8) | (g << 16) | (r << 24);
 	}
 
-	inline gml::Vec3<float> toVec3(uint32_t color)
+	inline gml::Vec3f toVec3(uint32_t color)
 	{
-		return gml::Vec3<float>(((color >> 24) & 0xff) / 255.0f, ((color >> 16) & 0xff) / 255.0f, ((color >> 8) & 0xff) / 255.0f);
+		return gml::Vec3f(((color >> 24) & 0xff) / 255.0f, ((color >> 16) & 0xff) / 255.0f, ((color >> 8) & 0xff) / 255.0f);
 	}
-	inline gml::Vec4<float> toVec4(uint32_t color)
+	inline gml::Vec4f toVec4(uint32_t color)
 	{
-		return gml::Vec4<float>(((color >> 24) & 0xff) / 255.0f, ((color >> 16) & 0xff) / 255.0f, ((color >> 8) & 0xff) / 255.0f, ((color) & 0xff) / 255.0f);
+		return gml::Vec4f(((color >> 24) & 0xff) / 255.0f, ((color >> 16) & 0xff) / 255.0f, ((color >> 8) & 0xff) / 255.0f, ((color) & 0xff) / 255.0f);
 	}
 }

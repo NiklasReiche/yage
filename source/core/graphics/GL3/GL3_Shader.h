@@ -36,7 +36,7 @@ namespace gl3
 		void setUniform(std::string name, int value);
 		void setUniform(std::string name, bool value);
 		void setUniform(std::string name, float value);
-		void setUniform(std::string name, gml::Vec3<float> value);
-		void setUniform(std::string name, gml::Matrix4D<float> value);
+		void setUniform(std::string name, gml::Vec3f value);
+		void setUniform(std::string name, gml::Mat4f value);
 	};
 }

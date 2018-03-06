@@ -21,7 +21,7 @@
 #include "GL3_Viewport.h"
 #include "GL3_Texture.h"
 
-#include <math/MVector.h>
+#include <math/matrix.h>
 #include <platform/platform.h>
 
 namespace gl3
@@ -165,7 +165,7 @@ namespace gl3
 		void bindTexture(const GL3_Texture & texture, int unit = 0);
 
 		void useUnitShader();
-		void useUnitTransformShader(gml::Matrix4D<float> transform);
+		void useUnitTransformShader(gml::Mat4f transform);
 		void drawUnitDrawable();
 	};
 }

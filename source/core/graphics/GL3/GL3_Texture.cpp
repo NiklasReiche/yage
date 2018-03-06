@@ -140,7 +140,7 @@ namespace gl3
 		glContext->setActiveRenderTarget(fbo);
 		glContext->setActiveViewport(Viewport(0, 0, width, height));
 
-		glContext->useUnitTransformShader(gml::rotate(level * 90, gml::Vec3f(0.0f, 0.0f, 1.0f)));
+		glContext->useUnitTransformShader(gml::Mat4f::axisAngle(gml::Vec3f(0.0f, 0.0f, 1.0f), level * 90));
 		glContext->bindTexture(*this);
 		glContext->drawUnitDrawable();
 

@@ -4,12 +4,18 @@
 
 set( YAGE_MATH_SOURCE
 
-	"${YAGE_CORE_PATH}/math/MVector.h"
-	"${YAGE_CORE_PATH}/math/interpolation.h"
+	"${YAGE_CORE_PATH}/math/maths.h"
+	"${YAGE_CORE_PATH}/math/vectorBase.h"
+	"${YAGE_CORE_PATH}/math/vectorBase.tpp"
 	"${YAGE_CORE_PATH}/math/vector.h"
-	"${YAGE_CORE_PATH}/math/quaternion.h"
+	"${YAGE_CORE_PATH}/math/vector.tpp"
+	"${YAGE_CORE_PATH}/math/matrixBase.h"
+	"${YAGE_CORE_PATH}/math/matrixBase.tpp"
 	"${YAGE_CORE_PATH}/math/matrix.h"
-	
+	"${YAGE_CORE_PATH}/math/matrix.tpp"
+	"${YAGE_CORE_PATH}/math/quaternion.h"
+	"${YAGE_CORE_PATH}/math/quaternion.tpp"
+	"${YAGE_CORE_PATH}/math/interpolation.h"
 )
 
 set( YAGE_GRAPHICS_SOURCE

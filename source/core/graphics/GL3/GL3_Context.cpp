@@ -115,7 +115,7 @@ namespace gl3
 		GL3_UnitTransformShaderTemplate unitTransformShaderTemplate;
 		unitTransformShader = compileShader(unitTransformShaderTemplate.vertexCode, unitTransformShaderTemplate.fragmentCode);
 		unitTransformShader.setUniform("screenTexture", 0);
-		unitTransformShader.setUniform("transform", gml::Matrix4D<float>());
+		unitTransformShader.setUniform("transform", gml::Mat4f());
 
 		glState.window_width = width;
 		glState.window_height = height;
@@ -545,7 +545,7 @@ namespace gl3
 	{
 		useShader(unitShader);
 	}
-	void GL3_Context::useUnitTransformShader(gml::Matrix4D<float> transform)
+	void GL3_Context::useUnitTransformShader(gml::Mat4f transform)
 	{
 		useShader(unitTransformShader);
 		unitTransformShader.setUniform("transform", transform);

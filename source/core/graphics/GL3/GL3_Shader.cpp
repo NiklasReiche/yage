@@ -38,29 +38,34 @@ namespace gl3
 
 	void GL3_Shader::setUniform(std::string name, int value)
 	{
+		if (!hasUniform(name)) return;
 		glContext->useShader(*this);
-		glUniform1i(uniformLocations[name], value);
+		glUniform1i(uniformLocations.at(name), value);
 	}
 	void GL3_Shader::setUniform(std::string name, bool value)
 	{
+		if (!hasUniform(name)) return;
 		glContext->useShader(*this);
-		glUniform1i(uniformLocations[name], (int)value);
+		glUniform1i(uniformLocations.at(name), (int)value);
 	}
 	void GL3_Shader::setUniform(std::string name, float value)
 	{
+		if (!hasUniform(name)) return;
 		glContext->useShader(*this);
-		glUniform1f(uniformLocations[name], value);
+		glUniform1f(uniformLocations.at(name), value);
 	}
-	void GL3_Shader::setUniform(std::string name, gml::Vec3<float> value)
+	void GL3_Shader::setUniform(std::string name, gml::Vec3f value)
 	{
+		if (!hasUniform(name)) return;
 		glContext->useShader(*this);
-		glUniform3f(uniformLocations[name], value.x, value.y, value.z);
+		glUniform3f(uniformLocations.at(name), value.x, value.y, value.z);
 	}
-	void GL3_Shader::setUniform(std::string name, gml::Matrix4D<float> value)
+	void GL3_Shader::setUniform(std::string name, gml::Mat4f value)
 	{
+		if (!hasUniform(name)) return;
 		float matrix[16];
 		value.convertToArray(matrix);
 		glContext->useShader(*this);
-		glUniformMatrix4fv(uniformLocations[name], 1, GL_TRUE, matrix);
+		glUniformMatrix4fv(uniformLocations.at(name), 1, GL_TRUE, matrix);
 	}
 }
