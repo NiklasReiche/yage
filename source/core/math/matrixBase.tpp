@@ -264,14 +264,14 @@ namespace gml
 		return *this;
 	}
 
-	template <typename T, size_t Row, size_t Column>
-	MatrixBase<T, Column, Row> transpose(
-		const MatrixBase<T, Row, Column>& matrix)
+	template <typename T, size_t Rows, size_t Columns>
+	MatrixBase<T, Columns, Rows> transpose(
+		const MatrixBase<T, Rows, Columns>& matrix)
 	{
-		MatrixBase<T, Row, Column> result;
-		for (auto i = 0; i < Row; ++i)
+		MatrixBase<T, Columns, Rows> result;
+		for (auto i = 0; i < Rows; ++i)
 		{
-			for (auto j = 0; j < Column; ++j)
+			for (auto j = 0; j < Columns; ++j)
 			{
 				result.at(j, i) = matrix.at(i, j);
 			}
@@ -355,6 +355,30 @@ namespace gml
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
+	bool operator==(
+		const MatrixBase<T, Rows, Columns>& left,
+		const MatrixBase<T, Rows, Columns>& right)
+	{
+		for (auto i = 0; i < Rows; ++i)
+		{
+			for (auto j = 0; j < Columns; ++j)
+			{
+				if (left.at(i, j) != right.at(i, j))
+					return false;
+			}
+		}
+		return true;
+	}
+
+	template <typename T, size_t Rows, size_t Columns>
+	bool operator!=(
+		const MatrixBase<T, Rows, Columns>& left,
+		const MatrixBase<T, Rows, Columns>& right)
+	{
+		return !(left == right);
+	}
+
+	template <typename T, size_t Rows, size_t Columns>
 	MatrixBase<T, Rows, Columns> operator+(
 		const MatrixBase<T, Rows, Columns>& left,
 		const MatrixBase<T, Rows, Columns>& right)
@@ -383,7 +407,7 @@ namespace gml
 				T value = 0;
 				for (auto k = 0; k < RowCol; ++k)
 				{
-					value += left.at(RowsL, RowCol) * right.at(RowCol, ColumnsR);
+					value += left.at(i, k) * right.at(k, j);
 				}
 				result.at(i, j) = value;
 			}

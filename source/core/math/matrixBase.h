@@ -28,55 +28,6 @@ namespace gml
 			std::array<T, (Columns > 0) ? Columns : 1>,
 			(Rows > 0) ? Rows : 1> data;
 
-	private:
-		/**
-		 * @brief Returns a matrix with a given row and column removed. 
-		 * 
-		 * @param row the row to remove
-		 * @param column the column to remove
-		 * @return the stripped matrix
-		 * 
-		 * @throws InvalidDimensionException if row or column is out of bounds
-		 */
-		MatrixBase<T, Rows - 1, Columns - 1> reduce(size_t row, size_t column)
-		const;
-
-		/**
-		 * @brief Adds a row to another row in this matrix.
-		 * 
-		 * @param first the row to add the second row
-		 * @param second the row the first row will be added to
-		 */
-		void addRows(size_t first, size_t second);
-
-		/**
-		 * @brief Adds a muliplied row to another mulitplied row in this matrix.
-		 * 
-		 * @param first the row to add the second row
-		 * @param firstFactor factor for the first row
-		 * @param second the row the first row will be added to
-		 * @param secondFactor factor for the second row
-		 */
-		void addMultRows(
-			size_t first, double firstFactor,
-			size_t second, double secondFactor);
-
-		/**
-		 * @brief Muliplies a row by the given factor.
-		 * 
-		 * @param row the row to modify
-		 * @param factor the factor
-		 */
-		void multRow(size_t row, double factor);
-
-		/**
-		 * @brief Switch two rows in this matrix.
-		 * 
-		 * @param first the first row to switch
-		 * @param second the second row to switch
-		 */
-		void switchRows(size_t first, size_t second);
-
 	public:
 		/**
 		 * @brief Initializes the diagonal values with ones, the rest with zeros.
@@ -153,6 +104,55 @@ namespace gml
 		template<typename U, size_t N>
 		friend MatrixBase<U, N, N> inverse(
 			const MatrixBase<U, N, N>& matrix);
+
+	private:
+		/**
+		* @brief Returns a matrix with a given row and column removed.
+		*
+		* @param row the row to remove
+		* @param column the column to remove
+		* @return the stripped matrix
+		*
+		* @throws InvalidDimensionException if row or column is out of bounds
+		*/
+		MatrixBase<T, Rows - 1, Columns - 1> reduce(size_t row, size_t column)
+			const;
+
+		/**
+		* @brief Adds a row to another row in this matrix.
+		*
+		* @param first the row to add the second row
+		* @param second the row the first row will be added to
+		*/
+		void addRows(size_t first, size_t second);
+
+		/**
+		* @brief Adds a muliplied row to another mulitplied row in this matrix.
+		*
+		* @param first the row to add the second row
+		* @param firstFactor factor for the first row
+		* @param second the row the first row will be added to
+		* @param secondFactor factor for the second row
+		*/
+		void addMultRows(
+			size_t first, double firstFactor,
+			size_t second, double secondFactor);
+
+		/**
+		* @brief Muliplies a row by the given factor.
+		*
+		* @param row the row to modify
+		* @param factor the factor
+		*/
+		void multRow(size_t row, double factor);
+
+		/**
+		* @brief Switch two rows in this matrix.
+		*
+		* @param first the first row to switch
+		* @param second the second row to switch
+		*/
+		void switchRows(size_t first, size_t second);
 	};
 
 	/**
@@ -190,6 +190,16 @@ namespace gml
 		const MatrixBase<T, Rows, Columns>& matrix);
 
 	template <typename T, size_t Rows, size_t Columns>
+	bool operator==(
+		const MatrixBase<T, Rows, Columns>& left,
+		const MatrixBase<T, Rows, Columns>& right);
+
+	template <typename T, size_t Rows, size_t Columns>
+	bool operator!=(
+		const MatrixBase<T, Rows, Columns>& left,
+		const MatrixBase<T, Rows, Columns>& right);
+
+	template <typename T, size_t Rows, size_t Columns>
 	MatrixBase<T, Rows, Columns> operator+(
 		const MatrixBase<T, Rows, Columns>& left,
 		const MatrixBase<T, Rows, Columns>& right);
@@ -223,15 +233,6 @@ namespace gml
 	MatrixBase<T, Rows, Columns> operator/(
 		const MatrixBase<T, Rows, Columns>& left,
 		const T & right);
-
-
-
-	//---------------------------------------------------------------------------
-	//-- Implementation ---------------------------------------------------------
-
-	//-- private members --------------------------------------------------------
-
-	
 }
 
 #include "matrixBase.tpp"
