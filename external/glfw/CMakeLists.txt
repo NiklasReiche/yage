@@ -1,6 +1,6 @@
 set(CMAKE_LEGACY_CYGWIN_WIN32 OFF)
 
-project(GLFW C)
+project(GLFW C) # no idea why this isn't working
 
 cmake_minimum_required(VERSION 2.8.12)
 

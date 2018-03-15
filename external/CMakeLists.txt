@@ -3,8 +3,9 @@
 ###################################################################
 
 if(WIN32 OR UNIX)
-    message( STATUS "Building glfw --" )
+	message( STATUS "Building glfw --" )
 	include( glfw.cmake )
+    
 	message( STATUS "Building glad --" )
 	include( glad.cmake )
 

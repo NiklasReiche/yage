@@ -1,0 +1,35 @@
+# CMake generation dependency list for this directory.
+D:/DEV/Projects/YAGE/external/glfw/CMakeLists.txt
+D:/DEV/Projects/YAGE/external/glfw/src/glfw-project-build/CMakeFiles/3.9.2-MSVC_2/CMakeSystem.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/CMakeSystemSpecificInitialize.cmake
+D:/DEV/Projects/YAGE/external/glfw/src/glfw-project-build/CMakeFiles/3.9.2-MSVC_2/CMakeCCompiler.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/CMakeSystemSpecificInformation.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/CMakeGenericSystem.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/Platform/Windows.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/Platform/WindowsPaths.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/CMakeCInformation.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/CMakeLanguageInformation.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/Platform/Windows-MSVC-C.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/Platform/Windows-MSVC.cmake
+D:/DEV/Projects/YAGE/external/glfw/src/glfw-project-build/CMakeFiles/3.9.2-MSVC_2/CMakeRCCompiler.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/CMakeRCInformation.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/CMakeCommonLanguageInclude.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/FindThreads.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/CheckLibraryExists.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/CheckSymbolExists.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/CheckIncludeFile.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/FindPackageMessage.cmake
+D:/DEV/Projects/YAGE/external/glfw/CMake/modules/FindVulkan.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/FindPackageMessage.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/FindDoxygen.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/FindPackageMessage.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/CMakePackageConfigHelpers.cmake
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/WriteBasicConfigVersionFile.cmake
+D:/DEV/Projects/YAGE/external/glfw/src/glfw3Config.cmake.in
+C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.9/Modules/BasicConfigVersion-SameMajorVersion.cmake.in
+D:/DEV/Projects/YAGE/external/glfw/src/glfw_config.h.in
+D:/DEV/Projects/YAGE/external/glfw/src/glfw3.pc.in
+D:/DEV/Projects/YAGE/external/glfw/cmake_uninstall.cmake.in
