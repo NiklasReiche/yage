@@ -136,7 +136,8 @@ namespace gml
 	}
 
 	template <typename T>
-	Quaternion<T>& Quaternion<T>::operator*=(const T& rhs)
+	template <typename T2>
+	Quaternion<T>& Quaternion<T>::operator*=(const T2& rhs)
 	{
 		this->x *= rhs;
 		this->y *= rhs;
@@ -261,14 +262,14 @@ namespace gml
 		return Quaternion<T>(lhs) *= rhs;
 	}
 
-	template <typename T>
-	Quaternion<T> operator*(const Quaternion<T>& lhs, const T& rhs)
+	template <typename T, typename T2>
+	Quaternion<T> operator*(const Quaternion<T>& lhs, const T2& rhs)
 	{
 		return Quaternion<T>(lhs) *= rhs;;
 	}
 
-	template <typename T>
-	Quaternion<T> operator*(const T& lhs, const Quaternion<T>& rhs)
+	template <typename T, typename T2>
+	Quaternion<T> operator*(const T2& lhs, const Quaternion<T>& rhs)
 	{
 		return Quaternion<T>(rhs) *= lhs;
 	}

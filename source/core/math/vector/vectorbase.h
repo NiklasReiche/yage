@@ -100,8 +100,10 @@ namespace gml
 		VectorBase<T, Size> operator-() const;
 		VectorBase<T, Size>& operator+=(const VectorBase<T, Size>& right);
 		VectorBase<T, Size>& operator-=(const VectorBase<T, Size>& right);
-		VectorBase<T, Size>& operator*=(const T& right);
-		VectorBase<T, Size>& operator/=(const T& right);
+		template <typename T2>
+		VectorBase<T, Size>& operator*=(const T2& right);
+		template <typename T2>
+		VectorBase<T, Size>& operator/=(const T2& right);
 	};
 
 	/**
@@ -155,20 +157,20 @@ namespace gml
 		const VectorBase<T, Size>& left,
 		const VectorBase<T, Size>& right);
 
-	template <typename T, size_t Size>
+	template <typename T, size_t Size, typename T2>
 	VectorBase<T, Size> operator*(
-		const T& left,
+		const T2& left,
 		const VectorBase<T, Size>& right);
 
-	template <typename T, size_t Size>
+	template <typename T, size_t Size, typename T2>
 	VectorBase<T, Size> operator*(
 		const VectorBase<T, Size>& left,
-		const T& right);
+		const T2& right);
 
-	template <typename T, size_t Size>
+	template <typename T, size_t Size, typename T2>
 	VectorBase<T, Size> operator/(
 		const VectorBase<T, Size>& left,
-		const T& right);
+		const T2& right);
 }
 
 #include "vectorBase.tpp"

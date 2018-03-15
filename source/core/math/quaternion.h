@@ -169,7 +169,8 @@ namespace gml
 		static Quaternion<T> rotationMatrix(Mat3<T> matrix);
 
 	public:
-		Quaternion<T>& operator*=(const T& rhs);
+		template <typename T2>
+		Quaternion<T>& operator*=(const T2& rhs);
 		Quaternion<T>& operator*=(const Quaternion<T>& rhs);
 	};
 
@@ -200,11 +201,11 @@ namespace gml
 	template <typename T>
 	Quaternion<T> operator*(const Quaternion<T>& lhs, const Quaternion<T>& rhs);
 
-	template <typename T>
-	Quaternion<T> operator*(const Quaternion<T>& lhs, const T& rhs);
+	template <typename T, typename T2>
+	Quaternion<T> operator*(const Quaternion<T>& lhs, const T2& rhs);
 
-	template <typename T>
-	Quaternion<T> operator*(const T& lhs, const Quaternion<T>& rhs);
+	template <typename T, typename T2>
+	Quaternion<T> operator*(const T2& lhs, const Quaternion<T>& rhs);
 }
 
 #include "quaternion.tpp"
