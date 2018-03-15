@@ -1,4 +1,5 @@
 #pragma once
+#include "matrix.h"
 
 namespace gml
 {
@@ -15,9 +16,21 @@ namespace gml
 	}
 
 	template <typename T>
+	Quaternion<T>::Quaternion(const Vec3<T> & vector)
+		: w(0), x(vector.x), y(vector.y), z(vector.z)
+	{
+	}
+
+	template <typename T>
+	double Quaternion<T>::sqrLength() const
+	{
+		return x * x + y * y + z * z + w * w;
+	}
+
+	template <typename T>
 	double Quaternion<T>::length() const
 	{
-		return sqrt(x * x + y * y + z * z + w * w);
+		return sqrt(sqrLength());
 	}
 
 	template <typename T>
@@ -43,86 +56,83 @@ namespace gml
 	template <typename T>
 	Vec3<T> Quaternion<T>::getForward() const
 	{
-		return normalize(Vec3<T>{
-			-2 * (x * z + w * y),
-			-2 * (y * z - w * x),
-			-1 + 2 * (x * x + y * y)
-		});
+		Quaternion<T> q = gml::normalize(*this);
+		Quaternion<T> result = q * Quaternion<T>(Vec3<T>::worldForward()) * gml::conjugate(q);
+		return gml::normalize(Vec3<T>(result.x, result.y, result.z));
 	}
 
 	template <typename T>
 	Vec3<T> Quaternion<T>::getRight() const
 	{
-		return normalize(Vec3<T>{
-			1 - 2 * (y * y + z * z),
-			2 * (x * y + w * z),
-			2 * (x * z - w * y)
-		});
+		Quaternion<T> q = gml::normalize(*this);
+		Quaternion<T> result = q * Quaternion<T>(Vec3<T>::worldRight()) * gml::conjugate(q);
+		return gml::normalize(Vec3<T>(result.x, result.y, result.z));
 	}
 
 	template <typename T>
 	Vec3<T> Quaternion<T>::getUp() const
 	{
-		return normalize(Vec3<T>{
-			2 * (x * y - w * z),
-			1 - 2 * (x * x + z * z),
-			2 * (y * z + w * x)
-		});
+		Quaternion<T> q = gml::normalize(*this);
+		Quaternion<T> result = q * Quaternion<T>(Vec3<T>::worldUp()) * gml::conjugate(q);
+		return gml::normalize(Vec3<T>(result.x, result.y, result.z));
 	}
 
 	template <typename T>
 	double Quaternion<T>::getPitch() const
 	{
-		float test = x * y + z * w;
-		if (test > 0.499)
+		const auto unit = sqrLength();
+		const double test = x * y + z * w;
+		if (test > 0.499*unit || test < -0.499*unit)
 		{
-			// singularity at north pole
-			return 0;
+			return 0; // singularity at north and south pole
 		}
-		if (test < -0.499)
-		{
-			// singularity at south pole
-			return 0;
-		}
-		float sqx = x * x;
-		float sqz = z * z;
-		return std::atan2(2 * x * w - 2 * y * z, 1 - 2 * sqx - 2 * sqz);
+		const double sqw = w * w;
+		const double sqx = x * x;
+		const double sqy = y * y;
+		const double sqz = z * z;
+		return std::atan2(2 * x * w - 2 * y * z, -sqx + sqy - sqz + sqw);
 	}
 
 	template <typename T>
 	double Quaternion<T>::getYaw() const
 	{
-		float test = x * y + z * w;
-		if (test > 0.499)
+		const auto unit = sqrLength();
+		const double test = x * y + z * w;
+		if (test > 0.499*unit)
 		{
-			// singularity at north pole
-			return 2 * std::atan2(x, w);
+			return 2 * std::atan2(x, w); // singularity at north pole
 		}
-		if (test < -0.499)
+		if (test < -0.499*unit)
 		{
-			// singularity at south pole
-			return -2 * std::atan2(x, w);
+			return -2 * std::atan2(x, w); // singularity at south pole
 		}
-		float sqy = y * y;
-		float sqz = z * z;
-		return std::atan2(2 * y * w - 2 * x * z, 1 - 2 * sqy - 2 * sqz);
+		const double sqw = w * w;
+		const double sqx = x * x;
+		const double sqy = y * y;
+		const double sqz = z * z;
+		return std::atan2(2 * y * w - 2 * x * z, sqx - sqy - sqz + sqw);
 	}
 
 	template <typename T>
 	double Quaternion<T>::getRoll() const
 	{
-		float test = x * y + z * w;
-		if (test > 0.499)
+		const auto unit = sqrLength();
+		const double test = x * y + z * w;
+		if (test > 0.499*unit)
 		{
-			// singularity at north pole
-			return PI / 2;
+			return PI / 2; // singularity at north pole
 		}
-		if (test < -0.499)
+		if (test < -0.499*unit)
 		{
-			// singularity at south pole
-			return -PI / 2;
+			return -PI / 2; // singularity at south pole
 		}
-		return std::asin(2 * test);
+		return std::asin(2 * test / unit);
+	}
+
+	template <typename T>
+	Mat4<T> Quaternion<T>::toMatrix()
+	{
+		return Mat4<T>::quaternion(*this);
 	}
 
 	template <typename T>
@@ -152,37 +162,78 @@ namespace gml
 	}
 
 	template <typename T>
-	static Quaternion<T> axisAngle(double angle, const Vec3<T>& axis)
+	Quaternion<T> Quaternion<T>::axisAngle(const Vec3<T>& axis, double angle)
 	{
-		axis.normalze();
-		angle = toRad(angle);
+		gml::Vec3<T> a = gml::normalize(axis);
 		const double s = std::sin(angle / 2);
 
 		Quaternion<T> q;
 		q.w = std::cos(angle / 2);
-		q.x = axis.x * s;
-		q.y = axis.y * s;
-		q.z = axis.z * s;
+		q.x = a.x * s;
+		q.y = a.y * s;
+		q.z = a.z * s;
 		return q;
 	}
 
 	template <typename T>
-	static Quaternion<T> eulerAngle(
-		const double pitch, 
+	Quaternion<T> Quaternion<T>::eulerAngle(
 		const double yaw, 
-		const double roll)
+		const double roll,
+		const double pitch)
 	{
-		const double c1 = std::cos(toRad(yaw) / 2);
-		const double c2 = std::cos(toRad(roll) / 2);
-		const double c3 = std::cos(toRad(pitch) / 2);
-		const double s1 = std::sin(toRad(yaw) / 2);
-		const double s2 = std::sin(toRad(roll) / 2);
-		const double s3 = std::sin(toRad(pitch) / 2);
-		const double w = c1 * c2 * c3 - s1 * s2 * s3;
-		const double x = s1 * s2 * c3 + c1 * c2 * s3;
-		const double y = s1 * c2 * c3 + c1 * s2 * s3;
-		const double z = c1 * s2 * c3 - s1 * c2 * s3;
+		const double cy = std::cos(yaw / 2);
+		const double cr = std::cos(roll / 2);
+		const double cp = std::cos(pitch / 2);
+		const double sy = std::sin(yaw / 2);
+		const double sr = std::sin(roll / 2);
+		const double sp = std::sin(pitch / 2);
+		
+		const double w = cy * cr * cp - sy * sr * sp;
+		const double x = sy * sr * cp + cy * cr * sp;
+		const double y = sy * cr * cp + cy * sr * sp;
+		const double z = cy * sr * cp - sy * cr * sp;
 		return Quaternion<T>(w, x, y, z);
+	}
+
+	template <typename T>
+	Quaternion<T> Quaternion<T>::rotationMatrix(Mat3<T> matrix)
+	{
+		const double tr = matrix.trace();
+		Mat3<T> & m = matrix;
+		Quaternion<T> q;
+		if (tr > 0)
+		{
+			const double s = std::sqrt(tr + 1) * 2;
+			q.w = 0.25 * s;
+			q.x = (m.at(2, 1) - m.at(1, 2)) / s;
+			q.y = (m.at(0, 2) - m.at(2, 0)) / s;
+			q.z = (m.at(1, 0) - m.at(0, 1)) / s;
+		}
+		else if ((m.at(0, 0) > m.at(1, 1)) && (m.at(0, 0) > m.at(2, 2)))
+		{
+			const double s = std::sqrt(1.0 + m.at(0, 0) - m.at(1, 1) - m.at(2, 2)) * 2;
+			q.w = (m.at(2, 1) - m.at(1, 2)) / s;
+			q.x = 0.25 * s;
+			q.y = (m.at(0, 1) + m.at(1, 0)) / s;
+			q.z = (m.at(0, 2) + m.at(2, 0)) / s;
+		}
+		else if (m.at(1, 1) > m.at(2, 2))
+		{
+			const double s = std::sqrt(1.0 + m.at(1, 1) - m.at(0, 0) - m.at(2, 2)) * 2;
+			q.w = (m.at(0, 2) - m.at(2, 0)) / s;
+			q.x = (m.at(0, 1) + m.at(1, 0)) / s;
+			q.y = 0.25 * s;
+			q.z = (m.at(1, 2) + m.at(2, 1)) / s;
+		}
+		else 
+		{
+			const double s = std::sqrt(1.0 + m.at(2, 2) - m.at(0, 0) - m.at(1, 1)) * 2;
+			q.w = (m.at(1, 0) - m.at(0, 1)) / s;
+			q.x = (m.at(0, 2) + m.at(2, 0)) / s;
+			q.y = (m.at(1, 2) + m.at(2, 1)) / s;
+			q.z = 0.25 * s;
+		}
+		return q;
 	}
 
 	template <typename T>

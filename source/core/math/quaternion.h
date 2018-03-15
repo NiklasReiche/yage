@@ -2,8 +2,8 @@
 
 #include <ostream>
 
-#include "maths.h"
 #include "vector.h"
+#include "matrix.h"
 
 namespace gml
 {
@@ -14,6 +14,13 @@ namespace gml
 	typedef Quaternion<float> Quatf;
 	typedef Quaternion<double> Quatd;
 	typedef Quaternion<unsigned int> Quatui;
+
+	template <typename T>
+	class Mat3;
+	template <typename T>
+	class Mat4;
+	template <typename T>
+	class Vec3;
 
 	/**
 	 * @brief Represents a generic quaternion.
@@ -42,7 +49,21 @@ namespace gml
 		 */
 		Quaternion(const T& w, const T& x, const T& y, const T& z);
 
+		/**
+		 * @brief Constructs a pure quaternion from a vector
+		 * 
+		 * @param vector the vector to construct from
+		 */
+		Quaternion(const Vec3<T> & vector);
+
 	public:
+		/**
+		* @brief Returns the squared length of this quaternion.
+		*
+		* @return the squared length
+		*/
+		double sqrLength() const;
+
 		/**
 		 * @brief Returns this quaternion's length.
 		 * 
@@ -65,8 +86,8 @@ namespace gml
 		Quaternion<T>& conjugate();
 
 		/**
-		 * @brief Extracts the Forward vector of the rotation expressed by this
-		 * quaternion.
+		 * @brief Extracts the Forward vector of the rotation expressed by 
+		 * this quaternion.
 		 * 
 		 * @return the Forward vector
 		 */
@@ -112,25 +133,40 @@ namespace gml
 		*/
 		double getRoll() const;
 
+		/**
+		 * @brief Converts this quaternion into a rotation matrix.
+		 * 
+		 * @return the matrix
+		 */
+		Mat4<T> toMatrix();
+
 	public:
 		/**
 		 * @brief Constructs a quaterion from an axis angle representation.
 		 * 
-		 * @param angle the angle in degrees
 		 * @param axis the rotation axis
+		 * @param angle the angle in radians
 		 * @return the quaternion
 		 */
-		static Quaternion<T> axisAngle(double angle, const Vec3<T>& axis);
+		static Quaternion<T> axisAngle(const Vec3<T>& axis, double angle);
 
 		/**
 		 * @brief Constructs a quaterion from an euler angle representation.
 		 * 
-		 * @param pitch the pitch component
-		 * @param yaw the yaw component
-		 * @param roll the roll component
+		 * @param yaw the rotation around the y axis in radians
+		 * @param roll the rotation around the z axis in radians
+		 * @param pitch the rotation around the x axis in radians
 		 * @return the quaternion
 		 */
-		static Quaternion<T> eulerAngle(double pitch, double yaw, double roll);
+		static Quaternion<T> eulerAngle(double yaw, double roll, double pitch);
+
+		/**
+		 * @brief Constructs a quaterion from a rotation matrix.
+		 * 
+		 * @param matrix the rotation matrix
+		 * @return the quaternion
+		 */
+		static Quaternion<T> rotationMatrix(Mat3<T> matrix);
 
 	public:
 		Quaternion<T>& operator*=(const T& rhs);

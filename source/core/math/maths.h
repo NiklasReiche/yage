@@ -14,12 +14,4 @@ namespace gml
 	{
 		return rad * (180.0 / PI);
 	}
-
-	class DivideByZeroException : public std::exception
-	{
-	};
-
-	class InvalidDimensionException : public std::exception
-	{
-	};
 }

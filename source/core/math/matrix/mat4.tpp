@@ -3,60 +3,6 @@
 namespace gml
 {
 	template <typename T>
-	Mat1<T>::Mat1()
-		: MatrixBase()
-	{
-	}
-
-	template <typename T>
-	Mat1<T>::Mat1(const Mat1<T>& other)
-		: MatrixBase(other)
-	{
-	}
-
-	template <typename T>
-	Mat1<T>::Mat1(const MatrixBase<T, 1, 1>& other)
-		: MatrixBase(other)
-	{
-	}
-
-	template <typename T>
-	Mat2<T>::Mat2()
-		: MatrixBase()
-	{
-	}
-
-	template <typename T>
-	Mat2<T>::Mat2(const Mat2<T>& other)
-		: MatrixBase(other)
-	{
-	}
-
-	template <typename T>
-	Mat2<T>::Mat2(const MatrixBase<T, 2, 2>& other)
-		: MatrixBase(other)
-	{
-	}
-
-	template <typename T>
-	Mat3<T>::Mat3()
-		: MatrixBase()
-	{
-	}
-
-	template <typename T>
-	Mat3<T>::Mat3(const Mat3<T>& other)
-		: MatrixBase(other)
-	{
-	}
-
-	template <typename T>
-	Mat3<T>::Mat3(const MatrixBase<T, 3, 3>& other)
-		: MatrixBase(other)
-	{
-	}
-
-	template <typename T>
 	Mat4<T>::Mat4()
 		: MatrixBase()
 	{
@@ -75,23 +21,40 @@ namespace gml
 	}
 
 	template <typename T>
-	Vec3<T> Mat4<T>::getTranslation()
+	Vec3<T> Mat4<T>::getTranslation() const
 	{
 		return Vec3<T>(this->at(0, 3), this->at(1, 3), this->at(2, 3));
 	}
 
 	template <typename T>
-	Mat3<T> Mat4<T>::getRotation()
+	Mat3<T> Mat4<T>::getRotation() const
 	{
-		return Mat3<T>(
-			this->at(0, 0), this->at(0, 1), this->at(0, 2),
-			this->at(1, 0), this->at(1, 1), this->at(1, 2),
-			this->at(2, 0), this->at(2, 1), this->at(2, 2)
-		);
+		Vec3<T> scale = getScale();
+		return Mat3<T>{
+			this->at(0, 0) / scale.x, this->at(0, 1) / scale.y, this->at(0, 2) / scale.z,
+				this->at(1, 0) / scale.x, this->at(1, 1) / scale.y, this->at(1, 2) / scale.z,
+				this->at(2, 0) / scale.x, this->at(2, 1) / scale.y, this->at(2, 2) / scale.z
+		};
 	}
 
 	template <typename T>
-	Mat4<T> Mat4<T>::translate(const double x, const double y, const double z)
+	Vec3<T> Mat4<T>::getScale() const
+	{
+		Vec3<T> scale;
+		scale.x = Vec3<T>(this->at(0, 0), this->at(1, 0), this->at(2, 0)).length();
+		scale.y = Vec3<T>(this->at(0, 1), this->at(1, 1), this->at(2, 1)).length();
+		scale.z = Vec3<T>(this->at(0, 2), this->at(1, 2), this->at(2, 2)).length();
+		return scale;
+	}
+
+	template <typename T>
+	Quaternion<T> Mat4<T>::toQuaternion()
+	{
+		return Quaternion<T>::rotationMatrix(*this);
+	}
+
+	template <typename T>
+	Mat4<T> Mat4<T>::translate(const T& x, const T& y, const T& z)
 	{
 		Mat4<T> result;
 		result.at(0, 3) = x;
@@ -101,7 +64,7 @@ namespace gml
 	}
 
 	template <typename T>
-	Mat4<T> Mat4<T>::translate(const double translation)
+	Mat4<T> Mat4<T>::translate(const T& translation)
 	{
 		return Mat4<T>::translate(translation, translation, translation);
 	}
@@ -114,7 +77,7 @@ namespace gml
 	}
 
 	template <typename T>
-	Mat4<T> Mat4<T>::scale(const double x, const double y, const double z)
+	Mat4<T> Mat4<T>::scale(const T& x, const T& y, const T& z)
 	{
 		Mat4<T> result;
 		result.at(0, 0) = x;
@@ -124,7 +87,7 @@ namespace gml
 	}
 
 	template <typename T>
-	Mat4<T> Mat4<T>::scale(const double scale)
+	Mat4<T> Mat4<T>::scale(const T& scale)
 	{
 		return Mat4<T>::scale(scale, scale, scale);
 	}
@@ -136,17 +99,49 @@ namespace gml
 	}
 
 	template <typename T>
-	Mat4<T> Mat4<T>::axisAngle(Vec3<T> axis, double angle)
+	Mat4<T> Mat4<T>::axisAngle(const Vec3<T>& axis, const double angle)
 	{
-		// TODO
-		return Mat4<T>();
+		Vec3<T> a = gml::normalize(axis);
+		const T x = a.x;
+		const T y = a.y;
+		const T z = a.z;
+		const T c = std::cos(angle);
+		const T s = std::sin(angle);
+		const T t = 1 - c;
+
+		Mat4<T> result;
+		result.at(0, 0) = x * x * t + c;
+		result.at(0, 1) = x * y * t - z * s;
+		result.at(0, 2) = x * z * t + y * s;
+
+		result.at(1, 0) = y * x * t + z * s;
+		result.at(1, 1) = y * y * t + c;
+		result.at(1, 2) = y * z * t - x * s;
+
+		result.at(2, 0) = z * x * t - y * s;
+		result.at(2, 1) = z * y * t + x * s;
+		result.at(2, 2) = z * z * t + c;
+		return result;
 	}
 
 	template <typename T>
-	Mat4<T> Mat4<T>::quaternion(Quaternion<T> quaternion)
+	Mat4<T> Mat4<T>::quaternion(const Quaternion<T>& quaternion)
 	{
-		// TODO
-		return Mat4<T>();
+		const Quaternion<T> q = normalize(quaternion);;
+
+		Mat4<T> result;
+		result.at(0, 0) = 1 - 2 * q.y * q.y - 2 * q.z * q.z;
+		result.at(0, 1) = 2 * q.x * q.y - 2 * q.z * q.w;
+		result.at(0, 2) = 2 * q.x * q.z + 2 * q.y * q.w;
+
+		result.at(1, 0) = 2 * q.x * q.y + 2 * q.z * q.w;
+		result.at(1, 1) = 1 - 2 * q.x * q.x - 2 * q.z * q.z;
+		result.at(1, 2) = 2 * q.y * q.z - 2 * q.x * q.w;
+
+		result.at(2, 0) = 2 * q.x * q.z - 2 * q.y * q.w;
+		result.at(2, 1) = 2 * q.y * q.z + 2 * q.x * q.w;
+		result.at(2, 2) = 1 - 2 * q.x * q.x - 2 * q.y * q.y;
+		return result;
 	}
 
 	template <typename T>
@@ -193,13 +188,13 @@ namespace gml
 		const Vec3<T>& target,
 		const Vec3<T>& up)
 	{
-		Vec3<T> direction = pos - target;
+		Vec3<T> direction = normalize(pos - target);
 		Vec3<T> right = normalize(cross(up, direction));
 		Mat4<T> mat1 = {
-			{right.x, right.y, right.z, 0,},
-			{up.x, up.y, up.z, 0,},
-			{direction.x, direction.y, direction.z, 0,},
-			{0, 0, 0, 1}
+			{ right.x, right.y, right.z, 0 },
+		{ up.x, up.y, up.z, 0 },
+		{ direction.x, direction.y, direction.z, 0 },
+		{ 0, 0, 0, 1 }
 		};
 		return mat1 * Mat4<T>::translate(-pos.x, -pos.y, -pos.z);
 	}

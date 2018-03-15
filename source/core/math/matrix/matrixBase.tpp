@@ -157,6 +157,62 @@ namespace gml
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
+	MatrixBase<T, Rows, Columns>::MatrixBase(
+		const MatrixBase<T, Rows, Columns>& other)
+	{
+		for (auto i = 0; i < Rows; ++i)
+		{
+			for (auto j = 0; j < Columns; ++j)
+			{
+				this->at(i, j) = other.at(i, j);
+			}
+		}
+	}
+
+	template <typename T, size_t Rows, size_t Columns>
+	template <typename T2>
+	MatrixBase<T, Rows, Columns>::MatrixBase(
+		const MatrixBase<T2, Rows, Columns>& other)
+	{
+		for (auto i = 0; i < Rows; ++i)
+		{
+			for (auto j = 0; j < Columns; ++j)
+			{
+				this->at(i, j) = other.at(i, j);
+			}
+		}
+	}
+
+	template <typename T, size_t Rows, size_t Columns>
+	MatrixBase<T, Rows, Columns>& MatrixBase<T, Rows, Columns>::operator=(
+		const MatrixBase<T, Rows, Columns>& other)
+	{
+		for (auto i = 0; i < Rows; ++i)
+		{
+			for (auto j = 0; j < Columns; ++j)
+			{
+				this->at(i, j) = other.at(i, j);
+			}
+		}
+		return *this;
+	}
+
+	template <typename T, size_t Rows, size_t Columns>
+	template<typename T2>
+	MatrixBase<T, Rows, Columns>& MatrixBase<T, Rows, Columns>::operator=(
+		const MatrixBase<T2, Rows, Columns>& other)
+	{
+		for (auto i = 0; i < Rows; ++i)
+		{
+			for (auto j = 0; j < Columns; ++j)
+			{
+				this->at(i, j) = other.at(i, j);
+			}
+		}
+		return *this;
+	}
+
+	template <typename T, size_t Rows, size_t Columns>
 	T& MatrixBase<T, Rows, Columns>::at(
 		size_t row,
 		size_t column)
@@ -188,6 +244,24 @@ namespace gml
 			det += std::pow(-1, i + 1) * at(1, i) * reduce(1, i).det();
 		}
 		return det;
+	}
+
+	template <typename T, size_t Rows, size_t Columns>
+	double MatrixBase<T, Rows, Columns>::trace() 
+	const
+	{
+		double trace = 0;
+		for(auto i = 0; i < Rows; ++i)
+		{
+			for (auto j = 0; j < Columns; ++j)
+			{
+				if (i == j)
+				{
+					trace += this->at(i, j);
+				}
+			}
+		}
+		return trace;
 	}
 
 	template <typename T, size_t Rows, size_t Columns>

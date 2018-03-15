@@ -22,6 +22,11 @@ namespace gml
 			return data;
 		}
 
+		double trace() const
+		{
+			return data;
+		}
+
 		T& at(size_t row = 0, size_t column = 0)
 		{
 			return data;

@@ -4,9 +4,9 @@
 #include <initializer_list>
 #include <ostream>
 
-#include "maths.h"
+#include "../exception.h"
 #include "matrixSpecial.h"
-#include "vectorbase.h"
+#include "../vector/vectorbase.h"
 
 namespace gml
 {
@@ -60,6 +60,18 @@ namespace gml
 		 */
 		explicit MatrixBase(const T arr[]);
 
+		MatrixBase(const MatrixBase<T, Rows, Columns>& other);
+
+		template<typename T2>
+		MatrixBase(const MatrixBase<T2, Rows, Columns>& other);
+
+		MatrixBase<T, Rows, Columns>& operator=(
+			const MatrixBase<T, Rows, Columns>& other);
+
+		template<typename T2>
+		MatrixBase<T, Rows, Columns>& operator=(
+			const MatrixBase<T2, Rows, Columns>& other);
+
 	public:
 		/**
 		 * @brief Returns a reference to this matrix's field at a given position.
@@ -88,12 +100,20 @@ namespace gml
 		double det() const;
 
 		/**
+		 * @brief Returns the trace of this matrix.
+		 * 
+		 * @return the trace
+		 */
+		double trace() const;
+
+		/**
 		 * @brief Fills the given c-style array with values from this matrix.
 		 * 
 		 * @param arr the array to fill
 		 */
 		void convertToArray(T arr[]) const;
 
+	public:
 		MatrixBase<T, Rows, Columns>& operator+=(
 			const MatrixBase<T, Rows, Columns>& right);
 		MatrixBase<T, Rows, Columns>& operator-=(

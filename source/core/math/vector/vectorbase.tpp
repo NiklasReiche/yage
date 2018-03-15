@@ -25,6 +25,46 @@ namespace gml
 	}
 
 	template<typename T, size_t Size>
+	VectorBase<T, Size>::VectorBase(const VectorBase<T, Size>& other)
+	{
+		for (auto i = 0; i < Size; ++i)
+		{
+			this->at(i) = other.at(i);
+		}
+	}
+
+	template<typename T, size_t Size>
+	template<typename T2>
+	VectorBase<T, Size>::VectorBase(const VectorBase<T2, Size>& other)
+	{
+		for (auto i = 0; i < Size; ++i)
+		{
+			this->at(i) = other.at(i);
+		}
+	}
+
+	template<typename T, size_t Size>
+	VectorBase<T, Size>& VectorBase<T, Size>::operator=(const VectorBase<T, Size>& other)
+	{
+		for (auto i = 0; i < Size; ++i)
+		{
+			this->at(i) = other.at(i);
+		}
+		return *this;
+	}
+
+	template<typename T, size_t Size>
+	template<typename T2>
+	VectorBase<T, Size>& VectorBase<T, Size>::operator=(const VectorBase<T2, Size>& other)
+	{
+		for (auto i = 0; i < Size; ++i)
+		{
+			this->at(i) = other.at(i);
+		}
+		return *this;
+	}
+
+	template<typename T, size_t Size>
 	T& VectorBase<T, Size>::at(size_t pos)
 	{
 		return data.at(pos);
@@ -214,6 +254,6 @@ namespace gml
 		{
 			throw DivideByZeroException();
 		}
-		return (1 / length) * vector;
+		return vector * static_cast<T>(1 / length);
 	}
 }
