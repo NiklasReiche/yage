@@ -1,62 +1,98 @@
 #include "sceneRenderer.h"
 
-namespace graphics3d
+namespace gl3d
 {
-	void SceneRenderer::renderGraph(SceneNode* root)
+	void SceneRenderer::renderGraph(std::shared_ptr<SceneNode> root)
 	{
 		std::vector<Geom> drawablesLoop;
-		std::vector<PointLight> lightsLoop;
+		uniformValues.dirLights.clear();
+		uniformValues.pointLights.clear();
 
-		auto collectGeometry = [this, &drawablesLoop, &lightsLoop](SceneObject* node, gml::Matrix4D<float> transform)
+		auto collectGeometry = [this, &drawablesLoop](SceneObject* node, gml::Mat4d transform)
 		{
-			if (drawables.count(node->getID()))
-				drawablesLoop.push_back({ drawables.at(node->getID()), materials.at(node->getID()), transform });
-			if (lights.count(node->getID())) {
-				lightsLoop.push_back(lights.at(node->getID()));
-				lightsLoop.back().position = gml::Vec3f(transform.getTranslation());
+			if (node->hasMaterial() && node->hasMesh())
+			{
+				drawablesLoop.push_back({ 
+					*node->getMesh(), 
+					*node->getMaterial(),
+					transform});
 			}
-
+			if (node->hasLight())
+			{
+				std::shared_ptr<Light> light = node->getLight();
+				switch(light->getType())
+				{
+				case LightType::DIR_LIGHT:
+					{
+					std::shared_ptr<DirLight> dirLight = std::static_pointer_cast<DirLight>(light);
+					uniformValues.dirLights.push_back(dirLight);
+					}
+				case LightType::POINT_LIGHT:
+					{
+					std::shared_ptr<PointLight> pointLight = std::static_pointer_cast<PointLight>(light);
+					pointLight->setPosition(gml::Vec3d(transform.getTranslation()));
+					uniformValues.pointLights.push_back(pointLight);
+					}
+				default:
+					break;
+				}
+			}
+			if (node->hasCamera())
+			{
+				std::shared_ptr<Camera> camera = node->getCamera();
+				camera->moveTo(transform.getTranslation());
+				camera->rotateTo(transform.getRotation().toQuaternion());
+			}
 		};
 
-		auto applyTransform = [](SceneGroup* node, gml::Matrix4D<float> transform)
-		{
-			return node->applyTransform(transform);
-		};
+		root->updateChildren(collectGeometry);
 
-		root->updateChildren(collectGeometry, applyTransform, gml::Matrix4D<float>());
-
-		this->shader.setUniform("number_pointLight", (int)lightsLoop.size());
-		for (int i = 0; i < lightsLoop.size(); ++i)
-		{
-			this->shader.setUniform("pointLights[" + util::to_string(i) + "].position", lightsLoop.at(i).position);
-			this->shader.setUniform("pointLights[" + util::to_string(i) + "].ambient", lightsLoop.at(i).color.ambient);
-			this->shader.setUniform("pointLights[" + util::to_string(i) + "].diffuse", lightsLoop.at(i).color.diffuse);
-			this->shader.setUniform("pointLights[" + util::to_string(i) + "].specular", lightsLoop.at(i).color.specular);
-			this->shader.setUniform("pointLights[" + util::to_string(i) + "].constant", lightsLoop.at(i).constant);
-			this->shader.setUniform("pointLights[" + util::to_string(i) + "].linear", lightsLoop.at(i).linear);
-			this->shader.setUniform("pointLights[" + util::to_string(i) + "].quadratic", lightsLoop.at(i).quadratic);
-		}
 		for (Geom drawable : drawablesLoop)
 		{
-			this->shader.setUniform("model", drawable.transform);
-			this->shader.setUniform("material.ambient", drawable.material.ambient);
-			this->shader.setUniform("material.diffuse", drawable.material.diffuse);
-			this->shader.setUniform("material.specular", drawable.material.specular);
-			this->shader.setUniform("material.shininess", drawable.material.shininess);
-			this->gl->draw(drawable.drawable);
+			gl::Shader shader = drawable.material.getShader();
+			shader.setUniform("model", drawable.transform);
+
+			shader.setUniform("number_dirLight", (int)uniformValues.dirLights.size());
+			for (int i = 0; i < uniformValues.dirLights.size(); ++i)
+			{
+				setDirLightShader(shader, i, uniformValues.dirLights.at(i));
+			}
+
+			shader.setUniform("number_pointLight", (int)uniformValues.pointLights.size());
+			for (int i = 0; i < uniformValues.pointLights.size(); ++i)
+			{
+				setPointLightShader(shader, i, uniformValues.pointLights.at(i));
+			}
+
+			drawable.material.updateShader();
+			this->gl->draw(drawable.mesh.drawable);
 		}
 	}
 
-	void SceneRenderer::addDrawable(int id, gl::Drawable drawable)
+	void SceneRenderer::setLightColorsShader(gl::Shader shader, std::string lightType, unsigned int pos, const LightColor& color) const
 	{
-		drawables[id] = drawable;
+		shader.setUniform(lightType + "[" + util::to_string(pos) + "].ambient", color.ambient);
+		shader.setUniform(lightType + "[" + util::to_string(pos) + "].diffuse", color.diffuse);
+		shader.setUniform(lightType + "[" + util::to_string(pos) + "].specular", color.specular);
 	}
-	void SceneRenderer::addMaterial(int id, Mat drawable)
+
+	void SceneRenderer::setLightConstantsShader(gl::Shader shader, std::string lightType, unsigned int pos, const LightConstants& constants) const
 	{
-		materials[id] = drawable;
+		shader.setUniform(lightType + "[" + util::to_string(pos) + "].constant", constants.constant);
+		shader.setUniform(lightType + "[" + util::to_string(pos) + "].linear", constants.linear);
+		shader.setUniform(lightType + "[" + util::to_string(pos) + "].quadratic", constants.quadratic);
 	}
-	void SceneRenderer::addLight(int id, PointLight drawable)
+
+	void SceneRenderer::setDirLightShader(gl::Shader shader, unsigned pos, std::shared_ptr<DirLight> light) const
 	{
-		lights[id] = drawable;
+		setLightColorsShader(shader, "dirLights", pos, light->getColors());
+		shader.setUniform("dirLights[" + util::to_string(pos) + "].direction", light->getDirection());
+	}
+
+	void SceneRenderer::setPointLightShader(gl::Shader shader, unsigned pos, std::shared_ptr<PointLight> light) const
+	{
+		setLightColorsShader(shader, "pointLights", pos, light->getColors());
+		setLightConstantsShader(shader, "pointLights", pos, light->getConstants());
+		shader.setUniform("pointLights[" + util::to_string(pos) + "].position", light->getPosition());
 	}
 }

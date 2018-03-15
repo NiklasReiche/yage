@@ -3,7 +3,7 @@
 #include "platform/platform.h"
 #include "graphics/gl.h"
 #include "input/InputController.h"
-#include "math/MVector.h"
+#include "math/gml.h"
 
 #include "graphics3d/camera.h"
 #include "graphics3d/sceneRenderer.h"
@@ -27,22 +27,16 @@ private:
 	Mouse mouse;
 
 	gl::Shader shader;
-	gl3d::Camera camera;
+	std::shared_ptr<gl3d::Camera> camera;
 	gl3d::ResourceManager resourceManager;
 	gl3d::SceneRenderer renderer;
 
-	int MATERIAL_CODE = 1;
-	int DRAWABLE_CODE = 2;
-	int LIGHT_CODE = 3;
+	std::shared_ptr<gl3d::SceneGroup> scene;
+	std::shared_ptr<gl3d::SceneGroup> cubeGroup;
+	std::shared_ptr<gl3d::SceneObject> light1;
+	std::shared_ptr<gl3d::SceneObject> cube1;
 
-	gl3d::SceneGroup scene;
-	gl3d::SceneGroup group1;
-	gl3d::SceneObject cube1;
-	gl3d::SceneObject light1;
-	gl3d::SceneGroup group2;
-	gl3d::SceneObject cube2;
-	gl3d::SceneObject cube3;
-	gl3d::SceneGroup group3;
+	int test = 0;
 
 public:
 	App()
@@ -53,12 +47,10 @@ public:
 		inputListener = inputController->addListener();
 		inputListener->setOnMousePosEvent(std::bind(&App::on_mouse_pos_event, this, std::placeholders::_1, std::placeholders::_2));
 		inputListener->setOnKeyEvent(std::bind(&App::on_key_event, this, std::placeholders::_1, std::placeholders::_2));
-		mouse.isHidden = true;
 
 		renderer.gl = glContext;
-		renderer.resourceManager = &resourceManager;
 
-		camera = gl3d::Camera(gml::Vec3f(0.0f, 0.0f, 2.0f), gml::axisAngle<float>(0.0f, gml::Vec3f(0.0f, 0.0f, -1.0f)));
+		camera = std::make_shared<gl3d::Camera>(gl3d::Camera(gml::Vec3f(0.0f, 0.0f, 5.0f), gml::Quatd::eulerAngle(gml::PI, 0, 0)));
 
 		glContext->setActiveViewport(gl::Viewport(0, 0, 1500, 900));
 
@@ -71,11 +63,9 @@ public:
 			;
 		gl::ShaderLoader shaderLoader(platform, glContext);
 		shader = shaderLoader.loadFromString(vertexShader, fragmentShader);
-		renderer.shader = shader;
 
-		gml::Matrix4D<float> proj = gml::perspective<float>(45.0f, (float)(1500) / (float)(900), 0.1f, 1000.0f);
+		gml::Mat4f proj = gml::Mat4f::perspective(45.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
 		shader.setUniform("projection", proj);
-		shader.setUniform("viewPos", camera.getPosition());
 
 		setupGraph();
 		glContext->enableDepthTest();
@@ -91,12 +81,12 @@ public:
 			-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 
-			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-			0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-			0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-			0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-			-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+			0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+			0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+			0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+			-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
 
 			-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 			-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
@@ -128,60 +118,44 @@ public:
 		};
 
 		gl::Drawable cube = glContext->createDrawable(vertices, { 3, 3 }, gl::DrawMode::DRAW_STATIC);
-		gl3d::Mesh cubeMesh;
-		cubeMesh.drawable = cube;
-		unsigned int id_cube = resourceManager.add(cubeMesh);
+		std::shared_ptr<gl3d::Mesh> cubeMesh = std::make_shared<gl3d::Mesh>();;
+		cubeMesh->drawable = cube;
 
-		gl3d::Material ruby;
-		ruby.addVec3("ambient", gml::Vec3f(0.1));
-		ruby.addVec3("diffuse", gml::Vec3f(0.61f, 0.04f, 0.04f));
-		ruby.addVec3("specular", gml::Vec3f(0.7f, 0.6f, 0.6));
-		ruby.addFloat("shininess", 0.6f);
-		ruby.setShader(shader);
-		unsigned int id_ruby = resourceManager.add(ruby);
+		std::shared_ptr<gl3d::Material> ruby = std::make_shared<gl3d::Material>();
+		ruby->addVec3("ambient", gml::Vec3f(0.1));
+		ruby->addVec3("diffuse", gml::Vec3f(0.61f, 0.04f, 0.04f));
+		ruby->addVec3("specular", gml::Vec3f(0.7f, 0.6f, 0.6));
+		ruby->addFloat("shininess", 32.0f);
+		ruby->setShader(shader);
 
-		gl3d::PointLight light;
-		light.color.ambient = gml::Vec3f(0.2f);
-		light.color.diffuse = gml::Vec3f(0.5f);
-		light.color.specular = gml::Vec3f(1.0f);
-		light.constants.constant = 1.0f;
-		light.constants.linear = 0.09f;
-		light.constants.quadratic = 0.032f;
-		unsigned int id_light = resourceManager.add(light);
 
-		cube1 = gl3d::SceneObject();
-		cube1.addId(gl3d::SceneObjectIdCode::MATERIAL, id_ruby);
-		cube1.addId(gl3d::SceneObjectIdCode::MESH, id_cube);
+		std::shared_ptr<gl3d::PointLight> lightRes = 
+			std::make_shared<gl3d::PointLight>(gl3d::PointLight(
+				{ gml::Vec3f(0.2f), gml::Vec3f(0.5f), gml::Vec3f(1.0f) },
+				{ 1.0f, 0.09f, 0.032f }));
 
-		cube2 = gl3d::SceneObject();
-		cube2.addId(gl3d::SceneObjectIdCode::MATERIAL, id_ruby);
-		cube2.addId(gl3d::SceneObjectIdCode::MESH, id_cube);
+		cube1 = std::make_shared<gl3d::SceneObject>("cube");
+		cube1->bindMaterial(ruby);
+		cube1->bindMesh(cubeMesh);
 
-		light1 = gl3d::SceneObject();
-		light1.addId(gl3d::SceneObjectIdCode::LIGHT, id_light);
+		light1 = std::make_shared<gl3d::SceneObject>("light");
+		light1->setTransform(gml::Mat4d::quaternion(gml::Quatd::eulerAngle(0, 0, 0)) * gml::Mat4d::translate(gml::Vec3d(0.0, 0.0, -3.0)) * gml::Mat4d::scale(0.1f));
+		light1->bindMaterial(ruby);
+		light1->bindMesh(cubeMesh);
+		light1->bindLight(lightRes);
+		light1->bindCamera(camera);
 
-		cube3 = gl3d::SceneObject();
-		cube3.addId(gl3d::SceneObjectIdCode::MATERIAL, id_ruby);
-		cube3.addId(gl3d::SceneObjectIdCode::MESH, id_cube);
+		scene = std::make_shared<gl3d::SceneGroup>("world");
+		cubeGroup = std::make_shared<gl3d::SceneGroup>("cubeGroup");
 
-		group1.setTransform(gml::translate<float>(gml::Vec3f(0.0f, 1.5f, 0.0f)));
-		group1.addChild(&cube1);
-
-		group3.addChild(&light1);
-		group3.addChild(&cube3);
-
-		group2.setTransform(gml::translate<float>(gml::Vec3f(0.0f, 0.0f, -3.0f)));
-		group2.addChild(&cube2);
-
-		group2.addChild(&group1);
-		group2.addChild(&group3);
-
-		scene.addChild(&group2);
+		scene->addChild(cubeGroup);
+		scene->addChild(cube1);
+		cubeGroup->addChild(light1);
 	}
 
 	void run()
 	{
-		float coord = -1.0f;
+		double coord = -1.0;
 		glContext->showWindow();
 		platform->getTimeStep();
 		while (!platform->shouldDestroy())
@@ -190,20 +164,20 @@ public:
 			glClearColor(0, 0.5, 0.5, 1);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+			coord += 0.5 * dt;
+
+			gml::Mat4d localTransform =
+				gml::Mat4d::axisAngle(gml::Vec3d(1.0, 0.0, 0.0), coord) *
+				gml::Mat4d::translate(gml::Vec3d(0.0, 0.0, -3.0)) * 
+				gml::Mat4d::scale(0.1f);
+
+			light1->setTransform(localTransform);
+
 			glContext->useShader(shader);
-			shader.setUniform("view", camera.getViewMatrix());
-			shader.setUniform("viewPos", camera.getPosition());
+			shader.setUniform("view", camera->getViewMatrix());
+			shader.setUniform("viewPos", camera->getPosition());
 
-			coord += 0.1 * dt;
-			gml::Matrix4D<float> globalTransform = gml::translate<float>(gml::Vec3f(0.0f, 0.0f, -3.0f)) * gml::rotate<float>(coord * 100, gml::Vec3f(0.0f, 0.0f, -1.0f));
-			gml::Matrix4D<float> localTransform = gml::translate<float>(gml::Vec3f(0.0f, 1.5f, 0.0f)) * gml::rotate<float>(coord * 100, gml::Vec3f(0.0f, 0.0f, -1.0f));
-
-			group2.setTransform(globalTransform);
-			group1.setTransform(localTransform);
-			localTransform = /*gml::rotate<float>(coord * 300, gml::Vec3f(1.0f, 0.0f, 1.0f)) * */ gml::translate<float>(gml::Vec3f(0.0f, 0.0f, 2.0f)) * gml::scale<float>(0.1f);
-			group3.setTransform(localTransform);
-
-			renderer.renderGraph(&scene);
+			renderer.renderGraph(scene);
 
 			glContext->swapBuffers();
 			inputController->poll();
@@ -212,36 +186,45 @@ public:
 
 	void on_mouse_pos_event(float x, float y)
 	{
-		if (!mouse.first) {
+		if ( mouse.isHidden) {
 			gml::Vec2f dist = mouse.pos - gml::Vec2f(x, y);
 			gml::Vec2f angle = dist * mouse.sensitivity;
 
-			gml::Quaternion<float> q_yaw = gml::eulerAngle<float>(0, angle.x, 0);
-			gml::Quaternion<float> q_pitch = gml::eulerAngle<float>(angle.y, 0, 0);
+			gml::Quaternion<float> q_yaw = gml::Quatf::eulerAngle(0, angle.x, 0);
+			gml::Quaternion<float> q_pitch = gml::Quatf::eulerAngle(angle.y, 0, 0);
 
 			//gml::Quaternion<float> newRotation = gml::normalize<float>(q_yaw * camera.rotation * q_pitch);
-			camera.rotateYaw(angle.x);
-			camera.rotatePitch(angle.y);
-			mouse.isHidden = false;
-		}
-		else {
-			mouse.first = false;
+			camera->rotateYaw(angle.x);
+			camera->rotatePitch(angle.y);
 		}
 		mouse.pos = gml::Vec2f(x, y);
 	}
 	void on_key_event(input::KeyCode code, input::KeyAction action)
 	{
 		if (code == input::KeyCode::KEY_W && (action == input::KeyAction::REPEAT || action == input::KeyAction::PRESS)) {
-			camera.moveForward(0.1);
+			camera->moveForward(0.1);
 		}
 		if (code == input::KeyCode::KEY_A && (action == input::KeyAction::REPEAT || action == input::KeyAction::PRESS)) {
-			camera.moveLeft(0.1);
+			camera->moveLeft(0.1);
 		}
 		if (code == input::KeyCode::KEY_S && (action == input::KeyAction::REPEAT || action == input::KeyAction::PRESS)) {
-			camera.moveBackward(0.1);
+			camera->moveBackward(0.1);
 		}
 		if (code == input::KeyCode::KEY_D && (action == input::KeyAction::REPEAT || action == input::KeyAction::PRESS)) {
-			camera.moveRight(0.1);
+			camera->moveRight(0.1);
+		}
+		if (code == input::KeyCode::KEY_1 && (action == input::KeyAction::REPEAT || action == input::KeyAction::PRESS)) {
+			test += 10;
+		}
+		if (code == input::KeyCode::KEY_X && action == input::KeyAction::PRESS) {
+			if (mouse.isHidden) {
+				platform->showCursor();
+				mouse.isHidden = false;
+			}
+			else {
+				platform->hideCursor();
+				mouse.isHidden = true;
+			}
 		}
 	}
 };

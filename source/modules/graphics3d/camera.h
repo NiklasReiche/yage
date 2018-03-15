@@ -1,34 +1,35 @@
 #pragma once
 
-#include <math/MVector.h>
+#include <math/gml.h>
 
 namespace gl3d
 {
 	class Camera
 	{
 	private:
-		gml::Vec3f position;
-		gml::Quaternion<float> rotation;
+		gml::Vec3d position;
+		gml::Quatd rotation;
 
 	public:
 		Camera();
-		Camera(gml::Vec3f position, gml::Quaternion<float> rotation);
+		Camera(gml::Vec3d position, gml::Quatd rotation);
 		
-		void move(gml::Vec3f move);
-		void moveTo(gml::Vec3f position);
-		void moveForward(float amount);
-		void moveBackward(float amount);
-		void moveLeft(float amount);
-		void moveRight(float amount);
+		void move(gml::Vec3d vector);
+		void moveTo(gml::Vec3d position);
+		void moveForward(double amount);
+		void moveBackward(double amount);
+		void moveLeft(double amount);
+		void moveRight(double amount);
 
-		void rotate(gml::Quaternion<float> rotate);
-		void rotateTo(gml::Quaternion<float> rotation);
-		void rotateYaw(float degree);
-		void rotatePitch(float degree);
-		void rotateRoll(float degree);
+		void rotate(gml::Quatd quaternion);
+		void rotateTo(gml::Quatd rotation);
+		void rotateYaw(double degree);
+		void rotatePitch(double degree);
+		void rotateRoll(double degree);
+		void lookAt(gml::Vec3d target, double degree = 0.0f);
 
-		gml::Matrix4D<float> getViewMatrix();
-		gml::Vec3f getPosition();
-		gml::Quaternion<float> getRotation();
+		gml::Mat4d getViewMatrix() const;
+		gml::Vec3d getPosition() const;
+		gml::Quatd getRotation() const;
 	};
 }

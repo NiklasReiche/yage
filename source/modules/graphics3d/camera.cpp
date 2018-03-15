@@ -3,72 +3,77 @@
 namespace gl3d
 {
 	Camera::Camera() {
-		this->position = gml::Vec3f(0.0f);
-		this->rotation = gml::Quaternion<float>();
+		this->position = gml::Vec3d(0.0);
+		this->rotation = gml::Quatd();
 	}
-	Camera::Camera(gml::Vec3f position, gml::Quaternion<float> rotation) {
+	Camera::Camera(gml::Vec3d position, gml::Quatd rotation) {
 		this->position = position;
 		this->rotation = rotation;
 	}
 
-	void Camera::move(gml::Vec3f vector)
+	void Camera::move(gml::Vec3d vector)
 	{
 		this->position += vector;
 	}
-	void Camera::moveTo(gml::Vec3f position)
+	void Camera::moveTo(gml::Vec3d position)
 	{
 		this->position = position;
 	}
-	void Camera::moveForward(float amount)
+	void Camera::moveForward(double amount)
 	{
 		this->position += rotation.getForward() * amount;
 	}
-	void Camera::moveBackward(float amount)
+	void Camera::moveBackward(double amount)
 	{
-		this->position += rotation.getForward() * -amount;
+		this->position -= rotation.getForward() * amount;
 	}
-	void Camera::moveLeft(float amount)
+	void Camera::moveLeft(double amount)
 	{
-		this->position += rotation.getRight() * -amount;
+		this->position -= rotation.getRight() * amount;
 	}
-	void Camera::moveRight(float amount)
+	void Camera::moveRight(double amount)
 	{
 		this->position += rotation.getRight() * amount;
 	}
 
-	void Camera::rotate(gml::Quaternion<float> quaternion)
+	void Camera::rotate(gml::Quatd quaternion)
 	{
 		this->rotation *= quaternion;
 	}
-	void Camera::rotateTo(gml::Quaternion<float> rotation)
+	void Camera::rotateTo(gml::Quatd rotation)
 	{
 		this->rotation = rotation;
 	}
-	void Camera::rotateYaw(float degree)
+	void Camera::rotateYaw(double degree)
 	{
-		this->rotation = this->rotation * gml::eulerAngle<float>(0, degree, 0);
-		this->rotation = gml::normalize<float>(this->rotation);
+		this->rotation = this->rotation * gml::Quatd::eulerAngle(gml::toRad(degree), 0, 0);
+		this->rotation = gml::normalize(this->rotation);
 	}
-	void Camera::rotatePitch(float degree)
+	void Camera::rotatePitch(double degree)
 	{
-		this->rotation = this->rotation * gml::eulerAngle<float>(degree, 0, 0);
-		this->rotation = gml::normalize<float>(this->rotation);
+		this->rotation = this->rotation * gml::Quatd::eulerAngle(0, 0, gml::toRad(-degree));
+		this->rotation = gml::normalize(this->rotation);
 	}
-	void Camera::rotateRoll(float degree)
+	void Camera::rotateRoll(double degree)
 	{
-		this->rotation = this->rotation * gml::eulerAngle<float>(0, 0, degree);
-		this->rotation = gml::normalize<float>(this->rotation);
+		this->rotation = this->rotation * gml::Quatd::eulerAngle(0, gml::toRad(degree), 0);
+		this->rotation = gml::normalize(this->rotation);
 	}
 
-	gml::Matrix4D<float> Camera::getViewMatrix() 
+	void Camera::lookAt(gml::Vec3d target, double degree)
 	{
-		return gml::inverse<float>(gml::translate<float>(position) * gml::rotate<float>(rotation));
+		// TODO
 	}
-	gml::Vec3f Camera::getPosition() 
+
+	gml::Mat4d Camera::getViewMatrix() const
+	{
+		return gml::Mat4d::lookAt(position, position + rotation.getForward(), rotation.getUp());
+	}
+	gml::Vec3d Camera::getPosition() const
 	{
 		return position;
 	}
-	gml::Quaternion<float> Camera::getRotation()
+	gml::Quatd Camera::getRotation() const
 	{
 		return rotation;
 	}

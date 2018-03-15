@@ -3,25 +3,13 @@
 #include <map>
 
 #include "sceneNode.h"
+#include "../material.h"
+#include "../mesh.h"
+#include "../camera.h"
+#include "../light/light.h"
 
 namespace gl3d
 {
-	/**
-	 * @brief Represents different resource types.
-	 * To be used as id types in a scene object.
-	 */
-	enum class SceneObjectIdCode
-	{
-		MATERIAL,
-		MESH,
-		LIGHT,
-		CUSTOM_1,
-		CUSTOM_2,
-		CUSTOM_3,
-		CUSTOM_4,
-		CUSTOM_5
-	};
-
 	/**
 	 * @brief Represents a group node in a scene graph. 
 	 * This node type doesn't own any children. Different integer id values can
@@ -31,7 +19,10 @@ namespace gl3d
 	class SceneObject : public SceneNode
 	{
 	private:
-		std::map<SceneObjectIdCode, int> resourceIds;
+		std::shared_ptr<Material> material = nullptr;
+		std::shared_ptr<Mesh> mesh = nullptr;
+		std::shared_ptr<Light> light = nullptr;
+		std::shared_ptr<Camera> camera = nullptr;
 
 	public:
 		/**
@@ -40,34 +31,40 @@ namespace gl3d
 		SceneObject();
 
 		/**
-		 * @brief Constructs an object node with a custom name.
+		 * @brief Constructs an object node with a custom name and transform.
 		 * 
 		 * @param name the node's name
+		 * @param transform the node's local transform
 		 */
-		explicit SceneObject(const std::string name);
+		explicit SceneObject(
+			std::string name,
+			gml::Mat4d transform = gml::Mat4d());
 
-		/**
-		 * @brief Adds an id to the given id target. 
-		 * 
-		 * @param code the id target
-		 * @param nodeId the id to add
-		 */
-		void addId(SceneObjectIdCode code, int nodeId);
 
-		/**
-		 * @brief Checks whether this node has an id bound to the given target.
-		 * 
-		 * @param code the id target
-		 * @return true if the target is bound, false otherwise
-		 */
-		bool hasId(SceneObjectIdCode code) const;
+		void bindMaterial(std::shared_ptr<Material> material);
 
-		/**
-		 * @brief Returns the id bound to the given target.
-		 * 
-		 * @param code the id target
-		 * @return the id
-		 */
-		int getId(SceneObjectIdCode code) const;
+		void bindMesh(std::shared_ptr<Mesh> mesh);
+
+		void bindLight(std::shared_ptr<Light> light);
+
+		void bindCamera(std::shared_ptr<Camera> camera);
+
+		
+		bool hasMaterial() const;
+
+		bool hasMesh() const;
+
+		bool hasLight() const;
+
+		bool hasCamera() const;
+
+
+		std::shared_ptr<Material> getMaterial() const;
+
+		std::shared_ptr<Mesh> getMesh() const;
+
+		std::shared_ptr<Light> getLight() const;
+
+		std::shared_ptr<Camera> getCamera() const;
 	};
 }

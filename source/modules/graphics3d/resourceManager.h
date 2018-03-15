@@ -3,7 +3,8 @@
 #include "resourceCache.h"
 #include "material.h"
 #include "mesh.h"
-#include "light.h"
+#include "light/dirLight.h"
+#include "light/pointLight.h"
 
 namespace gl3d
 {

@@ -1,7 +1,7 @@
 #include <platform/platform.h>
 #include <graphics/gl.h>
 #include "input/InputController.h"
-#include "math/MVector.h"
+#include "math/gml.h"
 #include "graphics3d/skybox.h"
 #include "graphics3d/camera.h"
 
@@ -45,15 +45,11 @@ private:
 	void on_mouse_pos_event(float x, float y);
 	void on_key_event(input::KeyCode code, input::KeyAction action);
 
-	float getPitch(gml::Quaternion<float> quaternion);
-
 public:
 	App();
 	~App();
 	
 	int run();
-
-	void updateCamera();
 
 	void loadSkybox(std::array<std::string, 6> filenames);
 	void drawSkybox();

@@ -4,8 +4,8 @@
 
 namespace gl3d
 {
-	SceneNode::SceneNode(const NodeType type, const std::string name)
-		: type(type), name(name)
+	SceneNode::SceneNode(const NodeType type, const std::string name, const gml::Mat4d transform)
+		: type(type), name(name), transform(transform)
 	{
 	}
 
@@ -22,23 +22,37 @@ namespace gl3d
 	}
 
 	void SceneNode::updateChildren(
-		const std::function<void(SceneObject*, gml::Matrix4D<float>)> func,
-		const std::function<gml::Matrix4D<float>(SceneGroup*, gml::Matrix4D<float>)> func2,
-		const gml::Matrix4D<float> transform)
+		const std::function<void(SceneObject*, gml::Mat4d)> func,
+		const gml::Mat4d transform)
 	{
-		for (SceneNode* child : children)
+		for (auto child : children)
 		{
 			switch (child->getType())
 			{
 			case NodeType::GROUP:
-				child->updateChildren(func, func2, func2(static_cast<SceneGroup*>(child), transform));
+				child->updateChildren(func, child->applyTransform(transform));
 				break;
 			case NodeType::OBJECT:
-				func(static_cast<SceneObject*>(child), transform);
+				func(static_cast<SceneObject*>(child.get()), child->applyTransform(transform));
 				break;
 			default: break;
 			}
 		}
+	}
+
+	gml::Mat4d SceneNode::applyTransform(const gml::Mat4d & transform) const
+	{
+		return transform * this->transform;
+	}
+
+	void SceneNode::setTransform(const gml::Mat4d & tranform)
+	{
+		this->transform = tranform;
+	}
+
+	gml::Mat4d SceneNode::getTransform() const
+	{
+		return transform;
 	}
 
 	NodeType SceneNode::getType() const

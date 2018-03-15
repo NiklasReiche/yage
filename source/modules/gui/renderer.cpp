@@ -18,7 +18,7 @@ namespace gui
 		guiShader = loader.loadFromString(guiShaderTemplate.guiShader_vert, guiShaderTemplate.guiShader_frag);
 		textShader = loader.loadFromString(fontShaderTemplate.textShader_vert, fontShaderTemplate.textShader_frag);
 
-		gml::Matrix4D<float> projection = gml::orthographic<float>(0.0f, (float)viewport.width, (float)viewport.height, 0.0f, 0.1f, 100.0f);
+		gml::Mat4d projection = gml::Mat4d::orthographic(0.0, (float)viewport.width, (float)viewport.height, 0.0, 0.1, 100.0);
 		guiShader.setUniform("projection", projection);
 		guiShader.setUniform("texture", 0);
 		textShader.setUniform("projection", projection);

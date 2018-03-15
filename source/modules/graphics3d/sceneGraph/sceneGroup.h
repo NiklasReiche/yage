@@ -12,10 +12,6 @@ namespace gl3d
 	 */
 	class SceneGroup : public SceneNode
 	{
-	private:
-		/** @brief This node's transformation matrix. */
-		gml::Matrix4D<float> transform;
-
 	public:
 		/**
 		 * @brief Constructs a group node with an idendity transform and an 
@@ -29,29 +25,15 @@ namespace gl3d
 		 * @param name the name
 		 * @param transform the transform
 		 */
-		SceneGroup(std::string name, gml::Matrix4D<float> transform);
+		explicit SceneGroup(
+			std::string name, 
+			gml::Mat4d transform = gml::Mat4d());
 
 		/**
-		 * @brief Adds a node as a child to this node.
+		 * @brief Adds a group node as a child to this node.
 		 * 
 		 * @param node the node to add
 		 */
-		void addChild(SceneNode* node);
-
-		/**
-		 * @brief Applies the given transform to this node's transform.
-		 * The matrices are multiplied. This node's transform remains unmodified.
-		 * 
-		 * @param transform the transform to apply
-		 * @return the resulting transform
-		 */
-		gml::Matrix4D<float> applyTransform(gml::Matrix4D<float> transform) const;
-
-		/**
-		 * @brief Sets this node's transfomation matrix.
-		 * 
-		 * @param tranform the transform to set
-		 */
-		void setTransform(gml::Matrix4D<float> tranform);
+		void addChild(std::shared_ptr<SceneNode> node);
 	};
 }

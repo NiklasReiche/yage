@@ -3,27 +3,72 @@
 namespace gl3d
 {
 	SceneObject::SceneObject()
-		: SceneNode(NodeType::OBJECT, "")
+		: SceneNode(NodeType::OBJECT, "", gml::Mat4d())
 	{
 	}
 
-	SceneObject::SceneObject(const std::string name)
-		: SceneNode(NodeType::OBJECT, name)
+	SceneObject::SceneObject(const std::string name, const gml::Mat4d transform)
+		: SceneNode(NodeType::OBJECT, name, transform)
 	{
 	}
 
-	void SceneObject::addId(SceneObjectIdCode code, int nodeId)
+	void SceneObject::bindMaterial(const std::shared_ptr<Material> material)
 	{
-		resourceIds.insert(std::pair<SceneObjectIdCode, int>(code, nodeId));
+		this->material = material;
 	}
 
-	bool SceneObject::hasId(const SceneObjectIdCode code) const
+	void SceneObject::bindMesh(const std::shared_ptr<Mesh> mesh)
 	{
-		return resourceIds.count(code) > 0;
+		this->mesh = mesh;
 	}
 
-	int SceneObject::getId(const SceneObjectIdCode code) const
+	void SceneObject::bindLight(const std::shared_ptr<Light> light)
 	{
-		return resourceIds.at(code);
+		this->light = light;
+	}
+
+	void SceneObject::bindCamera(const std::shared_ptr<Camera> camera)
+	{
+		this->camera = camera;
+	}
+
+	bool SceneObject::hasMaterial() const
+	{
+		return material != nullptr;
+	}
+
+	bool SceneObject::hasMesh() const
+	{
+		return mesh != nullptr;
+	}
+
+	bool SceneObject::hasLight() const
+	{
+		return light != nullptr;
+	}
+
+	bool SceneObject::hasCamera() const
+	{
+		return camera != nullptr;
+	}
+
+	std::shared_ptr<Material> SceneObject::getMaterial() const
+	{
+		return material;
+	}
+
+	std::shared_ptr<Mesh> SceneObject::getMesh() const
+	{
+		return mesh;
+	}
+
+	std::shared_ptr<Light> SceneObject::getLight() const
+	{
+		return light;
+	}
+
+	std::shared_ptr<Camera> SceneObject::getCamera() const
+	{
+		return camera;
 	}
 }

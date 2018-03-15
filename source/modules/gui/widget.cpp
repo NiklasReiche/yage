@@ -284,7 +284,7 @@ namespace gui
 	{
 		if (this->size != size) {
 			this->size = size;
-			this->innerSize = size - gml::Vec2f((float)borderSize) * 2;
+			this->innerSize = size - gml::Vec2f((float)borderSize) * 2.0f;
 			updateGeometry();
 			layout->update(this);
 		}
@@ -347,7 +347,7 @@ namespace gui
 				break;
 
 			case Anchor::CENTER:
-				position = parent->getInnerPosition() + parent->getInnerSize() / 2 + (offset);
+				position = parent->getInnerPosition() + parent->getInnerSize() / 2.0f + (offset);
 				break;
 			}
 

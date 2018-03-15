@@ -1,44 +1,50 @@
 #pragma once
 
+#include <memory>
+
 #include "platform/util.h"
 #include "graphics/graphics.h"
 #include "sceneGraph/sceneNode.h"
 #include "sceneGraph/sceneGroup.h"
 #include "sceneGraph/sceneObject.h"
-#include "light.h"
+#include "light/light.h"
+#include "light/dirLight.h"
+#include "light/pointLight.h"
+#include "resourceManager.h"
+#include "material.h"
+#include "mesh.h"
 
-namespace graphics3d
+namespace gl3d
 {
-	struct Mat
-	{
-		gml::Vec3f ambient;
-		gml::Vec3f diffuse;
-		gml::Vec3f specular;
-		float shininess;
-	};
 	struct Geom
 	{
-		gl::Drawable drawable;
-		Mat material;
-		gml::Matrix4D<float> transform;
+		Mesh mesh;
+		Material material;
+		gml::Mat4d transform;
 	};
-	
+
+	struct ShaderUniformValues
+	{
+		gml::Vec3d viewPos;
+		gml::Mat4d view;
+		std::vector<std::shared_ptr<DirLight>> dirLights;
+		std::vector<std::shared_ptr<PointLight>> pointLights;
+	};
 
 	class SceneRenderer
 	{
 	private:
-		std::map<int, gl::Drawable> drawables;
-		std::map<int, Mat> materials;
-		std::map<int, PointLight> lights;
+		ShaderUniformValues uniformValues;
+
+		void setLightColorsShader(gl::Shader shader, std::string lightType, unsigned int pos, const LightColor & color) const;
+		void setLightConstantsShader(gl::Shader shader, std::string lightType, unsigned int pos, const LightConstants & constants) const;
+
+		void setDirLightShader(gl::Shader shader, unsigned int pos, std::shared_ptr<DirLight> light) const;
+		void setPointLightShader(gl::Shader shader, unsigned int pos, std::shared_ptr<PointLight> light) const;
 
 	public:
-		gl::GraphicsContext* gl;
-		gl::Shader shader;
+		gl::GraphicsContext* gl = nullptr;
 
-		void renderGraph(SceneNode* root);
-
-		void addDrawable(int id, gl::Drawable drawable);
-		void addMaterial(int id, Mat drawable);
-		void addLight(int id, PointLight drawable);
+		void renderGraph(std::shared_ptr<SceneNode> root);
 	};
 }

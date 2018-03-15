@@ -91,7 +91,13 @@ set( YAGE_GRAPHICS_3D_SOURCE
 	"${YAGE_MODULES_PATH}/graphics3d/skybox.h"
 	"${YAGE_MODULES_PATH}/graphics3d/skybox.cpp"
 
-	"${YAGE_MODULES_PATH}/graphics3d/light.h"
+	"${YAGE_MODULES_PATH}/graphics3d/light/light.h"
+	"${YAGE_MODULES_PATH}/graphics3d/light/light.cpp"
+	"${YAGE_MODULES_PATH}/graphics3d/light/pointLight.h"
+	"${YAGE_MODULES_PATH}/graphics3d/light/pointLight.cpp"
+	"${YAGE_MODULES_PATH}/graphics3d/light/dirLight.h"
+	"${YAGE_MODULES_PATH}/graphics3d/light/dirLight.cpp"
+
 	"${YAGE_MODULES_PATH}/graphics3d/material.h"
 	"${YAGE_MODULES_PATH}/graphics3d/material.cpp"
 	"${YAGE_MODULES_PATH}/graphics3d/mesh.h"
@@ -109,6 +115,5 @@ set( YAGE_GRAPHICS_3D_SOURCE
 
 	"${YAGE_MODULES_PATH}/graphics3d/resourceCache.h"
 	"${YAGE_MODULES_PATH}/graphics3d/resourceManager.h"
-	"${YAGE_MODULES_PATH}/graphics3d/shader.h"
 
 )
