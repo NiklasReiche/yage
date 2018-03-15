@@ -1,5 +1,10 @@
 
-add_executable( coreTest core-math/vectorTest.cpp )
+add_executable( coreTest 
+	main.cpp
+	core-math/vectorTest.cpp 
+	core-math/matrixTest.cpp
+	core-math/quaternionTest.cpp
+)
 
 target_link_libraries( coreTest PUBLIC YAGEcore
                                 PUBLIC gtest )
