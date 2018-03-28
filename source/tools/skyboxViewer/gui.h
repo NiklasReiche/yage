@@ -29,7 +29,7 @@ private:
 	std::string installPath = "D:/dev/projects/yage/source/tools/skyboxViewer";
 #endif
 #ifdef __unix
-	std::string installPath = "/home/niklas/dev/yage/source/tools/skyboxViewer";
+	std::string installPath = "/home/niklas/Code/yage/source/tools/skyboxViewer";
 #endif
 	std::string lastPath = installPath + "/assets/skybox";
 	int thumbnailSize = 0;

@@ -39,7 +39,7 @@ public:
 	std::string installPath = "D:/DEV/Projects/yage/source/tools/guiEditor";
 #endif
 #ifdef __unix
-	std::string installPath = "/home/niklas/dev/yage/source/tools/guiEditor";
+	std::string installPath = "/home/niklas/Code/yage/source/tools/guiEditor";
 #endif
 
 	GuiTest(sys::PlatformHandle * platform, gl::GraphicsContext * gl, input::InputController * inputController)
