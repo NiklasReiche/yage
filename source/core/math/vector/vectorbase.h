@@ -5,6 +5,7 @@
 #include <ostream>
 
 #include "../exception.h"
+#include "../maths.h"
 
 namespace gml
 {
@@ -157,20 +158,20 @@ namespace gml
 		const VectorBase<T, Size>& left,
 		const VectorBase<T, Size>& right);
 
-	template <typename T, size_t Size, typename T2>
+	template <typename T, size_t Size>
 	VectorBase<T, Size> operator*(
-		const T2& left,
+		const double left,
 		const VectorBase<T, Size>& right);
 
-	template <typename T, size_t Size, typename T2>
+	template <typename T, size_t Size>
 	VectorBase<T, Size> operator*(
 		const VectorBase<T, Size>& left,
-		const T2& right);
+		const double right);
 
-	template <typename T, size_t Size, typename T2>
+	template <typename T, size_t Size>
 	VectorBase<T, Size> operator/(
 		const VectorBase<T, Size>& left,
-		const T2& right);
+		const double right);
 }
 
-#include "vectorBase.tpp"
+#include "vectorbase.tpp"

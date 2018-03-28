@@ -7,8 +7,8 @@ set( YAGE_MATH_SOURCE
 	"${YAGE_CORE_PATH}/math/maths.h"
 	"${YAGE_CORE_PATH}/math/exception.h"
 
-	"${YAGE_CORE_PATH}/math/vector/vectorBase.h"
-	"${YAGE_CORE_PATH}/math/vector/vectorBase.tpp"
+	"${YAGE_CORE_PATH}/math/vector/vectorbase.h"
+	"${YAGE_CORE_PATH}/math/vector/vectorbase.tpp"
 	"${YAGE_CORE_PATH}/math/vector/vec2.h"
 	"${YAGE_CORE_PATH}/math/vector/vec2.tpp"
 	"${YAGE_CORE_PATH}/math/vector/vec3.h"

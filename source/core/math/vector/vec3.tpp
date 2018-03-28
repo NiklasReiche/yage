@@ -10,19 +10,19 @@ namespace gml
 
 	template <typename T>
 	Vec3<T>::Vec3(T x, T y, T z)
-		: VectorBase({ x, y, z })
+		: VectorBase<T, 3>({ x, y, z })
 	{
 	}
 
 	template <typename T>
 	Vec3<T>::Vec3(const Vec3<T>& other)
-		: VectorBase(other)
+		: VectorBase<T, 3>(other)
 	{
 	}
 
 	template <typename T>
 	Vec3<T>::Vec3(const VectorBase<T, 3>& other)
-		: VectorBase(other)
+		: VectorBase<T, 3>(other)
 	{
 	}
 

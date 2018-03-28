@@ -1,28 +1,30 @@
 #pragma once
 
+#include "vec2.h"
+
 namespace gml
 {
 	template <typename T>
 	Vec2<T>::Vec2()
-		: VectorBase()
+		: VectorBase<T, 2>()
 	{
 	}
 
 	template <typename T>
 	Vec2<T>::Vec2(T x, T y)
-		: VectorBase({ x, y })
+		: VectorBase<T, 2>({ x, y })
 	{
 	}
 
 	template <typename T>
 	Vec2<T>::Vec2(const Vec2<T>& other)
-		: VectorBase(other)
+		: VectorBase<T, 2>(other)
 	{
 	}
 
 	template <typename T>
 	Vec2<T>::Vec2(const VectorBase<T, 2>& other)
-		: VectorBase(other)
+		: VectorBase<T, 2>(other)
 	{
 	}
 

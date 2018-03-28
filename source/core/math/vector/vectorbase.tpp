@@ -210,26 +210,26 @@ namespace gml
 		return VectorBase<T, Size>(left) -= right;
 	}
 
-	template <typename T, size_t Size, typename T2>
+	template <typename T, size_t Size>
 	VectorBase<T, Size> operator*(
-		const T2& left,
+		const double left,
 		const VectorBase<T, Size>& right)
 	{
 		return VectorBase<T, Size>(right) *= left;
 	}
 
-	template <typename T, size_t Size, typename T2>
+	template <typename T, size_t Size>
 	VectorBase<T, Size> operator*(
 		const VectorBase<T, Size>& left,
-		const T2& right)
+		const double right)
 	{
 		return VectorBase<T, Size>(left) *= right;
 	}
 
-	template <typename T, size_t Size, typename T2>
+	template <typename T, size_t Size>
 	VectorBase<T, Size> operator/(
 		const VectorBase<T, Size>& left,
-		const T2& right)
+		const double right)
 	{
 		return VectorBase<T, Size>(left) /= right;
 	}

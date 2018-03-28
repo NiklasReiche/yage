@@ -4,19 +4,19 @@ namespace gml
 {
 	template <typename T>
 	Mat4<T>::Mat4()
-		: MatrixBase()
+		: MatrixBase<T, 4, 4>()
 	{
 	}
 
 	template <typename T>
 	Mat4<T>::Mat4(const Mat4<T>& other)
-		: MatrixBase(other)
+		: MatrixBase<T, 4, 4>(other)
 	{
 	}
 
 	template <typename T>
 	Mat4<T>::Mat4(const MatrixBase<T, 4, 4>& other)
-		: MatrixBase(other)
+		: MatrixBase<T, 4, 4>(other)
 	{
 	}
 

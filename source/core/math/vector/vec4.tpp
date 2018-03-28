@@ -10,19 +10,19 @@ namespace gml
 
 	template <typename T>
 	Vec4<T>::Vec4(T x, T y, T z, T w)
-		: VectorBase({ x, y, z, w })
+		: VectorBase<T, 4>({ x, y, z, w })
 	{
 	}
 
 	template <typename T>
 	Vec4<T>::Vec4(const Vec4<T>& other)
-		: VectorBase(other)
+		: VectorBase<T, 4>(other)
 	{
 	}
 
 	template <typename T>
 	Vec4<T>::Vec4(const VectorBase<T, 4>& other)
-		: VectorBase(other)
+		: VectorBase<T, 4>(other)
 	{
 	}
 

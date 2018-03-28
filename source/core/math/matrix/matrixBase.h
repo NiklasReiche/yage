@@ -5,6 +5,7 @@
 #include <ostream>
 
 #include "../exception.h"
+#include "../maths.h"
 #include "matrixSpecial.h"
 #include "../vector/vectorbase.h"
 
