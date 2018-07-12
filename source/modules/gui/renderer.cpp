@@ -18,7 +18,7 @@ namespace gui
 		guiShader = loader.loadFromString(guiShaderTemplate.guiShader_vert, guiShaderTemplate.guiShader_frag);
 		textShader = loader.loadFromString(fontShaderTemplate.textShader_vert, fontShaderTemplate.textShader_frag);
 
-		gml::Mat4d projection = gml::Mat4d::orthographic(0.0, (float)viewport.width, (float)viewport.height, 0.0, 0.1, 100.0);
+		gml::Mat4d projection = gml::Mat4d::orthographic(0.0, viewport.width, viewport.height, 0.0, 0.1, 100.0);
 		guiShader.setUniform("projection", projection);
 		guiShader.setUniform("texture", 0);
 		textShader.setUniform("projection", projection);
@@ -34,16 +34,16 @@ namespace gui
 
 		glContext->useShader(guiShader);
 		glContext->bindTexture(guiTexture);
-		for (unsigned int i = 0; i < widgets.size(); ++i)
+		for (auto widget : widgets)
 		{
-			glContext->draw(*widgets[i]);
+			glContext->draw(*widget);
 		}
 
 		glContext->useShader(textShader);
-		for (unsigned int i = 0; i < text.size(); ++i)
+		for (auto texts : text)
 		{
-			glContext->bindTexture(text[i]->getTexture(), 0);
-			glContext->draw(*text[i]);
+			glContext->bindTexture(texts->getTexture(), 0);
+			glContext->draw(*texts);
 		}
 
 		glContext->disableBlending();

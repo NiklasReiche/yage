@@ -26,7 +26,7 @@ namespace gui
 		GuiRenderer() {}
 		GuiRenderer(sys::PlatformHandle * platform, gl::GraphicsContext* glContext, gl::Viewport viewport);
 
-		void render();
+		void render() override;
 
 		void drawWidget(gl::Drawable & widget);
 		void drawText(font::Text & text);

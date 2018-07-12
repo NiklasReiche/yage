@@ -29,7 +29,7 @@ namespace gui
 		}
 	}
 
-	void Master::update(double dt)
+	void Master::update(const double dt)
 	{
 		for (unsigned int i = 0; i < finishedAnimations.size(); ++i)
 		{
@@ -42,8 +42,6 @@ namespace gui
 		{
 			animations.at(i)->update(dt);
 		}
-
-
 
 		inputManager.update(root);
 

@@ -27,12 +27,15 @@ namespace gui
 
 	public:
 		Animation(Widget* widget, Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time);
+		~Animation() = default;
 
 		void start();
 		void stop();
 		void reset();
 
-		virtual void update(double dt){}
+		virtual void update(double dt)
+		{
+		}
 
 		void setOnAnimationStop(std::function<void()> callback);
 		bool is_finished();
@@ -42,13 +45,13 @@ namespace gui
 	{
 	public:
 		MoveAnimation(Widget* widget, Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time);
-		void update(double dt);
+		void update(double dt) override;
 	};
 
 	class SizeAnimation : public Animation
 	{
 	public:
 		SizeAnimation(Widget* widget, Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time);
-		void update(double dt);
+		void update(double dt) override;
 	};
 }
