@@ -117,3 +117,24 @@ set( YAGE_GRAPHICS_3D_SOURCE
 	"${YAGE_MODULES_PATH}/graphics3d/resourceManager.h"
 
 )
+
+set( YAGE_GRAPHICS_2D_SOURCE 
+
+	"${YAGE_MODULES_PATH}/graphics2d/sprite.h"
+	"${YAGE_MODULES_PATH}/graphics2d/sprite.cpp"
+	"${YAGE_MODULES_PATH}/graphics2d/spriteAnimation.h"
+	"${YAGE_MODULES_PATH}/graphics2d/spriteAnimation.cpp"
+	"${YAGE_MODULES_PATH}/graphics2d/renderer.h"
+	"${YAGE_MODULES_PATH}/graphics2d/renderer.cpp"
+
+)
+
+set( YAGE_ALGO_SOURCE 
+
+	"${YAGE_MODULES_PATH}/algo/tree/treeNode.h"
+	"${YAGE_MODULES_PATH}/algo/tree/treeNode.tpp"
+
+	"${YAGE_MODULES_PATH}/algo/sceneGraph.h"
+	"${YAGE_MODULES_PATH}/algo/sceneGraph.cpp"
+
+)
