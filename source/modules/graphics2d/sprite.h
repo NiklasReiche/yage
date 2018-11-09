@@ -12,10 +12,14 @@ namespace gl2d
 		gml::Vec2f center;
 		gml::Vec2f halfSize;
 
+		gl::Drawable drawable;
+		gl::Texture texture;
+
 		SpriteAnimation animation;
 
 	public:
 		Sprite(gml::Vec2f center, gml::Vec2f halfSize, SpriteAnimation animation);
+		Sprite(gml::Vec2f center, gml::Vec2f halfSize, gl::Texture texture, gl::GraphicsContext* glContext);
 
 		gl::Texture getTexture();
 
