@@ -5,6 +5,13 @@
 
 namespace graph
 {
+	/**
+	 * @brief Represents a generic tree node with a specified amount of keys 
+	 * and any amount of children.
+	 * 
+	 * @tparam T data type of the keys
+	 * @tparam Size amount of keys in the node
+	 */
 	template<typename T, size_t Size>
 	class TreeNode
 	{

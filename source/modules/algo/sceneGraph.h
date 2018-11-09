@@ -16,7 +16,8 @@ namespace graph
 
 		gml::Mat4d foldDepthFirst(const gml::Mat4d& accumulator) override;
 
-		void setTransform(const gml::Mat4d& transform);
-		gml::Mat4d getTransform() const;
+		void setModelTransform(const gml::Mat4d& transform);
+		gml::Mat4d getModelTransform() const;
+		gml::Mat4d getWorldTransform() const;
 	};
 }
