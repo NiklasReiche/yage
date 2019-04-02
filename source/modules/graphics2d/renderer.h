@@ -8,9 +8,10 @@ namespace gl2d
 	class Renderer
 	{
 	private:
-		gl::GraphicsContext glContext;
+		gl::GraphicsContext* glContext = nullptr;
 		
 	public:
+		Renderer(gl::GraphicsContext* glContext);
 		void drawSprite(Sprite sprite);
 	};
 }

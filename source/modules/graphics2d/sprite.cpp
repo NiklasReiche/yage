@@ -17,14 +17,19 @@ gl2d::Sprite::Sprite(gml::Vec2f center, gml::Vec2f halfSize, gl::Texture texture
 		center.x + halfSize.x, center.y + halfSize.y, 1.0f, 1.0f,
 		center.x + halfSize.x, center.y + halfSize.y, 1.0f, 1.0f,
 		center.x + halfSize.x, center.y - halfSize.y, 1.0f, 0.0f,
-		center.x - halfSize.x, center.y - halfSize.y, 1.0f, 0.0f
+		center.x - halfSize.x, center.y - halfSize.y, 0.0f, 0.0f
 	};
 	this->drawable = glContext->createDrawable(vertices, {2,2}, gl::DrawMode::DRAW_STATIC);
 }
 
-gl::Texture gl2d::Sprite::getTexture()
+gl::Texture gl2d::Sprite::getTexture() const
 {
-	return animation.getCurrentFrame();
+	return texture;
+}
+
+gl::Drawable gl2d::Sprite::getDrawable() const
+{
+	return drawable;
 }
 
 gml::Vec2f gl2d::Sprite::getCenter() const

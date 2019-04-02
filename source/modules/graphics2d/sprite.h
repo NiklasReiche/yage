@@ -21,7 +21,8 @@ namespace gl2d
 		Sprite(gml::Vec2f center, gml::Vec2f halfSize, SpriteAnimation animation);
 		Sprite(gml::Vec2f center, gml::Vec2f halfSize, gl::Texture texture, gl::GraphicsContext* glContext);
 
-		gl::Texture getTexture();
+		gl::Texture getTexture() const;
+		gl::Drawable getDrawable() const;
 
 		gml::Vec2f getCenter() const;
 		gml::Vec2f getHalfSize() const;

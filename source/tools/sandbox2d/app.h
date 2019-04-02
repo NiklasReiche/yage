@@ -4,6 +4,10 @@
 #include "graphics/gl.h"
 #include "input/InputController.h"
 #include "math/gml.h"
+#include "graphics2d/sprite.h"
+#include "image/image.h"
+#include "image/imageReader.h"
+#include "graphics2d/renderer.h"
 
 struct Mouse
 {
@@ -20,6 +24,7 @@ private:
 	gl::GraphicsContext* glContext;
 	input::InputController* inputController;
 	input::InputListener* inputListener;
+	gl2d::Renderer* renderer;
 	Mouse mouse;
 
 	gl::Shader shader;
@@ -35,6 +40,7 @@ public:
 		inputListener = inputController->addListener();
 		inputListener->setOnMousePosEvent(std::bind(&App::on_mouse_pos_event, this, std::placeholders::_1, std::placeholders::_2));
 		inputListener->setOnKeyEvent(std::bind(&App::on_key_event, this, std::placeholders::_1, std::placeholders::_2));
+		renderer = new gl2d::Renderer(glContext);
 
 		glContext->setActiveViewport(gl::Viewport(0, 0, 1500, 900));
 
@@ -47,12 +53,17 @@ public:
 			;
 		gl::ShaderLoader shaderLoader(platform, glContext);
 		shader = shaderLoader.loadFromString(vertexShader, fragmentShader);
+		shader.setUniform("projection", gml::Mat4f::orthographic(0, 1500, 0, 900, 0, 100));
 
 		glContext->enableDepthTest();
 	}
 
 	void run()
 	{
+		img::Image spriteImage = img::ImageReader(platform).readFile("D:\\DEV\\Projects\\YAGE\\source\\tools\\sandbox2d\\assets\\spaceship.png");
+		gl::Texture spriteTexture = glContext->create2DTexture(spriteImage.getRawData(), spriteImage.getWidth(), spriteImage.getHeight(), gl::ImageFormat::RGB);
+		gl2d::Sprite sprite(gml::Vec2f(500, 500), gml::Vec2f(100, 100), spriteTexture, glContext);
+
 		glContext->showWindow();
 		platform->getTimeStep();
 		while (!platform->shouldDestroy())
@@ -62,6 +73,7 @@ public:
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			glContext->useShader(shader);
+			renderer->drawSprite(sprite);
 
 			glContext->swapBuffers();
 			inputController->poll();
