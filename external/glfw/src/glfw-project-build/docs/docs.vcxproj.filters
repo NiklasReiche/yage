@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\DEV\Projects\YAGE\external\glfw\docs\CMakeLists.txt" />
+    <CustomBuild Include="D:\DEV\Projects\YAGE\external\glfw\src\glfw-project-build\CMakeFiles\9e520bd11edf920c8503ba3e9a6a6432\docs.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="D:\DEV\Projects\YAGE\external\glfw\src\glfw-project-build\docs\CMakeFiles\docs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{03D82FA7-0ABE-322E-BB47-7DF04151D99E}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
