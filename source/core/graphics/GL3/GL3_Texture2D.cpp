@@ -9,11 +9,7 @@ namespace gl3
 	GL3_Texture2D::GL3_Texture2D(GL3_Texture2D&& other) noexcept
 		: GL3_Texture(std::move(other))
 	{
-		this->width = other.width;
-		this->height = other.height;
-
-		other.width = 0;
-		other.height = 0;
+		*this = std::move(other);
 	}
 
 	GL3_Texture2D& GL3_Texture2D::operator=(GL3_Texture2D&& other) noexcept
@@ -22,9 +18,13 @@ namespace gl3
 		{
 			this->width = other.width;
 			this->height = other.height;
+			this->maxMipmapLevel = other.maxMipmapLevel;
 
 			other.width = 0;
 			other.height = 0;
+			other.maxMipmapLevel = 0;
+
+			GL3_Texture::operator=(std::move(other));
 		}
 
 		return *this;
