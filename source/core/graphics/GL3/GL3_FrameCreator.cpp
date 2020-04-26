@@ -23,7 +23,7 @@ namespace gl3
 		// create empty texture
 		const std::vector<unsigned char> emptyData = {};
 		buffer->texture = std::static_pointer_cast<GL3_Texture2D>(std::shared_ptr<gl::ITexture2D>(context->getTextureCreator()->
-			createTexture2D(emptyData, width, height, format)));
+			createTexture2D(width, height, format, emptyData)));
 		buffer->texture->configTextureFilter(TextureFilter::LINEAR, TextureFilter::LINEAR);
 
 		// attach texture

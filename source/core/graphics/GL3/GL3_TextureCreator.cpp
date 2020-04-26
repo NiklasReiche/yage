@@ -7,12 +7,27 @@
 namespace gl3
 {
 	std::unique_ptr<gl::ITexture2D> GL3_TextureCreator::createTexture2D(
-		const std::vector<unsigned char> & data,
 		const int width,
 		const int height,
-		const gl::ImageFormat format,
-		const int rowAlignment)
+		const gl::ImageFormat textureFormat,
+		const std::vector<unsigned char>& data,
+		gl::PixelTransferParams params)
 	{
+		if (width <= 0 || height <= 0)
+			throw std::invalid_argument("texture dimensions must be strictly positive");
+
+		if (textureFormat == gl::ImageFormat::UNDEFINED)
+			throw std::invalid_argument("texture format cannot be undefined");
+
+		if (params.dataFormat == gl::ImageFormat::UNDEFINED)
+			params.dataFormat = textureFormat;
+		
+		const int nChannels = static_cast<int>(params.dataFormat);
+		const int rowAlignment = static_cast<int>(params.rowAlignment);
+		
+		if (!data.empty() && !gl::isDataSizeCorrect(width, height, nChannels, rowAlignment, data))
+			throw std::invalid_argument("the input data container is incorrectly sized");
+		
 		auto ptr = lockContextPtr();
 		auto texture = std::unique_ptr<GL3_Texture2D>(new GL3_Texture2D(ptr));
 		
@@ -22,19 +37,22 @@ namespace gl3
 		// bind object
 		ptr->bindTexture(GL_TEXTURE_2D, texture->id);
 
-		// select pixel pack format
-		InternalFormat internalFormat = GL3_Context::convertToInternalFormat(format);
-		ImageFormat imageFormat = GL3_Context::convertToImageFormat(format);
-
-		// set unpack alignment
+		// set pixel transfer parameters
+		InternalFormat internalFormat = convertToInternalFormat(textureFormat);
+		ImageFormat imageFormat = convertToImageFormat(params.dataFormat);
 		ptr->setUnpackAlignment(rowAlignment);
 
 		// upload data to gpu
 		glTexImage2D(
-			GL_TEXTURE_2D, 0, static_cast<GLenum>(internalFormat),
-			width, height, 0,
-			static_cast<GLenum>(imageFormat), static_cast<GLenum>(PixelType::U_BYTE),
-			data.empty() ? nullptr : &(data[0]));
+			GL_TEXTURE_2D, 
+			0, 
+			static_cast<GLenum>(internalFormat),
+			width, 
+			height, 
+			0,
+			static_cast<GLenum>(imageFormat), 
+			GL_UNSIGNED_BYTE,
+			data.empty() ? nullptr : data.data());
 
 		// set default filter & wrapper options
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -47,14 +65,10 @@ namespace gl3
 
 		texture->height = height;
 		texture->width = width;
-
+		texture->nChannels = nChannels;
+		
 		texture->target = TextureType::TEXTURE_2D;
 		texture->format = internalFormat;
-
-		texture->pxType = PixelType::U_BYTE;
-		texture->pxFormat = imageFormat;
-		texture->rowAlignment = rowAlignment;
-		texture->nChannels = GL3_Context::convertToChannelSize(imageFormat);
 
 		return texture;
 	}
@@ -64,7 +78,8 @@ namespace gl3
 		int width,
 		int height,
 		int depth,
-		gl::ImageFormat format,
+		gl::ImageFormat dataFormat,
+		gl::ImageFormat textureFormat,
 		int rowAlignment)
 	{
 		throw NotImplementedException();
@@ -74,7 +89,8 @@ namespace gl3
 		const std::array<std::vector<unsigned char>, 6> & data,
 		int width,
 		int height,
-		gl::ImageFormat format,
+		gl::ImageFormat dataFormat,
+		gl::ImageFormat textureFormat,
 		int rowAlignment)
 	{
 #if 0

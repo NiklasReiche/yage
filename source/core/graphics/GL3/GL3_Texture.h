@@ -18,16 +18,10 @@ namespace gl3
 		void configTextureFilter(TextureFilter minOption, TextureFilter magOption);
 		void configTextureFilter(MipmapOption minOption, TextureFilter magOption);
 
-		void resize(int width, int height);
-		void rotate(int level);
-
 	protected:
 		GLuint texture = 0;
 		TextureType target = TextureType::UNDEFINED;
 		InternalFormat format = InternalFormat::UNDEFINED;
-		ImageFormat pxFormat = ImageFormat::UNDEFINED;
-		PixelType pxType = PixelType::UNDEFINED;
-		int rowAlignment = 4;
 		int nChannels = 0;
 
 		using GL3_Object::GL3_Object;

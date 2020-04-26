@@ -13,9 +13,8 @@ namespace gl3
 		const GLenum source, const GLenum type, const GLuint id, const GLenum severity,
 		const GLsizei length, const GLchar* message, const void* userParam)
 	{
-		fprintf(stdout, "%s\n", message);
+		//fprintf(stdout, "%s\n", message);
 		if (severity == GL_DEBUG_SEVERITY_HIGH) {
-			fprintf(stderr, "Aborting...\n");
 			throw GlException(id, std::string(message));
 		}
 	}
@@ -268,56 +267,5 @@ namespace gl3
 	int GL3_Context::getRenderTargetHeight() const
 	{
 		return glState.renderTargetHeight;
-	}
-
-	InternalFormat GL3_Context::convertToInternalFormat(const gl::ImageFormat format)
-	{
-		switch (format)
-		{
-			case gl::ImageFormat::R:
-				return InternalFormat::R8;
-			case gl::ImageFormat::RG:
-				return InternalFormat::RG8;
-			case gl::ImageFormat::RGB:
-				return InternalFormat::RGB8;
-			case gl::ImageFormat::RGBA:
-				return InternalFormat::RGBA8;
-			default:
-				return InternalFormat::UNDEFINED;
-		}
-	}
-
-	ImageFormat GL3_Context::convertToImageFormat(const gl::ImageFormat format)
-	{
-		switch (format)
-		{
-			case gl::ImageFormat::R:
-				return ImageFormat::R;
-			case gl::ImageFormat::RG:
-				return ImageFormat::RG;
-			case gl::ImageFormat::RGB:
-				return ImageFormat::RGB;
-			case gl::ImageFormat::RGBA:
-				return ImageFormat::RGBA;
-			default:
-				return ImageFormat::UNDEFINED;
-		}
-	}
-
-	int GL3_Context::convertToChannelSize(const ImageFormat format)
-	{
-		switch (format)
-		{
-			case ImageFormat::R:
-				return 1;
-			case ImageFormat::RG:
-				return 2;
-			case ImageFormat::RGB:
-				return 3;
-			case ImageFormat::RGBA:
-				return 4;
-			default:
-				return 0;
-		}
 	}
 }

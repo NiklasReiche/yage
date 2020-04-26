@@ -1,4 +1,7 @@
 #include "GL3_Texture2D.h"
+
+#include <cmath>
+
 #include "GL3_Context.h"
 
 namespace gl3
@@ -26,69 +29,107 @@ namespace gl3
 
 		return *this;
 	}
-	
-	void GL3_Texture2D::setSubData(
-		const int xOffset, const int yOffset, 
-		const int width, const int height, unsigned char * data)
+
+	int GL3_Texture2D::getMaxMipmapLevel() const
 	{
-		auto ptr = lockContextPtr();
-		ptr->setUnpackAlignment(rowAlignment);
-		ptr->bindTexture(static_cast<GLenum>(target), texture);
+		return static_cast<int>(std::floor(std::log2(std::max(width, height))));
+	}
+
+	void GL3_Texture2D::setImage(
+		const std::vector<unsigned char>& data,
+		const gl::PixelTransferParams params)
+	{
+		setSubImage(0, 0, width, height, data, params);
+	}
+
+	void GL3_Texture2D::setSubImage(
+		const int xOffset,
+		const int yOffset,
+		const int width,
+		const int height,
+		const std::vector<unsigned char>& data,
+		gl::PixelTransferParams params)
+	{
+		if (xOffset < 0 || yOffset < 0 || width <= 0 || height <= 0)
+			throw std::invalid_argument("area dimensions cannot be negative");
+
+		if (xOffset + width > this->width || yOffset + height > this->height)
+			throw std::invalid_argument("the specified area is out of bounds");
+
+		if (params.dataFormat == gl::ImageFormat::UNDEFINED)
+			params.dataFormat = getFormat();
+
+		const int channels = static_cast<int>(params.dataFormat);
+		const int rowAlignment = static_cast<int>(params.rowAlignment);
 		
-		glTexSubImage2D(
-			GL_TEXTURE_2D, 0, 
-			xOffset, yOffset, 
-			width, height, 
-			static_cast<GLenum>(pxFormat), static_cast<GLenum>(pxType), 
-			data);
-	}
-	
-	void GL3_Texture2D::setSubData(
-		const int xOffset, const int yOffset,
-		const int width, const int height, std::vector<unsigned char>& data)
-	{
-		setSubData(xOffset, yOffset, width, height, &data[0]);
-	}
+		if (!gl::isDataSizeCorrect(width, height, channels, rowAlignment, data))
+			throw std::invalid_argument("the input data container is incorrectly sized");
 
-	void GL3_Texture2D::setData(
-		const int width, const int height, unsigned char * data)
-	{
+
 		auto ptr = lockContextPtr();
 		ptr->setUnpackAlignment(rowAlignment);
 		ptr->bindTexture(static_cast<GLenum>(target), texture);
 
-		glTexImage2D(
-			GL_TEXTURE_2D, 0, GLenum(format), 
-			width, height, 0, 
-			static_cast<GLenum>(pxFormat), 
-			static_cast<GLenum>(pxType), data);
-
-		this->width = width;
-		this->height = height;
-	}
-	void GL3_Texture2D::setData(
-		const int width, const int height, std::vector<unsigned char>& data)
-	{
-		setData(width, height, &data[0]);
+		glTexSubImage2D(
+			GL_TEXTURE_2D,
+			0,
+			xOffset, 
+			yOffset,
+			width, 
+			height,
+			static_cast<GLenum>(convertToImageFormat(params.dataFormat)),
+			GL_UNSIGNED_BYTE, 
+			data.data());
 	}
 
-	void GL3_Texture2D::getData(std::vector<unsigned char>& data, const int level)
+	std::vector<unsigned char> GL3_Texture2D::getImage(
+		const gl::PixelTransferParams params)
 	{
+		return getMipmapImage(0, params);
+	}
+
+	std::vector<unsigned char> GL3_Texture2D::getMipmapImage(
+		const int level,
+		gl::PixelTransferParams params)
+	{
+		if (level > maxMipmapLevel)
+			throw std::invalid_argument("there is no mipmap for the given level: <" + std::to_string(level) + ">");
+
+		if (params.dataFormat == gl::ImageFormat::UNDEFINED)
+			params.dataFormat = getFormat();
+
+		const int rowAlignment = static_cast<int>(params.rowAlignment);
+		
 		auto ptr = lockContextPtr();
 		ptr->setPackAlignment(rowAlignment);
 		ptr->bindTexture(static_cast<GLenum>(target), texture);
 
-		data.resize(
-			width / static_cast<int>(pow(2, level)) * 
-			(height / static_cast<int>(pow(2, level))) * 
+		auto data = std::vector<unsigned char>(
+			std::max(1, static_cast<int>(floor(width / pow(2, level)))) *
+			std::max(1, static_cast<int>(floor(height / pow(2, level)))) *
 			nChannels);
 
+		const int levelWidth = std::max(1, static_cast<int>(std::floor(width / std::pow(2, level))));
+		const int levelHeight = std::max(1, static_cast<int>(std::floor(height / std::pow(2, level))));
+		data = std::vector<unsigned char>(gl::calculateImageDataSize(levelWidth, levelHeight, nChannels, rowAlignment));
+
 		glGetTexImage(
-			static_cast<GLenum>(target), 
-			static_cast<GLint>(level), 
-			static_cast<GLenum>(pxFormat), 
-			static_cast<GLenum>(pxType), 
-			&data[0]);
+			static_cast<GLenum>(target),
+			static_cast<GLint>(level),
+			static_cast<GLenum>(convertToImageFormat(params.dataFormat)),
+			GL_UNSIGNED_BYTE,
+			data.data());
+
+		return data;
+	}
+
+	void GL3_Texture2D::generateMipmaps()
+	{
+		auto ptr = lockContextPtr();
+		ptr->bindTexture(static_cast<GLenum>(target), texture);
+
+		glGenerateMipmap(static_cast<GLenum>(target));
+		maxMipmapLevel = getMaxMipmapLevel();
 	}
 
 	int GL3_Texture2D::getWidth() const
@@ -106,8 +147,8 @@ namespace gl3
 		return nChannels;
 	}
 
-	bool GL3_Texture2D::isEmpty() const
+	gl::ImageFormat GL3_Texture2D::getFormat() const
 	{
-		
+		return convertToTextureFormat(format);
 	}
 }

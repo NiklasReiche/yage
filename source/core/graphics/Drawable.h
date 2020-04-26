@@ -60,7 +60,7 @@ namespace gl
 		 * 
 		 * @return True if the buffer is empty, false otherwise.
 		 */
-		[[nodicard]]
+		[[nodiscard]]
 		virtual bool isEmpty() = 0;
 
 	protected:

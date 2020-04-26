@@ -10,26 +10,28 @@ namespace gl3
 	{
 	public:
 		std::unique_ptr<gl::ITexture2D> createTexture2D(
-			const std::vector<unsigned char> & data,
 			int width,
 			int height,
-			gl::ImageFormat format,
-			int rowAlignment = 4) override;
+			gl::ImageFormat textureFormat,
+			const std::vector<unsigned char>& data,
+			gl::PixelTransferParams params) override;
 
 		std::unique_ptr<gl::ITexture3D> createTexture3D(
 			const std::vector<unsigned char> & data,
 			int width,
 			int height,
 			int depth,
-			gl::ImageFormat format,
-			int rowAlignment = 4) override;
+			gl::ImageFormat dataFormat,
+			gl::ImageFormat textureFormat,
+			int rowAlignment) override;
 
 		std::unique_ptr<gl::ICubemap> createCubemap(
 			const std::array<std::vector<unsigned char>, 6> & data,
 			int width,
 			int height,
-			gl::ImageFormat format,
-			int rowAlignment = 4) override;
+			gl::ImageFormat dataFormat,
+			gl::ImageFormat textureFormat,
+			int rowAlignment) override;
 
 	private:
 		using GL3_BaseObject::GL3_BaseObject;
