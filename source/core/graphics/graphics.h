@@ -13,7 +13,6 @@
 #include "ShaderCreator.h"
 
 #include "Texture2D.h"
-#include "Texture3D.h"
 #include "Cubemap.h"
 #include "TextureCreator.h"
 
@@ -37,7 +36,6 @@
 #include "GL3/GL3_ShaderCreator.h"
 
 #include "GL3/GL3_Texture.h"
-#include "GL3/GL3_Texture3D.h"
 #include "GL3/GL3_Cubemap.h"
 #include "GL3/GL3_TextureCreator.h"
 

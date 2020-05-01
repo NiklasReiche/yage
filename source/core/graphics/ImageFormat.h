@@ -4,9 +4,10 @@ namespace gl
 {
 	enum class ImageFormat
 	{
-		R,
-		RG,
-		RGB,
-		RGBA
+		UNDEFINED = 0,
+		R = 1,
+		RG = 2,
+		RGB = 3,
+		RGBA = 4
 	};
 }

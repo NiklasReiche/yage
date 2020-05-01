@@ -59,10 +59,6 @@ namespace gl3
 		
 		void setPolygonMode(GLenum mode);
 
-		static InternalFormat convertToInternalFormat(gl::ImageFormat format);
-		static ImageFormat convertToImageFormat(gl::ImageFormat format);
-		static int convertToChannelSize(ImageFormat format);
-
 	private:
 		struct OpenGlState
 		{
