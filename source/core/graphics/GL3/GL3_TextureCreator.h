@@ -23,12 +23,17 @@ namespace gl3
                 gl::PixelTransferParams params) override;
 
 		std::unique_ptr<gl::ICubemap> createCubemap(
-			const std::array<std::vector<unsigned char>, 6> & data,
 			int width,
 			int height,
-			gl::ImageFormat dataFormat,
 			gl::ImageFormat textureFormat,
-			int rowAlignment) override;
+			const std::array<std::vector<unsigned char>, 6> &data) override;
+
+		std::unique_ptr<gl::ICubemap> createCubemap(
+			int width,
+			int height,
+			gl::ImageFormat textureFormat,
+			const std::array<std::vector<unsigned char>, 6> &data,
+			gl::PixelTransferParams params) override;
 
 	private:
 		using GL3_BaseObject::GL3_BaseObject;

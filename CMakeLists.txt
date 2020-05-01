@@ -30,7 +30,7 @@ endif()
 # compiler flags     #
 ######################
 set( GCC_COMPILER_FLAGS
-		"-fdiagnostics-color=always --coverage"
+		"-fdiagnostics-color=always -Wall --coverage"
 )
 set( MSVC_COMPILER_FLAGS
 	"/MP"

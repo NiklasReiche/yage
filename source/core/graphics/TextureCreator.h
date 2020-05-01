@@ -46,8 +46,7 @@ namespace gl
 			int width,
 			int height,
 			ImageFormat textureFormat,
-			const std::vector<unsigned char>& data
-		) = 0;
+			const std::vector<unsigned char>& data) = 0;
 
         /**
          * @brief Creates a new 2D-texture.
@@ -83,17 +82,55 @@ namespace gl
                 int height,
                 ImageFormat textureFormat,
                 const std::vector<unsigned char>& data,
-                PixelTransferParams params
-        ) = 0;
+                PixelTransferParams params) = 0;
 
+		/**
+		 * @brief Creates a new Cubemap texture.
+		 *
+		 *
+		 *
+		 * @param width Width of a single cubemap face texture.
+		 * @param height Height of a single cubemap face texture.
+		 * @param textureFormat Pixel format of the texture.
+		 * @param data A set of sub-pixel values with which to initialize the texture.
+		 * @return The initialized texture.
+		 *
+		 * @throws std::invalid_argument The data is not correctly sized.
+         * @throws std::invalid_argument The width or height is not strictly positive.
+         * @throws std::invalid_argument The texture format is undefined.
+         * @throws std::logic_error The graphics context of this TextureCreator was destroyed.
+		 */
 		[[nodiscard]]
 		virtual std::unique_ptr<ICubemap> createCubemap(
-			const std::array<std::vector<unsigned char>, 6> & data,
 			int width,
 			int height,
-			ImageFormat dataFormat,
 			ImageFormat textureFormat,
-			int rowAlignment = 1) = 0;
+			const std::array<std::vector<unsigned char>, 6> &data) = 0;
+
+		/**
+		 * @brief Creates a new Cubemap texture.
+		 *
+		 *
+		 *
+		 * @param width Width of a single cubemap face texture.
+		 * @param height Height of a single cubemap face texture.
+		 * @param textureFormat Pixel format of the texture.
+		 * @param data A set of sub-pixel values with which to initialize the texture.
+		 * @param params Hints on how the input data is formatted.
+		 * @return The initialized texture.
+		 *
+		 * @throws std::invalid_argument The data is not correctly sized.
+         * @throws std::invalid_argument The width or height is not strictly positive.
+         * @throws std::invalid_argument The texture format is undefined.
+         * @throws std::logic_error The graphics context of this TextureCreator was destroyed.
+		 */
+		[[nodiscard]]
+		virtual std::unique_ptr<ICubemap> createCubemap(
+			int width,
+			int height,
+			ImageFormat textureFormat,
+			const std::array<std::vector<unsigned char>, 6> &data,
+			PixelTransferParams params) = 0;
 
 	protected:
 		ITextureCreator() = default;
