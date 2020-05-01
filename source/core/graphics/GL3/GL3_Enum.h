@@ -1,6 +1,8 @@
 #pragma once
 
+#include <stdexcept>
 #include <platform/OpenGL.h>
+#include "../ImageFormat.h"
 
 namespace gl3
 {
@@ -89,4 +91,55 @@ namespace gl3
 	{
 		TRIANGLES = GL_TRIANGLES
 	};
+
+	inline InternalFormat convertToInternalFormat(const gl::ImageFormat format)
+	{
+		switch (format)
+		{
+		case gl::ImageFormat::R:
+			return InternalFormat::R8;
+		case gl::ImageFormat::RG:
+			return InternalFormat::RG8;
+		case gl::ImageFormat::RGB:
+			return InternalFormat::RGB8;
+		case gl::ImageFormat::RGBA:
+			return InternalFormat::RGBA8;
+		default:
+			return InternalFormat::UNDEFINED;
+		}
+	}
+	
+	inline ImageFormat convertToImageFormat(const gl::ImageFormat format)
+	{
+		switch (format)
+		{
+		case gl::ImageFormat::R:
+			return ImageFormat::R;
+		case gl::ImageFormat::RG:
+			return ImageFormat::RG;
+		case gl::ImageFormat::RGB:
+			return ImageFormat::RGB;
+		case gl::ImageFormat::RGBA:
+			return ImageFormat::RGBA;
+		default:
+			return ImageFormat::UNDEFINED;
+		}
+	}
+
+	inline gl::ImageFormat convertToTextureFormat(const InternalFormat format)
+	{
+		switch (format)
+		{
+		case InternalFormat::R8:
+			return gl::ImageFormat::R;
+		case InternalFormat::RG8:
+			return gl::ImageFormat::RG;
+		case InternalFormat::RGB8:
+			return gl::ImageFormat::RGB;
+		case InternalFormat::RGBA8:
+			return gl::ImageFormat::RGBA;
+		default:
+			throw std::invalid_argument("unknown image format");
+		}
+	}
 }

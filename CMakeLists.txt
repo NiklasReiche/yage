@@ -13,7 +13,7 @@ set( CMAKE_CXX_STANDARD 17 )
 ######################
 option( YAGE_BUILD_ANDROID "Cross compile for Android" OFF )
 option( YAGE_BUILD_TESTS "Build unit tests" ON )
-enable_testing()
+
 
 ######################
 # Android settings   #
@@ -30,17 +30,21 @@ endif()
 # compiler flags     #
 ######################
 set( GCC_COMPILER_FLAGS
-	"-fdiagnostics-color=always"
+		"-fdiagnostics-color=always -Wall --coverage"
 )
 set( MSVC_COMPILER_FLAGS
 	"/MP"
 )
 
-if(WIN32)
-	set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${MSVC_COMPILER_FLAGS}" )
-elseif(UNIX)
-	set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COMPILER_FLAGS}"  )
-endif()
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	# using Clang
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	# using GCC
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COMPILER_FLAGS}")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	# using Visual Studio C++
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_COMPILER_FLAGS}")
+endif ()
 
 
 ######################

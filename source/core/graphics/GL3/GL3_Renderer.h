@@ -28,7 +28,6 @@ namespace gl3
 		void useShader(const gl::IShader & shader) override;
 
 		void bindTexture(const gl::ITexture2D & texture, int unit = 0) override;
-		void bindTexture(const gl::ITexture3D & texture, int unit = 0) override;
 		void bindTexture(const gl::ICubemap & texture, int unit = 0) override;
 
 		void enableDepthTest() override;

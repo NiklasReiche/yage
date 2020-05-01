@@ -3,10 +3,10 @@
 
 # Build results
 [Bb]uild/
-bin/
+[Bb]in/
 
 # External libraries
-lib/
+[Ll]ib/
 
 # Visual Studio cache/options directory
 .vs/
@@ -15,3 +15,9 @@ lib/
 # Android Studio files
 .idea/
 *.iml
+
+# CLion cmake files
+cmake-build*/
+
+# doc files
+*.vpp.bak_*

@@ -63,23 +63,6 @@ TEST_F(ContextTest, DrawableGetSetData)
 	ASSERT_THAT(drawableData, ContainerEq(vertices));
 }
 
-TEST_F(ContextTest, Texture2DInitialization)
-{
-	std::shared_ptr<gl::ITextureCreator> tCreator = context->getTextureCreator();
-
-	const std::vector<unsigned char> image = {
-		0, 0, 0,	1, 2, 1,
-		100, 200,	1, 6, 40,
-		1, 2, 3,	4, 7, 5};
-	std::shared_ptr<gl::ITexture2D> texture = tCreator->createTexture2D(image, 2, 3, gl::ImageFormat::RGB);
-
-	ASSERT_TRUE(std::static_pointer_cast<gl3::GL3_Texture2D>(texture)->isValid());
-
-	ASSERT_EQ(2, texture->getWidth());
-	ASSERT_EQ(3, texture->getHeight());
-	ASSERT_EQ(3, texture->getChannels());
-}
-
 TEST_F(ContextTest, FrameInitialization)
 {
 	std::shared_ptr<gl::IFrameCreator> tCreator = context->getFrameCreator();

@@ -7,13 +7,16 @@ add_executable( allTest
 	core-math/matrixTest.cpp
 	core-math/quaterniontest.cpp
 	core-graphics/contextTest.cpp
+	core-graphics/textureTest.cpp
 )
 
-target_link_libraries( allTest PUBLIC YAGEcore
-                                PUBLIC gtest
-								PUBLIC gmock)
+target_link_libraries( allTest
+		PUBLIC YAGEcore
+		PUBLIC gtest
+		PUBLIC gmock
+)
 
 add_test(
-	NAME coreTest 
+	NAME coreTest
 	COMMAND allTest --gtest_catch_exceptions=0
 	WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

@@ -4,7 +4,6 @@
 #include "Shader.h"
 #include "Frame.h"
 #include "Texture2D.h"
-#include "Texture3D.h"
 #include "Cubemap.h"
 
 namespace gl
@@ -35,7 +34,6 @@ namespace gl
 		virtual void useShader(const IShader& shader) = 0;
 
 		virtual void bindTexture(const ITexture2D& texture, int unit = 0) = 0;
-		virtual void bindTexture(const ITexture3D& texture, int unit = 0) = 0;
 		virtual void bindTexture(const ICubemap& texture, int unit = 0) = 0;
 
 		virtual void enableDepthTest() = 0;

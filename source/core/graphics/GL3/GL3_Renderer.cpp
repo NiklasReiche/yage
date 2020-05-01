@@ -3,7 +3,6 @@
 #include "GL3_Context.h"
 #include "GL3_Drawable.h"
 #include "GL3_Texture2D.h"
-#include "GL3_Texture3D.h"
 #include "GL3_Cubemap.h"
 #include "GL3_Shader.h"
 #include "GL3_Framebuffer.h"
@@ -149,12 +148,6 @@ namespace gl3
 	void GL3_Renderer::bindTexture(const gl::ITexture2D & texture, const int unit)
 	{
 		const auto& ptr = static_cast<const GL3_Texture2D&>(texture);
-		bindTexture(static_cast<const GL3_Texture&>(ptr), unit);
-	}
-
-	void GL3_Renderer::bindTexture(const gl::ITexture3D& texture, const int unit)
-	{
-		const auto& ptr = static_cast<const GL3_Texture3D&>(texture);
 		bindTexture(static_cast<const GL3_Texture&>(ptr), unit);
 	}
 
