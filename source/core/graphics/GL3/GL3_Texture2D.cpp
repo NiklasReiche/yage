@@ -6,13 +6,13 @@
 
 namespace gl3
 {
-	GL3_Texture2D::GL3_Texture2D(GL3_Texture2D&& other) noexcept
+	GL3_Texture2D::GL3_Texture2D(GL3_Texture2D &&other) noexcept
 		: GL3_Texture(std::move(other))
 	{
 		*this = std::move(other);
 	}
 
-	GL3_Texture2D& GL3_Texture2D::operator=(GL3_Texture2D&& other) noexcept
+	GL3_Texture2D &GL3_Texture2D::operator=(GL3_Texture2D &&other) noexcept
 	{
 		if (this != &other)
 		{
@@ -35,34 +35,43 @@ namespace gl3
 		return static_cast<int>(std::floor(std::log2(std::max(width, height))));
 	}
 
+	void GL3_Texture2D::setImage(const std::vector<unsigned char> &data)
+	{
+		setImage(data, { getFormat(), gl::RowAlignment::B_1 });
+	}
+
 	void GL3_Texture2D::setImage(
-		const std::vector<unsigned char>& data,
+		const std::vector<unsigned char> &data,
 		const gl::PixelTransferParams params)
 	{
-		setSubImage(0, 0, width, height, data, params);
+		setSubImage({ 0, 0, width, height }, data, params);
 	}
 
 	void GL3_Texture2D::setSubImage(
-		const int xOffset,
-		const int yOffset,
-		const int width,
-		const int height,
-		const std::vector<unsigned char>& data,
+		utils::Area subArea,
+		const std::vector<unsigned char> &data)
+	{
+		setSubImage(subArea, data, { getFormat(), gl::RowAlignment::B_1 });
+	}
+
+	void GL3_Texture2D::setSubImage(
+		utils::Area subArea,
+		const std::vector<unsigned char> &data,
 		gl::PixelTransferParams params)
 	{
-		if (xOffset < 0 || yOffset < 0 || width <= 0 || height <= 0)
+		if (subArea.x < 0 || subArea.y < 0 || subArea.w <= 0 || subArea.h <= 0)
 			throw std::invalid_argument("area dimensions cannot be negative");
 
-		if (xOffset + width > this->width || yOffset + height > this->height)
+		if (subArea.x + subArea.w > width || subArea.y + subArea.h > height)
 			throw std::invalid_argument("the specified area is out of bounds");
 
 		if (params.dataFormat == gl::ImageFormat::UNDEFINED)
-			params.dataFormat = getFormat();
+			throw std::invalid_argument("image format cannot be undefined");
 
 		const int channels = static_cast<int>(params.dataFormat);
 		const int rowAlignment = static_cast<int>(params.rowAlignment);
-		
-		if (!gl::isDataSizeCorrect(width, height, channels, rowAlignment, data))
+
+		if (!gl::isDataSizeCorrect(subArea.w, subArea.h, channels, rowAlignment, data))
 			throw std::invalid_argument("the input data container is incorrectly sized");
 
 
@@ -73,33 +82,41 @@ namespace gl3
 		glTexSubImage2D(
 			GL_TEXTURE_2D,
 			0,
-			xOffset, 
-			yOffset,
-			width, 
-			height,
+			subArea.x,
+			subArea.y,
+			subArea.w,
+			subArea.h,
 			static_cast<GLenum>(convertToImageFormat(params.dataFormat)),
-			GL_UNSIGNED_BYTE, 
+			pxType,
 			data.data());
 	}
 
-	std::vector<unsigned char> GL3_Texture2D::getImage(
-		const gl::PixelTransferParams params)
+	std::vector<unsigned char> GL3_Texture2D::getImage()
+	{
+		return getImage({ getFormat(), gl::RowAlignment::B_1 });
+	}
+
+	std::vector<unsigned char> GL3_Texture2D::getImage(const gl::PixelTransferParams params)
 	{
 		return getMipmapImage(0, params);
 	}
 
-	std::vector<unsigned char> GL3_Texture2D::getMipmapImage(
-		const int level,
-		gl::PixelTransferParams params)
+	std::vector<unsigned char> GL3_Texture2D::getMipmapImage(int level)
+	{
+		return getMipmapImage(level, { getFormat(), gl::RowAlignment::B_1 });
+	}
+
+	std::vector<unsigned char> GL3_Texture2D::getMipmapImage(const int level, gl::PixelTransferParams params)
 	{
 		if (level > maxMipmapLevel)
 			throw std::invalid_argument("there is no mipmap for the given level: <" + std::to_string(level) + ">");
 
 		if (params.dataFormat == gl::ImageFormat::UNDEFINED)
-			params.dataFormat = getFormat();
+			throw std::invalid_argument("image format cannot be undefined");
 
 		const int rowAlignment = static_cast<int>(params.rowAlignment);
-		
+
+
 		auto ptr = lockContextPtr();
 		ptr->setPackAlignment(rowAlignment);
 		ptr->bindTexture(static_cast<GLenum>(target), texture);
@@ -117,7 +134,7 @@ namespace gl3
 			static_cast<GLenum>(target),
 			static_cast<GLint>(level),
 			static_cast<GLenum>(convertToImageFormat(params.dataFormat)),
-			GL_UNSIGNED_BYTE,
+			pxType,
 			data.data());
 
 		return data;
@@ -136,12 +153,12 @@ namespace gl3
 	{
 		return width;
 	}
-	
+
 	int GL3_Texture2D::getHeight() const
 	{
 		return height;
 	}
-	
+
 	int GL3_Texture2D::getChannels() const
 	{
 		return nChannels;

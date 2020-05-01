@@ -19,6 +19,7 @@ namespace gl3
 		void configTextureFilter(MipmapOption minOption, TextureFilter magOption);
 
 	protected:
+		const GLenum pxType = GL_UNSIGNED_BYTE;
 		GLuint texture = 0;
 		TextureType target = TextureType::UNDEFINED;
 		InternalFormat format = InternalFormat::UNDEFINED;
