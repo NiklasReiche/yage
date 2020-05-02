@@ -18,7 +18,7 @@ namespace gml
 	 * @tparam Rows the number of rows
 	 * @tparam Columns the number of columns
 	 */
-	template <typename T, size_t Rows, size_t Columns>
+	template<typename T, size_t Rows, size_t Columns>
 	class MatrixBase
 	{
 	private:
@@ -38,66 +38,67 @@ namespace gml
 		/**
 		* @brief Initializes all fields with the same value.
 		*/
-		explicit MatrixBase(const T& value);
+		explicit MatrixBase(const T &value);
 
 		/**
-		 * @brief Initializes the fields by a 1d initialzer list.
+		 * @brief Initializes the fields by a 1d initializer list.
 		 * 
 		 * @param init the initializer list
 		 */
-		MatrixBase(const std::initializer_list<T>& init);
+		MatrixBase(const std::initializer_list<T> &init);
 
 		/**
-		* @brief Initializes the fields by a 2d initialzer list.
+		* @brief Initializes the fields by a 2d initializer list.
 		*
 		* @param init the initializer list
 		*/
-		MatrixBase(const std::initializer_list<std::initializer_list<T>>& init);
+		MatrixBase(const std::initializer_list<std::initializer_list<T>> &init);
 
 		/**
-		 * @brief Initialzes this matrix with values from a linear c-style array.
+		 * @brief Initializes this matrix with values from a linear c-style array.
 		 * 
 		 * @param arr the array
 		 */
 		explicit MatrixBase(const T arr[]);
 
-		MatrixBase(const MatrixBase<T, Rows, Columns>& other);
+		MatrixBase(const MatrixBase<T, Rows, Columns> &other);
 
 		template<typename T2>
-		MatrixBase(const MatrixBase<T2, Rows, Columns>& other);
+		explicit MatrixBase(const MatrixBase<T2, Rows, Columns> &other);
 
-		MatrixBase<T, Rows, Columns>& operator=(
-			const MatrixBase<T, Rows, Columns>& other);
+		MatrixBase<T, Rows, Columns> &operator=(
+			const MatrixBase<T, Rows, Columns> &other);
 
 		template<typename T2>
-		MatrixBase<T, Rows, Columns>& operator=(
-			const MatrixBase<T2, Rows, Columns>& other);
+		MatrixBase<T, Rows, Columns> &operator=(
+			const MatrixBase<T2, Rows, Columns> &other);
 
 	public:
 		/**
 		 * @brief Returns a reference to this matrix's field at a given position.
 		 * 
 		 * @param row the row
-		 * @param column the coulmn
+		 * @param column the column
 		 * @return a reference to the field
 		 */
-		T& at(size_t row, size_t column);
+		T &at(size_t row, size_t column);
 
 		/**
 		* @brief Returns a const reference to this matrix's field at a given 
 		* position.
 		*
 		* @param row the row
-		* @param column the coulmn
+		* @param column the column
 		* @return a const reference to the field
 		*/
-		const T& at(size_t row, size_t column) const;
+		const T &at(size_t row, size_t column) const;
 
 		/**
-		* @brief Returns the determinante of this matrix.
+		* @brief Returns the determinant of this matrix.
 		*
-		* @return the determinante
+		* @return the determinant
 		*/
+		[[nodiscard]]
 		double det() const;
 
 		/**
@@ -105,6 +106,7 @@ namespace gml
 		 * 
 		 * @return the trace
 		 */
+		[[nodiscard]]
 		double trace() const;
 
 		/**
@@ -115,16 +117,16 @@ namespace gml
 		void convertToArray(T arr[]) const;
 
 	public:
-		MatrixBase<T, Rows, Columns>& operator+=(
-			const MatrixBase<T, Rows, Columns>& right);
-		MatrixBase<T, Rows, Columns>& operator-=(
-			const MatrixBase<T, Rows, Columns>& right);
-		MatrixBase<T, Rows, Columns>& operator*=(const T& right);
-		MatrixBase<T, Rows, Columns>& operator/=(const T& right);
+		MatrixBase<T, Rows, Columns> &operator+=(const MatrixBase<T, Rows, Columns> &right);
+
+		MatrixBase<T, Rows, Columns> &operator-=(const MatrixBase<T, Rows, Columns> &right);
+
+		MatrixBase<T, Rows, Columns> &operator*=(const T &right);
+
+		MatrixBase<T, Rows, Columns> &operator/=(const T &right);
 
 		template<typename U, size_t N>
-		friend MatrixBase<U, N, N> inverse(
-			const MatrixBase<U, N, N>& matrix);
+		friend MatrixBase<U, N, N> inverse(const MatrixBase<U, N, N> &matrix);
 
 	private:
 		/**
@@ -137,7 +139,7 @@ namespace gml
 		* @throws InvalidDimensionException if row or column is out of bounds
 		*/
 		MatrixBase<T, Rows - 1, Columns - 1> reduce(size_t row, size_t column)
-			const;
+		const;
 
 		/**
 		* @brief Adds a row to another row in this matrix.
@@ -148,7 +150,7 @@ namespace gml
 		void addRows(size_t first, size_t second);
 
 		/**
-		* @brief Adds a muliplied row to another mulitplied row in this matrix.
+		* @brief Adds a multiplied row to another multiplied row in this matrix.
 		*
 		* @param first the row to add the second row
 		* @param firstFactor factor for the first row
@@ -185,9 +187,9 @@ namespace gml
 	* @param matrix the matrix to transpose
 	* @return the transposed matrix
 	*/
-	template <typename T, size_t Rows, size_t Columns>
+	template<typename T, size_t Rows, size_t Columns>
 	MatrixBase<T, Columns, Rows> transpose(
-		const MatrixBase<T, Rows, Columns>& matrix);
+		const MatrixBase<T, Rows, Columns> &matrix);
 
 	/**
 	* @brief Calculates the inverse of a given matrix.
@@ -198,62 +200,61 @@ namespace gml
 	* @return the inverse
 	*
 	* @throws InvalidDimensionException if the matrix is not quadratic
-	* @throws DivideByZeroException if the determinante is zero
+	* @throws DivideByZeroException if the determinant is zero
 	*/
-	template <typename T, size_t Rows>
-	MatrixBase<T, Rows, Rows> inverse(
-		const MatrixBase<T, Rows, Rows>& matrix);
+	template<typename T, size_t Rows>
+	MatrixBase<T, Rows, Rows> inverse(const MatrixBase<T, Rows, Rows> &matrix);
 
 
-	template <typename T, size_t Rows, size_t Columns>
-	std::ostream& operator<<(
-		std::ostream& os,
-		const MatrixBase<T, Rows, Columns>& matrix);
+	template<typename T, size_t Rows, size_t Columns>
+	std::ostream &operator<<(
+		std::ostream &os,
+		const MatrixBase<T, Rows, Columns> &matrix);
 
-	template <typename T, size_t Rows, size_t Columns>
+	template<typename T, size_t Rows, size_t Columns>
 	bool operator==(
-		const MatrixBase<T, Rows, Columns>& left,
-		const MatrixBase<T, Rows, Columns>& right);
+		const MatrixBase<T, Rows, Columns> &left,
+		const MatrixBase<T, Rows, Columns> &right);
 
-	template <typename T, size_t Rows, size_t Columns>
+	template<typename T, size_t Rows, size_t Columns>
 	bool operator!=(
-		const MatrixBase<T, Rows, Columns>& left,
-		const MatrixBase<T, Rows, Columns>& right);
+		const MatrixBase<T, Rows, Columns> &left,
+		const MatrixBase<T, Rows, Columns> &right);
 
-	template <typename T, size_t Rows, size_t Columns>
+	template<typename T, size_t Rows, size_t Columns>
 	MatrixBase<T, Rows, Columns> operator+(
-		const MatrixBase<T, Rows, Columns>& left,
-		const MatrixBase<T, Rows, Columns>& right);
+		const MatrixBase<T, Rows, Columns> &left,
+		const MatrixBase<T, Rows, Columns> &right);
 
-	template <typename T, size_t Rows, size_t Columns>
+	template<typename T, size_t Rows, size_t Columns>
 	MatrixBase<T, Rows, Columns> operator-(
-		const MatrixBase<T, Rows, Columns>& left,
-		const MatrixBase<T, Rows, Columns>& right);
+		const MatrixBase<T, Rows, Columns> &left,
+		const MatrixBase<T, Rows, Columns> &right);
 
-	template <typename T, size_t RowsL, size_t ColumnsR, size_t RowCol>
+	template<typename T, size_t RowsL, size_t ColumnsR, size_t RowCol>
 	MatrixBase<T, RowsL, ColumnsR> operator*(
-		const MatrixBase<T, RowsL, RowCol>& left,
-		const MatrixBase<T, RowCol, ColumnsR>& right);
+		const MatrixBase<T, RowsL, RowCol> &left,
+		const MatrixBase<T, RowCol, ColumnsR> &right);
 
-	template <typename T, size_t Rows, size_t Columns>
+	template<typename T, size_t Rows, size_t Columns>
 	MatrixBase<T, Rows, Columns> operator*(
-		const T & left,
-		const MatrixBase<T, Rows, Columns>& right);
+		const T &left,
+		const MatrixBase<T, Rows, Columns> &right);
 
-	template <typename T, size_t Rows, size_t Columns>
+	template<typename T, size_t Rows, size_t Columns>
 	MatrixBase<T, Rows, Columns> operator*(
-		const MatrixBase<T, Rows, Columns>& left,
-		const T & right);
+		const MatrixBase<T, Rows, Columns> &left,
+		const T &right);
 
-	template <typename T, size_t Rows, size_t Columns>
+	template<typename T, size_t Rows, size_t Columns>
 	VectorBase<T, Rows> operator*(
-		const MatrixBase<T, Rows, Columns>& left,
-		const VectorBase<T, Columns>& right);
+		const MatrixBase<T, Rows, Columns> &left,
+		const VectorBase<T, Columns> &right);
 
-	template <typename T, size_t Rows, size_t Columns>
+	template<typename T, size_t Rows, size_t Columns>
 	MatrixBase<T, Rows, Columns> operator/(
-		const MatrixBase<T, Rows, Columns>& left,
-		const T & right);
+		const MatrixBase<T, Rows, Columns> &left,
+		const T &right);
 }
 
 #include "matrixBase.tpp"

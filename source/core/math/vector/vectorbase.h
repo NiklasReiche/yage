@@ -31,14 +31,14 @@ namespace gml
 		VectorBase();
 
 		/**
-		 * @brief Initializes all fieds with the given value.
+		 * @brief Initializes all fields with the given value.
 		 * 
 		 * @param value the initializing value
 		 */
 		explicit VectorBase(T value);
 
 		/**
-		* @brief Initializes the fields by an initialzer list.
+		* @brief Initializes the fields by an initializer list.
 		*
 		* @param init the initializer list
 		* 
@@ -50,7 +50,7 @@ namespace gml
 		VectorBase(const VectorBase<T, Size>& other);
 
 		template <typename T2>
-		VectorBase(const VectorBase<T2, Size>& other);
+		explicit VectorBase(const VectorBase<T2, Size>& other);
 
 		VectorBase<T, Size>& operator=(const VectorBase<T, Size>& other);
 
@@ -80,6 +80,7 @@ namespace gml
 		 * 
 		 * @return the squared length
 		 */
+		[[nodiscard]]
 		double sqrLength() const;
 
 		/**
@@ -87,6 +88,7 @@ namespace gml
 		 * 
 		 * @return the length
 		 */
+		[[nodiscard]]
 		double length() const;
 
 		/**
@@ -160,18 +162,18 @@ namespace gml
 
 	template <typename T, size_t Size>
 	VectorBase<T, Size> operator*(
-		const double left,
+		double left,
 		const VectorBase<T, Size>& right);
 
 	template <typename T, size_t Size>
 	VectorBase<T, Size> operator*(
 		const VectorBase<T, Size>& left,
-		const double right);
+		double right);
 
 	template <typename T, size_t Size>
 	VectorBase<T, Size> operator/(
 		const VectorBase<T, Size>& left,
-		const double right);
+		double right);
 }
 
 #include "vectorbase.tpp"
