@@ -69,7 +69,7 @@ namespace gml
 	}
 
 	template <typename T>
-	float angle(Vec3<T> left, Vec3<T> right)
+	double angle(Vec3<T> left, Vec3<T> right)
 	{
 		const double lengths = left.length() * right.length();
 		if (lengths == 0.0)

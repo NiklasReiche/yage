@@ -43,7 +43,7 @@ namespace gml
 	}
 
 	template <typename T>
-	float angle(Vec2<T> left, Vec2<T> right)
+	double angle(Vec2<T> left, Vec2<T> right)
 	{
 		return std::acos(dot(normalize(left), normalize(right)));
 	}

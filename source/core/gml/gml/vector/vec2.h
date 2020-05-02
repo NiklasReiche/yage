@@ -44,7 +44,7 @@ namespace gml
 	* @throws DivideByZeroException if one or both vector's lengths is zero
 	*/
 	template <typename T>
-	float angle(Vec2<T> left, Vec2<T> right);
+	double angle(Vec2<T> left, Vec2<T> right);
 }
 
 #include "vec2.tpp"

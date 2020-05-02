@@ -185,7 +185,7 @@ TEST(VectorTest, Angle)
 	Vec3d vec1(1, 0, 0);
 	Vec3d vec2(1, 1, 0);
 
-	double expected = toRad(45);
+	double expected = toRad(45.0);
 	double result = angle(vec1, vec2);
 	EXPECT_DOUBLE_EQ(expected, result);
 	EXPECT_THROW((angle(Vec3d(), Vec3d())), DivideByZeroException);
@@ -195,7 +195,7 @@ TEST(VectorTest, Angle)
 	Vec2d vec3(1, 0);
 	Vec2d vec4(1, 1);
 
-	expected = toRad(45);
+	expected = toRad(45.0);
 	result = angle(vec3, vec4);
 	EXPECT_DOUBLE_EQ(expected, result);
 	EXPECT_THROW((angle(Vec2d(), Vec2d())), DivideByZeroException);
