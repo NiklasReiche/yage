@@ -5,8 +5,7 @@ namespace gml
 	template <typename T, size_t Rows, size_t Columns>
 	MatrixBase<T, Rows - 1, Columns - 1> MatrixBase<T, Rows, Columns>::reduce(
 		const size_t row,
-		const size_t column)
-		const
+		const size_t column) const
 	{
 		if (row > Rows || column > Columns)
 		{
@@ -14,10 +13,10 @@ namespace gml
 		}
 
 		MatrixBase<T, Rows - 1, Columns - 1> result;
-		for (auto i = 0; i < Rows - 1; ++i)
+		for (size_t i = 0; i < Rows - 1; ++i)
 		{
 			const auto rowI = (i < row) ? i : i + 1;
-			for (auto j = 0; j < Columns - 1; ++j)
+			for (size_t j = 0; j < Columns - 1; ++j)
 			{
 				const auto colI = (j < column) ? j : j + 1;
 				result.at(i, j) = this->at(rowI, colI);
@@ -31,7 +30,7 @@ namespace gml
 		const size_t first,
 		const size_t second)
 	{
-		for (auto i = 0; i < Columns; ++i)
+		for (size_t i = 0; i < Columns; ++i)
 		{
 			this->at(second, i) += this->at(first, i);
 		}
@@ -42,7 +41,7 @@ namespace gml
 		const size_t first, const double firstFactor,
 		const size_t second, const double secondFactor)
 	{
-		for (auto i = 0; i < Columns; ++i)
+		for (size_t i = 0; i < Columns; ++i)
 		{
 			this->at(second, i) =
 				at(second, i) * secondFactor + at(first, i) * firstFactor;
@@ -54,7 +53,7 @@ namespace gml
 		const size_t row,
 		const double factor)
 	{
-		for (auto i = 0; i < Columns; ++i)
+		for (size_t i = 0; i < Columns; ++i)
 		{
 			this->at(row, i) *= factor;
 		}
@@ -65,7 +64,7 @@ namespace gml
 		const size_t first,
 		const size_t second)
 	{
-		for (auto i = 0; i < Columns; i++)
+		for (size_t i = 0; i < Columns; i++)
 		{
 			T temp = at(first, i);
 			at(first, i) = at(second, i);
@@ -76,9 +75,9 @@ namespace gml
 	template <typename T, size_t Rows, size_t Columns>
 	MatrixBase<T, Rows, Columns>::MatrixBase()
 	{
-		for (auto i = 0; i < Rows; ++i)
+		for (size_t i = 0; i < Rows; ++i)
 		{
-			for (auto j = 0; j < Columns; ++j)
+			for (size_t j = 0; j < Columns; ++j)
 			{
 				if (i == j)
 				{
@@ -96,7 +95,7 @@ namespace gml
 	MatrixBase<T, Rows, Columns>::MatrixBase(
 		const T& value)
 	{
-		for (auto i = 0; i < Rows; ++i)
+		for (size_t i = 0; i < Rows; ++i)
 		{
 			data.at(i).fill(value);
 		}
@@ -144,12 +143,11 @@ namespace gml
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
-	MatrixBase<T, Rows, Columns>::MatrixBase(
-		const T arr[])
+	MatrixBase<T, Rows, Columns>::MatrixBase(const T arr[])
 	{
-		for (auto i = 0; i < Rows; ++i)
+		for (size_t i = 0; i < Rows; ++i)
 		{
-			for (auto j = 0; j < Columns; ++j)
+			for (size_t j = 0; j < Columns; ++j)
 			{
 				data.at(i).at(j) = arr[i * Columns + j];
 			}
@@ -157,12 +155,11 @@ namespace gml
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
-	MatrixBase<T, Rows, Columns>::MatrixBase(
-		const MatrixBase<T, Rows, Columns>& other)
+	MatrixBase<T, Rows, Columns>::MatrixBase(const MatrixBase<T, Rows, Columns>& other)
 	{
-		for (auto i = 0; i < Rows; ++i)
+		for (size_t i = 0; i < Rows; ++i)
 		{
-			for (auto j = 0; j < Columns; ++j)
+			for (size_t j = 0; j < Columns; ++j)
 			{
 				this->at(i, j) = other.at(i, j);
 			}
@@ -171,12 +168,11 @@ namespace gml
 
 	template <typename T, size_t Rows, size_t Columns>
 	template <typename T2>
-	MatrixBase<T, Rows, Columns>::MatrixBase(
-		const MatrixBase<T2, Rows, Columns>& other)
+	MatrixBase<T, Rows, Columns>::MatrixBase(const MatrixBase<T2, Rows, Columns>& other)
 	{
-		for (auto i = 0; i < Rows; ++i)
+		for (size_t i = 0; i < Rows; ++i)
 		{
-			for (auto j = 0; j < Columns; ++j)
+			for (size_t j = 0; j < Columns; ++j)
 			{
 				this->at(i, j) = other.at(i, j);
 			}
@@ -184,12 +180,11 @@ namespace gml
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
-	MatrixBase<T, Rows, Columns>& MatrixBase<T, Rows, Columns>::operator=(
-		const MatrixBase<T, Rows, Columns>& other)
+	MatrixBase<T, Rows, Columns>& MatrixBase<T, Rows, Columns>::operator=(const MatrixBase<T, Rows, Columns>& other)
 	{
-		for (auto i = 0; i < Rows; ++i)
+		for (size_t i = 0; i < Rows; ++i)
 		{
-			for (auto j = 0; j < Columns; ++j)
+			for (size_t j = 0; j < Columns; ++j)
 			{
 				this->at(i, j) = other.at(i, j);
 			}
@@ -199,12 +194,11 @@ namespace gml
 
 	template <typename T, size_t Rows, size_t Columns>
 	template<typename T2>
-	MatrixBase<T, Rows, Columns>& MatrixBase<T, Rows, Columns>::operator=(
-		const MatrixBase<T2, Rows, Columns>& other)
+	MatrixBase<T, Rows, Columns>& MatrixBase<T, Rows, Columns>::operator=(const MatrixBase<T2, Rows, Columns>& other)
 	{
-		for (auto i = 0; i < Rows; ++i)
+		for (size_t i = 0; i < Rows; ++i)
 		{
-			for (auto j = 0; j < Columns; ++j)
+			for (size_t j = 0; j < Columns; ++j)
 			{
 				this->at(i, j) = other.at(i, j);
 			}
@@ -213,25 +207,19 @@ namespace gml
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
-	T& MatrixBase<T, Rows, Columns>::at(
-		size_t row,
-		size_t column)
+	T& MatrixBase<T, Rows, Columns>::at(size_t row, size_t column)
 	{
 		return data.at(row).at(column);
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
-	const T& MatrixBase<T, Rows, Columns>::at(
-		size_t row,
-		size_t column)
-		const
+	const T& MatrixBase<T, Rows, Columns>::at(size_t row, size_t column) const
 	{
 		return data.at(row).at(column);
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
-	double MatrixBase<T, Rows, Columns>::det()
-		const
+	double MatrixBase<T, Rows, Columns>::det() const
 	{
 		if (Rows == 1 && Columns == 1)
 		{
@@ -239,7 +227,7 @@ namespace gml
 		}
 
 		double det = 0;
-		for (auto i = 0; i < Columns; ++i)
+		for (size_t i = 0; i < Columns; ++i)
 		{
 			det += std::pow(-1, i + 1) * at(1, i) * reduce(1, i).det();
 		}
@@ -247,13 +235,12 @@ namespace gml
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
-	double MatrixBase<T, Rows, Columns>::trace() 
-	const
+	double MatrixBase<T, Rows, Columns>::trace() const
 	{
 		double trace = 0;
-		for(auto i = 0; i < Rows; ++i)
+		for(size_t i = 0; i < Rows; ++i)
 		{
-			for (auto j = 0; j < Columns; ++j)
+			for (size_t j = 0; j < Columns; ++j)
 			{
 				if (i == j)
 				{
@@ -265,12 +252,11 @@ namespace gml
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
-	void MatrixBase<T, Rows, Columns>::convertToArray(T arr[])
-		const
+	void MatrixBase<T, Rows, Columns>::convertToArray(T arr[]) const
 	{
-		for (auto i = 0; i < Rows; ++i)
+		for (size_t i = 0; i < Rows; ++i)
 		{
-			for (auto j = 0; j < Columns; ++j)
+			for (size_t j = 0; j < Columns; ++j)
 			{
 				arr[i * Columns + j] = this->at(i, j);
 			}
@@ -278,12 +264,11 @@ namespace gml
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
-	MatrixBase<T, Rows, Columns>& MatrixBase<T, Rows, Columns>::operator+=(
-		const MatrixBase<T, Rows, Columns>& right)
+	MatrixBase<T, Rows, Columns>& MatrixBase<T, Rows, Columns>::operator+=(const MatrixBase<T, Rows, Columns>& right)
 	{
-		for (auto i = 0; i < Rows; ++i)
+		for (size_t i = 0; i < Rows; ++i)
 		{
-			for (auto j = 0; j < Columns; ++j)
+			for (size_t j = 0; j < Columns; ++j)
 			{
 				this->at(i, j) += right.at(i, j);
 			}
@@ -292,12 +277,11 @@ namespace gml
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
-	MatrixBase<T, Rows, Columns>& MatrixBase<T, Rows, Columns>::operator-=(
-		const MatrixBase<T, Rows, Columns>& right)
+	MatrixBase<T, Rows, Columns>& MatrixBase<T, Rows, Columns>::operator-=(const MatrixBase<T, Rows, Columns>& right)
 	{
-		for (auto i = 0; i < Rows; ++i)
+		for (size_t i = 0; i < Rows; ++i)
 		{
-			for (auto j = 0; j < Columns; ++j)
+			for (size_t j = 0; j < Columns; ++j)
 			{
 				this->at(i, j) -= right.at(i, j);
 			}
@@ -306,12 +290,11 @@ namespace gml
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
-	MatrixBase<T, Rows, Columns>& MatrixBase<T, Rows, Columns>::operator*=(
-		const T& right)
+	MatrixBase<T, Rows, Columns>& MatrixBase<T, Rows, Columns>::operator*=(const T& right)
 	{
-		for (auto i = 0; i < Rows; ++i)
+		for (size_t i = 0; i < Rows; ++i)
 		{
-			for (auto j = 0; j < Columns; ++j)
+			for (size_t j = 0; j < Columns; ++j)
 			{
 				this->at(i, j) *= right;
 			}
@@ -320,17 +303,16 @@ namespace gml
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
-	MatrixBase<T, Rows, Columns>& MatrixBase<T, Rows, Columns>::operator/=(
-		const T& right)
+	MatrixBase<T, Rows, Columns>& MatrixBase<T, Rows, Columns>::operator/=(const T& right)
 	{
 		if (right == 0)
 		{
 			throw DivideByZeroException();
 		}
 
-		for (auto i = 0; i < Rows; ++i)
+		for (size_t i = 0; i < Rows; ++i)
 		{
-			for (auto j = 0; j < Columns; ++j)
+			for (size_t j = 0; j < Columns; ++j)
 			{
 				this->at(i, j) /= right;
 			}
@@ -339,13 +321,12 @@ namespace gml
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
-	MatrixBase<T, Columns, Rows> transpose(
-		const MatrixBase<T, Rows, Columns>& matrix)
+	MatrixBase<T, Columns, Rows> transpose(const MatrixBase<T, Rows, Columns>& matrix)
 	{
 		MatrixBase<T, Columns, Rows> result;
-		for (auto i = 0; i < Rows; ++i)
+		for (size_t i = 0; i < Rows; ++i)
 		{
-			for (auto j = 0; j < Columns; ++j)
+			for (size_t j = 0; j < Columns; ++j)
 			{
 				result.at(j, i) = matrix.at(i, j);
 			}
@@ -354,8 +335,7 @@ namespace gml
 	}
 
 	template <typename T, size_t Rows>
-	MatrixBase<T, Rows, Rows> inverse(
-		const MatrixBase<T, Rows, Rows>& matrix)
+	MatrixBase<T, Rows, Rows> inverse(const MatrixBase<T, Rows, Rows>& matrix)
 	{
 		if (matrix.det() == 0)
 		{
@@ -368,7 +348,7 @@ namespace gml
 		// Zeilen vertauschen falls erster Eintrag 0 ist
 		if (mat.at(0, 0) == 0)
 		{
-			for (auto i = 0; i < Rows; ++i)
+			for (size_t i = 0; i < Rows; ++i)
 			{
 				if (mat.at(i, 0) != 0)
 				{
@@ -380,7 +360,7 @@ namespace gml
 		}
 
 		// Diagonale auf 1 und Werte unterhalb auf 0 bringen
-		for (auto i = 0; i < Rows; ++i)
+		for (size_t i = 0; i < Rows; ++i)
 		{
 			// Wert der Diagonalen auf 1 bringen
 			T value = mat.at(i, i);
@@ -388,7 +368,7 @@ namespace gml
 			inverse.multRow(i, 1 / value);
 
 			// Werte unterhalb der Diagonalen auf 0 bringen
-			for (auto j = i + 1; j < Rows; ++j)
+			for (size_t j = i + 1; j < Rows; ++j)
 			{
 				T firstFactor = -mat.at(j, i);
 				T secondFactor = mat.at(i, i);
@@ -398,7 +378,7 @@ namespace gml
 			}
 		}
 		// Werte oberhalb der Diagonalen auf 1 bringen
-		for (auto i = Rows - 1; i > 0; --i)
+		for (size_t i = Rows - 1; i > 0; --i)
 		{
 			for (int j = i - 1; j >= 0; --j)
 			{
@@ -413,13 +393,11 @@ namespace gml
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
-	std::ostream& operator<<(
-		std::ostream& os,
-		const MatrixBase<T, Rows, Columns>& matrix)
+	std::ostream& operator<<(std::ostream& os, const MatrixBase<T, Rows, Columns>& matrix)
 	{
-		for (auto i = 0; i < Rows; ++i)
+		for (size_t i = 0; i < Rows; ++i)
 		{
-			for (auto j = 0; j < Columns; ++j)
+			for (size_t j = 0; j < Columns; ++j)
 			{
 				os << matrix.at(i, j) << " ";
 			}
@@ -429,13 +407,11 @@ namespace gml
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
-	bool operator==(
-		const MatrixBase<T, Rows, Columns>& left,
-		const MatrixBase<T, Rows, Columns>& right)
+	bool operator==(const MatrixBase<T, Rows, Columns>& left, const MatrixBase<T, Rows, Columns>& right)
 	{
-		for (auto i = 0; i < Rows; ++i)
+		for (size_t i = 0; i < Rows; ++i)
 		{
-			for (auto j = 0; j < Columns; ++j)
+			for (size_t j = 0; j < Columns; ++j)
 			{
 				if (left.at(i, j) != right.at(i, j))
 					return false;
@@ -445,9 +421,7 @@ namespace gml
 	}
 
 	template <typename T, size_t Rows, size_t Columns>
-	bool operator!=(
-		const MatrixBase<T, Rows, Columns>& left,
-		const MatrixBase<T, Rows, Columns>& right)
+	bool operator!=(const MatrixBase<T, Rows, Columns>& left, const MatrixBase<T, Rows, Columns>& right)
 	{
 		return !(left == right);
 	}
@@ -474,12 +448,12 @@ namespace gml
 		const MatrixBase<T, RowCol, ColumnsR>& right)
 	{
 		MatrixBase<T, RowsL, ColumnsR> result;
-		for (auto i = 0; i < RowsL; ++i)
+		for (size_t i = 0; i < RowsL; ++i)
 		{
-			for (auto j = 0; j < ColumnsR; ++j)
+			for (size_t j = 0; j < ColumnsR; ++j)
 			{
 				T value = 0;
-				for (auto k = 0; k < RowCol; ++k)
+				for (size_t k = 0; k < RowCol; ++k)
 				{
 					value += left.at(i, k) * right.at(k, j);
 				}
@@ -511,9 +485,9 @@ namespace gml
 		const VectorBase<T, Columns>& right)
 	{
 		VectorBase<T, Rows> result;
-		for (auto i = 0; i < Rows; ++i)
+		for (size_t i = 0; i < Rows; ++i)
 		{
-			for (auto j = 0; j < Columns; ++j)
+			for (size_t j = 0; j < Columns; ++j)
 			{
 				result.at(i) += left.at(i, j) * right.at(j);
 			}

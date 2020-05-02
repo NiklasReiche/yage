@@ -26,7 +26,7 @@ static void EXPECT_QUAT(Quaternion<T> expected, Quaternion<T> result)
 template<typename T, size_t size>
 static void EXPECT_VEC(Vector<T, size> expected, VectorBase<T, size> result)
 {
-	for (auto i = 0; i < size; ++i)
+	for (size_t i = 0; i < size; ++i)
 	{
 		EXPECT_NEAR(expected.at(i), result.at(i), 0.0001);
 	}
@@ -86,7 +86,7 @@ TEST(QuaternionTest, Conversion)
 		gml::Quatd quat = gml::Quatd::axisAngle(gml::Vec3d(0.0, 0.0, 1.0), i);
 		gml::Mat4d mat = gml::Mat4d::axisAngle(gml::Vec3d(0.0, 0.0, 1.0), i);
 
-		gml::Quatd quat2 = mat.getRotation().toQuaternion();
+		//gml::Quatd quat2 = mat.getRotation().toQuaternion();
 
 		gml::Vec4d vec = mat * gml::Vec4d(0, 1, 0, 0);
 		EXPECT_VEC(Vec3d(vec.x, vec.y, vec.z), quat.getUp());

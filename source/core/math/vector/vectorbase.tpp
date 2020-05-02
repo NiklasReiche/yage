@@ -27,7 +27,7 @@ namespace gml
 	template <typename T, size_t Size>
 	VectorBase<T, Size>::VectorBase(const VectorBase<T, Size>& other)
 	{
-		for (auto i = 0; i < Size; ++i)
+		for (size_t i = 0; i < Size; ++i)
 		{
 			this->at(i) = other.at(i);
 		}
@@ -37,7 +37,7 @@ namespace gml
 	template <typename T2>
 	VectorBase<T, Size>::VectorBase(const VectorBase<T2, Size>& other)
 	{
-		for (auto i = 0; i < Size; ++i)
+		for (size_t i = 0; i < Size; ++i)
 		{
 			this->at(i) = other.at(i);
 		}
@@ -46,7 +46,7 @@ namespace gml
 	template <typename T, size_t Size>
 	VectorBase<T, Size>& VectorBase<T, Size>::operator=(const VectorBase<T, Size>& other)
 	{
-		for (auto i = 0; i < Size; ++i)
+		for (size_t i = 0; i < Size; ++i)
 		{
 			this->at(i) = other.at(i);
 		}
@@ -57,7 +57,7 @@ namespace gml
 	template <typename T2>
 	VectorBase<T, Size>& VectorBase<T, Size>::operator=(const VectorBase<T2, Size>& other)
 	{
-		for (auto i = 0; i < Size; ++i)
+		for (size_t i = 0; i < Size; ++i)
 		{
 			this->at(i) = other.at(i);
 		}
@@ -103,7 +103,7 @@ namespace gml
 	VectorBase<T, Size> VectorBase<T, Size>::operator-() const
 	{
 		VectorBase<T, Size> result;
-		for (auto i = 0; i < Size; ++i)
+		for (size_t i = 0; i < Size; ++i)
 		{
 			result.at(i) = -this->at(i);
 		}
@@ -111,10 +111,9 @@ namespace gml
 	}
 
 	template <typename T, size_t Size>
-	VectorBase<T, Size>& VectorBase<T, Size>::operator+=(
-		const VectorBase<T, Size>& right)
+	VectorBase<T, Size>& VectorBase<T, Size>::operator+=(const VectorBase<T, Size>& right)
 	{
-		for (auto i = 0; i < Size; ++i)
+		for (size_t i = 0; i < Size; ++i)
 		{
 			this->at(i) += right.at(i);
 		}
@@ -122,10 +121,9 @@ namespace gml
 	}
 
 	template <typename T, size_t Size>
-	VectorBase<T, Size>& VectorBase<T, Size>::operator-=(
-		const VectorBase<T, Size>& right)
+	VectorBase<T, Size>& VectorBase<T, Size>::operator-=(const VectorBase<T, Size>& right)
 	{
-		for (auto i = 0; i < Size; ++i)
+		for (size_t i = 0; i < Size; ++i)
 		{
 			this->at(i) -= right.at(i);
 		}
@@ -134,10 +132,9 @@ namespace gml
 
 	template <typename T, size_t Size>
 	template <typename T2>
-	VectorBase<T, Size>& VectorBase<T, Size>::operator*=(
-		const T2& right)
+	VectorBase<T, Size>& VectorBase<T, Size>::operator*=(const T2& right)
 	{
-		for (auto i = 0; i < Size; ++i)
+		for (size_t i = 0; i < Size; ++i)
 		{
 			this->at(i) *= right;
 		}
@@ -146,15 +143,14 @@ namespace gml
 
 	template <typename T, size_t Size>
 	template <typename T2>
-	VectorBase<T, Size>& VectorBase<T, Size>::operator/=(
-		const T2& right)
+	VectorBase<T, Size>& VectorBase<T, Size>::operator/=(const T2& right)
 	{
 		if (right == 0)
 		{
 			throw DivideByZeroException();
 		}
 
-		for (auto i = 0; i < Size; ++i)
+		for (size_t i = 0; i < Size; ++i)
 		{
 			this->at(i) /= right;
 		}
@@ -162,11 +158,9 @@ namespace gml
 	}
 
 	template <typename T, size_t Size>
-	std::ostream& operator<<(
-		std::ostream& os,
-		const VectorBase<T, Size>& vec)
+	std::ostream& operator<<(std::ostream& os, const VectorBase<T, Size>& vec)
 	{
-		for (auto i = 0; i < Size; ++i)
+		for (size_t i = 0; i < Size; ++i)
 		{
 			os << vec.at(i) << " ";
 		}
@@ -174,11 +168,9 @@ namespace gml
 	}
 
 	template <typename T, size_t Size>
-	bool operator==(
-		const VectorBase<T, Size>& left,
-		const VectorBase<T, Size>& right)
+	bool operator==(const VectorBase<T, Size>& left, const VectorBase<T, Size>& right)
 	{
-		for (auto i = 0; i < Size; ++i)
+		for (size_t i = 0; i < Size; ++i)
 		{
 			if (left.at(i) != right.at(i))
 				return false;
@@ -187,60 +179,46 @@ namespace gml
 	}
 
 	template <typename T, size_t Size>
-	bool operator!=(
-		const VectorBase<T, Size>& left,
-		const VectorBase<T, Size>& right)
+	bool operator!=(const VectorBase<T, Size>& left, const VectorBase<T, Size>& right)
 	{
 		return !(left == right);
 	}
 
 	template <typename T, size_t Size>
-	VectorBase<T, Size> operator+(
-		const VectorBase<T, Size>& left,
-		const VectorBase<T, Size>& right)
+	VectorBase<T, Size> operator+(const VectorBase<T, Size>& left, const VectorBase<T, Size>& right)
 	{
 		return VectorBase<T, Size>(left) += right;
 	}
 
 	template <typename T, size_t Size>
-	VectorBase<T, Size> operator-(
-		const VectorBase<T, Size>& left,
-		const VectorBase<T, Size>& right)
+	VectorBase<T, Size> operator-(const VectorBase<T, Size>& left, const VectorBase<T, Size>& right)
 	{
 		return VectorBase<T, Size>(left) -= right;
 	}
 
 	template <typename T, size_t Size>
-	VectorBase<T, Size> operator*(
-		const double left,
-		const VectorBase<T, Size>& right)
+	VectorBase<T, Size> operator*(const double left, const VectorBase<T, Size>& right)
 	{
 		return VectorBase<T, Size>(right) *= left;
 	}
 
 	template <typename T, size_t Size>
-	VectorBase<T, Size> operator*(
-		const VectorBase<T, Size>& left,
-		const double right)
+	VectorBase<T, Size> operator*(const VectorBase<T, Size>& left, const double right)
 	{
 		return VectorBase<T, Size>(left) *= right;
 	}
 
 	template <typename T, size_t Size>
-	VectorBase<T, Size> operator/(
-		const VectorBase<T, Size>& left,
-		const double right)
+	VectorBase<T, Size> operator/(const VectorBase<T, Size>& left, const double right)
 	{
 		return VectorBase<T, Size>(left) /= right;
 	}
 
 	template <typename T, size_t Size>
-	T dot(
-		const VectorBase<T, Size>& left,
-		const VectorBase<T, Size>& right)
+	T dot(const VectorBase<T, Size>& left, const VectorBase<T, Size>& right)
 	{
 		T result = 0;
-		for (auto i = 0; i < Size; ++i)
+		for (size_t i = 0; i < Size; ++i)
 		{
 			result += left.at(i) * right.at(i);
 		}
@@ -248,8 +226,7 @@ namespace gml
 	}
 
 	template <typename T, size_t Size>
-	VectorBase<T, Size> normalize(
-		const VectorBase<T, Size>& vector)
+	VectorBase<T, Size> normalize(const VectorBase<T, Size>& vector)
 	{
 		const double length = vector.length();
 		if (length == 0)
