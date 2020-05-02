@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <math/matrix.h>
+#include <gml/matrix.h>
 
 using namespace gml;
 

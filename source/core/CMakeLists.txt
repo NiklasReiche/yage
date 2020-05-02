@@ -2,6 +2,8 @@
 # source/core				                                      #
 ###################################################################
 
+add_subdirectory(gml)
+
 include(${YAGE_CMAKE_PATH}/sources-core.cmake)
 
 set(YAGE_CORE_COMMON_SOURCE
@@ -19,10 +21,6 @@ set(YAGE_CORE_DESKTOP_SOURCE
 	${YAGE_GRAPHICS_GL3_SOURCE}
 	)
 
-add_library(YAGEmath STATIC ${YAGE_MATH_SOURCE})
-target_include_directories(YAGEmath PUBLIC ${YAGE_CORE_PATH}/math)
-SET_TARGET_PROPERTIES(YAGEmath PROPERTIES LINKER_LANGUAGE CXX)
-
 if (ANDROID)
 	add_library(YAGEcore STATIC ${YAGE_CORE_COMMON_SOURCE} ${YAGE_CORE_ANDROID_SOURCE})
 
@@ -31,7 +29,7 @@ if (ANDROID)
 		libGLESv2.so
 		libandroid.so
 		liblog.so
-		YAGEmath
+		yageMath
 		)
 
 	target_include_directories(YAGEcore PUBLIC ${YAGE_CORE_PATH}
@@ -45,7 +43,7 @@ elseif (WIN32)
 
 	target_link_libraries(YAGEcore
 		PUBLIC opengl32.lib
-		PUBLIC YAGEmath
+		PUBLIC yageMath
 		PUBLIC glfw
 		PUBLIC glad
 		PUBLIC tfd)
@@ -60,7 +58,7 @@ elseif (UNIX)
 
 	target_link_libraries(YAGEcore
 		PUBLIC libGL.so
-		PUBLIC YAGEmath
+		PUBLIC yageMath
 		PUBLIC glfw
 		PUBLIC glad
 		PUBLIC tfd)

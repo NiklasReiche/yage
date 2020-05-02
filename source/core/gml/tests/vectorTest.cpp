@@ -1,19 +1,12 @@
 #include <gtest/gtest.h>
 
-#include <math/maths.h>
-#include <math/vector.h>
+#include <gml/maths.h>
+#include <gml/vector.h>
 
 using namespace gml;
 
 class VectorTest : public testing::Test
-{
-protected:
-	virtual void SetUp() {
-	}
-
-	virtual void TearDown() {
-	}
-};
+{};
 
 TEST(VectorTest, Construct)
 {

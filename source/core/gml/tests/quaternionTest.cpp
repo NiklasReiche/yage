@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <math/quaternion.h>
-#include "math/maths.h"
+#include <gml/quaternion.h>
 
 using namespace gml;
 

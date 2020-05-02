@@ -1,22 +1,6 @@
+message(STATUS "Configuring tests...")
 
 enable_testing()
 
-add_executable( allTest 
-	main.cpp
-	core-math/vectorTest.cpp 
-	core-math/matrixTest.cpp
-	core-math/quaterniontest.cpp
-	core-graphics/contextTest.cpp
-	core-graphics/textureTest.cpp
-)
-
-target_link_libraries( allTest
-		PUBLIC YAGEcore
-		PUBLIC gtest
-		PUBLIC gmock
-)
-
-add_test(
-	NAME coreTest
-	COMMAND allTest --gtest_catch_exceptions=0
-	WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+message(STATUS " Configuring coreGraphicsTest...")
+add_subdirectory(core-graphics)

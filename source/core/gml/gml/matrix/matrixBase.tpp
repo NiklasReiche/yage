@@ -378,9 +378,9 @@ namespace gml
 			}
 		}
 		// Werte oberhalb der Diagonalen auf 1 bringen
-		for (size_t i = Rows - 1; i > 0; --i)
+		for (size_t i = Rows; i-- > 1; ) // prevent unsigned overflow
 		{
-			for (size_t j = i - 1; j >= 0; --j)
+			for (size_t j = i; j-- > 0; ) // prevent unsigned overflow
 			{
 				T firstFactor = -mat.at(j, i);
 				T secondFactor = 1;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "math/vector.h"
+#include <gml/vector.h>
 
 namespace gl
 {
