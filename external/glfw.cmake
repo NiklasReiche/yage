@@ -16,3 +16,9 @@ endif()
 
 add_subdirectory(${YAGE_EXTERNAL_PATH}/glfw)
 #target_include_directories(glfw PUBLIC $<BUILD_INTERFACE:${YAGE_EXTERNAL_PATH}/glfw/include>)
+target_compile_options(glfw
+	PRIVATE
+	$<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
+	-w>
+	$<$<CXX_COMPILER_ID:MSVC>:
+	>)
