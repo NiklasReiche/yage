@@ -32,19 +32,6 @@ namespace gml
 
 		Vec2<T>& operator=(const VectorBase<T, 2> & other);
 	};
-
-	/**
-	* @brief Calculates the angle bewtween two 2-dimensional vectors.
-	*
-	* @tparam T the type
-	* @param left the first vector
-	* @param right the second vector
-	* @return the angle in radians
-	*
-	* @throws DivideByZeroException if one or both vector's lengths is zero
-	*/
-	template <typename T>
-	double angle(Vec2<T> left, Vec2<T> right);
 }
 
 #include "vec2.tpp"

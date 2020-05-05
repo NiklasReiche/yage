@@ -50,19 +50,6 @@ namespace gml
 	*/
 	template <typename T>
 	Vec3<T> cross(Vec3<T> left, Vec3<T> right);
-
-	/**
-	* @brief Calculates the angle bewtween two 3-dimensional vectors.
-	*
-	* @tparam T the type
-	* @param left the first vector
-	* @param right the second vector
-	* @return the angle in radians
-	*
-	* @throws DivideByZeroException if one or both vector's lengths is zero
-	*/
-	template <typename T>
-	double angle(Vec3<T> left, Vec3<T> right);
 }
 
 #include "vec3.tpp"

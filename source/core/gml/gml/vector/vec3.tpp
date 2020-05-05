@@ -67,15 +67,4 @@ namespace gml
 		result.z = left.x * right.y - left.y * right.x;
 		return result;
 	}
-
-	template <typename T>
-	double angle(Vec3<T> left, Vec3<T> right)
-	{
-		const double lengths = left.length() * right.length();
-		if (lengths == 0.0)
-		{
-			throw DivideByZeroException();
-		}
-		return std::acos(dot(left, right) / lengths);
-	}
 }

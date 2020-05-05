@@ -4,7 +4,7 @@ namespace gml
 {
 	template <typename T, size_t Size>
 	VectorBase<T, Size>::VectorBase()
-		: data{0}
+		: data{}
 	{
 	}
 
@@ -25,15 +25,6 @@ namespace gml
 	}
 
 	template <typename T, size_t Size>
-	VectorBase<T, Size>::VectorBase(const VectorBase<T, Size>& other)
-	{
-		for (size_t i = 0; i < Size; ++i)
-		{
-			this->at(i) = other.at(i);
-		}
-	}
-
-	template <typename T, size_t Size>
 	template <typename T2>
 	VectorBase<T, Size>::VectorBase(const VectorBase<T2, Size>& other)
 	{
@@ -41,16 +32,6 @@ namespace gml
 		{
 			this->at(i) = other.at(i);
 		}
-	}
-
-	template <typename T, size_t Size>
-	VectorBase<T, Size>& VectorBase<T, Size>::operator=(const VectorBase<T, Size>& other)
-	{
-		for (size_t i = 0; i < Size; ++i)
-		{
-			this->at(i) = other.at(i);
-		}
-		return *this;
 	}
 
 	template <typename T, size_t Size>
@@ -157,6 +138,34 @@ namespace gml
 		return *this;
 	}
 
+	template<typename T, size_t Size>
+	VectorBase <T, Size> normalize(VectorBase <T, Size> vector)
+	{
+		return vector.normalize();
+	}
+
+	template<typename T, size_t Size>
+	T dot(const VectorBase <T, Size> &left, const VectorBase <T, Size> &right)
+	{
+		T result = 0;
+		for (size_t i = 0; i < Size; ++i)
+		{
+			result += left.at(i) * right.at(i);
+		}
+		return result;
+	}
+
+	template<typename T, size_t Size>
+	double angle(const VectorBase <T, Size> &left, const VectorBase <T, Size> &right)
+	{
+		const double lengths = left.length() * right.length();
+		if (lengths == 0.0)
+		{
+			throw DivideByZeroException();
+		}
+		return std::acos(dot(left, right) / lengths);
+	}
+
 	template <typename T, size_t Size>
 	std::ostream& operator<<(std::ostream& os, const VectorBase<T, Size>& vec)
 	{
@@ -212,27 +221,5 @@ namespace gml
 	VectorBase<T, Size> operator/(const VectorBase<T, Size>& left, const double right)
 	{
 		return VectorBase<T, Size>(left) /= right;
-	}
-
-	template <typename T, size_t Size>
-	T dot(const VectorBase<T, Size>& left, const VectorBase<T, Size>& right)
-	{
-		T result = 0;
-		for (size_t i = 0; i < Size; ++i)
-		{
-			result += left.at(i) * right.at(i);
-		}
-		return result;
-	}
-
-	template <typename T, size_t Size>
-	VectorBase<T, Size> normalize(const VectorBase<T, Size>& vector)
-	{
-		const double length = vector.length();
-		if (length == 0)
-		{
-			throw DivideByZeroException();
-		}
-		return vector * static_cast<T>(1 / length);
 	}
 }
