@@ -5,11 +5,13 @@
 namespace gml
 {
 	/**
-	* @brief Represents a 3-dimensional generic vector.
-	* This class adds special members x, y, z for conveniance.
-	*
-	* @tparam T the type
-	*/
+	 * @brief Represents a specialized 3-dimensional vector.
+	 *
+	 * This subclass adds special members x, y, z for convenience.
+	 * Vec3<T> and VectorBase<T, 3> can be used interchangeably.
+	 *
+	 * @tparam T The type of the vector's components.
+	 */
 	template<typename T>
 	class Vec3 : public VectorBase<T, 3>
 	{
@@ -18,20 +20,15 @@ namespace gml
 		T & y = this->at(1);
 		T & z = this->at(2);
 
-		/** Inherit Constructors from VectorBase */
 		using VectorBase<T, 3>::VectorBase;
-
-		Vec3();
 
 		Vec3(T x, T y, T z);
 
 		Vec3(const Vec3<T> & other);
 
-		Vec3(const VectorBase<T, 3> & other);
+		Vec3(const VectorBase<T, 3>& other);
 
-		Vec3<T>& operator=(const Vec3<T> & other);
-
-		Vec3<T>& operator=(const VectorBase<T, 3> & other);
+		Vec3<T> &operator=(const Vec3<T> &other);
 
 		static Vec3<T> worldForward();
 

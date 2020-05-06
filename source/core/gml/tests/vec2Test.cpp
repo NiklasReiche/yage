@@ -77,12 +77,17 @@ TEST(Vec2Test, Constructor_ConversionBase)
 
 TEST(Vec2Test, Assignment_Copy)
 {
-	Vec2<double> vec;
+	Vec2<int> initial(2, 6);
+	Vec2<int> vec;
 
-	vec = Vec2<double>(2.0f, 6.0f);
+	vec = initial;
+	initial.x = 3;
+	initial.y = 9;
 
-	EXPECT_EQ(2.0f, vec.x);
-	EXPECT_EQ(6.0f, vec.y);
+	EXPECT_EQ(2, vec.x);
+	EXPECT_EQ(6, vec.y);
+	EXPECT_EQ(3, initial.x);
+	EXPECT_EQ(9, initial.y);
 }
 
 TEST(Vec2Test, Assignment_Conversion)
@@ -99,17 +104,8 @@ TEST(Vec2Test, Assignment_ConversionBase)
 {
 	Vec2<double> vec;
 
-	vec = Vector<float, 2>{ 2.0f, 6.0f };
+	vec = Vector<double, 2>{ 2.0, 6.0 };
 
 	EXPECT_EQ(2.0f, vec.x);
 	EXPECT_EQ(6.0f, vec.y);
-}
-
-
-TEST(Vec2Test, Equality)
-{
-	ASSERT_TRUE(Vec2i({ 3, 2 }) == Vec2i({ 3, 2 }));
-	ASSERT_FALSE(Vec2i({ 3, 1 }) == Vec2i({ 3, 2 }));
-	ASSERT_TRUE(Vec2i({ 3, 1 }) != Vec2i({ 3, 2 }));
-	ASSERT_FALSE(Vec2i({ 3, 2 }) != Vec2i({ 3, 2 }));
 }

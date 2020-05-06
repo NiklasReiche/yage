@@ -1,42 +1,37 @@
 #pragma once
 
+#include "vec3.h"
+
 namespace gml
 {
-	template <typename T>
-	Vec3<T>::Vec3()
-		: VectorBase<T, 3>()
-	{
-	}
-
 	template <typename T>
 	Vec3<T>::Vec3(T x, T y, T z)
 		: VectorBase<T, 3>({ x, y, z })
 	{
 	}
 
+	// We need to define the copy constructor so the x,y,z references do not get copied
 	template <typename T>
 	Vec3<T>::Vec3(const Vec3<T>& other)
 		: VectorBase<T, 3>(other)
 	{
 	}
 
-	template <typename T>
-	Vec3<T>::Vec3(const VectorBase<T, 3>& other)
+	// Makes Vec3<T> and VectorBase<T, 3> interchangeable
+	template<typename T>
+	Vec3<T>::Vec3(const VectorBase<T, 3> &other)
 		: VectorBase<T, 3>(other)
 	{
 	}
 
+	// We need to define the copy assignment operator so the x,y,z references do not get copied
 	template <typename T>
 	Vec3<T>& Vec3<T>::operator=(const Vec3<T>& other)
 	{
-		VectorBase<T, 3>::operator=(other);
-		return *this;
-	}
-
-	template <typename T>
-	Vec3<T>& Vec3<T>::operator=(const VectorBase<T, 3>& other)
-	{
-		VectorBase<T, 3>::operator=(other);
+		if (this != &other)
+		{
+			VectorBase<T, 3>::operator=(other);
+		}
 		return *this;
 	}
 
