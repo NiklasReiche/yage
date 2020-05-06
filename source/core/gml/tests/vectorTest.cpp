@@ -15,7 +15,7 @@ public:
 		double imaginary;
 
 		ComplexD()
-		: real(0), imaginary(0)
+			: real(0), imaginary(0)
 		{}
 
 		ComplexD(double a, double b)
@@ -32,11 +32,13 @@ public:
 		ComplexF()
 			: real(0), imaginary(0)
 		{}
-		ComplexF(const ComplexD& other)
-		: real(static_cast<float>(other.real)),
-		imaginary(static_cast<float>(other.imaginary))
+
+		ComplexF(const ComplexD &other)
+			: real(static_cast<float>(other.real)),
+			  imaginary(static_cast<float>(other.imaginary))
 		{}
-		ComplexF& operator=(ComplexD& other)
+
+		ComplexF &operator=(ComplexD &other)
 		{
 			this->real = static_cast<float>(other.real);
 			this->imaginary = static_cast<float>(other.imaginary);
@@ -178,6 +180,14 @@ TEST(VectorTest, Assignment_Conversion_WithClasses)
 }
 
 
+TEST(VectorTest, Equality)
+{
+	ASSERT_TRUE(Vec3i({ 3, 2, 4 }) == Vec3i({ 3, 2, 4 }));
+	ASSERT_FALSE(Vec3i({ 3, 1, 4 }) == Vec3i({ 3, 2, 4 }));
+	ASSERT_TRUE(Vec3i({ 3, 1, 4 }) != Vec3i({ 3, 2, 4 }));
+	ASSERT_FALSE(Vec3i({ 3, 2, 4 }) != Vec3i({ 3, 2, 4 }));
+}
+
 TEST(VectorTest, Add)
 {
 	const Vec3i vec1(2, 1, 3);
@@ -257,6 +267,7 @@ TEST(VectorTest, Divide)
 	EXPECT_THROW((result = result / 0.0), DivideByZeroException);
 }
 
+
 TEST(VectorTest, Dot)
 {
 	const Vec3d vec1(2, 1, 3);
@@ -265,14 +276,6 @@ TEST(VectorTest, Dot)
 	double result = dot(vec1, vec2);
 
 	EXPECT_EQ(-1, result);
-}
-
-TEST(VectorTest, Equality)
-{
-	ASSERT_TRUE(Vec3i({3, 2, 4}) == Vec3i({ 3, 2, 4 }));
-	ASSERT_FALSE(Vec3i({ 3, 1, 4 }) == Vec3i({ 3, 2, 4 }));
-	ASSERT_TRUE(Vec3i({ 3, 1, 4 }) != Vec3i({ 3, 2, 4 }));
-	ASSERT_FALSE(Vec3i({ 3, 2, 4 }) != Vec3i({ 3, 2, 4 }));
 }
 
 TEST(VectorTest, Normalize)
@@ -335,3 +338,5 @@ TEST(VectorTest, Angle)
 	EXPECT_THROW((angle(vec3, Vec2d())), DivideByZeroException);
 	EXPECT_THROW((angle(Vec2d(), vec4)), DivideByZeroException);
 }
+
+
