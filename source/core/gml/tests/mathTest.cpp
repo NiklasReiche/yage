@@ -1,50 +1,70 @@
-#include <gtest/gtest.h>
+#include <catch2/catch.h>
 
 #include <gml/maths.h>
 #include <gml/interpolation.h>
 
-class MathTest : public testing::Test
+using namespace gml;
+
+TEST_CASE("RadDegConversion")
 {
-};
+	double pi_d = gml::PI;
+	auto pi_f = static_cast<float>(gml::PI);
 
-TEST(MathTest, RadDegConversion)
-{
-	// double implementation
-	ASSERT_DOUBLE_EQ(gml::toDeg(0.0), 0.0);
-	ASSERT_DOUBLE_EQ(gml::toRad(0.0), 0.0);
+	SECTION("toRad") {
+		SECTION("zero") {
+			CHECK(toRad(0.0) == 0.0);
 
-	ASSERT_DOUBLE_EQ(gml::toDeg(gml::PI), 180.0);
-	ASSERT_DOUBLE_EQ(gml::toDeg(2 * gml::PI), 360.0);
-	ASSERT_DOUBLE_EQ(gml::toDeg(3 * gml::PI), 540.0);
-	ASSERT_DOUBLE_EQ(gml::toRad(180.0), gml::PI);
-	ASSERT_DOUBLE_EQ(gml::toRad(360.0), 2* gml::PI);
-	ASSERT_DOUBLE_EQ(gml::toRad(540.0), 3 * gml::PI);
+			CHECK(toRad(0.0f) == 0.0f);
+		}
+		
+		SECTION("PI") {
+			CHECK(toRad(180.0) == Approx(pi_d));
+			CHECK(toRad(360.0) == Approx(2 * pi_d));
+			CHECK(toRad(540.0) == Approx(3 * pi_d));
 
-	ASSERT_DOUBLE_EQ(gml::toDeg(-gml::PI), -180.0);
-	ASSERT_DOUBLE_EQ(gml::toRad(-180.0), -gml::PI);
+			CHECK(toRad(180.0f) == Approx(pi_f));
+			CHECK(toRad(360.0f) == Approx(2 * pi_f));
+			CHECK(toRad(540.0f) == Approx(3 * pi_f));
+		}
+		
+		SECTION("negative") {
+			CHECK(toRad(-180.0) == Approx(-pi_d));
 
-	// float implementation
-	const float pi_f = static_cast<float>(gml::PI);
-	ASSERT_FLOAT_EQ(gml::toDeg(0.0f), 0.0f);
-	ASSERT_FLOAT_EQ(gml::toRad(0.0f), 0.0f);
+			CHECK(toRad(-180.0f) == Approx(-pi_f));
+		}
+	}
 
-	ASSERT_FLOAT_EQ(gml::toDeg(pi_f), 180.0f);
-	ASSERT_FLOAT_EQ(gml::toDeg(2 * pi_f), 360.0f);
-	ASSERT_FLOAT_EQ(gml::toDeg(3 * pi_f), 540.0f);
-	ASSERT_FLOAT_EQ(gml::toRad(180.0f), pi_f);
-	ASSERT_FLOAT_EQ(gml::toRad(360.0f), 2 * pi_f);
-	ASSERT_FLOAT_EQ(gml::toRad(540.0f), 3 * pi_f);
+	SECTION("toDeg") {
+		SECTION("zero") {
+			CHECK(toDeg(0.0) == 0.0);
 
-	ASSERT_FLOAT_EQ(gml::toDeg(-pi_f), -180.0f);
-	ASSERT_FLOAT_EQ(gml::toRad(-180.0f), -pi_f);
+			CHECK(toDeg(0.0f) == 0.0f);
+		}
+
+		SECTION("PI") {
+			CHECK(toDeg(pi_d) == Approx(180.0));
+			CHECK(toDeg(2 * pi_d) == Approx(360.0));
+			CHECK(toDeg(3 * pi_d) == Approx(540.0));
+
+			CHECK(toDeg(pi_f) == Approx(180.0f));
+			CHECK(toDeg(2 * pi_f) == Approx(360.0f));
+			CHECK(toDeg(3 * pi_f) == Approx(540.0f));
+		}
+
+		SECTION("negative") {
+			CHECK(toDeg(-pi_d) == Approx(-180.0));
+
+			CHECK(toDeg(-pi_f) == Approx(-180.0f));
+		}
+	}
 }
 
-TEST(MathTest, Lerp)
+TEST_CASE("Lerp")
 {
-	ASSERT_DOUBLE_EQ(gml::lerp(0.0, 1.0, 0.5), 0.5);
-	ASSERT_DOUBLE_EQ(gml::lerp(0.0, 0.0, 0.5), 0);
-	ASSERT_DOUBLE_EQ(gml::lerp(0.0, 3.0, 1/3.0), 1);
-	ASSERT_DOUBLE_EQ(gml::lerp(-3.0, 1.0, 0.5), -1);
+	CHECK(gml::lerp(0.0, 1.0, 0.5) == Approx(0.5));
+	CHECK(gml::lerp(0.0, 0.0, 0.5) == Approx(0));
+	CHECK(gml::lerp(0.0, 3.0, 1/3.0) == Approx(1));
+	CHECK(gml::lerp(-3.0, 1.0, 0.5) == Approx(-1));
 
-	ASSERT_EQ(gml::lerp(0, 10, 0.5), 5);
+	CHECK(gml::lerp(0, 10, 0.5) == 5);
 }

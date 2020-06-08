@@ -1,111 +1,103 @@
-#include <gtest/gtest.h>
+#include <catch2/catch.h>
 
 #include <gml/vector.h>
 
 using namespace gml;
 
-class Vec2Test : public testing::Test
+TEST_CASE("Vec2 test")
 {
-};
+	SECTION("Constructor") {
+		SECTION("Constructor_Default") {
+			Vec2<int> vec;
 
-TEST(Vec2Test, Constructor_Default)
-{
-	Vec2<int> vec;
+			CHECK(0 == vec.x);
+			CHECK(0 == vec.y);
+		}
 
-	EXPECT_EQ(0, vec.x);
-	EXPECT_EQ(0, vec.y);
-}
+		SECTION("Constructor_InitializerList") {
+			Vec2<int> vec{ 25, 42 };
 
-TEST(Vec2Test, Constructor_InitializerList)
-{
-	Vec2<int> vec{25, 42};
+			CHECK(25 == vec.x);
+			CHECK(42 == vec.y);
+		}
 
-	EXPECT_EQ(25, vec.x);
-	EXPECT_EQ(42, vec.y);
-}
+		SECTION("Constructor_Fill") {
+			Vec2<int> vec(3);
 
-TEST(Vec2Test, Constructor_Fill)
-{
-	Vec2<int> vec(3);
+			CHECK(3 == vec.x);
+			CHECK(3 == vec.y);
+		}
 
-	EXPECT_EQ(3, vec.x);
-	EXPECT_EQ(3, vec.y);
-}
+		SECTION("Constructor_Explicit") {
+			Vec2<int> vec(25, 42);
 
-TEST(Vec2Test, Constructor_Explicit)
-{
-	Vec2<int> vec(25, 42);
+			CHECK(25 == vec.x);
+			CHECK(42 == vec.y);
+		}
 
-	EXPECT_EQ(25, vec.x);
-	EXPECT_EQ(42, vec.y);
-}
+		SECTION("Constructor_Copy") {
+			Vec2<int> initial(2, 6);
+			Vec2<int> vec = initial;
+			initial.x = 3;
+			initial.y = 9;
 
-TEST(Vec2Test, Constructor_Copy)
-{
-	Vec2<int> initial(2, 6);
-	Vec2<int> vec = initial;
-	initial.x = 3;
-	initial.y = 9;
+			CHECK(2 == vec.x);
+			CHECK(6 == vec.y);
+			CHECK(3 == initial.x);
+			CHECK(9 == initial.y);
+		}
 
-	EXPECT_EQ(2, vec.x);
-	EXPECT_EQ(6, vec.y);
-	EXPECT_EQ(3, initial.x);
-	EXPECT_EQ(9, initial.y);
-}
+		SECTION("Constructor_Conversion") {
+			Vec2<float> initial(2.0f, 6.0f);
+			Vec2<double> vec = initial;
+			initial.x = 3;
+			initial.y = 9;
 
-TEST(Vec2Test, Constructor_Conversion)
-{
-	Vec2<float> initial(2.0f, 6.0f);
-	Vec2<double> vec = initial;
-	initial.x = 3;
-	initial.y = 9;
+			CHECK(2.0f == vec.x);
+			CHECK(6.0f == vec.y);
+			CHECK(3 == initial.x);
+			CHECK(9 == initial.y);
+		}
 
-	EXPECT_EQ(2.0f, vec.x);
-	EXPECT_EQ(6.0f, vec.y);
-	EXPECT_EQ(3, initial.x);
-	EXPECT_EQ(9, initial.y);
-}
+		SECTION("Constructor_ConversionBase") {
+			Vec2<double> vec = Vector<float, 2>{ 2.0f, 6.0f };
 
-TEST(Vec2Test, Constructor_ConversionBase)
-{
-	Vec2<double> vec = Vector<float, 2>{2.0f, 6.0f};
+			CHECK(2.0f == vec.x);
+			CHECK(6.0f == vec.y);
+		}
+	}
+	
+	SECTION("Assignment") {
+		SECTION("Assignment_Copy") {
+			Vec2<int> initial(2, 6);
+			Vec2<int> vec;
 
-	EXPECT_EQ(2.0f, vec.x);
-	EXPECT_EQ(6.0f, vec.y);
-}
+			vec = initial;
+			initial.x = 3;
+			initial.y = 9;
 
+			CHECK(2 == vec.x);
+			CHECK(6 == vec.y);
+			CHECK(3 == initial.x);
+			CHECK(9 == initial.y);
+		}
 
-TEST(Vec2Test, Assignment_Copy)
-{
-	Vec2<int> initial(2, 6);
-	Vec2<int> vec;
+		SECTION("Assignment_Conversion") {
+			Vec2<double> vec;
 
-	vec = initial;
-	initial.x = 3;
-	initial.y = 9;
+			vec = Vec2<float>(2.0f, 6.0f);
 
-	EXPECT_EQ(2, vec.x);
-	EXPECT_EQ(6, vec.y);
-	EXPECT_EQ(3, initial.x);
-	EXPECT_EQ(9, initial.y);
-}
+			CHECK(2.0f == vec.x);
+			CHECK(6.0f == vec.y);
+		}
 
-TEST(Vec2Test, Assignment_Conversion)
-{
-	Vec2<double> vec;
+		SECTION("Assignment_ConversionBase") {
+			Vec2<double> vec;
 
-	vec = Vec2<float>(2.0f, 6.0f);
+			vec = Vector<double, 2>{ 2.0, 6.0 };
 
-	EXPECT_EQ(2.0f, vec.x);
-	EXPECT_EQ(6.0f, vec.y);
-}
-
-TEST(Vec2Test, Assignment_ConversionBase)
-{
-	Vec2<double> vec;
-
-	vec = Vector<double, 2>{ 2.0, 6.0 };
-
-	EXPECT_EQ(2.0f, vec.x);
-	EXPECT_EQ(6.0f, vec.y);
+			CHECK(2.0f == vec.x);
+			CHECK(6.0f == vec.y);
+		}
+	}
 }

@@ -19,12 +19,24 @@ namespace gml
 		/**
 		* @brief Constructs an identity matrix.
 		*/
-		Mat2();
+		constexpr Mat2()
+			: MatrixBase<T, 2, 2>()
+		{
+		}
 
-		Mat2(const Mat2<T>& other);
+		constexpr Mat2(const Mat2<T>& other)
+			: MatrixBase<T, 2, 2>(other)
+		{
+		}
 
-		Mat2(const MatrixBase<T, 2, 2>& other);
+		constexpr Mat2(const MatrixBase<T, 2, 2>& other)
+			: MatrixBase<T, 2, 2>(other)
+		{
+		}
+
+		static constexpr const Mat2<T> Identity = {
+			{ 1, 0 },
+			{ 0, 1 }
+		};
 	};
 }
-
-#include "mat2.tpp"

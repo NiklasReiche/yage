@@ -7,7 +7,7 @@ cmake_policy(SET CMP0076 NEW)
 set( YAGE_VERSION_MAJOR 0 )
 set( YAGE_VERSION_MINOR 1 )
 
-set( CMAKE_CXX_STANDARD 17 )
+set( CMAKE_CXX_STANDARD 20 )
 
 
 ######################
@@ -32,7 +32,7 @@ endif()
 # compiler flags     #
 ######################
 set( GCC_COMPILER_FLAGS
-		"-fdiagnostics-color=always -Wall -Werror --coverage"
+		"-fdiagnostics-color=always -Wall -Wextra -Werror --coverage"
 )
 set( MSVC_COMPILER_FLAGS
 	"/MP"

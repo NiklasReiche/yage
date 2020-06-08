@@ -27,7 +27,7 @@ static void EXPECT_VEC(Vector<T, size> expected, VectorBase<T, size> result)
 {
 	for (size_t i = 0; i < size; ++i)
 	{
-		EXPECT_NEAR(expected.at(i), result.at(i), 0.0001);
+		EXPECT_NEAR(expected(i), result(i), 0.0001);
 	}
 }
 

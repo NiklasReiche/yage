@@ -22,11 +22,26 @@ namespace gml
 		/**
 		* @brief Constructs an identity matrix.
 		*/
-		Mat3();
+		constexpr Mat3()
+			: MatrixBase<T, 3, 3>()
+		{
+		}
 
-		Mat3(const Mat3<T>& other);
+		constexpr Mat3(const Mat3<T>& other)
+			: MatrixBase<T, 3, 3>(other)
+		{
+		}
 
-		Mat3(const MatrixBase<T, 3, 3>& other);
+		constexpr Mat3(const MatrixBase<T, 3, 3>& other)
+			: MatrixBase<T, 3, 3>(other)
+		{
+		}
+
+		static constexpr const Mat3<T> Identity = {
+			{ 1, 0, 0 },
+			{ 0, 1, 0 },
+			{ 0, 0, 1 }
+		};
 
 		/**
 		 * @brief Converts this matrix to a quaternion. 
@@ -34,8 +49,9 @@ namespace gml
 		 * 
 		 * @return the quaternion
 		 */
-		Quaternion<T> toQuaternion();
+		Quaternion<T> toQuaternion()
+		{
+			return Quaternion<T>::rotationMatrix(*this);
+		}
 	};
 }
-
-#include "mat3.tpp"

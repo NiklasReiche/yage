@@ -1,13 +1,14 @@
 #pragma once
 
 #include "matrix/matrixBase.h"
+#include "matrix/matrixOperations.h"
 #include "matrix/mat2.h"
 #include "matrix/mat3.h"
 #include "matrix/mat4.h"
 
 namespace gml
 {
-	template <typename T, size_t Rows, size_t Columns>
+	template <typename T, std::size_t Rows, std::size_t Columns>
 	using Matrix = MatrixBase<T, Rows, Columns>;
 
 	typedef Mat2<int> Mat2i;

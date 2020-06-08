@@ -1,14 +1,16 @@
 add_executable(coreMathTest
 	main.cpp
+	mathTest.cpp
 	vectorTest.cpp
+	vec2Test.cpp
+	vec3Test.cpp
 	matrixTest.cpp
-	quaternionTest.cpp
-	mathTest.cpp vec2Test.cpp vec3Test.cpp)
+	#quaternionTest.cpp
+	)
 
 target_link_libraries(coreMathTest
 	PUBLIC yageMath
-	PUBLIC gtest
-	PUBLIC gmock
+	PUBLIC catch2
 	)
 
 add_test(

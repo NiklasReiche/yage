@@ -5,24 +5,17 @@ target_include_directories(yageMath
 
 target_sources(yageMath
 
-	INTERFACE gml/vector/vectorbase.h
-	INTERFACE gml/vector/vectorbase.tpp
+	INTERFACE gml/vector/vectorBase.h
 	INTERFACE gml/vector/vec2.h
-	INTERFACE gml/vector/vec2.tpp
 	INTERFACE gml/vector/vec3.h
-	INTERFACE gml/vector/vec3.tpp
 	INTERFACE gml/vector/vec4.h
-	INTERFACE gml/vector/vec4.tpp
 
 	INTERFACE gml/matrix/matrixBase.h
-	INTERFACE gml/matrix/matrixBase.tpp
+	INTERFACE gml/matrix/matrixOperations.h
 	INTERFACE gml/matrix/matrixSpecial.h
 	INTERFACE gml/matrix/mat2.h
-	INTERFACE gml/matrix/mat2.tpp
 	INTERFACE gml/matrix/mat3.h
-	INTERFACE gml/matrix/mat3.tpp
 	INTERFACE gml/matrix/mat4.h
-	INTERFACE gml/matrix/mat4.tpp
 
 	INTERFACE gml/maths.h
 	INTERFACE gml/exception.h

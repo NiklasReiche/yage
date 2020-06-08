@@ -7,7 +7,7 @@
 
 namespace gml
 {
-	template <typename T, size_t Size>
+	template <typename T, std::size_t Size>
 	using Vector = VectorBase<T, Size>;
 
 	typedef Vec2<int> Vec2i;

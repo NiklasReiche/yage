@@ -1,216 +1,328 @@
-#include <gtest/gtest.h>
+#include <catch2/catch.h>
 
 #include <gml/matrix.h>
 
 using namespace gml;
 
-class MatrixTest : public testing::Test
+TEST_CASE("MatrixBase test")
 {
-protected:
-	virtual void SetUp() {
-	}
+	SECTION("Constructor") {
+		SECTION("Constructor_Default") {
+			const Matrix<int, 2, 3> mat;
 
-	virtual void TearDown() {
-	}
-};
+			CHECK(0 == mat(0, 0));
+			CHECK(0 == mat(0, 1));
+			CHECK(0 == mat(0, 2));
 
-TEST(MatrixTest, Construct)
-{
-	// default constructor
-	Matrix<int, 2, 3> mat1;
-	EXPECT_EQ(1, mat1.at(0, 0));
-	EXPECT_EQ(0, mat1.at(0, 1));
-	EXPECT_EQ(0, mat1.at(0, 2));
-	EXPECT_EQ(0, mat1.at(1, 0));
-	EXPECT_EQ(1, mat1.at(1, 1));
-	EXPECT_EQ(0, mat1.at(1, 2));
+			CHECK(0 == mat(1, 0));
+			CHECK(0 == mat(1, 1));
+			CHECK(0 == mat(1, 2));
+		}
 
-	// single value constructor
-	Matrix<int, 2, 2> mat2(3);
-	EXPECT_EQ(3, mat2.at(0, 0));
-	EXPECT_EQ(3, mat2.at(0, 1));
-	EXPECT_EQ(3, mat2.at(1, 0));
-	EXPECT_EQ(3, mat2.at(1, 1));
+		SECTION("Constructor_Fill") {
+			const Matrix<int, 3, 2> mat(42);
 
-	// 1d initializer list
-	Matrix<int, 2, 3> mat3 = {
-		1, 3, 0,
-		3, 6, 1};
-	EXPECT_EQ(1, mat3.at(0, 0));
-	EXPECT_EQ(3, mat3.at(0, 1));
-	EXPECT_EQ(0, mat3.at(0, 2));
-	EXPECT_EQ(3, mat3.at(1, 0));
-	EXPECT_EQ(6, mat3.at(1, 1));
-	EXPECT_EQ(1, mat3.at(1, 2));
+			CHECK(42 == mat(0, 0));
+			CHECK(42 == mat(0, 1));
 
-	// 2d initializer list
-	Matrix<int, 2, 3> mat4 = {
-		{ 1, 3, 0 },
-		{ 3, 6, 1 }};
-	EXPECT_EQ(1, mat4.at(0, 0));
-	EXPECT_EQ(3, mat4.at(0, 1));
-	EXPECT_EQ(0, mat4.at(0, 2));
-	EXPECT_EQ(3, mat4.at(1, 0));
-	EXPECT_EQ(6, mat4.at(1, 1));
-	EXPECT_EQ(1, mat4.at(1, 2));
+			CHECK(42 == mat(1, 0));
+			CHECK(42 == mat(1, 1));
 
-	// conversion constructor
-	Mat2i mat5 = Matrix<int, 2, 2>(3);
-	EXPECT_EQ(mat2, mat5);
+			CHECK(42 == mat(2, 0));
+			CHECK(42 == mat(2, 1));
+		}
 
-	mat5 = mat2;
-	EXPECT_EQ(mat2, mat5);
-}
+		SECTION("Constructor_Array") {
+			int arr[] = {
+				3, 5, 2,
+				6, 3, 8
+			};
 
-TEST(MatrixTest, Add)
-{
-	Matrix<int, 2, 3> mat1 = {
-		{ 1, 3, 0 },
-		{ 3, 6, 1 } };
+			const Matrix<int, 2, 3> mat(arr);
 
-	Matrix<int, 2, 3> mat2 = {
-		{ -1, 2, 0 },
-		{ 3, 7, 4 } };
+			CHECK(3 == mat(0, 0));
+			CHECK(5 == mat(0, 1));
+			CHECK(2 == mat(0, 2));
 
-	Matrix<int, 2, 3> result = mat1 + mat2;
-	Matrix<int, 2, 3> expected = {
-		{ 0, 5, 0 },
-		{ 6, 13, 5 } };
+			CHECK(6 == mat(1, 0));
+			CHECK(3 == mat(1, 1));
+			CHECK(8 == mat(1, 2));
+		}
 
-	EXPECT_EQ(expected, result);
-}
 
-TEST(MatrixTest, Subtract)
-{
-	Matrix<int, 2, 3> mat1 = {
-		{ 1, 3, 0 },
-		{ 3, 6, 1 } };
+		SECTION("Constructor_InitializerList1D") {
+			const Matrix<int, 2, 3> mat{
+				3, 5, 2,
+				6, 3, 8
+			};
 
-	Matrix<int, 2, 3> mat2 = {
-		{ -1, 2, 0 },
-		{ 3, 7, 4 } };
+			CHECK(3 == mat(0, 0));
+			CHECK(5 == mat(0, 1));
+			CHECK(2 == mat(0, 2));
 
-	Matrix<int, 2, 3> result = mat1 - mat2;
-	Matrix<int, 2, 3> expected = {
-		{ 2, 1, 0 },
-		{ 0, -1, -3 } };
+			CHECK(6 == mat(1, 0));
+			CHECK(3 == mat(1, 1));
+			CHECK(8 == mat(1, 2));
+		}
 
-	EXPECT_EQ(expected, result);
-}
+		SECTION("Constructor_InitializerList2D") {
+			const Matrix<int, 2, 3> mat{
+				{ 3, 5, 2 },
+				{ 6, 3, 8 }
+			};
 
-TEST(MatrixTest, Multiply)
-{
-	Matrix<int, 2, 3> mat1 = {
-		{ 1, 3, 0 },
-		{ 3, 6, 1 } };
+			CHECK(3 == mat(0, 0));
+			CHECK(5 == mat(0, 1));
+			CHECK(2 == mat(0, 2));
 
-	Matrix<int, 3, 3> mat2 = {
-		{ -1, 2, 0 },
-		{ -1, 2, 0 },
-		{  3, 7, 4 } };
+			CHECK(6 == mat(1, 0));
+			CHECK(3 == mat(1, 1));
+			CHECK(8 == mat(1, 2));
+		}
 
-	Matrix<int, 2, 3> result = mat1 * mat2;
-	Matrix<int, 2, 3> expected = {
-		{ -4,  8, 0 },
-		{ -6, 25, 4 } };
+		SECTION("Constructor_Copy") {
+			const Matrix<int, 2, 3> initial{
+				3, 5, 2,
+				6, 3, 8
+			};
 
-	EXPECT_EQ(expected, result);
+			const Matrix<int, 2, 3> mat = initial;
 
-	result = mat1 * 2;
-	expected = {
-		{ 2,  6, 0 },
-		{ 6, 12, 2 } };
+			CHECK(3 == mat(0, 0));
+			CHECK(5 == mat(0, 1));
+			CHECK(2 == mat(0, 2));
 
-	EXPECT_EQ(expected, result);
-}
+			CHECK(6 == mat(1, 0));
+			CHECK(3 == mat(1, 1));
+			CHECK(8 == mat(1, 2));
+		}
 
-TEST(MatrixTest, Divide)
-{
-	Matrix<int, 2, 3> mat1 = {
-		{ 2,  6, 0 },
-		{ 6, 12, 2 } };
+		SECTION("Constructor_Conversion") {
+			const Matrix<float, 2, 3> initial{
+				3.0f, 5.0f, 2.0f,
+				6.0f, 3.0f, 8.0f
+			};
 
-	Matrix<int, 2, 3> expected = {
-		{ 1, 3, 0 },
-		{ 3, 6, 1 } };
+			const Matrix<double, 2, 3> mat = initial;
 
-	Matrix<int, 2, 3> result = mat1 / 2;
-	EXPECT_EQ(expected, result);
-}
+			CHECK(3.0 == mat(0, 0));
+			CHECK(5.0 == mat(0, 1));
+			CHECK(2.0 == mat(0, 2));
 
-TEST(MatrixTest, Det)
-{
-	Mat4f mat1 = {
-		{ 0,  1,  3,  2 },
-		{ 2, -1, -9, -2 },
-		{ 1,  7,  2,  9 },
-		{ -1, 6, -11, 4 }
-	};
-
-	EXPECT_EQ(64, mat1.det());
-}
-
-TEST(MatrixTest, Inverse)
-{
-	Mat4f mat1{
-		{  4,  1,  3,  2 },
-		{  2, -1, -9, -2 },
-		{  1,  7,  2,  9 },
-		{ -1,  6, -11, 4 } 
-	};
-
-	Mat4f expected{
-		{ 163 / 588.0f,   1 / 84.0f,  -4 / 49.0f,   5 / 98.0f },
-		{ 349 / 588.0f, -53 / 84.0f, -26 / 49.0f,  57 / 98.0f },
-		{  65 / 588.0f, -13 / 84.0f,  -4 / 49.0f,   5 / 98.0f },
-		{ -76 / 147.0f,  11 / 21.0f,  27 / 49.0f, -23 / 49.0f } 
-	};
-
-	Mat4f result = inverse(mat1);
-
-	for (auto i = 0; i < 4; ++i)
-	{
-		for (auto j = 0; j < 4; ++j)
-		{
-			EXPECT_NEAR(expected.at(i, j), result.at(i, j), 0.00001);
+			CHECK(6.0 == mat(1, 0));
+			CHECK(3.0 == mat(1, 1));
+			CHECK(8.0 == mat(1, 2));
 		}
 	}
 
-	mat1 = {
-		{ 0,  1,  3,  2 },
-		{ 2, -1, -9, -2 },
-		{ 1,  7,  2,  9 },
-		{ -1, 6, -11, 4 } 
-	};
+	SECTION("Operators") {
+		SECTION("Operator_Add") {
+			const Matrix<int, 2, 3> lhs = {
+				{ 1, 3, 0 },
+				{ 3, 6, 1 }};
 
-	expected = (1 / 64.0f) * Mat4f{
-		{ -163,  -7,  48, -30 }, 
-		{ -349, -57,  80, -34 }, 
-		{  -65, -13,  16, -10 }, 
-		{  304,  48, -64,  32 }
-	};
+			const Matrix<int, 2, 3> rhs = {
+				{ -1, 2, 0 },
+				{ 3,  7, 4 }};
 
-	result = inverse(mat1);
+			const Matrix<int, 2, 3> expected = {
+				{ 0, 5,  0 },
+				{ 6, 13, 5 }};
 
-	for (auto i = 0; i < 4; ++i)
-	{
-		for (auto j = 0; j < 4; ++j)
-		{
-			EXPECT_NEAR(expected.at(i, j), result.at(i, j), 0.00001);
+			CHECK(expected == lhs + rhs);
+		}
+
+		SECTION("Operator_Subtract") {
+			const Matrix<int, 2, 3> lhs = {
+				{ 1, 3, 0 },
+				{ 3, 6, 1 }};
+
+			const Matrix<int, 2, 3> rhs = {
+				{ -1, 2, 0 },
+				{ 3,  7, 4 }};
+
+			const Matrix<int, 2, 3> expected = {
+				{ 2, 1,  0 },
+				{ 0, -1, -3 }};
+
+			CHECK(expected == lhs - rhs);
+		}
+
+		SECTION("Operator_Multiply") {
+			const Matrix<int, 2, 3> lhs = {
+				{ 1, 3, 0 },
+				{ 3, 6, 1 }};
+
+			const Matrix<int, 3, 4> rhs = {
+				{ -1, 2, 0, 1 },
+				{ -1, 2, 0, 4 },
+				{ 3,  7, 4, 2 }};
+
+			const Matrix<int, 2, 4> expected = {
+				{ -4, 8,  0, 13 },
+				{ -6, 25, 4, 29 }};
+
+			CHECK(expected == lhs * rhs);
+		}
+
+		SECTION("Operator_Divide") {
+			const Matrix<int, 2, 3> lhs = {
+				{ 2, 6,  0 },
+				{ 6, 12, 2 }};
+
+			const Matrix<int, 2, 3> expected = {
+				{ 1, 3, 0 },
+				{ 3, 6, 1 }};
+
+			CHECK(expected == lhs / 2);
 		}
 	}
-}
 
-TEST(MatrixTest, Transpose)
-{
-	Matrix<int, 2, 3> mat1 = {
-		{ 2,  3, 0 },
-		{ 6, 18, 2 } };
+	SECTION("determinant") {
+		SECTION("Det_1x1") {
+			const Matrix<int, 1, 1> mat(7);
 
-	Matrix<int, 3, 2> expected = {
-		{ 2,  6},
-		{ 3, 18 },
-		{ 0,  2 } };
+			CHECK(7 == det(mat));
+		}
 
-	EXPECT_EQ(expected, transpose(mat1));
+		SECTION("Det_2x2") {
+			const Matrix<double, 2, 2> mat{
+				1, 2,
+				3, 4
+			};
+
+			CHECK(-2 == det(mat));
+		}
+
+		SECTION("Det_3x3") {
+			const Matrix<double, 3, 3> mat{
+				2, -1, 0,
+				-1, 2, -1,
+				0, -1, 2
+			};
+
+			CHECK(4 == det(mat));
+		}
+
+		SECTION("Det_HigherDimension") {
+			const Matrix<float, 4, 4> mat = {
+				{ 0,  1,  3,   2 },
+				{ 2,  -1, -9,  -2 },
+				{ 1,  7,  2,   9 },
+				{ -1, 6,  -11, 4 }
+			};
+
+			CHECK(64 == det(mat));
+		}
+	}
+
+	SECTION("Trace") {
+		const Matrix<int, 3, 3> mat{
+			2, 4, 1,
+			6, -1, 0,
+			7, 3, 5
+		};
+
+		CHECK(6 == trace(mat));
+	}
+
+	SECTION("transpose") {
+		SECTION("Transpose_NonQuadratic") {
+			const Matrix<int, 2, 3> mat = {
+				{ 2, 3,  0 },
+				{ 6, 18, 2 }
+			};
+
+			const Matrix<int, 3, 2> expected = {
+				{ 2, 6 },
+				{ 3, 18 },
+				{ 0, 2 }
+			};
+
+			CHECK(expected == transpose(mat));
+			CHECK(mat == transpose(expected));
+			CHECK(mat == transpose(transpose(mat)));
+		}
+
+		SECTION("Transpose_Quadratic") {
+			const Matrix<int, 2, 2> mat{
+				1, 2,
+				3, 4
+			};
+
+			const Matrix<int, 2, 2> trans{
+				1, 3,
+				2, 4
+			};
+
+			CHECK(trans == transpose(mat));
+			CHECK(mat == transpose(trans));
+			CHECK(mat == transpose(transpose(mat)));
+		}
+	}
+	
+	SECTION("Inverse") {
+		SECTION("Inverse_2x2") {
+			const Matrix<double, 2, 2> mat{
+				1, 2,
+				3, 4
+			};
+
+			const Matrix<double, 2, 2> inv{
+				-2, 1,
+				1.5, -0.5
+			};
+
+			CHECK(inv == inverse(mat));
+			CHECK(mat == inverse(inv));
+			CHECK(mat == inverse(inverse(mat)));
+		}
+
+		SECTION("Inverse_3x3") {
+			const Matrix<double, 3, 3> mat{
+				2, -1, 0,
+				-1, 2, -1,
+				0, -1, 2
+			};
+
+			const Matrix<double, 3, 3> inv{
+				3 / 4.0, 2 / 4.0, 1 / 4.0,
+				2 / 4.0, 4 / 4.0, 2 / 4.0,
+				1 / 4.0, 2 / 4.0, 3 / 4.0
+			};
+
+			CHECK(inv == inverse(mat));
+			CHECK(mat == inverse(inv));
+			CHECK(mat == inverse(inverse(mat)));
+		}
+
+		SECTION("Inverse_higherDimension") {
+			const Matrix<double, 4, 4> mat{
+				{ 4,  1,  3,   2 },
+				{ 2,  -1, -9,  -2 },
+				{ 1,  7,  2,   9 },
+				{ -1, 6,  -11, 4 }
+			};
+
+			const Matrix<double, 4, 4> inv{
+				{ 163 / 588.0, 1 / 84.0,   -4 / 49.0,  5 / 98.0 },
+				{ 349 / 588.0, -53 / 84.0, -26 / 49.0, 57 / 98.0 },
+				{ 65 / 588.0,  -13 / 84.0, -4 / 49.0,  5 / 98.0 },
+				{ -76 / 147.0, 11 / 21.0,  27 / 49.0,  -23 / 49.0 }
+			};
+
+			auto expect_eq = [](const Matrix<double, 4, 4>& a, const Matrix<double, 4, 4>& b)
+			{
+				for (int i = 0; i < 4; ++i) {
+					for (int j = 0; j < 4; ++j) {
+						CHECK(a(i, j) == Approx(b(i, j)).epsilon(1e-10));
+					}
+				}
+			};
+
+			expect_eq(inv, inverse(mat));
+			expect_eq(mat, inverse(inv));
+			expect_eq(mat, inverse(inverse(mat)));
+		}
+	}
 }

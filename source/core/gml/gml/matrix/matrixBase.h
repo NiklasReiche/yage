@@ -3,6 +3,7 @@
 #include <array>
 #include <initializer_list>
 #include <ostream>
+#include <span>
 
 #include "../exception.h"
 #include "../maths.h"
@@ -12,249 +13,336 @@
 namespace gml
 {
 	/**
-	 * @brief Represents a generic NxM dimensional matrix 
+	 * @brief Represents a generic NxM dimensional matrix.
 	 * 
-	 * @tparam T the generic type
-	 * @tparam Rows the number of rows
-	 * @tparam Columns the number of columns
+	 * @tparam T The type of the matrix's components.
+	 * @tparam M The number of rows.
+	 * @tparam N The number of columns.
 	 */
-	template<typename T, size_t Rows, size_t Columns>
+	template<typename T, std::size_t M, std::size_t N>
 	class MatrixBase
 	{
-	private:
-		/**
-		 * @brief The matrix fields as a 2d array.
-		 */
-		std::array<
-			std::array<T, (Columns > 0) ? Columns : 1>,
-			(Rows > 0) ? Rows : 1> data;
-
 	public:
 		/**
-		 * @brief Initializes the diagonal values with ones, the rest with zeros.
+		 * @brief Value-initializes all components.
 		 */
-		MatrixBase();
+		constexpr MatrixBase()
+			: elements{ }
+		{
+		}
 
 		/**
-		* @brief Initializes all fields with the same value.
-		*/
-		explicit MatrixBase(const T &value);
+		 * @brief Initializes all components with the same value.
+		 *
+		 * @param value The default value used for initialization.
+		 */
+		constexpr explicit MatrixBase(const T& value)
+		{
+			elements.fill(value);
+		}
 
 		/**
-		 * @brief Initializes the fields by a 1d initializer list.
+		 * @brief Initializes the components from a continuous memory block.
+		 *
+		 * The data is read in row-major format.
+		 *
+		 * @param data Continuous memory to copy elements from.
+		 */
+		constexpr explicit MatrixBase(std::span<T, N * M> data)
+		{
+			std::copy(data.begin(), data.end(), elements.begin());
+		}
+
+		/**
+		 * @brief Initializes the components from a one-dimensional initializer list.
 		 * 
-		 * @param init the initializer list
+		 * @param init The initializer list.
 		 */
-		MatrixBase(const std::initializer_list<T> &init);
+		constexpr MatrixBase(const std::initializer_list<T>& init)
+		{
+			if (init.size() != M * N) {
+				throw InvalidDimensionException();
+			}
+			std::copy(std::begin(init), std::end(init), std::begin(elements));
+		}
 
 		/**
-		* @brief Initializes the fields by a 2d initializer list.
-		*
-		* @param init the initializer list
-		*/
-		MatrixBase(const std::initializer_list<std::initializer_list<T>> &init);
+		 * @brief Initializes the components from a two-dimensional initializer list.
+		 *
+		 * @param init The initializer list.
+		 */
+		constexpr MatrixBase(const std::initializer_list<std::initializer_list<T>>& init)
+		{
+			if (init.size() != M) {
+				throw InvalidDimensionException();
+			}
+
+			std::size_t i = 0;
+			for (const auto& row : init) {
+				if (row.size() != N) {
+					throw InvalidDimensionException();
+				}
+				std::copy(std::begin(row), std::end(row), std::begin(elements) + i * N);
+				++i;
+			}
+		}
 
 		/**
-		 * @brief Initializes this matrix with values from a linear c-style array.
-		 * 
-		 * @param arr the array
+		 * @brief Constructs a matrix by copy-converting the components of another matrix.
+		 *
+		 * Type T of the constructed matrix must to be assignable from type T2 of the matrix being copied.
+		 *
+		 * @tparam T2 Type of the components of the vector from which to convert.
+		 * @param other Matrix from which to copy and convert the components.
 		 */
-		explicit MatrixBase(const T arr[]);
-
-		MatrixBase(const MatrixBase<T, Rows, Columns> &other);
-
 		template<typename T2>
-		explicit MatrixBase(const MatrixBase<T2, Rows, Columns> &other);
+		constexpr MatrixBase(const MatrixBase<T2, M, N>& other)
+		{
+			std::copy(other.data(), other.data() + (N * M), elements.begin());
+		}
 
-		MatrixBase<T, Rows, Columns> &operator=(
-			const MatrixBase<T, Rows, Columns> &other);
-
+		/**
+		 * @brief Assigns this vector by copy-converting the components of another vector.
+		 *
+		 * Type T of the constructed matrix must to be assignable from type T2 of the copied matrix.
+		 *
+		 * @tparam T2 Type of the components of the vector from which to convert.
+		 * @param other Matrix from which to copy and convert the components.
+		 * @return This matrix.
+		 */
 		template<typename T2>
-		MatrixBase<T, Rows, Columns> &operator=(
-			const MatrixBase<T2, Rows, Columns> &other);
+		constexpr MatrixBase<T, M, N>& operator=(const MatrixBase<T2, M, N>& other)
+		{
+			std::copy(other.data(), other.data() + (N * M), elements.begin());
+			return *this;
+		}
 
-	public:
 		/**
-		 * @brief Returns a reference to this matrix's field at a given position.
-		 * 
-		 * @param row the row
-		 * @param column the column
-		 * @return a reference to the field
+		 * @brief Gives direct access to the underlying array.
+		 *
+		 * @return Pointer to the underlying element storage (equal to the address of the first element).
 		 */
-		T &at(size_t row, size_t column);
+		constexpr T* data() noexcept
+		{
+			return elements.data();
+		}
 
 		/**
-		* @brief Returns a const reference to this matrix's field at a given 
-		* position.
-		*
-		* @param row the row
-		* @param column the column
-		* @return a const reference to the field
-		*/
-		const T &at(size_t row, size_t column) const;
-
-		/**
-		* @brief Returns the determinant of this matrix.
-		*
-		* @return the determinant
-		*/
-		[[nodiscard]]
-		double det() const;
-
-		/**
-		 * @brief Returns the trace of this matrix.
-		 * 
-		 * @return the trace
+		 * @brief Gives direct access to the underlying array.
+		 *
+		 * @return Pointer to the underlying element storage (equal to the address of the first element).
 		 */
-		[[nodiscard]]
-		double trace() const;
+		constexpr const T* data() const noexcept
+		{
+			return elements.data();
+		}
 
 		/**
-		 * @brief Fills the given c-style array with values from this matrix.
-		 * 
-		 * @param arr the array to fill
+		 * @brief Returns the reference to an element of this matrix.
+		 *
+		 * @param m The row index of the element.
+		 * @param n The column index of the element.
+		 * @return The reference to the requested element.
+		 *
+		 * @throws std::out_of_range If !(m < M && n < N).
 		 */
-		void convertToArray(T arr[]) const;
-
-	public:
-		MatrixBase<T, Rows, Columns> &operator+=(const MatrixBase<T, Rows, Columns> &right);
-
-		MatrixBase<T, Rows, Columns> &operator-=(const MatrixBase<T, Rows, Columns> &right);
-
-		MatrixBase<T, Rows, Columns> &operator*=(const T &right);
-
-		MatrixBase<T, Rows, Columns> &operator/=(const T &right);
-
-		template<typename U, size_t N>
-		friend MatrixBase<U, N, N> inverse(const MatrixBase<U, N, N> &matrix);
-
-	private:
-		/**
-		* @brief Returns a matrix with a given row and column removed.
-		*
-		* @param row the row to remove
-		* @param column the column to remove
-		* @return the stripped matrix
-		*
-		* @throws InvalidDimensionException if row or column is out of bounds
-		*/
-		MatrixBase<T, Rows - 1, Columns - 1> reduce(size_t row, size_t column)
-		const;
+		constexpr T& operator()(int m, int n)
+		{
+			return elements.at(m * N + n);
+		}
 
 		/**
-		* @brief Adds a row to another row in this matrix.
-		*
-		* @param first the row to add the second row
-		* @param second the row the first row will be added to
-		*/
-		void addRows(size_t first, size_t second);
+		 * @brief Returns the reference to an element of this matrix.
+		 *
+		 * @param m The row index of the element.
+		 * @param n The column index of the element.
+		 * @return The reference to the requested element.
+		 *
+		 * @throws std::out_of_range If !(m < M && n < N).
+		 */
+		constexpr const T& operator()(int m, int n) const
+		{
+			return elements.at(m * N + n);
+		}
 
 		/**
-		* @brief Adds a multiplied row to another multiplied row in this matrix.
-		*
-		* @param first the row to add the second row
-		* @param firstFactor factor for the first row
-		* @param second the row the first row will be added to
-		* @param secondFactor factor for the second row
-		*/
-		void addMultRows(
-			size_t first, double firstFactor,
-			size_t second, double secondFactor);
+		 * @brief Element-wise addition.
+		 */
+		constexpr MatrixBase<T, M, N>& operator+=(const MatrixBase<T, M, N>& rhs)
+		{
+			for (std::size_t i = 0; i < M * N; ++i) {
+				elements.at(i) += rhs.elements.at(i);
+			}
+			return *this;
+		}
 
 		/**
-		* @brief Muliplies a row by the given factor.
-		*
-		* @param row the row to modify
-		* @param factor the factor
-		*/
-		void multRow(size_t row, double factor);
+		 * @brief Element-wise subtraction.
+		 */
+		constexpr MatrixBase<T, M, N>& operator-=(const MatrixBase<T, M, N>& rhs)
+		{
+			for (std::size_t i = 0; i < M * N; ++i) {
+				elements.at(i) -= rhs.elements.at(i);
+			}
+			return *this;
+		}
+
+		/**
+		 * @brief Element-wise scalar multiplication.
+		 */
+		constexpr MatrixBase<T, M, N>& operator*=(const T& rhs)
+		{
+			for (std::size_t i = 0; i < M * N; ++i) {
+				elements.at(i) *= rhs;
+			}
+			return *this;
+		}
+
+		/**
+		 * @brief Matrix multiplication with a square matrix.
+		 */
+		constexpr MatrixBase<T, M, N>& operator*=(const MatrixBase<T, N, N>& rhs)
+		{
+			return operator=(*this * rhs);
+		}
+
+		/**
+		 * @brief Element-wise scalar division.
+		 */
+		constexpr MatrixBase<T, M, N>& operator/=(const T& rhs)
+		{
+			if (rhs == 0) {
+				throw DivideByZeroException();
+			}
+			for (std::size_t i = 0; i < M * N; ++i) {
+				elements.at(i) /= rhs;
+			}
+			return *this;
+		}
 
 		/**
 		* @brief Switch two rows in this matrix.
 		*
-		* @param first the first row to switch
-		* @param second the second row to switch
+		* @param first The index of the first row to switch with the other row.
+		* @param second The index of the second row to switch with the other row.
 		*/
-		void switchRows(size_t first, size_t second);
+		constexpr void switchRows(std::size_t first, std::size_t second)
+		{
+			for (std::size_t i = 0; i < N; i++) {
+				T temp = operator()(first, i);
+				operator()(first, i) = operator()(second, i);
+				operator()(second, i) = temp;
+			}
+		}
+
+		/**
+		 * @brief Adds a multiplied row to another multiplied row in this matrix.
+		 *
+		 * The row is modified by the following equation: rowA = a * rowA + b * rowB
+		 *
+		 * @param rowA The index of the row to modify.
+		 * @param a The factor by which to multiply rowA.
+		 * @param rowB The index of the row to add to the modified rowA.
+		 * @param b The factor by which to multiply rowB before adding it to rowA.
+		 */
+		constexpr void combineRows(std::size_t rowA, double a, std::size_t rowB, double b)
+		{
+			for (std::size_t i = 0; i < N; ++i) {
+				operator()(rowA, i) = operator()(rowA, i) * a + operator()(rowB, i) * b;
+			}
+		}
+
+		template<typename T_, std::size_t M_, std::size_t N_>
+		friend constexpr bool operator==(const MatrixBase<T_, M_, N_>& left, const MatrixBase<T_, M_, N_>& right);
+
+	private:
+		/**
+		 * @brief The matrix components.
+		 */
+		std::array<T, N * M> elements;
 	};
 
-	/**
-	* @brief Transposes a given matrix.
-	*
-	* @tparam T the type
-	* @tparam Rows rows of the input matrix
-	* @tparam Columns columns of the input matrix
-	* @param matrix the matrix to transpose
-	* @return the transposed matrix
-	*/
-	template<typename T, size_t Rows, size_t Columns>
-	MatrixBase<T, Columns, Rows> transpose(
-		const MatrixBase<T, Rows, Columns> &matrix);
 
-	/**
-	* @brief Calculates the inverse of a given matrix.
-	*
-	* @tparam T the type
-	* @tparam Rows rows of the input matrix
-	* @param matrix the matrix to invert
-	* @return the inverse
-	*
-	* @throws InvalidDimensionException if the matrix is not quadratic
-	* @throws DivideByZeroException if the determinant is zero
-	*/
-	template<typename T, size_t Rows>
-	MatrixBase<T, Rows, Rows> inverse(const MatrixBase<T, Rows, Rows> &matrix);
+	template<typename T, std::size_t M, std::size_t N>
+	std::ostream& operator<<(std::ostream& os, const MatrixBase<T, M, N>& matrix)
+	{
+		os << "\n[ ";
+		for (std::size_t i = 0; i < M; ++i) {
+			for (std::size_t j = 0; j < N; ++j) {
+				os << (i == 0 && j == 0 ? "" : "  ") << (matrix(i, j) < 0 ? "" : " ") << matrix(i, j);
+			}
+			os << (i < M - 1 ? "\n": " ]\n");
+		}
+		return os;
+	}
 
+	template<typename T, std::size_t M, std::size_t N>
+	constexpr bool operator==(const MatrixBase<T, M, N>& left, const MatrixBase<T, M, N>& right)
+	{
+		return left.elements == right.elements;
+	}
 
-	template<typename T, size_t Rows, size_t Columns>
-	std::ostream &operator<<(
-		std::ostream &os,
-		const MatrixBase<T, Rows, Columns> &matrix);
+	template<typename T, std::size_t M, std::size_t N>
+	constexpr bool operator!=(const MatrixBase<T, M, N>& left, const MatrixBase<T, M, N>& right)
+	{
+		return !(left == right);
+	}
 
-	template<typename T, size_t Rows, size_t Columns>
-	bool operator==(
-		const MatrixBase<T, Rows, Columns> &left,
-		const MatrixBase<T, Rows, Columns> &right);
+	template<typename T, std::size_t M, std::size_t N>
+	constexpr MatrixBase<T, M, N> operator+(const MatrixBase<T, M, N>& left, const MatrixBase<T, M, N>& right)
+	{
+		return MatrixBase<T, M, N>(left) += right;
+	}
 
-	template<typename T, size_t Rows, size_t Columns>
-	bool operator!=(
-		const MatrixBase<T, Rows, Columns> &left,
-		const MatrixBase<T, Rows, Columns> &right);
+	template<typename T, std::size_t M, std::size_t N>
+	constexpr MatrixBase<T, M, N> operator-(const MatrixBase<T, M, N>& left, const MatrixBase<T, M, N>& right)
+	{
+		return MatrixBase<T, M, N>(left) -= right;
+	}
 
-	template<typename T, size_t Rows, size_t Columns>
-	MatrixBase<T, Rows, Columns> operator+(
-		const MatrixBase<T, Rows, Columns> &left,
-		const MatrixBase<T, Rows, Columns> &right);
+	template<typename T, std::size_t M, std::size_t N, std::size_t P>
+	constexpr MatrixBase<T, M, P> operator*(const MatrixBase<T, M, N>& left, const MatrixBase<T, N, P>& right)
+	{
+		MatrixBase<T, M, P> result;
+		for (std::size_t i = 0; i < M; ++i) {
+			for (std::size_t j = 0; j < P; ++j) {
+				T value = 0;
+				for (std::size_t k = 0; k < N; ++k) {
+					value += left(i, k) * right(k, j);
+				}
+				result(i, j) = value;
+			}
+		}
+		return result;
+	}
 
-	template<typename T, size_t Rows, size_t Columns>
-	MatrixBase<T, Rows, Columns> operator-(
-		const MatrixBase<T, Rows, Columns> &left,
-		const MatrixBase<T, Rows, Columns> &right);
+	template<typename T, std::size_t M, std::size_t N>
+	constexpr MatrixBase<T, M, N> operator*(const T& left, const MatrixBase<T, M, N>& right)
+	{
+		return MatrixBase<T, M, N>(right) *= left;
+	}
 
-	template<typename T, size_t RowsL, size_t ColumnsR, size_t RowCol>
-	MatrixBase<T, RowsL, ColumnsR> operator*(
-		const MatrixBase<T, RowsL, RowCol> &left,
-		const MatrixBase<T, RowCol, ColumnsR> &right);
+	template<typename T, std::size_t M, std::size_t N>
+	constexpr MatrixBase<T, M, N> operator*(const MatrixBase<T, M, N>& left, const T& right)
+	{
+		return MatrixBase<T, M, N>(left) *= right;
+	}
 
-	template<typename T, size_t Rows, size_t Columns>
-	MatrixBase<T, Rows, Columns> operator*(
-		const T &left,
-		const MatrixBase<T, Rows, Columns> &right);
+	template<typename T, std::size_t M, std::size_t N>
+	constexpr VectorBase<T, M> operator*(const MatrixBase<T, M, N>& left, const VectorBase<T, N>& right)
+	{
+		VectorBase<T, M> result;
+		for (std::size_t i = 0; i < M; ++i) {
+			for (std::size_t j = 0; j < N; ++j) {
+				result(i) += left(i, j) * right(j);
+			}
+		}
+		return result;
+	}
 
-	template<typename T, size_t Rows, size_t Columns>
-	MatrixBase<T, Rows, Columns> operator*(
-		const MatrixBase<T, Rows, Columns> &left,
-		const T &right);
-
-	template<typename T, size_t Rows, size_t Columns>
-	VectorBase<T, Rows> operator*(
-		const MatrixBase<T, Rows, Columns> &left,
-		const VectorBase<T, Columns> &right);
-
-	template<typename T, size_t Rows, size_t Columns>
-	MatrixBase<T, Rows, Columns> operator/(
-		const MatrixBase<T, Rows, Columns> &left,
-		const T &right);
+	template<typename T, std::size_t M, std::size_t N>
+	constexpr MatrixBase<T, M, N> operator/(const MatrixBase<T, M, N>& left, const T& right)
+	{
+		return MatrixBase<T, M, N>(left) /= right;
+	}
 }
-
-#include "matrixBase.tpp"

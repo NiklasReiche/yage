@@ -15,21 +15,27 @@ namespace gml
 	 * @tparam T The type of the vector's components.
 	 * @tparam Size The vector's dimension.
 	 */
-	template<typename T, size_t Size>
+	template<typename T, std::size_t Size>
 	class VectorBase
 	{
 	public:
 		/**
 		 * @brief Value-initializes all vector components.
 		 */
-		VectorBase();
+		constexpr VectorBase()
+			: elements{ }
+		{
+		}
 
 		/**
 		 * @brief Initializes all vector components with a given value.
 		 * 
 		 * @param value The initializing value.
 		 */
-		explicit VectorBase(T value);
+		constexpr explicit VectorBase(T value)
+		{
+			elements.fill(value);
+		}
 
 		/**
 		* @brief Initializes the fields by an initializer list.
@@ -39,7 +45,13 @@ namespace gml
 		* @throws InvalidDimensionException if initializer list is different size
 		* from this vector's dimension
 		*/
-		VectorBase(const std::initializer_list<T> &init);
+		constexpr VectorBase(const std::initializer_list<T>& init)
+		{
+			if (init.size() != Size) {
+				throw InvalidDimensionException();
+			}
+			std::copy(std::begin(init), std::end(init), std::begin(elements));
+		}
 
 		/**
 		 * @brief Constructs a vector by copy-converting the components of another vector.
@@ -50,7 +62,12 @@ namespace gml
 		 * @param other Vector from which to copy and convert the components.
 		 */
 		template<typename T2>
-		VectorBase(const VectorBase<T2, Size> &other);
+		constexpr VectorBase(const VectorBase<T2, Size>& other)
+		{
+			for (std::size_t i = 0; i < Size; ++i) {
+				elements.at(i) = other(i);
+			}
+		}
 
 		/**
 		 * @brief Assigns this vector by copy-converting the components of another vector.
@@ -62,39 +79,55 @@ namespace gml
 		 * @return This vector.
 		 */
 		template<typename T2>
-		VectorBase<T, Size> &operator=(const VectorBase<T2, Size> &other);
+		constexpr VectorBase<T, Size>& operator=(const VectorBase<T2, Size>& other)
+		{
+			for (std::size_t i = 0; i < Size; ++i) {
+				elements.at(i) = other(i);
+			}
+			return *this;
+		}
 
 		/**
 		 * @brief Returns a reference to this vector's component at a given index.
-		 * 
+		 *
 		 * @param index The components's index.
 		 * @return A reference to the component.
 		 */
-		T &at(size_t index);
+		constexpr T& operator()(int i)
+		{
+			return elements.at(i);
+		}
 
 		/**
 		 * @brief Returns a const reference to this vector's component at a given index.
-		 * 
+		 *
 		 * @param pos The components's index.
 		 * @return A const reference to the component.
 		 */
-		const T &at(size_t pos) const;
+		constexpr const T& operator()(int i) const
+		{
+			return elements.at(i);
+		}
 
 		/**
-		 * @brief Returns the squared euclidean length of this vector.
-		 * 
-		 * @return The squared euclidean length of this vector.
+		 * @brief Gives direct access to the underlying array.
+		 *
+		 * @return Pointer to the underlying element storage (equal to the address of the first element).
 		 */
-		[[nodiscard]]
-		double sqrLength() const;
+		constexpr T* data() noexcept
+		{
+			return elements.data();
+		}
 
 		/**
-		 * @brief Returns the euclidean length of this vector.
-		 * 
-		 * @return The euclidean length of this vector.
+		 * @brief Gives direct access to the underlying array.
+		 *
+		 * @return Pointer to the underlying element storage (equal to the address of the first element).
 		 */
-		[[nodiscard]]
-		double length() const;
+		constexpr const T* data() const noexcept
+		{
+			return elements.data();
+		}
 
 		/**
 		 * @brief Normalizes this vector.
@@ -102,27 +135,46 @@ namespace gml
 		 * @return This vector.
 		 * @throws DivideByZeroException This vector's length is zero.
 		 */
-		VectorBase<T, Size> &normalize();
+		constexpr VectorBase<T, Size>& normalize();
 
 		/**
 		 * @brief Unary component-wise negation.
 		 * @return A negated vector.
 		 */
-		VectorBase<T, Size> operator-() const;
+		constexpr VectorBase<T, Size> operator-() const
+		{
+			VectorBase<T, Size> result;
+			for (std::size_t i = 0; i < Size; ++i) {
+				result(i) = -elements.at(i);
+			}
+			return result;
+		}
 
 		/**
 		 * @brief Component-wise addition.
 		 * @param right The vector to add to this vector.
 		 * @return This vector.
 		 */
-		VectorBase<T, Size> &operator+=(const VectorBase<T, Size> &right);
+		constexpr VectorBase<T, Size>& operator+=(const VectorBase<T, Size>& right)
+		{
+			for (std::size_t i = 0; i < Size; ++i) {
+				elements.at(i) += right(i);
+			}
+			return *this;
+		}
 
 		/**
 		 * @brief Component-wise subtraction.
 		 * @param right The vector to subtract from this vector.
 		 * @return This vector.
 		 */
-		VectorBase<T, Size> &operator-=(const VectorBase<T, Size> &right);
+		constexpr VectorBase<T, Size>& operator-=(const VectorBase<T, Size>& right)
+		{
+			for (std::size_t i = 0; i < Size; ++i) {
+				elements.at(i) -= right(i);
+			}
+			return *this;
+		}
 
 		/**
 		 * @brief Component-wise scalar multiplication.
@@ -130,8 +182,13 @@ namespace gml
 		 * @param right The scalar by which to multiply this vector.
 		 * @return This vector.
 		 */
-		template<typename T2>
-		VectorBase<T, Size> &operator*=(const T2 &right);
+		constexpr VectorBase<T, Size>& operator*=(const T& right)
+		{
+			for (std::size_t i = 0; i < Size; ++i) {
+				elements.at(i) *= right;
+			}
+			return *this;
+		}
 
 		/**
 		 * @brief Component-wise scalar division.
@@ -140,95 +197,148 @@ namespace gml
 		 * @return This vector.
 		 * @throws DivideByZeroException The scalar is zero.
 		 */
-		template<typename T2>
-		VectorBase<T, Size> &operator/=(const T2 &right);
+		constexpr VectorBase<T, Size>& operator/=(const T& right)
+		{
+			if (right == 0) {
+				throw DivideByZeroException();
+			}
+
+			for (std::size_t i = 0; i < Size; ++i) {
+				elements.at(i) /= right;
+			}
+			return *this;
+		}
 
 	private:
 		/**
 		* @brief The vector's components.
 		*/
-		std::array<T, Size> data;
+		std::array<T, Size> elements;
 	};
 
-	/**
-	* @brief Returns a normalized copy of a given vector.
-	*
-	* @tparam T The vector's type.
-	* @tparam Size The vector's dimension.
-	* @param vector The vector to normalize.
-	* @return A normalized copy of the vector.
-	*
-	* @throws DivideByZeroException The vector's length is zero.
-	*/
-	template<typename T, size_t Size>
-	VectorBase<T, Size> normalize(VectorBase<T, Size> vector);
+	template<typename T, std::size_t Size>
+	[[nodiscard]]
+	constexpr T dot(const VectorBase<T, Size>& left, const VectorBase<T, Size>& right)
+	{
+		T result = 0;
+		for (std::size_t i = 0; i < Size; ++i) {
+			result += left(i) * right(i);
+		}
+		return result;
+	}
 
 	/**
-	* @brief Calculates the dot product of two vectors.
-	*
-	* @tparam T The vectors' type.
-	* @tparam Size The vectors' dimension.
-	* @param left The first vector.
-	* @param right The second vector.
-	* @return The dot product.
-	*/
-	template<typename T, size_t Size>
-	T dot(const VectorBase<T, Size> &left, const VectorBase<T, Size> &right);
-
-	/**
-	 * @brief Computes the angle between two vectors.
+	 * @brief Returns the squared euclidean length of a vector.
 	 *
-	 * @tparam T The vectors' type.
-	 * @tparam Size The vectors' dimension.
-	 * @param left The first vector.
-	 * @param right The second vector.
-	 * @return The angle between the two vectors in radians.
-	 *
-	 * @throws DivideByZeroException One or both vector's lengths is zero.
+	 * @return The squared euclidean length of the vector.
 	 */
-	template<typename T, size_t Size>
-	double angle(const VectorBase<T, Size> &left, const VectorBase<T, Size> &right);
+	template<typename T, std::size_t Size>
+	[[nodiscard]]
+	constexpr double sqrLength(const VectorBase<T, Size>& vector)
+	{
+		return dot(vector, vector);
+	}
 
-	/* Overloaded Operators */
-	template<typename T, size_t Size>
-	std::ostream &operator<<(
-		std::ostream &os,
-		const VectorBase<T, Size> &vec);
+	/**
+	 * @brief Returns the euclidean length of a vector.
+	 *
+	 * @return The euclidean length of the vector.
+	 */
+	template<typename T, std::size_t Size>
+	[[nodiscard]]
+	constexpr double length(const VectorBase<T, Size>& vector)
+	{
+		return std::sqrt(sqrLength(vector));
+	}
 
-	template<typename T, size_t Size>
-	bool operator==(
-		const VectorBase<T, Size> &left,
-		const VectorBase<T, Size> &right);
+	/**
+	 * @brief Normalizes a vector.
+	 *
+	 * @return A normalized copy of the vector.
+	 *
+	 * @throws DivideByZeroException The vector's length is zero.
+	 */
+	template<typename T, std::size_t Size>
+	[[nodiscard]]
+	constexpr VectorBase<T, Size> normalize(const VectorBase<T, Size>& vector)
+	{
+		return vector / length(vector);
+	}
 
-	template<typename T, size_t Size>
-	bool operator!=(
-		const VectorBase<T, Size> &left,
-		const VectorBase<T, Size> &right);
+	template<typename T, std::size_t Size>
+	[[nodiscard]]
+	constexpr double angle(const VectorBase<T, Size>& lhs, const VectorBase<T, Size>& rhs)
+	{
+		const double lengths = length(lhs) * length(rhs);
+		if (lengths == 0.0) {
+			throw DivideByZeroException();
+		}
+		return std::acos(dot(lhs, rhs) / lengths);
+	}
 
-	template<typename T, size_t Size>
-	VectorBase<T, Size> operator+(
-		const VectorBase<T, Size> &left,
-		const VectorBase<T, Size> &right);
+	template<typename T, std::size_t Size>
+	std::ostream& operator<<(std::ostream& os, const VectorBase<T, Size>& vec)
+	{
+		os << "[";
+		for (std::size_t i = 0; i < Size; ++i) {
+			os << vec(i) << " ";
+		}
+		os << "]";
+		return os;
+	}
 
-	template<typename T, size_t Size>
-	VectorBase<T, Size> operator-(
-		const VectorBase<T, Size> &left,
-		const VectorBase<T, Size> &right);
+	template<typename T, std::size_t Size>
+	constexpr bool operator==(const VectorBase<T, Size>& lhs, const VectorBase<T, Size>& rhs)
+	{
+		for (std::size_t i = 0; i < Size; ++i) {
+			if (lhs(i) != rhs(i)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
-	template<typename T, size_t Size>
-	VectorBase<T, Size> operator*(
-		double left,
-		const VectorBase<T, Size> &right);
+	template<typename T, std::size_t Size>
+	constexpr bool operator!=(const VectorBase<T, Size>& lhs, const VectorBase<T, Size>& rhs)
+	{
+		return !(lhs == rhs);
+	}
 
-	template<typename T, size_t Size>
-	VectorBase<T, Size> operator*(
-		const VectorBase<T, Size> &left,
-		double right);
+	template<typename T, std::size_t Size>
+	constexpr VectorBase<T, Size> operator+(const VectorBase<T, Size>& lhs, const VectorBase<T, Size>& rhs)
+	{
+		return VectorBase<T, Size>(lhs) += rhs;
+	}
 
-	template<typename T, size_t Size>
-	VectorBase<T, Size> operator/(
-		const VectorBase<T, Size> &left,
-		double right);
+	template<typename T, std::size_t Size>
+	constexpr VectorBase<T, Size> operator-(const VectorBase<T, Size>& lhs, const VectorBase<T, Size>& rhs)
+	{
+		return VectorBase<T, Size>(lhs) -= rhs;
+	}
+
+	template<typename T, std::size_t Size>
+	constexpr VectorBase<T, Size> operator*(const double lhs, const VectorBase<T, Size>& rhs)
+	{
+		return VectorBase<T, Size>(rhs) *= lhs;
+	}
+
+	template<typename T, std::size_t Size>
+	constexpr VectorBase<T, Size> operator*(const VectorBase<T, Size>& lhs, const double rhs)
+	{
+		return VectorBase<T, Size>(lhs) *= rhs;
+	}
+
+	template<typename T, std::size_t Size>
+	constexpr VectorBase<T, Size> operator/(const VectorBase<T, Size>& lhs, const double rhs)
+	{
+		return VectorBase<T, Size>(lhs) /= rhs;
+	}
+
+	//-------------------------------------------------------------------------------------------
+
+	template<typename T, std::size_t Size>
+	constexpr VectorBase<T, Size>& VectorBase<T, Size>::normalize()
+	{
+		return operator=(gml::normalize(*this));
+	}
 }
-
-#include "vectorbase.tpp"

@@ -24,13 +24,28 @@ namespace gml
 		/**
 		 * @brief Constructs an identity matrix.
 		 */
-		Mat4();
+		constexpr Mat4()
+			: MatrixBase<T, 4, 4>()
+		{
+		}
 
-		Mat4(const Mat4<T>& other);
+		constexpr Mat4(const Mat4<T>& other)
+			: MatrixBase<T, 4, 4>(other)
+		{
+		}
 
-		Mat4(const MatrixBase<T, 4, 4>& other);
+		constexpr Mat4(const MatrixBase<T, 4, 4>& other)
+			: MatrixBase<T, 4, 4>(other)
+		{
+		}
 
-	public:
+		static constexpr const Mat4<T> Identity = {
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1
+		};
+
 		/**
 		* @brief Returns the translation component of this matrix.
 		*
@@ -46,7 +61,7 @@ namespace gml
 		Mat3<T> getRotation() const;
 
 		/**
-		* @brief Returs the scaling component of this matrix.
+		* @brief Returns the scaling component of this matrix.
 		*
 		* @return the scaling vector
 		*/
@@ -60,7 +75,6 @@ namespace gml
 		*/
 		Quaternion<T> toQuaternion();
 
-	public:
 		/**
 		* @brief Constructs a translation matrix.
 		*
@@ -70,14 +84,6 @@ namespace gml
 		* @return the translation matrix
 		*/
 		static Mat4<T> translate(const T& x, const T& y, const T& z);
-
-		/**
-		* @brief Constructs a translation matrix from a single value.
-		*
-		* @param translation the translation value
-		* @return the translation matrix
-		*/
-		static Mat4<T> translate(const T& translation);
 
 		/**
 		* @brief Constructs a translation matrix from a vector.
@@ -96,14 +102,6 @@ namespace gml
 		* @return the scaling matrix
 		*/
 		static Mat4<T> scale(const T& x, const T& y, const T& z);
-
-		/**
-		* @brief Constructs a scaling matrix from a single value.
-		*
-		* @param scale the scaling factor
-		* @return the scaling matrix
-		*/
-		static Mat4<T> scale(const T& scale);
 
 		/**
 		* @brief Constructs a scaling matrix from a vector.
@@ -132,7 +130,7 @@ namespace gml
 		static Mat4<T> quaternion(const Quaternion<T>& quaternion);
 
 		/**
-		* @brief Constructs a perspectiv projection matrix.
+		* @brief Constructs a perspective projection matrix.
 		*
 		* @param fov the field of view in degrees
 		* @param aspect the aspect ration
@@ -140,9 +138,7 @@ namespace gml
 		* @param far the far plane
 		* @return the projection matrix
 		*/
-		static Mat4<T> perspective(
-			double fov, double aspect,
-			double near, double far);
+		static Mat4<T> perspective(double fov, double aspect, double near, double far);
 
 		/**
 		* @brief Constructs an orthographic projection matrix.
@@ -155,10 +151,7 @@ namespace gml
 		* @param far the far plane
 		* @return the projection matrix
 		*/
-		static Mat4<T> orthographic(
-			double left, double right,
-			double bottom, double top,
-			double near, double far);
+		static Mat4<T> orthographic(double left, double right, double bottom, double top, double near, double far);
 
 		/**
 		* @brief Constructs a lookAt view matrix.
@@ -168,10 +161,7 @@ namespace gml
 		* @param up the camera up vector
 		* @return the view matrix
 		*/
-		static Mat4<T> lookAt(
-			const Vec3<T>& pos,
-			const Vec3<T>& target,
-			const Vec3<T>& up);
+		static Mat4<T> lookAt(const Vec3<T>& pos, const Vec3<T>& target, const Vec3<T>& up);
 	};
 }
 
