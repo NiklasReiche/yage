@@ -22,6 +22,8 @@ if(WIN32 OR UNIX)
 
 	message( STATUS "Building gtest --" )
 	include( gtest.cmake )
+
+	add_subdirectory(catch2)
 endif()
 
 if(ANDROID)
