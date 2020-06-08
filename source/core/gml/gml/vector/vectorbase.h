@@ -4,6 +4,7 @@
 #include <initializer_list>
 #include <ostream>
 
+#include "../constraints.h"
 #include "../exception.h"
 #include "../maths.h"
 
@@ -16,6 +17,7 @@ namespace gml
 	 * @tparam Size The vector's dimension.
 	 */
 	template<typename T, std::size_t Size>
+	requires StrictlyPositive<Size>
 	class VectorBase
 	{
 	public:
@@ -337,6 +339,7 @@ namespace gml
 	//-------------------------------------------------------------------------------------------
 
 	template<typename T, std::size_t Size>
+	requires StrictlyPositive<Size>
 	constexpr VectorBase<T, Size>& VectorBase<T, Size>::normalize()
 	{
 		return operator=(gml::normalize(*this));

@@ -5,6 +5,15 @@ target_include_directories(yageMath
 
 target_sources(yageMath
 
+	INTERFACE gml/constraints.h
+	INTERFACE gml/exception.h
+	INTERFACE gml/maths.h
+	INTERFACE gml/interpolation.h
+	INTERFACE gml/vector.h
+	INTERFACE gml/matrix.h
+	INTERFACE gml/quaternion.h
+	INTERFACE gml/quaternion.tpp
+
 	INTERFACE gml/vector/vectorBase.h
 	INTERFACE gml/vector/vec2.h
 	INTERFACE gml/vector/vec3.h
@@ -12,18 +21,9 @@ target_sources(yageMath
 
 	INTERFACE gml/matrix/matrixBase.h
 	INTERFACE gml/matrix/matrixOperations.h
-	INTERFACE gml/matrix/matrixSpecial.h
 	INTERFACE gml/matrix/mat2.h
 	INTERFACE gml/matrix/mat3.h
 	INTERFACE gml/matrix/mat4.h
-
-	INTERFACE gml/maths.h
-	INTERFACE gml/exception.h
-	INTERFACE gml/vector.h
-	INTERFACE gml/matrix.h
-	INTERFACE gml/quaternion.h
-	INTERFACE gml/quaternion.tpp
-	INTERFACE gml/interpolation.h
 	)
 
 add_subdirectory(tests)

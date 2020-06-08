@@ -5,9 +5,9 @@
 #include <ostream>
 #include <span>
 
+#include "../constraints.h"
 #include "../exception.h"
 #include "../maths.h"
-#include "matrixSpecial.h"
 #include "../vector/vectorbase.h"
 
 namespace gml
@@ -20,6 +20,7 @@ namespace gml
 	 * @tparam N The number of columns.
 	 */
 	template<typename T, std::size_t M, std::size_t N>
+	requires StrictlyPositive<M> && StrictlyPositive<N>
 	class MatrixBase
 	{
 	public:
