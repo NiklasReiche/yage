@@ -4,11 +4,11 @@
 #include <gml/interpolation.h>
 
 using namespace gml;
+using namespace std::numbers;
 
 TEST_CASE("RadDegConversion")
 {
-	double pi_d = gml::PI;
-	auto pi_f = static_cast<float>(gml::PI);
+	auto pi_f = pi_v<float>;
 
 	SECTION("toRad") {
 		SECTION("zero") {
@@ -18,9 +18,9 @@ TEST_CASE("RadDegConversion")
 		}
 		
 		SECTION("PI") {
-			CHECK(toRad(180.0) == Approx(pi_d));
-			CHECK(toRad(360.0) == Approx(2 * pi_d));
-			CHECK(toRad(540.0) == Approx(3 * pi_d));
+			CHECK(toRad(180.0) == Approx(pi));
+			CHECK(toRad(360.0) == Approx(2 * pi));
+			CHECK(toRad(540.0) == Approx(3 * pi));
 
 			CHECK(toRad(180.0f) == Approx(pi_f));
 			CHECK(toRad(360.0f) == Approx(2 * pi_f));
@@ -28,7 +28,7 @@ TEST_CASE("RadDegConversion")
 		}
 		
 		SECTION("negative") {
-			CHECK(toRad(-180.0) == Approx(-pi_d));
+			CHECK(toRad(-180.0) == Approx(-pi));
 
 			CHECK(toRad(-180.0f) == Approx(-pi_f));
 		}
@@ -42,9 +42,9 @@ TEST_CASE("RadDegConversion")
 		}
 
 		SECTION("PI") {
-			CHECK(toDeg(pi_d) == Approx(180.0));
-			CHECK(toDeg(2 * pi_d) == Approx(360.0));
-			CHECK(toDeg(3 * pi_d) == Approx(540.0));
+			CHECK(toDeg(pi) == Approx(180.0));
+			CHECK(toDeg(2 * pi) == Approx(360.0));
+			CHECK(toDeg(3 * pi) == Approx(540.0));
 
 			CHECK(toDeg(pi_f) == Approx(180.0f));
 			CHECK(toDeg(2 * pi_f) == Approx(360.0f));
@@ -52,7 +52,7 @@ TEST_CASE("RadDegConversion")
 		}
 
 		SECTION("negative") {
-			CHECK(toDeg(-pi_d) == Approx(-180.0));
+			CHECK(toDeg(-pi) == Approx(-180.0));
 
 			CHECK(toDeg(-pi_f) == Approx(-180.0f));
 		}

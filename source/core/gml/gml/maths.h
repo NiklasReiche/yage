@@ -1,12 +1,10 @@
 #pragma once
 
 #include <cmath>
+#include <numbers>
 
 namespace gml
 {
-	// TODO: Replace with c++20 <numbers> implementation
-	const double PI = 3.141592653589793238463;
-
 	/**
 	 * @brief Converts degrees to radians.
 	 * @param deg A value in degrees.
@@ -14,7 +12,7 @@ namespace gml
 	 */
 	inline double toRad(const double deg)
 	{
-		return deg * (PI / 180.0);
+		return deg * (std::numbers::pi / 180.0);
 	}
 
 	/**
@@ -22,7 +20,7 @@ namespace gml
 	 */
 	inline float toRad(const float deg)
 	{
-		return deg * (static_cast<float>(PI) / 180.0f);
+		return deg * (std::numbers::pi_v<float> / 180.0f);
 	}
 
 	/**
@@ -32,7 +30,7 @@ namespace gml
 	 */
 	inline double toDeg(const double rad)
 	{
-		return rad * (180.0 / PI);
+		return rad * (180.0 / std::numbers::pi);
 	}
 
 	/**
@@ -40,6 +38,6 @@ namespace gml
 	 */
 	inline float toDeg(const float rad)
 	{
-		return rad * (180.0f / static_cast<float>(PI));
+		return rad * (180.0f / std::numbers::pi_v<float>);
 	}
 }
