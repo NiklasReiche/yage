@@ -141,25 +141,7 @@ namespace gml
 		}
 
 		MatrixBase <T, N, N> mat = matrix;
-
-		// Initialize identity matrix
-		MatrixBase <T, N, N> inv;
-		for (std::size_t i = 0; i < N; ++i) {
-			inv(i, i) = 1;
-		}
-
-		/// switches the row i_min with the first non-zero row > i_min
-		/*
-		auto switchZero = [&mat, &inv](std::size_t i_min)
-		{
-			for (std::size_t i = i_min + 1; i < N; ++i) {
-				if (mat(i, i_min) != 0) {
-					mat.switchRows(i_min, i);
-					inv.switchRows(i_min, i);
-					break;
-				}
-			}
-		};*/
+		MatrixBase <T, N, N> inv = gml::Id<T, N>;
 
 		auto pivotSearch = [&mat](std::size_t i_min)
 		{

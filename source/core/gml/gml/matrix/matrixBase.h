@@ -12,15 +12,35 @@
 
 namespace gml
 {
+	template<typename T, std::size_t M, std::size_t N> requires StrictlyPositive<M> && StrictlyPositive<N>
+	class MatrixBase;
+
+	/**
+	 * @brief The NxN identity matrix.
+	 *
+	 * @tparam T The element type of the matrix.
+	 * @tparam N The dimension of the identity matrix.
+	 */
+	template<typename T, std::size_t N>
+	constexpr const MatrixBase<T, N, N> Id = []
+	{
+		MatrixBase<T, N, N> m;
+		for (std::size_t i = 0; i < N; ++i) {
+			m(i, i) = 1;
+		}
+		return m;
+	}();
+
 	/**
 	 * @brief Represents a generic NxM dimensional matrix.
+	 *
+	 * The dimensions must be greater than zero.
 	 * 
 	 * @tparam T The type of the matrix's components.
 	 * @tparam M The number of rows.
 	 * @tparam N The number of columns.
 	 */
-	template<typename T, std::size_t M, std::size_t N>
-	requires StrictlyPositive<M> && StrictlyPositive<N>
+	template<typename T, std::size_t M, std::size_t N> requires StrictlyPositive<M> && StrictlyPositive<N>
 	class MatrixBase
 	{
 	public:
@@ -263,7 +283,6 @@ namespace gml
 		std::array<T, N * M> elements;
 	};
 
-
 	template<typename T, std::size_t M, std::size_t N>
 	std::ostream& operator<<(std::ostream& os, const MatrixBase<T, M, N>& matrix)
 	{
@@ -272,7 +291,7 @@ namespace gml
 			for (std::size_t j = 0; j < N; ++j) {
 				os << (i == 0 && j == 0 ? "" : "  ") << (matrix(i, j) < 0 ? "" : " ") << matrix(i, j);
 			}
-			os << (i < M - 1 ? "\n": " ]\n");
+			os << (i < M - 1 ? "\n" : " ]\n");
 		}
 		return os;
 	}

@@ -3,42 +3,9 @@
 namespace gml
 {
 	template<typename T>
-	Vec3 <T> Mat4<T>::getTranslation() const
-	{
-		return Vec3<T>((*this)(0, 3), (*this)(1, 3), (*this)(2, 3));
-	}
-
-	template<typename T>
-	Mat3 <T> Mat4<T>::getRotation() const
-	{
-		Vec3<T> scale = getScale();
-		return Mat3<T>{
-			(*this)(0, 0) / scale.x, (*this)(0, 1) / scale.y, (*this)(0, 2) / scale.z,
-			(*this)(1, 0) / scale.x, (*this)(1, 1) / scale.y, (*this)(1, 2) / scale.z,
-			(*this)(2, 0) / scale.x, (*this)(2, 1) / scale.y, (*this)(2, 2) / scale.z
-		};
-	}
-
-	template<typename T>
-	Vec3 <T> Mat4<T>::getScale() const
-	{
-		return Vec3<T>{
-			Vec3<T>((*this)(0, 0), (*this)(1, 0), (*this)(2, 0)).length(),
-			Vec3<T>((*this)(0, 1), (*this)(1, 1), (*this)(2, 1)).length(),
-			Vec3<T>((*this)(0, 2), (*this)(1, 2), (*this)(2, 2)).length()
-		};
-	}
-
-	template<typename T>
-	Quaternion <T> Mat4<T>::toQuaternion()
-	{
-		return Quaternion<T>::rotationMatrix(*this);
-	}
-
-	template<typename T>
 	Mat4 <T> Mat4<T>::translate(const T& x, const T& y, const T& z)
 	{
-		Mat4<T> result = Identity;
+		Mat4<T> result = Id;
 		result(0, 3) = x;
 		result(1, 3) = y;
 		result(2, 3) = z;
@@ -54,7 +21,7 @@ namespace gml
 	template<typename T>
 	Mat4 <T> Mat4<T>::scale(const T& x, const T& y, const T& z)
 	{
-		Mat4<T> result = Identity;
+		Mat4<T> result = Id;
 		result(0, 0) = x;
 		result(1, 1) = y;
 		result(2, 2) = z;

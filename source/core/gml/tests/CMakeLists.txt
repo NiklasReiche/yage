@@ -6,7 +6,7 @@ add_executable(coreMathTest
 	vec3Test.cpp
 	matrixTest.cpp
 	#quaternionTest.cpp
-	)
+	matrixSpecialTest.cpp)
 
 target_link_libraries(coreMathTest
 	PUBLIC yageMath

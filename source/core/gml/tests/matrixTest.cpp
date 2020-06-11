@@ -178,6 +178,15 @@ TEST_CASE("MatrixBase test")
 		}
 	}
 
+	SECTION("Identity") {
+		Matrix<int, 2, 2> id = gml::Id<int, 2>;
+
+		CHECK(id(0, 0) == 1);
+		CHECK(id(0, 1) == 0);
+		CHECK(id(1, 0) == 0);
+		CHECK(id(1, 1) == 1);
+	}
+
 	SECTION("determinant") {
 		SECTION("Det_1x1") {
 			const Matrix<int, 1, 1> mat(7);
