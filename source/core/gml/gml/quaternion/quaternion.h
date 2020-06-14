@@ -232,19 +232,34 @@ namespace gml
 	}
 
 	template<typename T>
-	Quaternion<T> operator*(const Quaternion<T>& lhs, const Quaternion<T>& rhs)
+	constexpr bool operator==(const Quaternion<T>& lhs, const Quaternion<T>& rhs)
+	{
+		return lhs.w == rhs.w &&
+		       lhs.x == rhs.x &&
+		       lhs.y == rhs.y &&
+		       lhs.z == rhs.z;
+	}
+
+	template<typename T>
+	constexpr bool operator!=(const Quaternion<T>& lhs, const Quaternion<T>& rhs)
+	{
+		return !(lhs == rhs);
+	}
+
+	template<typename T>
+	constexpr Quaternion<T> operator*(const Quaternion<T>& lhs, const Quaternion<T>& rhs)
 	{
 		return Quaternion<T>(lhs) *= rhs;
 	}
 
 	template<typename T, typename T2>
-	Quaternion<T> operator*(const Quaternion<T>& lhs, const T2& rhs)
+	constexpr Quaternion<T> operator*(const Quaternion<T>& lhs, const T2& rhs)
 	{
 		return Quaternion<T>(lhs) *= rhs;
 	}
 
 	template<typename T, typename T2>
-	Quaternion<T> operator*(const T2& lhs, const Quaternion<T>& rhs)
+	constexpr Quaternion<T> operator*(const T2& lhs, const Quaternion<T>& rhs)
 	{
 		return Quaternion<T>(rhs) *= lhs;
 	}

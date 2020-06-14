@@ -2,6 +2,7 @@
 
 #include "matrix/matrixBase.h"
 #include "matrix/matrixOperations.h"
+#include "matrix/matrixConstructs.h"
 #include "matrix/mat2.h"
 #include "matrix/mat3.h"
 #include "matrix/mat4.h"
