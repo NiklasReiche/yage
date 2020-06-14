@@ -61,10 +61,25 @@ TEST_CASE("RadDegConversion")
 
 TEST_CASE("Lerp")
 {
-	CHECK(gml::lerp(0.0, 1.0, 0.5) == Approx(0.5));
-	CHECK(gml::lerp(0.0, 0.0, 0.5) == Approx(0));
-	CHECK(gml::lerp(0.0, 3.0, 1/3.0) == Approx(1));
-	CHECK(gml::lerp(-3.0, 1.0, 0.5) == Approx(-1));
+	SECTION("default") {
+		CHECK(lerp(0.0, 1.0, 0.5) == Approx(0.5));
+		CHECK(lerp(0.0, 3.0, 1 / 3.0) == Approx(1));
+		CHECK(lerp(0, 10, 0.5) == 5);
+	}
 
-	CHECK(gml::lerp(0, 10, 0.5) == 5);
+	SECTION("negative values") {
+		CHECK(lerp(-3.0, 1.0, 0.5) == Approx(-1));
+	}
+
+	SECTION("zero range") {
+		CHECK(lerp(0.0, 0.0, 0.5) == Approx(0));
+	}
+
+	SECTION("overflow") {
+		CHECK(lerp(0.0, 1.0, 2.0) == 1.0);
+	}
+
+	SECTION("underflow") {
+		CHECK(lerp(0.0, 1.0, -1.0) == 0.0);
+	};
 }
