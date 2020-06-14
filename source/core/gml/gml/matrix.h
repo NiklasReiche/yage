@@ -8,21 +8,21 @@
 
 namespace gml
 {
-	template <typename T, std::size_t Rows, std::size_t Columns>
+	template<typename T, std::size_t Rows, std::size_t Columns>
 	using Matrix = MatrixBase<T, Rows, Columns>;
 
-	typedef Mat2<int> Mat2i;
-	typedef Mat2<unsigned int> Mat2ui;
-	typedef Mat2<float> Mat2f;
-	typedef Mat2<double> Mat2d;
+	using Mat2i = Mat2<int>;
+	using Mat2u = Mat2<unsigned int>;
+	using Mat2f = Mat2<float>;
+	using Mat2d = Mat2<double>;
 
-	typedef Mat3<int> Mat3i;
-	typedef Mat3<unsigned int> Mat3ui;
-	typedef Mat3<float> Mat3f;
-	typedef Mat3<double> Mat3d;
+	using Mat3i = Mat3<int>;
+	using Mat3u = Mat3<unsigned int>;
+	using Mat3f = Mat3<float>;
+	using Mat3d = Mat3<double>;
 
-	typedef Mat4<int> Mat4i;
-	typedef Mat4<unsigned int> Mat4ui;
-	typedef Mat4<float> Mat4f;
-	typedef Mat4<double> Mat4d;
+	using Mat4i = Mat4<int>;
+	using Mat4u = Mat4<unsigned int>;
+	using Mat4f = Mat4<float>;
+	using Mat4d = Mat4<double>;
 }
