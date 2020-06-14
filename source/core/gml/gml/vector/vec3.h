@@ -22,24 +22,24 @@ namespace gml
 
 		using VectorBase<T, 3>::VectorBase;
 
-		Vec3(T x, T y, T z)
+		constexpr Vec3(T x, T y, T z)
 			: VectorBase<T, 3>({ x, y, z })
 		{
 		}
 
-		Vec3(const Vec3<T>& other)
-			: VectorBase<T, 3>(other)
-		{
-			// We need to define the copy constructor so the x,y,z references do not get copied
-		}
-
-		Vec3(const VectorBase<T, 3>& other)
+		constexpr Vec3(const VectorBase<T, 3>& other)
 			: VectorBase<T, 3>(other)
 		{
 			// Makes Vec3<T> and VectorBase<T, 3> interchangeable
 		}
 
-		Vec3<T>& operator=(const Vec3<T>& other)
+		constexpr Vec3(const Vec3<T>& other)
+			: VectorBase<T, 3>(other)
+		{
+			// We need to define the copy constructor so the x,y,z references do not get copied
+		}
+
+		constexpr Vec3<T>& operator=(const Vec3<T>& other)
 		{
 			// We need to define the copy assignment operator so the x,y,z references do not get copied
 			if (this != &other) {
@@ -48,17 +48,17 @@ namespace gml
 			return *this;
 		}
 
-		static Vec3<T> worldForward()
+		static constexpr Vec3<T> worldForward()
 		{
 			return Vec3<T>(0, 0, 1);
 		}
 
-		static Vec3<T> worldUp()
+		static constexpr Vec3<T> worldUp()
 		{
 			return Vec3<T>(0, 1, 0);
 		}
 
-		static Vec3<T> worldRight()
+		static constexpr Vec3<T> worldRight()
 		{
 			return Vec3<T>(-1, 0, 0);
 		}
@@ -73,7 +73,7 @@ namespace gml
 	* @return the cross product
 	*/
 	template<typename T>
-	Vec3<T> cross(Vec3<T> left, Vec3<T> right)
+	constexpr Vec3<T> cross(Vec3<T> left, Vec3<T> right)
 	{
 		Vec3<T> result;
 		result.x = left.y * right.z - left.z * right.y;

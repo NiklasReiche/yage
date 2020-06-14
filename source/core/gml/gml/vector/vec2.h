@@ -21,24 +21,24 @@ namespace gml
 
 		using VectorBase<T, 2>::VectorBase;
 
-		Vec2(T x, T y)
+		constexpr Vec2(T x, T y)
 			: VectorBase<T, 2>({ x, y })
 		{
 		}
 
-		Vec2(const Vec2<T>& other)
-			: VectorBase<T, 2>(other)
-		{
-			// We need to define the copy constructor so the x,y references do not get copied
-		}
-
-		Vec2(const VectorBase<T, 2>& other)
+		constexpr Vec2(const VectorBase<T, 2>& other)
 			: VectorBase<T, 2>(other)
 		{
 			// Makes Vec2<T> and VectorBase<T, 2> interchangeable
 		}
 
-		Vec2<T>& operator=(const Vec2<T>& other)
+		constexpr Vec2(const Vec2<T>& other)
+			: VectorBase<T, 2>(other)
+		{
+			// We need to define the copy constructor so the x,y references do not get copied
+		}
+
+		constexpr Vec2<T>& operator=(const Vec2<T>& other)
 		{
 			// We need to define the copy assignment operator so the x,y references do not get copied
 			if (this != &other) {

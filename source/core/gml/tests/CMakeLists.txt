@@ -2,8 +2,7 @@ add_executable(coreMathTest
 	main.cpp
 	mathTest.cpp
 	vectorTest.cpp
-	vec2Test.cpp
-	vec3Test.cpp
+	vecXTest.cpp
 	matrixTest.cpp
 	#quaternionTest.cpp
 	matrixSpecialTest.cpp)

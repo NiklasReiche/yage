@@ -283,7 +283,7 @@ namespace gml
 	{
 		os << "[";
 		for (std::size_t i = 0; i < Size; ++i) {
-			os << vec(i) << " ";
+			os << vec(i) << (i == Size - 1 ? "" : " ");
 		}
 		os << "]";
 		return os;

@@ -23,24 +23,24 @@ namespace gml
 
 		using VectorBase<T, 4>::VectorBase;
 
-		Vec4(T x, T y, T z, T w)
+		constexpr Vec4(T x, T y, T z, T w)
 			: VectorBase<T, 4>({ x, y, z, w })
 		{
 		}
 
-		Vec4(const Vec4<T>& other)
-			: VectorBase<T, 4>(other)
-		{
-			// We need to define the copy constructor so the x,y,z,w references do not get copied
-		}
-
-		Vec4(const VectorBase<T, 4>& other)
+		constexpr Vec4(const VectorBase<T, 4>& other)
 			: VectorBase<T, 4>(other)
 		{
 			// Makes Vec4<T> and VectorBase<T, 4> interchangeable
 		}
 
-		Vec4<T>& operator=(const Vec4<T>& other)
+		constexpr Vec4(const Vec4<T>& other)
+			: VectorBase<T, 4>(other)
+		{
+			// We need to define the copy constructor so the x,y,z,w references do not get copied
+		}
+
+		constexpr Vec4<T>& operator=(const Vec4<T>& other)
 		{
 			if (this != &other) {
 				VectorBase<T, 4>::operator=(other);
