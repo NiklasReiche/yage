@@ -2,7 +2,7 @@
 
 #include "mat4.h"
 
-namespace gml
+namespace gml::matrix
 {
 	/**
 	 * @brief Constructs a translation matrix.
@@ -107,7 +107,7 @@ namespace gml
 	template<typename T>
 	Mat4<T> quaternion(const Quaternion<T>& quaternion)
 	{
-		const Quaternion<T> q = normalize(quaternion);;
+		const Quaternion<T> q = normalize(quaternion);
 
 		Mat4<T> result;
 		result(0, 0) = 1 - 2 * q.y * q.y - 2 * q.z * q.z;
