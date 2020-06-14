@@ -10,6 +10,12 @@
 
 namespace gml
 {
+	template<typename T, std::size_t Size> requires StrictlyPositive<Size>
+	class VectorBase;
+
+	template<typename T, std::size_t Size>
+	constexpr double length(const VectorBase <T, Size>& vector);
+
 	/**
 	 * @brief Represents a generic n-dimensional vector.
 	 * 
@@ -137,7 +143,10 @@ namespace gml
 		 * @return This vector.
 		 * @throws DivideByZeroException This vector's length is zero.
 		 */
-		constexpr VectorBase<T, Size>& normalize();
+		constexpr VectorBase<T, Size>& normalize()
+		{
+			return operator/=(length(*this));
+		}
 
 		/**
 		 * @brief Unary component-wise negation.
@@ -218,65 +227,7 @@ namespace gml
 		std::array<T, Size> elements;
 	};
 
-	template<typename T, std::size_t Size>
-	[[nodiscard]]
-	constexpr T dot(const VectorBase<T, Size>& left, const VectorBase<T, Size>& right)
-	{
-		T result = 0;
-		for (std::size_t i = 0; i < Size; ++i) {
-			result += left(i) * right(i);
-		}
-		return result;
-	}
 
-	/**
-	 * @brief Returns the squared euclidean length of a vector.
-	 *
-	 * @return The squared euclidean length of the vector.
-	 */
-	template<typename T, std::size_t Size>
-	[[nodiscard]]
-	constexpr double sqrLength(const VectorBase<T, Size>& vector)
-	{
-		return dot(vector, vector);
-	}
-
-	/**
-	 * @brief Returns the euclidean length of a vector.
-	 *
-	 * @return The euclidean length of the vector.
-	 */
-	template<typename T, std::size_t Size>
-	[[nodiscard]]
-	constexpr double length(const VectorBase<T, Size>& vector)
-	{
-		return std::sqrt(sqrLength(vector));
-	}
-
-	/**
-	 * @brief Normalizes a vector.
-	 *
-	 * @return A normalized copy of the vector.
-	 *
-	 * @throws DivideByZeroException The vector's length is zero.
-	 */
-	template<typename T, std::size_t Size>
-	[[nodiscard]]
-	constexpr VectorBase<T, Size> normalize(const VectorBase<T, Size>& vector)
-	{
-		return vector / length(vector);
-	}
-
-	template<typename T, std::size_t Size>
-	[[nodiscard]]
-	constexpr double angle(const VectorBase<T, Size>& lhs, const VectorBase<T, Size>& rhs)
-	{
-		const double lengths = length(lhs) * length(rhs);
-		if (lengths == 0.0) {
-			throw DivideByZeroException();
-		}
-		return std::acos(dot(lhs, rhs) / lengths);
-	}
 
 	template<typename T, std::size_t Size>
 	std::ostream& operator<<(std::ostream& os, const VectorBase<T, Size>& vec)
@@ -334,14 +285,5 @@ namespace gml
 	constexpr VectorBase<T, Size> operator/(const VectorBase<T, Size>& lhs, const double rhs)
 	{
 		return VectorBase<T, Size>(lhs) /= rhs;
-	}
-
-	//-------------------------------------------------------------------------------------------
-
-	template<typename T, std::size_t Size>
-	requires StrictlyPositive<Size>
-	constexpr VectorBase<T, Size>& VectorBase<T, Size>::normalize()
-	{
-		return operator=(gml::normalize(*this));
 	}
 }

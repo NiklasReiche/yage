@@ -15,6 +15,7 @@ target_sources(yageMath
 	INTERFACE gml/quaternion.tpp
 
 	INTERFACE gml/vector/vectorBase.h
+	INTERFACE gml/vector/vectorOperations.h
 	INTERFACE gml/vector/vec2.h
 	INTERFACE gml/vector/vec3.h
 	INTERFACE gml/vector/vec4.h

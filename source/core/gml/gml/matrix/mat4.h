@@ -3,6 +3,7 @@
 #include "matrixBase.h"
 #include "mat3.h"
 #include "../vector/vec3.h"
+#include "../vector/vectorOperations.h"
 
 namespace gml
 {
