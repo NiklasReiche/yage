@@ -8,7 +8,7 @@
 #include "../constraints.h"
 #include "../exception.h"
 #include "../maths.h"
-#include "../vector/vectorbase.h"
+#include "../vector/vectorBase.h"
 
 namespace gml
 {

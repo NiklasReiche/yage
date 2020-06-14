@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vectorbase.h"
+#include "vectorBase.h"
 
 namespace gml
 {

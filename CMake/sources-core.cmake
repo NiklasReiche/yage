@@ -7,7 +7,7 @@
 set( YAGE_GRAPHICS_SOURCE
 
 	"${YAGE_CORE_PATH}/graphics/color.h"
-	"${YAGE_CORE_PATH}/graphics/renderer.h"
+	"${YAGE_CORE_PATH}/graphics/Renderer.h"
 	"${YAGE_CORE_PATH}/graphics/graphics.h"
 
 	"${YAGE_CORE_PATH}/graphics/Context.h"
