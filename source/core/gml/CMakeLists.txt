@@ -22,6 +22,7 @@ target_sources(yageMath
 
 	INTERFACE gml/matrix/matrixBase.h
 	INTERFACE gml/matrix/matrixOperations.h
+	INTERFACE gml/matrix/matrixConstructs.h
 	INTERFACE gml/matrix/mat2.h
 	INTERFACE gml/matrix/mat3.h
 	INTERFACE gml/matrix/mat4.h
