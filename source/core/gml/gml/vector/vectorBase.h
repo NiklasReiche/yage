@@ -46,6 +46,16 @@ namespace gml
 		}
 
 		/**
+		 * @brief Initializes the components from a continuous memory block.
+		 *
+		 * @param data Continuous memory to copy elements from.
+		 */
+		constexpr explicit VectorBase(std::span<T, Size> data)
+		{
+			std::copy(data.begin(), data.end(), elements.begin());
+		}
+
+		/**
 		* @brief Initializes the fields by an initializer list.
 		*
 		* @param init the initializer list
@@ -109,7 +119,7 @@ namespace gml
 		/**
 		 * @brief Returns a const reference to this vector's component at a given index.
 		 *
-		 * @param pos The components's index.
+		 * @param pos The component's index.
 		 * @return A const reference to the component.
 		 */
 		constexpr const T& operator()(int i) const
@@ -122,6 +132,7 @@ namespace gml
 		 *
 		 * @return Pointer to the underlying element storage (equal to the address of the first element).
 		 */
+		[[nodiscard]]
 		constexpr T* data() noexcept
 		{
 			return elements.data();
@@ -132,6 +143,7 @@ namespace gml
 		 *
 		 * @return Pointer to the underlying element storage (equal to the address of the first element).
 		 */
+		[[nodiscard]]
 		constexpr const T* data() const noexcept
 		{
 			return elements.data();
