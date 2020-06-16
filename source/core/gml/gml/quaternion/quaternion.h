@@ -61,7 +61,7 @@ namespace gml
 		 * 
 		 * @param v The vector to construct from.
 		 */
-		constexpr Quaternion(const Vec3<T>& v)
+		constexpr explicit Quaternion(const Vec3<T>& v)
 			: w(0), x(v.x), y(v.y), z(v.z)
 		{
 		}
@@ -98,6 +98,7 @@ namespace gml
 		 * 
 		 * @return the Forward vector
 		 */
+		[[nodiscard]]
 		constexpr Vec3<T> getForward() const
 		{
 			Quaternion<T> q = gml::normalize(*this);
@@ -110,6 +111,7 @@ namespace gml
 		 * 
 		 * @return the Right vector
 		 */
+		[[nodiscard]]
 		constexpr Vec3<T> getRight() const
 		{
 			Quaternion<T> q = gml::normalize(*this);
@@ -122,6 +124,7 @@ namespace gml
 		 * 
 		 * @return the Up vector
 		 */
+		[[nodiscard]]
 		constexpr Vec3<T> getUp() const
 		{
 			Quaternion<T> q = gml::normalize(*this);
@@ -134,6 +137,7 @@ namespace gml
 		 * 
 		 * @return the pitch in radians
 		 */
+		[[nodiscard]]
 		constexpr double getPitch() const
 		{
 			const auto unit = sqrLength(*this);
@@ -154,6 +158,7 @@ namespace gml
 		*
 		* @return the yaw in radians
 		*/
+		[[nodiscard]]
 		constexpr double getYaw() const
 		{
 			const auto unit = sqrLength(*this);
@@ -176,6 +181,7 @@ namespace gml
 		*
 		* @return the roll in radians
 		*/
+		[[nodiscard]]
 		constexpr double getRoll() const
 		{
 			const auto unit = sqrLength(*this);
@@ -194,13 +200,14 @@ namespace gml
 		 * 
 		 * @return the matrix
 		 */
-		Mat4<T> toMatrix()
+		[[nodiscard]]
+		constexpr Mat4<T> toMatrix() const
 		{
 			return Mat4<T>::quaternion(*this);
 		}
 
 		template<typename T2>
-		Quaternion<T>& operator*=(const T2& rhs)
+		constexpr Quaternion<T>& operator*=(const T2& rhs)
 		{
 			x *= rhs;
 			y *= rhs;
@@ -209,7 +216,7 @@ namespace gml
 			return *this;
 		}
 
-		Quaternion<T>& operator*=(const Quaternion<T>& rhs)
+		constexpr Quaternion<T>& operator*=(const Quaternion<T>& rhs)
 		{
 			Vec3<T> a = Vec3<T>(x, y, z);
 			Vec3<T> b = Vec3<T>(rhs.x, rhs.y, rhs.z);

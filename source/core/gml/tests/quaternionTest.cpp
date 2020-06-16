@@ -19,7 +19,7 @@ static void EXPECT_VEC(Vector<T, size> expected, VectorBase<T, size> result)
 {
 	for (size_t i = 0; i < size; ++i)
 	{
-		CHECK(Approx(expected(i)) == result(i));
+		CHECK(Approx(expected(i)).margin(1e-12) == result(i));
 	}
 }
 
