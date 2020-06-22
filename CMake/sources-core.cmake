@@ -2,42 +2,12 @@
 # source/core/Cmake
 #########################
 
-set( YAGE_MATH_SOURCE
 
-	"${YAGE_CORE_PATH}/math/maths.h"
-	"${YAGE_CORE_PATH}/math/exception.h"
-
-	"${YAGE_CORE_PATH}/math/vector/vectorbase.h"
-	"${YAGE_CORE_PATH}/math/vector/vectorbase.tpp"
-	"${YAGE_CORE_PATH}/math/vector/vec2.h"
-	"${YAGE_CORE_PATH}/math/vector/vec2.tpp"
-	"${YAGE_CORE_PATH}/math/vector/vec3.h"
-	"${YAGE_CORE_PATH}/math/vector/vec3.tpp"
-	"${YAGE_CORE_PATH}/math/vector/vec4.h"
-	"${YAGE_CORE_PATH}/math/vector/vec4.tpp"
-
-	"${YAGE_CORE_PATH}/math/matrix/matrixBase.h"
-	"${YAGE_CORE_PATH}/math/matrix/matrixBase.tpp"
-	"${YAGE_CORE_PATH}/math/matrix/matrixSpecial.h"
-	"${YAGE_CORE_PATH}/math/matrix/mat2.h"
-	"${YAGE_CORE_PATH}/math/matrix/mat2.tpp"
-	"${YAGE_CORE_PATH}/math/matrix/mat3.h"
-	"${YAGE_CORE_PATH}/math/matrix/mat3.tpp"
-	"${YAGE_CORE_PATH}/math/matrix/mat4.h"
-	"${YAGE_CORE_PATH}/math/matrix/mat4.tpp"
-
-	"${YAGE_CORE_PATH}/math/vector.h"
-	"${YAGE_CORE_PATH}/math/matrix.h"
-	"${YAGE_CORE_PATH}/math/quaternion.h"
-	"${YAGE_CORE_PATH}/math/quaternion.tpp"
-
-	"${YAGE_CORE_PATH}/math/interpolation.h"
-)
 
 set( YAGE_GRAPHICS_SOURCE
 
 	"${YAGE_CORE_PATH}/graphics/color.h"
-	"${YAGE_CORE_PATH}/graphics/renderer.h"
+	"${YAGE_CORE_PATH}/graphics/Renderer.h"
 	"${YAGE_CORE_PATH}/graphics/graphics.h"
 
 	"${YAGE_CORE_PATH}/graphics/Context.h"

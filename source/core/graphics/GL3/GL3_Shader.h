@@ -5,8 +5,6 @@
 
 #include <platform/OpenGL.h>
 #include "GL3_Object.h"
-#include "math/vector.h"
-#include "math/matrix.h"
 #include "../Shader.h"
 
 namespace gl3
