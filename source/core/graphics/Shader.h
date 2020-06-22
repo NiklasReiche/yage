@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include <math/vector.h>
-#include <math/matrix.h>
+#include <gml/vector.h>
+#include <gml/matrix.h>
 
 namespace gl
 {

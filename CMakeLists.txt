@@ -2,10 +2,12 @@ cmake_minimum_required(VERSION 3.6)
 
 project( YAGE CXX C )
 
+cmake_policy(SET CMP0076 NEW)
+
 set( YAGE_VERSION_MAJOR 0 )
 set( YAGE_VERSION_MINOR 1 )
 
-set( CMAKE_CXX_STANDARD 17 )
+set( CMAKE_CXX_STANDARD 20 )
 
 
 ######################
@@ -30,7 +32,7 @@ endif()
 # compiler flags     #
 ######################
 set( GCC_COMPILER_FLAGS
-		"-fdiagnostics-color=always -Wall --coverage"
+		"-fdiagnostics-color=always -Wall -Wextra -Werror --coverage"
 )
 set( MSVC_COMPILER_FLAGS
 	"/MP"
@@ -75,6 +77,10 @@ set( YAGE_TOOLS_PATH 	"${CMAKE_SOURCE_DIR}/source/tools" 		)
 # subdirectories 	 #
 ######################
 
+if (YAGE_BUILD_TESTS)
+	enable_testing()
+endif ()
+
 add_subdirectory( external )
 
 add_subdirectory( source/core )
@@ -96,5 +102,6 @@ endif()
 
 
 if(YAGE_BUILD_TESTS)
+	enable_testing()
 	add_subdirectory( tests )
 endif()
