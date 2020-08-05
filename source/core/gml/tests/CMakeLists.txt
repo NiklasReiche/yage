@@ -8,7 +8,7 @@ add_executable(coreMathTest
 	quaternionTest.cpp)
 
 target_link_libraries(coreMathTest
-	PUBLIC yageMath
+	PUBLIC yage_gml
 	PUBLIC catch2
 	)
 

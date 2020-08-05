@@ -1,9 +1,9 @@
-add_library(yageMath INTERFACE)
+add_library(yage_gml INTERFACE)
 
-target_include_directories(yageMath
+target_include_directories(yage_gml
 	INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 
-target_sources(yageMath
+target_sources(yage_gml
 
 	INTERFACE gml/gml.h
 
