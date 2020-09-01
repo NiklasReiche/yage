@@ -33,8 +33,7 @@ namespace sys::desktop
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 
-		glfwWindow = glfwCreateWindow(width, height, title.c_str(),
-			nullptr, nullptr);
+		glfwWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 
 		if (glfwWindow == nullptr) {
 			glfwTerminate();
@@ -55,11 +54,11 @@ namespace sys::desktop
 		dpi = 96;
 	}
 
-	void GlfwWindow::showWindow()
+	void GlfwWindow::show()
 	{
 		glfwShowWindow(glfwWindow);
 	}
-	void GlfwWindow::hideWindow()
+	void GlfwWindow::hide()
 	{
 		glfwHideWindow(glfwWindow);
 	}
@@ -150,7 +149,7 @@ namespace sys::desktop
 		inputListeners.emplace_back(listener);
 	}
 
-	void GlfwWindow::detach(input::InputListener& listener)
+	void GlfwWindow::detach(input::InputListener&)
 	{
 		throw NotImplementedException();
 	}
@@ -177,11 +176,11 @@ namespace sys::desktop
 		}
 	}
 
-	void GlfwWindow::onCharEvent(GLFWwindow* window, const unsigned int codepoint)
+	void GlfwWindow::onCharEvent(GLFWwindow*, const unsigned int)
 	{
 		throw NotImplementedException();
 	}
-	void GlfwWindow::onKeyEvent(GLFWwindow* window, const int key, const int scancode, const int action, const int mode)
+	void GlfwWindow::onKeyEvent(GLFWwindow* window, const int key, const int, const int action, const int)
 	{
 		auto handle = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
 		const input::KeyEvent event(convertToKeyCode(key), convertToKeyAction(action));
@@ -193,7 +192,7 @@ namespace sys::desktop
 		const input::MousePosEvent event(static_cast<float>(xPos), static_cast<float>(yPos));
 		handle->notifyListeners(event);
 	}
-	void GlfwWindow::onMouseButtonEvent(GLFWwindow* window, const int button, const int action, const int mods)
+	void GlfwWindow::onMouseButtonEvent(GLFWwindow* window, const int button, const int action, const int)
 	{
 		auto handle = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
 		const input::KeyEvent event(convertToMouseButtonCode(button), convertToKeyAction(action));
@@ -202,7 +201,7 @@ namespace sys::desktop
 	void GlfwWindow::onMouseWheelEvent(GLFWwindow* window, const double xOffset, const double yOffset)
 	{
 		auto handle = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
-		const input::MousePosEvent event(static_cast<float>(xOffset), static_cast<float>(yOffset));
+		const input::MouseWheelEvent event(static_cast<float>(xOffset), static_cast<float>(yOffset));
 		handle->notifyListeners(event);
 	}
 

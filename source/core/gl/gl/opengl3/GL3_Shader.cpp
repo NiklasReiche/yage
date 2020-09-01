@@ -80,10 +80,7 @@ namespace gl3
 		if (!hasUniform(name)) 
 			return;
 		
-		float matrix[16];
-		value.convertToArray(matrix);
-		
 		lockContextPtr()->bindShader(program);
-		glUniformMatrix4fv(uniformLocations.at(name), 1, GL_TRUE, matrix);
+		glUniformMatrix4fv(uniformLocations.at(name), 1, GL_TRUE, value.data());
 	}
 }

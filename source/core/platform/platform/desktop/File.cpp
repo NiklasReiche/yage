@@ -84,7 +84,7 @@ namespace sys::desktop
 		}
 	}
 
-	void File::write(std::stringstream & data)
+	void File::write(std::stringstream &)
 	{
 		throw NotImplementedException();
 	}

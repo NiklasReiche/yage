@@ -18,8 +18,8 @@ namespace gl3
 	class GL3_Context : public gl::IContext, public std::enable_shared_from_this<GL3_Context>
 	{
 	public:
-		explicit GL3_Context(sys::desktop::GlfwWindow* window);
-		~GL3_Context() = default;
+		explicit GL3_Context(sys::desktop::GlfwWindow* window, int width, int height);
+		~GL3_Context() override = default;
 
 		void makeCurrent();
 

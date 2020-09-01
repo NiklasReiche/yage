@@ -6,7 +6,6 @@ target_include_directories(yage_gl
 	INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 
 target_link_libraries(yage_gl
-	PUBLIC opengl_libs
 	PUBLIC yage_platform
 	PUBLIC yage_gml
 	)
@@ -41,7 +40,7 @@ elseif (UNIX)
 	target_link_libraries(yage_gl PUBLIC libGL.so)
 	add_subdirectory(gl/opengl3)
 elseif (ANDROID)
-	add_subdirectory(gl/opengles2)
+
 endif ()
 
 add_subdirectory(tests)

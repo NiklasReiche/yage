@@ -18,6 +18,16 @@ target_sources(yage_platform
 	INTERFACE platform/File.h
 	INTERFACE platform/FileLoader.h
 	INTERFACE platform/FileException.h
+
+	INTERFACE platform/input/Event.h
+	INTERFACE platform/input/Event.cpp
+	INTERFACE platform/input/KeyEvent.h
+	INTERFACE platform/input/KeyEvent.cpp
+	INTERFACE platform/input/MousePosEvent.h
+	INTERFACE platform/input/MousePosEvent.cpp
+	INTERFACE platform/input/MouseWheelEvent.h
+	INTERFACE platform/input/MouseWheelEvent.cpp
+
 	)
 
 if (WIN32 OR UNIX)

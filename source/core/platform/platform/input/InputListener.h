@@ -16,8 +16,8 @@ namespace input
 		InputListener& operator=(const InputListener& other) = default;
 		InputListener& operator=(InputListener&& other) = default;
 
-		virtual void onKeyEvent(const KeyEvent & event) {}
-		virtual void onMousePosEvent(const MousePosEvent& event) {}
-		virtual void onMouseWheelEvent(const MouseWheelEvent& event) {}
+		virtual void onKeyEvent(const KeyEvent&) {}
+		virtual void onMousePosEvent(const MousePosEvent&) {}
+		virtual void onMouseWheelEvent(const MouseWheelEvent&) {}
 	};
 }

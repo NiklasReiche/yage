@@ -5,14 +5,12 @@
 #include <functional>
 
 #include "../OpenGL.h"
-
-#include <gl/Context.h>
-
 #include "../Window.h"
-#include "File.h"
 #include "../input/InputListener.h"
-#include "input/KeyEvent.h"
-#include "input/MousePosEvent.h"
+#include "../input/KeyEvent.h"
+#include "../input/MousePosEvent.h"
+
+#include "File.h"
 
 namespace sys::desktop
 {
@@ -20,7 +18,7 @@ namespace sys::desktop
 	{
 	public:
 		GlfwWindow();
-		~GlfwWindow();
+		~GlfwWindow() override;
 
 		void initializeContext(
 			int width, 
@@ -32,8 +30,8 @@ namespace sys::desktop
 		void makeCurrent() override;
 		void pollEvents() override;
 		void swapBuffers() override;
-		void showWindow();
-		void hideWindow();
+		void show() override;
+		void hide() override;
 
 		[[nodiscard]]
 		int getWidth() const override;

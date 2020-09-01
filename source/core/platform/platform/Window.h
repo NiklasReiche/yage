@@ -14,6 +14,9 @@ namespace sys
 	public:
 		virtual ~IWindow() = default;
 
+		virtual void show() = 0;
+		virtual void hide() = 0;
+
 		virtual void makeCurrent() = 0;
 		virtual void pollEvents() = 0;
 		virtual void swapBuffers() = 0;

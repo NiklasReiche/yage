@@ -10,18 +10,19 @@
 namespace gl3
 {
 	void APIENTRY onGlError(
-		const GLenum source, const GLenum type, const GLuint id, const GLenum severity,
-		const GLsizei length, const GLchar* message, const void* userParam)
+		const GLenum, const GLenum, const GLuint id, const GLenum severity,
+		const GLsizei, const GLchar* message, const void*)
 	{
-		//fprintf(stdout, "%s\n", message);
 		if (severity == GL_DEBUG_SEVERITY_HIGH) {
 			throw GlException(id, std::string(message));
 		}
 	}
 
-	GL3_Context::GL3_Context(sys::desktop::GlfwWindow* window)
+	GL3_Context::GL3_Context(sys::desktop::GlfwWindow* window, int width, int height)
 		: window(window)
 	{
+		window->initializeContext(width, height);
+
 		// --- GLAD ---
 		if (!gladLoadGLLoader(GLADloadproc(glfwGetProcAddress)))
 		{
