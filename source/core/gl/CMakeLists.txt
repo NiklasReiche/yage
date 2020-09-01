@@ -7,8 +7,7 @@ target_include_directories(yage_gl
 
 target_link_libraries(yage_gl
 	PUBLIC opengl_libs
-	PUBLIC glfw
-	PUBLIC glad
+	PUBLIC yage_platform
 	PUBLIC yage_gml
 	)
 
@@ -21,7 +20,7 @@ target_sources(yage_gl
 
 	INTERFACE gl/PixelTransfer.h
 	INTERFACE gl/ImageFormat.h
-	INTERFACE gl/Texture2d.h
+	INTERFACE gl/Texture2D.h
 	INTERFACE gl/Cubemap.h
 	INTERFACE gl/TextureCreator.h
 

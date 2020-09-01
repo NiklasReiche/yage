@@ -1,6 +1,5 @@
 #include "GlfwWindow.h"
 #include <tfd/tinyfiledialogs.h>
-#include <graphics/GL3/GL3_Context.h>
 #include <utils/utils.h>
 #include <utils/NotImplementedException.h>
 
@@ -22,7 +21,7 @@ namespace sys::desktop
 		glfwTerminate();
 	}
 
-	std::shared_ptr<gl::IContext> GlfwWindow::createContext(
+	void GlfwWindow::initializeContext(
 		const int width, const int height, const std::string& title,
 		const int versionMajor, const int versionMinor)
 	{
@@ -54,8 +53,6 @@ namespace sys::desktop
 		glfwSetScrollCallback(glfwWindow, onMouseWheelEvent);
 
 		dpi = 96;
-
-		return std::make_unique<gl3::GL3_Context>(this);
 	}
 
 	void GlfwWindow::showWindow()

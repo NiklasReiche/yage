@@ -1,3 +1,5 @@
+message(STATUS "Configuring yage_gml")
+
 add_library(yage_gml INTERFACE)
 
 target_include_directories(yage_gml

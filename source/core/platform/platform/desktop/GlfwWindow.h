@@ -6,13 +6,13 @@
 
 #include "../OpenGL.h"
 
-#include <graphics/Context.h>
+#include <gl/Context.h>
 
 #include "../Window.h"
 #include "File.h"
-#include <input/InputListener.h>
-#include <input/KeyEvent.h>
-#include <input/MousePosEvent.h>
+#include "../input/InputListener.h"
+#include "input/KeyEvent.h"
+#include "input/MousePosEvent.h"
 
 namespace sys::desktop
 {
@@ -22,7 +22,7 @@ namespace sys::desktop
 		GlfwWindow();
 		~GlfwWindow();
 
-		std::shared_ptr<gl::IContext> createContext(
+		void initializeContext(
 			int width, 
 			int height, 
 			const std::string & title = "OpenGL", 

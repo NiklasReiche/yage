@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <platform/>
+
 #include "Renderer.h"
 #include "TextureCreator.h"
 #include "ShaderCreator.h"
@@ -28,4 +30,6 @@ namespace gl
 		IContext& operator=(const IContext & other) = default;
 		IContext& operator=(IContext&& other) = default;
 	};
+
+	std::shared_ptr<IContext> createContext();
 }
