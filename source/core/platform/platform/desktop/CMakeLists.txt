@@ -1,7 +1,8 @@
 target_sources(yage_platform
-	PUBLIC File.h
-	PUBLIC File.cpp
-	PUBLIC GlfwException.h
-	PUBLIC GlfwWindow.h
-	PUBLIC GlfwWindow.cpp
+	PRIVATE
+		File.h
+		File.cpp
+		GlfwException.h
+		GlfwWindow.h
+		GlfwWindow.cpp
 	)

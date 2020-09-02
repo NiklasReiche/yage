@@ -1,36 +1,37 @@
 message(STATUS "Configuring yage_gl")
 
-add_library(yage_gl)
+add_library(yage_gl STATIC)
 
 target_include_directories(yage_gl
-	INTERFACE ${CMAKE_CURRENT_LIST_DIR})
+	PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 target_link_libraries(yage_gl
-	PUBLIC yage_platform
-	PUBLIC yage_gml
+	PUBLIC
+		yage_platform
+		yage_gml
 	)
 
 target_sources(yage_gl
+	PRIVATE
+		gl/color.h
+		gl/graphics.h
 
-	INTERFACE gl/color.h
-	INTERFACE gl/graphics.h
+		gl/Context.h
 
-	INTERFACE gl/Context.h
+		gl/PixelTransfer.h
+		gl/ImageFormat.h
+		gl/Texture2D.h
+		gl/Cubemap.h
+		gl/TextureCreator.h
 
-	INTERFACE gl/PixelTransfer.h
-	INTERFACE gl/ImageFormat.h
-	INTERFACE gl/Texture2D.h
-	INTERFACE gl/Cubemap.h
-	INTERFACE gl/TextureCreator.h
+		gl/Drawable.h
+		gl/DrawableCreator.h
 
-	INTERFACE gl/Drawable.h
-	INTERFACE gl/DrawableCreator.h
+		gl/Shader.h
+		gl/ShaderCreator.h
 
-	INTERFACE gl/Shader.h
-	INTERFACE gl/ShaderCreator.h
-
-	INTERFACE gl/Frame.h
-	INTERFACE gl/FrameCreator.h
+		gl/Frame.h
+		gl/FrameCreator.h
 	)
 
 if (WIN32)

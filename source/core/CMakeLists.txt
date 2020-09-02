@@ -10,10 +10,11 @@ add_subdirectory(gl)
 add_library(yage_core)
 
 target_link_libraries(yage_core
-	PUBLIC yage_gml
-	PUBLIC yage_utils
-	PUBLIC yage_platform
-	PUBLIC yage_gl
+	PUBLIC
+		yage_gml
+		yage_utils
+		yage_platform
+		yage_gl
 	)
 
 

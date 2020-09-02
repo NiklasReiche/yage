@@ -1,33 +1,34 @@
 message(STATUS "Configuring yage_gl")
 
-add_library(yage_platform)
+add_library(yage_platform STATIC)
 
 target_include_directories(yage_platform
-	INTERFACE ${CMAKE_CURRENT_LIST_DIR})
+	PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 target_link_libraries(yage_platform
-	PUBLIC yage_utils
-	PUBLIC glfw
-	PUBLIC glad
-	PUBLIC tfd
+	PUBLIC
+		yage_utils
+		glfw
+		glad
+		tfd
 )
 
 target_sources(yage_platform
-	INTERFACE platform/OpenGL.h
-	INTERFACE platform/Window.h
-	INTERFACE platform/File.h
-	INTERFACE platform/FileLoader.h
-	INTERFACE platform/FileException.h
+	PRIVATE
+		platform/File.h
+		platform/FileLoader.h
+		platform/FileException.h
+		platform/OpenGL.h
+		platform/Window.h
 
-	INTERFACE platform/input/Event.h
-	INTERFACE platform/input/Event.cpp
-	INTERFACE platform/input/KeyEvent.h
-	INTERFACE platform/input/KeyEvent.cpp
-	INTERFACE platform/input/MousePosEvent.h
-	INTERFACE platform/input/MousePosEvent.cpp
-	INTERFACE platform/input/MouseWheelEvent.h
-	INTERFACE platform/input/MouseWheelEvent.cpp
-
+		platform/input/Event.h
+		platform/input/Event.cpp
+		platform/input/KeyEvent.h
+		platform/input/KeyEvent.cpp
+		platform/input/MousePosEvent.h
+		platform/input/MousePosEvent.cpp
+		platform/input/MouseWheelEvent.h
+		platform/input/MouseWheelEvent.cpp
 	)
 
 if (WIN32 OR UNIX)

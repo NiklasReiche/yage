@@ -4,11 +4,11 @@
 #include <iostream>
 #include <functional>
 
-#include "../OpenGL.h"
-#include "../Window.h"
-#include "../input/InputListener.h"
-#include "../input/KeyEvent.h"
-#include "../input/MousePosEvent.h"
+#include "platform/OpenGL.h"
+#include "platform/Window.h"
+#include "platform/input/InputListener.h"
+#include "platform/input/KeyEvent.h"
+#include "platform/input/MousePosEvent.h"
 
 #include "File.h"
 
