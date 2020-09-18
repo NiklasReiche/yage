@@ -20,8 +20,6 @@ TEST_CASE("Texture Test")
 			SECTION("without format conversion") {
 				std::shared_ptr<gl::ITexture2D> texture = tCreator->createTexture2D(2, 3, gl::ImageFormat::RGB, image);
 
-				CHECK(std::static_pointer_cast<gl3::GL3_Texture2D>(texture)->isValid());
-
 				CHECK(2 == texture->getWidth());
 				CHECK(3 == texture->getHeight());
 				CHECK(3 == texture->getChannels());
@@ -30,8 +28,6 @@ TEST_CASE("Texture Test")
 
 			SECTION("with format conversion") {
 				std::shared_ptr<gl::ITexture2D> texture = tCreator->createTexture2D(3, 3, gl::ImageFormat::RG, image);
-
-				CHECK(std::static_pointer_cast<gl3::GL3_Texture2D>(texture)->isValid());
 
 				CHECK(3 == texture->getWidth());
 				CHECK(3 == texture->getHeight());
@@ -45,8 +41,6 @@ TEST_CASE("Texture Test")
 				std::shared_ptr<gl::ITexture2D> texture =
 					tCreator->createTexture2D(2, 3, gl::ImageFormat::RGB, std::vector<unsigned char>());
 
-				CHECK(std::static_pointer_cast<gl3::GL3_Texture2D>(texture)->isValid());
-
 				CHECK(2 == texture->getWidth());
 				CHECK(3 == texture->getHeight());
 				CHECK(3 == texture->getChannels());
@@ -57,8 +51,6 @@ TEST_CASE("Texture Test")
 				std::shared_ptr<gl::ITexture2D> texture =
 					tCreator->createTexture2D(2, 3, gl::ImageFormat::RGB, std::vector<unsigned char>(),
 					                          { gl::ImageFormat::RG, gl::RowAlignment::B_2 });
-
-				CHECK(std::static_pointer_cast<gl3::GL3_Texture2D>(texture)->isValid());
 
 				CHECK(2 == texture->getWidth());
 				CHECK(3 == texture->getHeight());

@@ -7,7 +7,7 @@ add_subdirectory(utils)
 add_subdirectory(platform)
 add_subdirectory(gl)
 
-add_library(yage_core)
+add_library(yage_core SHARED)
 
 target_link_libraries(yage_core
 	PUBLIC

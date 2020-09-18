@@ -9,7 +9,7 @@ add_executable(coreMathTest
 
 target_link_libraries(coreMathTest
 	PUBLIC yage_gml
-	PUBLIC catch2
+	PUBLIC Catch2::Catch2
 	)
 
 add_test(

@@ -2,6 +2,9 @@ message(STATUS "Configuring yage_gl")
 
 add_library(yage_gl STATIC)
 
+target_compile_options(yage_gl
+	PRIVATE -fdiagnostics-color=always -Wall -Wextra -Werror)
+
 target_include_directories(yage_gl
 	PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 

@@ -1,38 +1,38 @@
-target_sources(yage_gl
-	PUBLIC GL3_Exception.h
-	PUBLIC GL3_Enum.h
-	PUBLIC GL3_BaseObject.h
-	PUBLIC GL3_Object.h
-	PUBLIC GL3_Object.cpp
+target_sources(yage_gl PRIVATE
+	GL3_Exception.h
+	GL3_Enum.h
+	GL3_BaseObject.h
+	GL3_Object.h
+	GL3_Object.cpp
 
-	PUBLIC GL3_Drawable.h
-	PUBLIC GL3_Drawable.cpp
-	PUBLIC GL3_DrawableCreator.h
-	PUBLIC GL3_DrawableCreator.cpp
+	GL3_Drawable.h
+	GL3_Drawable.cpp
+	GL3_DrawableCreator.h
+	GL3_DrawableCreator.cpp
 
-	PUBLIC GL3_Framebuffer.h
-	PUBLIC GL3_Framebuffer.cpp
-	PUBLIC GL3_FrameCreator.h
-	PUBLIC GL3_FrameCreator.cpp
+	GL3_Framebuffer.h
+	GL3_Framebuffer.cpp
+	GL3_FrameCreator.h
+	GL3_FrameCreator.cpp
 
-	PUBLIC GL3_Shader.h
-	PUBLIC GL3_Shader.cpp
-	PUBLIC GL3_ShaderCreator.h
-	PUBLIC GL3_ShaderCreator.cpp
+	GL3_Shader.h
+	GL3_Shader.cpp
+	GL3_ShaderCreator.h
+	GL3_ShaderCreator.cpp
 
-	PUBLIC GL3_Texture.h
-	PUBLIC GL3_Texture.cpp
-	PUBLIC GL3_Texture2D.h
-	PUBLIC GL3_Texture2D.cpp
-	PUBLIC GL3_Cubemap.h
-	PUBLIC GL3_Cubemap.cpp
-	PUBLIC GL3_TextureCreator.h
-	PUBLIC GL3_TextureCreator.cpp
+	GL3_Texture.h
+	GL3_Texture.cpp
+	GL3_Texture2D.h
+	GL3_Texture2D.cpp
+	GL3_Cubemap.h
+	GL3_Cubemap.cpp
+	GL3_TextureCreator.h
+	GL3_TextureCreator.cpp
 
-	PUBLIC GL3_UnitShader.h
+	GL3_UnitShader.h
 
-	PUBLIC GL3_Context.h
-	PUBLIC GL3_Context.cpp
-	PUBLIC GL3_Renderer.h
-	PUBLIC GL3_Renderer.cpp
+	GL3_Context.h
+	GL3_Context.cpp
+	GL3_Renderer.h
+	GL3_Renderer.cpp
 	)
