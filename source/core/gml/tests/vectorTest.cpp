@@ -1,4 +1,4 @@
-#include <catch2/catch.h>
+#include <catch2/catch.hpp>
 
 #include <gml/maths.h>
 #include <gml/vector.h>

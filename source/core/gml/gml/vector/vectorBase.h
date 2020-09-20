@@ -3,6 +3,7 @@
 #include <array>
 #include <initializer_list>
 #include <ostream>
+#include <span>
 
 #include "../constraints.h"
 #include "../exception.h"

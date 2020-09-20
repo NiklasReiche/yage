@@ -1,36 +1,58 @@
-###################################################################
-# /external	                                                      #
-###################################################################
+cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
+message(STATUS "Configuring external dependencies")
 
-if(WIN32 OR UNIX)
-	message( STATUS "Building glfw --" )
-	include( glfw.cmake )
-    
-	message( STATUS "Building glad --" )
-	include( glad.cmake )
+include(FetchContent)
 
-	message( STATUS "Building zlib --" )
-	include( zlib.cmake )
-	message( STATUS "Building libpng --" )
-	include( libpng.cmake )
+# - Catch 2 ------------------------------------------------------------------------------------------------------------
+FetchContent_Declare(
+	catch2
 
-	#message( STATUS "Building freetype" )
-	#include( freetype.cmake )
+	GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+	GIT_TAG 	   v2.13.1
+)
+FetchContent_MakeAvailable(catch2)
 
-	message( STATUS "Building tfd --" )
-	include( tfd.cmake )
+# - GLAD ---------------------------------------------------------------------------------------------------------------
+FetchContent_Declare(
+	glad
 
-	message( STATUS "Building gtest --" )
-	include( gtest.cmake )
+	GIT_REPOSITORY https://github.com/Dav1dde/glad.git
+	GIT_TAG v0.1.33
+)
 
-	add_subdirectory(catch2)
-endif()
+set(GLAD_PROFILE "core" CACHE STRING "OpenGL profile")
+set(GLAD_API "gl=4.3" CACHE STRING "API type/version pairs, like \"gl=3.2,gles=\", no version means latest")
+set(GLAD_GENERATOR "c" CACHE STRING "Language to generate the binding for")
 
-if(ANDROID)
-	message( STATUS "Building zlib --" )
-    include( zlib.cmake )
-	message( STATUS "Building libpng --" )
-	include( libpng.cmake )
-endif()
+FetchContent_MakeAvailable(glad)
 
-#include(freetype.cmake)
+# - GLFW ---------------------------------------------------------------------------------------------------------------
+FetchContent_Declare(
+	glfw
+
+	GIT_REPOSITORY https://github.com/glfw/glfw.git
+	GIT_TAG 3.3.2
+)
+
+set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "Build the GLFW documentation")
+set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "Build the GLFW example programs")
+set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "Build the GLFW test programs")
+set(GLFW_INSTALL OFF CACHE INTERNAL "Generate installation target")
+
+FetchContent_MakeAvailable(glfw)
+
+# - zlib ---------------------------------------------------------------------------------------------------------------
+#FetchContent_Declare(
+#	zlib
+#
+#	GIT_REPOSITORY https://github.com/madler/zlib
+#	GIT_TAG v1.2.11
+#)
+#option(BUILD_EXAMPLES OFF)
+#FetchContent_MakeAvailable(zlib)
+
+# - libpng -------------------------------------------------------------------------------------------------------------
+# TODO
+
+# - TFD ----------------------------------------------------------------------------------------------------------------
+add_subdirectory(tfd)

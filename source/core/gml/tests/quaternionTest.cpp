@@ -1,4 +1,4 @@
-#include <catch2/catch.h>
+#include <catch2/catch.hpp>
 
 #include <gml/quaternion.h>
 #include <gml/matrix.h>
