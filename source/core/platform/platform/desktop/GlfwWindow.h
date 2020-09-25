@@ -17,15 +17,8 @@ namespace sys::desktop
 	class GlfwWindow final : public IWindow, public std::enable_shared_from_this<GlfwWindow>
 	{
 	public:
-		GlfwWindow();
+		GlfwWindow(int width, int height, const std::string& title = "");
 		~GlfwWindow() override;
-
-		void initializeContext(
-			int width, 
-			int height, 
-			const std::string & title = "OpenGL", 
-			int versionMajor = 4, 
-			int versionMinor = 3);
 
 		void makeCurrent() override;
 		void pollEvents() override;
@@ -38,7 +31,9 @@ namespace sys::desktop
 		[[nodiscard]]
 		int getHeight() const override;
 		[[nodiscard]]
-		std::string getTitle() const override;
+		int getPixelWidth() const override;
+		[[nodiscard]]
+		int getPixelHeight() const override;
 
 		void enableVSync();
 		void disableVSync();

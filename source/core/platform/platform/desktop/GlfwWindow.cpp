@@ -7,31 +7,24 @@
 
 namespace sys::desktop
 {
-	GlfwWindow::GlfwWindow()
+	GlfwWindow::GlfwWindow(int width, int height, const std::string& title)
 	{
 		glfwSetErrorCallback(onError);
 
 		if (!glfwInit()) {
 			throw GlfwException(-1, "Failed to initialize GLFW");
 		}
-	}
-	
-	GlfwWindow::~GlfwWindow()
-	{
-		glfwTerminate();
-	}
 
-	void GlfwWindow::initializeContext(
-		const int width, const int height, const std::string& title,
-		const int versionMajor, const int versionMinor)
-	{
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, versionMajor);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, versionMinor);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+
+#ifdef DEBUG
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+#endif
 
 		glfwWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 
@@ -53,39 +46,60 @@ namespace sys::desktop
 
 		dpi = 96;
 	}
+	
+	GlfwWindow::~GlfwWindow()
+	{
+		glfwTerminate();
+	}
 
 	void GlfwWindow::show()
 	{
 		glfwShowWindow(glfwWindow);
 	}
+
 	void GlfwWindow::hide()
 	{
 		glfwHideWindow(glfwWindow);
 	}
+
 	int GlfwWindow::getWidth() const
 	{
 		int width;
 		glfwGetWindowSize(glfwWindow, &width, nullptr);
 		return width;
 	}
+
 	int GlfwWindow::getHeight() const
 	{
 		int height;
 		glfwGetWindowSize(glfwWindow, nullptr, &height);
 		return height;
 	}
-	std::string GlfwWindow::getTitle() const
+
+	int GlfwWindow::getPixelWidth() const
 	{
-		return "";
+	    int width;
+		glfwGetFramebufferSize(glfwWindow, &width, nullptr);
+		return width;
 	}
+
+	int GlfwWindow::getPixelHeight() const
+	{
+		int height;
+		glfwGetFramebufferSize(glfwWindow, nullptr, &height);
+		return height;
+	}
+
 	void GlfwWindow::makeCurrent()
 	{
 		glfwMakeContextCurrent(glfwWindow);
 	}
+
 	void GlfwWindow::pollEvents()
 	{
 		glfwPollEvents();
 	}
+
 	void GlfwWindow::swapBuffers()
 	{
 		glfwSwapBuffers(glfwWindow);
@@ -95,6 +109,7 @@ namespace sys::desktop
 	{
 		glfwSwapInterval(1);
 	}
+
 	void GlfwWindow::disableVSync()
 	{
 		glfwSwapInterval(0);
@@ -104,6 +119,7 @@ namespace sys::desktop
 	{
 		glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
+
 	void GlfwWindow::showCursor()
 	{
 		glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);

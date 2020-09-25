@@ -39,7 +39,9 @@ namespace sys
 		[[nodiscard]]
 		virtual int getHeight() const = 0;
 		[[nodiscard]]
-		virtual std::string getTitle() const = 0;
+		virtual int getPixelWidth() const = 0;
+		[[nodiscard]]
+		virtual int getPixelHeight() const = 0;
 
 		[[nodiscard]]
 		virtual int getDpi() const = 0;

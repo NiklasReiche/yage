@@ -28,4 +28,6 @@ namespace gl
 		IContext& operator=(const IContext & other) = default;
 		IContext& operator=(IContext&& other) = default;
 	};
+
+	std::shared_ptr<IContext> createContext(const std::weak_ptr<sys::IWindow>& window);
 }

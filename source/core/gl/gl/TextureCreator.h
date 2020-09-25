@@ -1,8 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <vector>
-#include <array>
+#include <span>
 
 #include "Texture2D.h"
 #include "Cubemap.h"
@@ -46,7 +45,7 @@ namespace gl
 			int width,
 			int height,
 			ImageFormat textureFormat,
-			const std::vector<unsigned char>& data) = 0;
+		    const std::span<unsigned char>& data) = 0;
 
         /**
          * @brief Creates a new 2D-texture.
@@ -81,7 +80,7 @@ namespace gl
                 int width,
                 int height,
                 ImageFormat textureFormat,
-                const std::vector<unsigned char>& data,
+		        const std::span<unsigned char>& data,
                 PixelTransferParams params) = 0;
 
 		/**
@@ -105,7 +104,7 @@ namespace gl
 			int width,
 			int height,
 			ImageFormat textureFormat,
-			const std::array<std::vector<unsigned char>, 6> &data) = 0;
+			const std::span<std::span<unsigned char>, 6> &data) = 0;
 
 		/**
 		 * @brief Creates a new Cubemap texture.
@@ -129,7 +128,7 @@ namespace gl
 			int width,
 			int height,
 			ImageFormat textureFormat,
-			const std::array<std::vector<unsigned char>, 6> &data,
+			const std::span<std::span<unsigned char>, 6> &data,
 			PixelTransferParams params) = 0;
 
 	protected:

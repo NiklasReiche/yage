@@ -5,6 +5,9 @@ add_library(yage_gl STATIC)
 target_compile_options(yage_gl
 	PRIVATE -fdiagnostics-color=always -Wall -Wextra -Werror)
 
+target_compile_definitions(yage_platform
+	PRIVATE "$<$<CONFIG:DEBUG>:DEBUG>")
+
 target_include_directories(yage_gl
 	PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 

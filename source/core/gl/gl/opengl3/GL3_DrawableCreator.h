@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include "../DrawableCreator.h"
 
@@ -10,13 +10,13 @@ namespace gl3
 	{
 	public:
 		std::unique_ptr<gl::IDrawable> createDrawable(
-			const std::vector<float> & vertices,
-			const std::vector<unsigned int> & vertexLayout,
-			gl::VertexFormat format = gl::VertexFormat::INTERLEAVED) override;
+		    const std::span<float>& vertices,
+		    const std::span<unsigned int>& vertexLayout,
+		    gl::VertexFormat format = gl::VertexFormat::INTERLEAVED) override;
 
 	private:
 		using GL3_BaseObject::GL3_BaseObject;
 
 		friend class GL3_Context;
 	};
-}
+}// namespace gl3

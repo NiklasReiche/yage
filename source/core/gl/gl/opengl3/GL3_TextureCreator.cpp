@@ -11,18 +11,18 @@ namespace gl3
 		int width,
 		int height,
 		gl::ImageFormat textureFormat,
-		const std::vector<unsigned char> &data)
+	    const std::span<unsigned char>& data)
 	{
 		return createTexture2D(width, height, textureFormat, data,
 		                       { textureFormat, gl::RowAlignment::B_1 });
 	}
 
 	std::unique_ptr<gl::ITexture2D> GL3_TextureCreator::createTexture2D(
-		const int width,
-		const int height,
-		const gl::ImageFormat textureFormat,
-		const std::vector<unsigned char> &data,
-		const gl::PixelTransferParams params)
+		int width,
+		int height,
+	    gl::ImageFormat textureFormat,
+	    const std::span<unsigned char>& data,
+	    gl::PixelTransferParams params)
 	{
 		if (width <= 0 || height <= 0)
 			throw std::invalid_argument("texture dimensions must be strictly positive");
@@ -85,7 +85,7 @@ namespace gl3
 		int width,
 		int height,
 		gl::ImageFormat textureFormat,
-		const std::array<std::vector<unsigned char>, 6> &data)
+		const std::span<std::span<unsigned char>, 6> &data)
 	{
 		return createCubemap(width, height, textureFormat, data, { textureFormat, gl::RowAlignment::B_1 });
 	}
@@ -94,7 +94,7 @@ namespace gl3
 		int width,
 		int height,
 		gl::ImageFormat textureFormat,
-		const std::array<std::vector<unsigned char>, 6> &data,
+		const std::span<std::span<unsigned char>, 6> &data,
 		gl::PixelTransferParams params)
 	{
 		if (width <= 0 || height <= 0)

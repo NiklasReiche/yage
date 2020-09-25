@@ -18,7 +18,7 @@ namespace gl3
 	class GL3_Context : public gl::IContext, public std::enable_shared_from_this<GL3_Context>
 	{
 	public:
-		explicit GL3_Context(sys::desktop::GlfwWindow* window, int width, int height);
+		explicit GL3_Context(const std::weak_ptr<sys::IWindow>& window);
 		~GL3_Context() override = default;
 
 		void makeCurrent();
@@ -97,7 +97,7 @@ namespace gl3
 
 		OpenGlState glState;
 		
-		sys::desktop::GlfwWindow* window;
+		std::weak_ptr<sys::IWindow> window;
 
 		std::shared_ptr<gl::IRenderer> renderer;
 		std::shared_ptr<gl::IShaderCreator> shaderCreator;

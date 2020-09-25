@@ -1,4 +1,4 @@
-add_executable(coreMathTest
+add_executable(yage_gml_test
 	main.cpp
 	mathTest.cpp
 	vectorTest.cpp
@@ -7,12 +7,13 @@ add_executable(coreMathTest
 	matXTest.cpp
 	quaternionTest.cpp)
 
-target_link_libraries(coreMathTest
-	PUBLIC yage_gml
-	PUBLIC Catch2::Catch2
+target_link_libraries(yage_gml_test
+	PRIVATE
+		yage_gml
+		Catch2::Catch2
 	)
 
 add_test(
-	NAME coreMathCTest
-	COMMAND coreMathTest
+	NAME yage_gml_CTest
+	COMMAND yage_gml_test
 	WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

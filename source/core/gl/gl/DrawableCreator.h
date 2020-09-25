@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <vector>
+#include <span>
 
 #include "Drawable.h"
 
@@ -32,8 +32,8 @@ namespace gl
 		 */
 		[[nodiscard]]
 		virtual std::unique_ptr<IDrawable> createDrawable(
-			const std::vector<float> & vertices,
-			const std::vector<unsigned int> & vertexLayout,
+			const std::span<float> & vertices,
+			const std::span<unsigned int> & vertexLayout,
 			VertexFormat format) = 0;
 
 	protected:

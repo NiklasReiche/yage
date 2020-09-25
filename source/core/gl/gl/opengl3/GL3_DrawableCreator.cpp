@@ -8,8 +8,8 @@
 namespace gl3
 {
 	std::unique_ptr<gl::IDrawable> GL3_DrawableCreator::createDrawable(
-		const std::vector<GLfloat> & vertices,
-		const std::vector<unsigned int> & vertexLayout,
+		const std::span<GLfloat>& vertices,
+		const std::span<unsigned int> & vertexLayout,
 		const gl::VertexFormat format)
 	{
 		// check vertex layout
@@ -78,7 +78,9 @@ namespace gl3
 		//drawable->primitive = PrimitiveType::TRIANGLES;
 		//drawable->usage = usage;
 		drawable->nVertices = nVertices;
-		drawable->layout = vertexLayout;
+		std::vector<unsigned int> layout = std::vector<unsigned int>();
+		layout.assign(vertexLayout.front(), vertexLayout.back());
+		drawable->layout = layout;
 		drawable->vertexSize = vertexSize;
 		drawable->format = format;
 		drawable->bufferSize = nVertices * vertexSize;

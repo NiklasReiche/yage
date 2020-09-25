@@ -1,5 +1,7 @@
 #pragma once
 
+#include <span>
+
 #include "ImageFormat.h"
 
 namespace gl
@@ -41,9 +43,9 @@ namespace gl
 		const int height,
 		const int channels,
 		const int alignment,
-		const std::vector<unsigned char>& data)
+		const std::span<unsigned char>& data)
 	{
-		return data.size() == static_cast<std::vector<unsigned char>::size_type>(
+		return data.size() == static_cast<std::span<unsigned char>::size_type>(
 			calculateImageDataSize(width, height, channels, alignment));
 	}
 }
