@@ -35,28 +35,28 @@ namespace gl3
 		return static_cast<int>(std::floor(std::log2(std::max(width, height))));
 	}
 
-	void GL3_Texture2D::setImage(const std::vector<unsigned char> &data)
+	void GL3_Texture2D::setImage(const std::span<unsigned char>& data)
 	{
 		setImage(data, { getFormat(), gl::RowAlignment::B_1 });
 	}
 
 	void GL3_Texture2D::setImage(
-		const std::vector<unsigned char> &data,
-		const gl::PixelTransferParams params)
+	    const std::span<unsigned char>& data,
+	    gl::PixelTransferParams params)
 	{
 		setSubImage({ 0, 0, width, height }, data, params);
 	}
 
 	void GL3_Texture2D::setSubImage(
 		utils::Area subArea,
-		const std::vector<unsigned char> &data)
+	    const std::span<unsigned char>& data)
 	{
 		setSubImage(subArea, data, { getFormat(), gl::RowAlignment::B_1 });
 	}
 
 	void GL3_Texture2D::setSubImage(
 		utils::Area subArea,
-		const std::vector<unsigned char> &data,
+	    const std::span<unsigned char>& data,
 		gl::PixelTransferParams params)
 	{
 		if (subArea.x < 0 || subArea.y < 0 || subArea.w <= 0 || subArea.h <= 0)

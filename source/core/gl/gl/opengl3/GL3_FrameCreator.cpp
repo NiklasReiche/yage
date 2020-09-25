@@ -21,7 +21,7 @@ namespace gl3
 		context->bindFramebuffer(GL_FRAMEBUFFER, buffer->FBO);
 
 		// create empty texture
-		const std::vector<unsigned char> emptyData = {};
+		const std::span<unsigned char> emptyData;
 		buffer->texture = std::static_pointer_cast<GL3_Texture2D>(std::shared_ptr<gl::ITexture2D>(context->getTextureCreator()->
 			createTexture2D(width, height, format, emptyData)));
 		buffer->texture->configTextureFilter(TextureFilter::LINEAR, TextureFilter::LINEAR);

@@ -13,7 +13,7 @@ int main()
 	    0.5f, -0.5f, 0.0f,
 	    0.0f, 0.5f, 0.0f
 	};
-	auto triangle = context->getDrawableCreator()->createDrawable(vertices, std::vector<unsigned int>{3}, gl::VertexFormat::BATCHED);
+	auto triangle = context->getDrawableCreator()->createDrawable(vertices, {&std::vector<unsigned int>{3}[0], 1}, gl::VertexFormat::BATCHED);
 
 	const std::string vertexShaderSource =
 	    "#version 330 core\n"
