@@ -1,6 +1,6 @@
 #include "GlfwWindow.h"
 #include <tfd/tinyfiledialogs.h>
-#include <utils/utils.h>
+#include <utils/strings.h>
 #include <utils/NotImplementedException.h>
 
 #include "GlfwException.h"
@@ -235,7 +235,7 @@ namespace sys::desktop
 	{
 		const char* defaultPathC = nullptr;
 		if (!defaultPath.empty()) {
-			defaultPathC = util::replaceAll(defaultPath, "\\", "/").c_str();
+			defaultPathC = utils::replaceAll(defaultPath, "\\", "/").c_str();
 		}
 
 		std::vector<const char*> filterListC;

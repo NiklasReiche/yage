@@ -2,7 +2,6 @@
 # source/core				                                      #
 ###################################################################
 
-add_subdirectory(utils)
 add_subdirectory(platform)
 add_subdirectory(gl)
 

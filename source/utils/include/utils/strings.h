@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace util
+namespace utils
 {
 	template<typename T>
 	std::string toString(T param)
@@ -14,9 +14,9 @@ namespace util
 		return stream.str();
 	}
 
-	inline void strip(std::string string, const std::string& delimiter, std::vector<std::string> & out)
+	inline std::vector<std::string> strip(std::string string, const std::string& delimiter)
 	{
-		out.resize(0);
+		std::vector<std::string> out;
 
 		size_t pos;
 		while ((pos = string.find(delimiter)) != std::string::npos) {
@@ -25,11 +25,7 @@ namespace util
 			out.push_back(token);
 		}
 		out.push_back(string);
-	}
-	inline std::vector<std::string> strip(const std::string& string, const std::string& delimiter)
-	{
-		std::vector<std::string> out;
-		strip(string, delimiter, out);
+
 		return out;
 	}
 
@@ -41,4 +37,4 @@ namespace util
 		}
 		return s;
 	}
-}
+}// namespace utils
