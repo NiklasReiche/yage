@@ -1,10 +1,10 @@
-#include <platform/Window.h>
-#include <platform/desktop/GlfwWindow.h>
-#include <gl/Context.h>
+#include <core/platform/Window.h>
+#include <core/platform/desktop/GlfwWindow.h>
+#include <core/gl/Context.h>
 
 int main()
 {
-	std::shared_ptr<sys::IWindow> window = std::make_shared<sys::desktop::GlfwWindow>(500, 500, "Simple Window");
+	std::shared_ptr<platform::IWindow> window = std::make_shared<platform::desktop::GlfwWindow>(500, 500, "Simple Window");
 	std::shared_ptr<gl::IContext> context = gl::createContext(window);
 
 

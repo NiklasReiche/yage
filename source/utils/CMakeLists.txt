@@ -1,3 +1,5 @@
+message(STATUS "> Configuring yage_utils")
+
 add_library(yage_utils INTERFACE)
 
 target_compile_options(yage_utils

@@ -1,19 +1,24 @@
-###################################################################
-# source/core				                                      #
-###################################################################
-
-add_subdirectory(platform)
-add_subdirectory(gl)
+message(STATUS "> Configuring yage_core")
 
 add_library(yage_core SHARED)
 
+target_compile_options(yage_core
+	PRIVATE -fdiagnostics-color=always -Wall -Wextra -Werror)
+
 target_link_libraries(yage_core
-	PUBLIC
-		yage_gml
-		yage_utils
-		yage_platform
-		yage_gl
-	)
+	PUBLIC yage_gml yage_utils glfw glad tfd)
+
+target_include_directories(yage_core
+	PUBLIC source)
+
+target_compile_definitions(yage_core
+	PRIVATE "$<$<CONFIG:DEBUG>:DEBUG>")
+
+add_subdirectory(source/core/platform)
+add_subdirectory(source/core/gl)
+add_subdirectory(source/core/input)
+
+
 
 
 #if (ANDROID)

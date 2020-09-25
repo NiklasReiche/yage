@@ -1,4 +1,4 @@
-message(STATUS "Configuring yage_gml")
+message(STATUS "> Configuring yage_gml")
 
 add_library(yage_gml INTERFACE)
 
