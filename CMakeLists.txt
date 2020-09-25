@@ -52,6 +52,7 @@ endif()
 
 add_subdirectory(external)
 
+add_subdirectory(source/gml)
 add_subdirectory(source/core)
 
 if(WIN32 OR UNIX)
