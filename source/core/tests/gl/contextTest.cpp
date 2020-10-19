@@ -11,8 +11,7 @@ TEST_CASE("Context Test")
 	std::shared_ptr<gl::IContext> context = gl::createContext(window);
 
 
-	SECTION("FrameInitialization")
-	{
+	SECTION("FrameInitialization") {
 		std::shared_ptr<gl::IFrameCreator> tCreator = context->getFrameCreator();
 
 		std::shared_ptr<gl::IFrame> frame = tCreator->createFrame(90, 50, gl::ImageFormat::RGBA);

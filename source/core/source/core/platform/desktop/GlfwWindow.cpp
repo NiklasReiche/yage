@@ -13,6 +13,10 @@ namespace platform::desktop
 {
 	GlfwWindow::GlfwWindow(int width, int height, const std::string& title)
 	{
+		if (width < 1 || height < 1) {
+			throw std::invalid_argument("Window dimensions must be positive");
+		}
+
 		glfwSetErrorCallback(onError);
 
 		if (!glfwInit()) {
