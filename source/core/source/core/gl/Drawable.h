@@ -1,5 +1,6 @@
 #pragma once
 
+#include <span>
 #include <vector>
 
 namespace gl
@@ -23,7 +24,7 @@ namespace gl
 		 * 
 		 * @param vertices Container whose contents will be uploaded to the GPU.
 		 */
-		virtual void setData(const std::vector<float> & vertices) = 0;
+		virtual void setData(const std::span<const float>& vertices) = 0;
 		
 		/**
 		 * @brief Overwrites part of the referenced GPU buffer with new data.
@@ -35,7 +36,7 @@ namespace gl
 		 *
 		 * @throws std::invalid_argument The offset or container size is out of bounds.
 		 */
-		virtual void setSubData(unsigned int offset, const std::vector<float> & vertices) = 0;
+		virtual void setSubData(unsigned int offset, const std::span<const float>& vertices) = 0;
 
 		/**
 		 * @brief Reads data from the referenced GPU buffer.
@@ -54,7 +55,6 @@ namespace gl
 		[[nodiscard]]
 		virtual std::vector<float> getSubData(unsigned int offset, unsigned int size) = 0;
 
-		
 		/**
 		 * @brief Returns whether the referenced GPU buffer is empty.
 		 * 

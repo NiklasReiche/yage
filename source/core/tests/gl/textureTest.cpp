@@ -1,13 +1,13 @@
 #include <catch2/catch.hpp>
 
-#include <platform/desktop/GlfwWindow.h>
-#include <gl/graphics.h>
+#include <core/platform/desktop/GlfwWindow.h>
+#include <core/gl/graphics.h>
 
 
 TEST_CASE("Texture Test")
 {
-	sys::desktop::GlfwWindow window;
-	std::shared_ptr<gl::IContext> context = window.createContext(100, 100);
+	std::shared_ptr<platform::IWindow> window = std::make_shared<platform::desktop::GlfwWindow>(100, 100);
+	std::shared_ptr<gl::IContext> context = gl::createContext(window);
 	std::shared_ptr<gl::ITextureCreator> tCreator = context->getTextureCreator();
 
 	SECTION("Initialization") {

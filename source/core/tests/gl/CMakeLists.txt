@@ -1,4 +1,5 @@
-target_sources(yage PRIVATE
+target_sources(yage_core_test PRIVATE
 	contextTest.cpp
-	textureTest.cpp
-	cubemapTest.cpp)
+	drawableTest.cpp
+	#textureTest.cpp
+	)

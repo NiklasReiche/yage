@@ -83,4 +83,4 @@ namespace platform::desktop
 		static input::KeyEvent::Action convertToKeyAction(int action) noexcept;
 		static input::KeyEvent::Code convertToMouseButtonCode(int button) noexcept;
 	};
-}// namespace sys::desktop
+}

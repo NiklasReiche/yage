@@ -18,7 +18,9 @@ add_subdirectory(source/core/platform)
 add_subdirectory(source/core/gl)
 add_subdirectory(source/core/input)
 
-
+if(YAGE_BUILD_TESTS)
+	add_subdirectory(tests)
+endif()
 
 
 #if (ANDROID)

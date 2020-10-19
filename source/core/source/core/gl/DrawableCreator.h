@@ -32,8 +32,8 @@ namespace gl
 		 */
 		[[nodiscard]]
 		virtual std::unique_ptr<IDrawable> createDrawable(
-			const std::span<float> & vertices,
-			const std::span<unsigned int> & vertexLayout,
+			const std::span<const float> & vertices,
+			const std::vector<unsigned int>& vertexLayout,
 			VertexFormat format) = 0;
 
 	protected:
