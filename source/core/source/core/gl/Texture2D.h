@@ -32,7 +32,7 @@ namespace gl
 		 * @throws std::invalid_argument The data container is not sized correctly.
 		 * @throws std::logic_error The graphics context of this Texture2D was destroyed.
 		 */
-		virtual void setImage(const std::span<unsigned char>& data) = 0;
+		virtual void setImage(const std::span<const unsigned char>& data) = 0;
 
 		/**
 		 * @brief Overwrites the current image data in this texture with the given data.
@@ -52,7 +52,7 @@ namespace gl
 		 * @throws std::invalid_argument The image format is undefined.
 		 * @throws std::logic_error The graphics context of this Texture2D was destroyed.
 		 */
-		virtual void setImage(const std::span<unsigned char>& data, PixelTransferParams params) = 0;
+		virtual void setImage(const std::span<const unsigned char>& data, PixelTransferParams params) = 0;
 
 		/**
 		 * @brief Overwrites an area of the image data in this texture with the given data.
@@ -70,7 +70,7 @@ namespace gl
 		 * @throws std::invalid_argument The data container is not sized correctly.
 		 * @throws std::logic_error The graphics context of this Texture2D was destroyed.
 		 */
-		virtual void setSubImage(utils::Area subArea, const std::span<unsigned char>& data) = 0;
+		virtual void setSubImage(utils::Area subArea, const std::span<const unsigned char>& data) = 0;
 
 		/**
 		 * @brief Overwrites an area of the image data in this texture with the given data.
@@ -93,7 +93,7 @@ namespace gl
 		 */
 		virtual void setSubImage(
 			utils::Area subArea,
-		    const std::span<unsigned char>& data,
+		    const std::span<const unsigned char>& data,
 			PixelTransferParams params) = 0;
 
 		/**

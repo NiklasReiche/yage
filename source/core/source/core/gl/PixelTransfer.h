@@ -43,7 +43,7 @@ namespace gl
 		const int height,
 		const int channels,
 		const int alignment,
-		const std::span<unsigned char>& data)
+		const std::span<const unsigned char>& data)
 	{
 		return data.size() == static_cast<std::span<unsigned char>::size_type>(
 			calculateImageDataSize(width, height, channels, alignment));

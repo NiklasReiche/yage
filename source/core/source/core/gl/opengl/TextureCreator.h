@@ -13,26 +13,26 @@ namespace opengl
 			int width,
 			int height,
 			gl::ImageFormat textureFormat,
-		    const std::span<unsigned char>& data) override;
+		    const std::span<const unsigned char>& data) override;
 
         std::unique_ptr<gl::ITexture2D> createTexture2D(
                 int width,
                 int height,
                 gl::ImageFormat textureFormat,
-		    const std::span<unsigned char>& data,
+		    const std::span<const unsigned char>& data,
                 gl::PixelTransferParams params) override;
 
 		std::unique_ptr<gl::ICubemap> createCubemap(
 			int width,
 			int height,
 			gl::ImageFormat textureFormat,
-			const std::span<std::span<unsigned char>, 6> &data) override;
+			const std::span<const std::span<const unsigned char>, 6> &data) override;
 
 		std::unique_ptr<gl::ICubemap> createCubemap(
 			int width,
 			int height,
 			gl::ImageFormat textureFormat,
-			const std::span<std::span<unsigned char>, 6> &data,
+			const std::span<const std::span<const unsigned char>, 6> &data,
 			gl::PixelTransferParams params) override;
 
 	private:

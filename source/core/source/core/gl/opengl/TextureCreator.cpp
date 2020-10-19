@@ -11,7 +11,7 @@ namespace opengl
 		int width,
 		int height,
 		gl::ImageFormat textureFormat,
-	    const std::span<unsigned char>& data)
+	    const std::span<const unsigned char>& data)
 	{
 		return createTexture2D(width, height, textureFormat, data,
 		                       { textureFormat, gl::RowAlignment::B_1 });
@@ -21,7 +21,7 @@ namespace opengl
 		int width,
 		int height,
 	    gl::ImageFormat textureFormat,
-	    const std::span<unsigned char>& data,
+	    const std::span<const unsigned char>& data,
 	    gl::PixelTransferParams params)
 	{
 		if (width <= 0 || height <= 0)
@@ -85,7 +85,7 @@ namespace opengl
 		int width,
 		int height,
 		gl::ImageFormat textureFormat,
-		const std::span<std::span<unsigned char>, 6> &data)
+		const std::span<const std::span<const unsigned char>, 6> &data)
 	{
 		return createCubemap(width, height, textureFormat, data, { textureFormat, gl::RowAlignment::B_1 });
 	}
@@ -94,7 +94,7 @@ namespace opengl
 		int width,
 		int height,
 		gl::ImageFormat textureFormat,
-		const std::span<std::span<unsigned char>, 6> &data,
+		const std::span<const std::span<const unsigned char>, 6> &data,
 		gl::PixelTransferParams params)
 	{
 		if (width <= 0 || height <= 0)

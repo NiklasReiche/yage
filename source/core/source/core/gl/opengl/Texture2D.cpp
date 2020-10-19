@@ -35,13 +35,13 @@ namespace opengl
 		return static_cast<int>(std::floor(std::log2(std::max(width, height))));
 	}
 
-	void Texture2D::setImage(const std::span<unsigned char>& data)
+	void Texture2D::setImage(const std::span<const unsigned char>& data)
 	{
 		setImage(data, { getFormat(), gl::RowAlignment::B_1 });
 	}
 
 	void Texture2D::setImage(
-	    const std::span<unsigned char>& data,
+	    const std::span<const unsigned char>& data,
 	    gl::PixelTransferParams params)
 	{
 		setSubImage({ 0, 0, width, height }, data, params);
@@ -49,14 +49,14 @@ namespace opengl
 
 	void Texture2D::setSubImage(
 		utils::Area subArea,
-	    const std::span<unsigned char>& data)
+	    const std::span<const unsigned char>& data)
 	{
 		setSubImage(subArea, data, { getFormat(), gl::RowAlignment::B_1 });
 	}
 
 	void Texture2D::setSubImage(
 		utils::Area subArea,
-	    const std::span<unsigned char>& data,
+	    const std::span<const unsigned char>& data,
 		gl::PixelTransferParams params)
 	{
 		if (subArea.x < 0 || subArea.y < 0 || subArea.w <= 0 || subArea.h <= 0)

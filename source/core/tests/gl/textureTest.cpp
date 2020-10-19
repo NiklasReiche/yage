@@ -62,56 +62,71 @@ TEST_CASE("Texture Test")
 		SECTION("wrong data size") {
 			SECTION("data too small") {
 				CHECK_THROWS_AS(
-					tCreator->createTexture2D(2, 3, gl::ImageFormat::RGB, { 1, 2, 3 })std::invalid_argument);
+					tCreator->createTexture2D(2, 3, gl::ImageFormat::RGB, std::vector<unsigned char>{ 1, 2, 3 }),
+					std::invalid_argument);
 			}
 
 			SECTION("data too large") {
-				ASSERT_THROW(
-					tCreator->createTexture2D(1, 2, gl::ImageFormat::R, { 1, 2, 3, 4 }),
+				CHECK_THROWS_AS(
+					tCreator->createTexture2D(1, 2, gl::ImageFormat::R, std::vector<unsigned char>{ 1, 2, 3, 4 }),
 					std::invalid_argument);
 			}
 		}
 
 		SECTION("undefined format") {
-			ASSERT_THROW(
+			CHECK_THROWS_AS(
 				tCreator->createTexture2D(2, 3, gl::ImageFormat::UNDEFINED, std::vector<unsigned char>()),
 				std::invalid_argument);
 		}
 
 		SECTION("non-positive dimensions") {
 			// width negative
-			ASSERT_THROW(
+			CHECK_THROWS_AS(
 				tCreator->createTexture2D(-2, 3, gl::ImageFormat::RGBA, std::vector<unsigned char>()),
 				std::invalid_argument);
 
 			// height negative
-			ASSERT_THROW(
+			CHECK_THROWS_AS(
 				tCreator->createTexture2D(2, -3, gl::ImageFormat::RGBA, std::vector<unsigned char>()),
 				std::invalid_argument);
 
 			// width and height negative
-			ASSERT_THROW(
+			CHECK_THROWS_AS(
 				tCreator->createTexture2D(-2, -3, gl::ImageFormat::RGBA, std::vector<unsigned char>()),
 				std::invalid_argument);
 
 			// width zero
-			ASSERT_THROW(
+			CHECK_THROWS_AS(
 				tCreator->createTexture2D(0, 3, gl::ImageFormat::RGBA, std::vector<unsigned char>()),
 				std::invalid_argument);
 
 			// height zero
-			ASSERT_THROW(
+			CHECK_THROWS_AS(
 				tCreator->createTexture2D(2, 0, gl::ImageFormat::RGBA, std::vector<unsigned char>()),
 				std::invalid_argument);
 
 			// width and height zero
-			ASSERT_THROW(
+			CHECK_THROWS_AS(
 				tCreator->createTexture2D(0, 0, gl::ImageFormat::RGBA, std::vector<unsigned char>()),
 				std::invalid_argument);
 		}
 	}
 
 	SECTION("set image") {
+		SECTION("set image") {
+			std::shared_ptr<gl::ITexture2D> texture =
+				tCreator->createTexture2D(2, 4, gl::ImageFormat::RGB, std::vector<unsigned char>());
+
+			const std::vector<unsigned char> image = {
+				0, 0, 0, 1, 2, 1,
+				10, 1, 2, 1, 6, 40,
+				1, 2, 3, 4, 7, 5,
+				0, 5, 1, 8, 9, 3 };
+			texture->setImage(image);
+
+			const auto data = texture->getImage();
+			CHECK(data == image);
+		}
 
 		SECTION("set sub image") {
 			const std::vector<unsigned char> image = {
@@ -121,8 +136,6 @@ TEST_CASE("Texture Test")
 				0, 5, 1, 8, 9, 3 };
 			std::shared_ptr<gl::ITexture2D> texture =
 				tCreator->createTexture2D(2, 4, gl::ImageFormat::RGB, image);
-
-			ASSERT_TRUE(std::static_pointer_cast<gl3::GL3_Texture2D>(texture)->isValid());
 
 			const std::vector<unsigned char> subImage = {
 				0, 1, 3, 1, 4, 10,
@@ -136,7 +149,7 @@ TEST_CASE("Texture Test")
 				0, 5, 1, 8, 9, 3 };
 
 			const auto data = texture->getImage();
-			ASSERT_THAT(data, ContainerEq(newImage));
+			CHECK(data == newImage);
 		}
 	}
 
@@ -152,41 +165,10 @@ TEST_CASE("Texture Test")
 		texture->generateMipmaps();
 
 		auto data = texture->getMipmapImage(0);
-		ASSERT_EQ(24, data.size());
+		CHECK(24 == data.size());
 		data = texture->getMipmapImage(1);
-		ASSERT_EQ(6, data.size());
+		CHECK(6 == data.size());
 		data = texture->getMipmapImage(2);
-		ASSERT_EQ(3, data.size());
+		CHECK(3 == data.size());
 	}
-}
-
-
-TEST_F(TextureTest, GetImage)
-{
-	const std::vector<unsigned char> image = {
-		0, 0, 0, 1, 2, 1,
-		10, 1, 2, 1, 6, 40,
-		1, 2, 3, 4, 7, 5,
-		0, 5, 1, 8, 9, 3 };
-	std::shared_ptr<gl::ITexture2D> texture =
-		tCreator->createTexture2D(2, 4, gl::ImageFormat::RGB, image);
-
-	const auto data = texture->getImage();
-	ASSERT_THAT(data, ContainerEq(image));
-}
-
-TEST_F(TextureTest, SetImage)
-{
-	std::shared_ptr<gl::ITexture2D> texture =
-		tCreator->createTexture2D(2, 4, gl::ImageFormat::RGB, std::vector<unsigned char>());
-
-	const std::vector<unsigned char> image = {
-		0, 0, 0, 1, 2, 1,
-		10, 1, 2, 1, 6, 40,
-		1, 2, 3, 4, 7, 5,
-		0, 5, 1, 8, 9, 3 };
-	texture->setImage(image);
-
-	const auto data = texture->getImage();
-	ASSERT_THAT(data, ContainerEq(image));
 }

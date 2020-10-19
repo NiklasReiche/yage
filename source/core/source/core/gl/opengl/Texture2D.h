@@ -16,15 +16,15 @@ namespace opengl
 
 		Texture2D& operator=(const Texture2D& other) = delete;
 
-		void setImage(const std::span<unsigned char>& data) override;
+		void setImage(const std::span<const unsigned char>& data) override;
 
-		void setImage(const std::span<unsigned char>& data, gl::PixelTransferParams params) override;
+		void setImage(const std::span<const unsigned char>& data, gl::PixelTransferParams params) override;
 
-		void setSubImage(utils::Area subArea, const std::span<unsigned char>& data) override;
+		void setSubImage(utils::Area subArea, const std::span<const unsigned char>& data) override;
 
 		void setSubImage(
 			utils::Area subArea,
-			const std::span<unsigned char>& data,
+			const std::span<const unsigned char>& data,
 			gl::PixelTransferParams params) override;
 
 		std::vector<unsigned char> getImage() override;

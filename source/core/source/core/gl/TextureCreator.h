@@ -45,7 +45,7 @@ namespace gl
 			int width,
 			int height,
 			ImageFormat textureFormat,
-		    const std::span<unsigned char>& data) = 0;
+		    const std::span<const unsigned char>& data) = 0;
 
         /**
          * @brief Creates a new 2D-texture.
@@ -80,7 +80,7 @@ namespace gl
                 int width,
                 int height,
                 ImageFormat textureFormat,
-		        const std::span<unsigned char>& data,
+		        const std::span<const unsigned char>& data,
                 PixelTransferParams params) = 0;
 
 		/**
@@ -104,7 +104,7 @@ namespace gl
 			int width,
 			int height,
 			ImageFormat textureFormat,
-			const std::span<std::span<unsigned char>, 6> &data) = 0;
+			const std::span<const std::span<const unsigned char>, 6> &data) = 0;
 
 		/**
 		 * @brief Creates a new Cubemap texture.
@@ -128,7 +128,7 @@ namespace gl
 			int width,
 			int height,
 			ImageFormat textureFormat,
-			const std::span<std::span<unsigned char>, 6> &data,
+			const std::span<const std::span<const unsigned char>, 6> &data,
 			PixelTransferParams params) = 0;
 
 	protected:
