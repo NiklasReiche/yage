@@ -26,7 +26,7 @@ namespace img
 		}
 	}
 
-	Image::Image(Image&& other)
+	Image::Image(Image&& other) noexcept
 	{
 		this->width = other.width;
 		other.width = 0;
@@ -75,14 +75,15 @@ namespace img
 		if (channels == 1 || channels == 3) {
 			for (int i = 0; i < height; ++i) {
 				for (int j = 0; j < width; ++j) {
-					data->insert(data->begin() + ((i * width + j) * channels + channels + (i * width + j)), 255); /* add (i * width + j) to index to adjust for already inserted values*/
+					/* add (i * width + j) to index to adjust for already inserted values*/
+					data->insert(data->begin() + ((i * width + j) * channels + channels + (i * width + j)), 255);
 				}
 			}
 			this->channels += 1;
 		}
 	}
 
-	gl::Texture2D Image::toTexture(gl::TextureCreator creator)
+	std::unique_ptr<gl::ITexture2D> Image::toTexture(const std::shared_ptr<gl::ITextureCreator>& creator) const
 	{
 		gl::ImageFormat format;
 		switch (channels)
@@ -100,7 +101,7 @@ namespace img
 			format = gl::ImageFormat::RGBA;
 			break;
 		}
-		return creator->createTexture2D(*getData(), width, height, format);
+		return creator->createTexture2D(width, height, format, *getData());
 	}
 
 	std::ostream& operator<<(std::ostream & os, const Image & image)

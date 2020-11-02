@@ -42,14 +42,14 @@ set(GLFW_INSTALL OFF CACHE INTERNAL "Generate installation target")
 FetchContent_MakeAvailable(glfw)
 
 # - zlib ---------------------------------------------------------------------------------------------------------------
-#FetchContent_Declare(
-#	zlib
-#
-#	GIT_REPOSITORY https://github.com/madler/zlib
-#	GIT_TAG v1.2.11
-#)
-#option(BUILD_EXAMPLES OFF)
-#FetchContent_MakeAvailable(zlib)
+FetchContent_Declare(
+	zlib
+
+	GIT_REPOSITORY https://github.com/madler/zlib
+	GIT_TAG v1.2.11
+)
+option(BUILD_EXAMPLES OFF)
+FetchContent_MakeAvailable(zlib)
 
 # - libpng -------------------------------------------------------------------------------------------------------------
 # TODO
