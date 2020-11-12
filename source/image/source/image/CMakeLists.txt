@@ -2,8 +2,8 @@ target_sources(yage_image
 	PRIVATE
 		img.h
 		img.cpp
-		image.h
-		image.cpp
+		Image.h
+		Image.cpp
 		enum.h
 
 		formats/bmp.h
