@@ -57,9 +57,10 @@ add_subdirectory(source/core)
 
 if(WIN32 OR UNIX)
 	add_subdirectory(source/image)
+	add_subdirectory(source/graphics3d)
 	#add_subdirectory( source/modules/font )
 	#add_subdirectory( source/modules/gui )
-	#add_subdirectory( source/modules/graphics3d )
+
 endif()
 
 if(ANDROID)
