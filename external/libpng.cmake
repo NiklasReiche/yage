@@ -14,7 +14,7 @@ option(PNGARG        "Disable ANSI-C prototypes" OFF)
 
 option(PNG_HARDWARE_OPTIMIZATIONS "Enable Hardware Optimizations" ON)
 
-set(ZLIB_LIBRARY "zlib")
+set(ZLIB_LIBRARY zlib)
 set(ZLIB_INCLUDE_DIR ${YAGE_EXTERNAL_PATH}/zlib/include/zlib)
 set(PNG_CUSTOM_EXPORT 0)
 

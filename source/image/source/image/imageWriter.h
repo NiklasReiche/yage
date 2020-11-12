@@ -7,7 +7,7 @@
 
 namespace img
 {
-	class ImageWriter
+	class ImageReaderWriter
 	{
 	public:
 		static void writeFile(Image & image, const std::string & path);

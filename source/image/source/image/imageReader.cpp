@@ -1,6 +1,6 @@
 #include <utils/utils.h>
 #include "imageReader.h"
-#include "formats/png.h"
+#include "formats/png_format.h"
 #include "formats/bmp.h"
 #include <utils/NotImplementedException.h>
 
