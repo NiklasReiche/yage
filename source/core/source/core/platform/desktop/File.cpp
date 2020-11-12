@@ -1,21 +1,26 @@
 #include "File.h"
-#include <utils/NotImplementedException.h>
 
 namespace platform::desktop
 {
-	File::File(const std::string & filename, const IFile::AccessMode mode)
+	File::File(const std::string & filename, FileType type, const IFile::AccessMode mode)
 		: filename(filename), mode(mode)
 	{
 		switch (mode)
 		{
 		case AccessMode::READ:
-			fileStream = std::make_unique<std::fstream>(filename, std::ios::in | std::ios::binary);
+			fileStream = std::make_unique<std::fstream>(filename,
+											   type == FileType::TEXT ? std::ios::in :
+											   std::ios::in | std::ios::binary);
 			break;
 		case AccessMode::WRITE:
-			fileStream = std::make_unique<std::fstream>(filename, std::ios::out | std::ios::binary);
+			fileStream = std::make_unique<std::fstream>(filename,
+											   type == FileType::TEXT ? std::ios::out :
+											   std::ios::out | std::ios::binary);
 			break;
 		case AccessMode::READ_WRITE:
-			fileStream = std::make_unique<std::fstream>(filename, std::ios::in | std::ios::out | std::ios::binary);
+			fileStream = std::make_unique<std::fstream>(filename,
+											   type == FileType::TEXT ? std::ios::in | std::ios::out :
+											   std::ios::in | std::ios::out | std::ios::binary);
 			break;
 		}
 

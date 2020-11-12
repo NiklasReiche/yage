@@ -4,7 +4,7 @@
 namespace platform::desktop
 {
 	BinaryFile::BinaryFile(const std::string& filename, AccessMode mode)
-		: File(filename, mode)
+		: File(filename, FileType::BINARY, mode)
 	{ }
 
 	void BinaryFile::read(void* buffer, size_t size)

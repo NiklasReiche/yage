@@ -8,10 +8,16 @@
 
 namespace platform::desktop
 {
+	enum class FileType
+	{
+		BINARY = std::ios::binary,
+		TEXT
+	};
+
 	class File : public virtual IFile
 	{
 	public:
-		explicit File(const std::string & filename, AccessMode mode = AccessMode::READ);
+		explicit File(const std::string & filename, FileType type, AccessMode mode);
 
 		void seek(int index, SeekOffset offset) override;
 

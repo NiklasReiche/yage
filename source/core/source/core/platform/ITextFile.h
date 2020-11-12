@@ -1,5 +1,4 @@
-#include <string>
-#include <ostream>
+#include <istream>
 
 #include "IFile.h"
 
@@ -9,9 +8,5 @@ namespace platform
 	{
 	public:
 		~ITextFile() override = default;
-
-		friend ITextFile& operator<<(ITextFile& os, const std::string& data);
 	};
-
-	ITextFile& operator<<(ITextFile& os, const std::string& data);
 }
