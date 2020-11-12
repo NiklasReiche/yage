@@ -1,0 +1,33 @@
+target_sources(yage_gl3d
+	PRIVATE
+	camera.h
+	camera.cpp
+
+	skybox.h
+	skybox.cpp
+
+	light/light.h
+	light/light.cpp
+	light/pointLight.h
+	light/pointLight.cpp
+	light/dirLight.h
+	light/dirLight.cpp
+
+	material.h
+	material.cpp
+	mesh.h
+	mesh.cpp
+
+	sceneGraph/sceneNode.h
+	sceneGraph/sceneNode.cpp
+	sceneGraph/sceneGroup.h
+	sceneGraph/sceneGroup.cpp
+	sceneGraph/sceneObject.h
+	sceneGraph/sceneObject.cpp
+
+	sceneRenderer.h
+	sceneRenderer.cpp
+
+	resourceCache.h
+	resourceManager.h
+	)
