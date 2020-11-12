@@ -2,7 +2,7 @@
 
 #include <core/platform/IBinaryFile.h>
 
-#include "image.h"
+#include "Image.h"
 #include "enum.h"
 
 namespace img

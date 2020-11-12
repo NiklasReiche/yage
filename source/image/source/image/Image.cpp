@@ -1,4 +1,4 @@
-#include "image.h"
+#include "Image.h"
 
 namespace img
 {
@@ -60,6 +60,7 @@ namespace img
 				break;
 			case 4: format = gl::ImageFormat::RGBA;
 				break;
+			default: format = gl::ImageFormat::UNDEFINED;
 		}
 		return creator->createTexture2D(width, height, format, {data(), imageData.size()});
 	}

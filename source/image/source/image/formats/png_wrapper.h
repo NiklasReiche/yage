@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/platform/IBinaryFile.h>
-#include <image/image.h>
+#include <image/Image.h>
 #include <image/enum.h>
 
 namespace img::png

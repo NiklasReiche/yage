@@ -9,8 +9,8 @@
 
 #include <core/platform/IBinaryFile.h>
 
-#include "../image.h"
-#include "../enum.h"
+#include <image/Image.h>
+#include <image/enum.h>
 
 namespace img::bmp
 {

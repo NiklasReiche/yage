@@ -80,7 +80,6 @@ namespace img::png
 		unsigned int width = png_get_image_width(png.png_ptr, png.info_ptr);
 		unsigned int height = png_get_image_height(png.png_ptr, png.info_ptr);
 		int channels = png_get_channels(png.png_ptr, png.info_ptr);
-		int bitDepth = png_get_bit_depth(png.png_ptr, png.info_ptr);
 		unsigned int color = png_get_color_type(png.png_ptr, png.info_ptr);
 
 		if ((color == PNG_COLOR_TYPE_RGB || color == PNG_COLOR_TYPE_GRAY) &&
@@ -101,7 +100,7 @@ namespace img::png
 		}
 
 		png_read_update_info(png.png_ptr, png.info_ptr);
-		bitDepth = png_get_bit_depth(png.png_ptr, png.info_ptr);
+		int bitDepth = png_get_bit_depth(png.png_ptr, png.info_ptr);
 
 		//const unsigned int DATA_SIZE = height * width * channels * bitDepth / 8;
 		const unsigned int ROW_STRIDE = width * channels * bitDepth / 8;
@@ -109,13 +108,13 @@ namespace img::png
 		Image image((int)width, (int)height, channels);
 
 		/* pointers to the beginnings of each row in this->data */
-		std::vector<png_bytep> rowPtrs(height);
+		std::vector<png_bytep> rowPointers(height);
 		for (size_t i = 0; i < height; ++i) {
 			png_uint_32 index = i * ROW_STRIDE;
-			rowPtrs[i] = (png_bytep)image.data() + index;
+			rowPointers[i] = (png_bytep)image.data() + index;
 		}
 
-		png_read_image(png.png_ptr, &rowPtrs[0]);
+		png_read_image(png.png_ptr, &rowPointers[0]);
 
 		return image;
 	}
