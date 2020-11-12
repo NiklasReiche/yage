@@ -1,12 +1,14 @@
 #pragma once
 
-#include "graphics/graphics.h"
+#include <memory>
+
+#include <core/gl/Drawable.h>
 
 namespace gl3d
 {
 	class Mesh
 	{
 	public:
-		gl::Drawable drawable;
+		std::unique_ptr<gl::IDrawable> drawable;
 	};
 }

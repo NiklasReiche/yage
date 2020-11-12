@@ -6,18 +6,18 @@ namespace gl3d
 		this->position = gml::Vec3d(0.0);
 		this->rotation = gml::Quatd();
 	}
-	Camera::Camera(gml::Vec3d position, gml::Quatd rotation) {
+	Camera::Camera(const gml::Vec3d& position, gml::Quatd rotation) {
 		this->position = position;
 		this->rotation = rotation;
 	}
 
-	void Camera::move(gml::Vec3d vector)
+	void Camera::move(const gml::Vec3d& vector)
 	{
 		this->position += vector;
 	}
-	void Camera::moveTo(gml::Vec3d position)
+	void Camera::moveTo(gml::Vec3d _position)
 	{
-		this->position = position;
+		this->position = _position;
 	}
 	void Camera::moveForward(double amount)
 	{
@@ -40,34 +40,34 @@ namespace gl3d
 	{
 		this->rotation *= quaternion;
 	}
-	void Camera::rotateTo(gml::Quatd rotation)
+	void Camera::rotateTo(gml::Quatd _rotation)
 	{
-		this->rotation = rotation;
+		this->rotation = _rotation;
 	}
 	void Camera::rotateYaw(double degree)
 	{
-		this->rotation = this->rotation * gml::Quatd::eulerAngle(gml::toRad(degree), 0, 0);
+		this->rotation = this->rotation * gml::quaternion::eulerAngle<double>(gml::toRad(degree), 0, 0);
 		this->rotation = gml::normalize(this->rotation);
 	}
 	void Camera::rotatePitch(double degree)
 	{
-		this->rotation = this->rotation * gml::Quatd::eulerAngle(0, 0, gml::toRad(-degree));
+		this->rotation = this->rotation * gml::quaternion::eulerAngle<double>(0, 0, gml::toRad(-degree));
 		this->rotation = gml::normalize(this->rotation);
 	}
 	void Camera::rotateRoll(double degree)
 	{
-		this->rotation = this->rotation * gml::Quatd::eulerAngle(0, gml::toRad(degree), 0);
+		this->rotation = this->rotation * gml::quaternion::eulerAngle<double>(0, gml::toRad(degree), 0);
 		this->rotation = gml::normalize(this->rotation);
 	}
 
-	void Camera::lookAt(gml::Vec3d target, double degree)
+	void Camera::lookAt(gml::Vec3d , double )
 	{
 		// TODO
 	}
 
 	gml::Mat4d Camera::getViewMatrix() const
 	{
-		return gml::Mat4d::lookAt(position, position + rotation.getForward(), rotation.getUp());
+		return gml::matrix::lookAt<double>(position, position + rotation.getForward(), rotation.getUp());
 	}
 	gml::Vec3d Camera::getPosition() const
 	{

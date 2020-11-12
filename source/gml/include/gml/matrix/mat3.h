@@ -30,17 +30,5 @@ namespace gml
 			: MatrixBase<T, 3, 3>(other)
 		{
 		}
-
-		/**
-		 * @brief Converts this matrix to a quaternion.
-		 *
-		 * Assumes that this matrix is a pure rotation matrix.
-		 * 
-		 * @return A quaternion representing the same rotation as this matrix.
-		 */
-		constexpr Quaternion<T> toQuaternion()
-		{
-			return Quaternion<T>::rotationMatrix(*this);
-		}
 	};
 }

@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "utils/utils.h"
-#include "graphics/graphics.h"
+#include <utils/strings.h>
+#include <core/gl/graphics.h>
 #include "sceneGraph/sceneNode.h"
 #include "sceneGraph/sceneGroup.h"
 #include "sceneGraph/sceneObject.h"
@@ -18,8 +18,8 @@ namespace gl3d
 {
 	struct Geom
 	{
-		Mesh mesh;
-		Material material;
+		std::shared_ptr<Mesh> mesh;
+		std::shared_ptr<Material> material;
 		gml::Mat4d transform;
 	};
 
@@ -34,17 +34,19 @@ namespace gl3d
 	class SceneRenderer
 	{
 	public:
-		gl::Renderer renderer = nullptr;
+		SceneRenderer() = default;
+		explicit SceneRenderer(std::shared_ptr<gl::IRenderer> renderer);
 
 		void renderGraph(const std::shared_ptr<SceneNode>& root);
 
 	private:
+		std::shared_ptr<gl::IRenderer> renderer;
 		ShaderUniformValues uniformValues;
 
-		void setLightColorsShader(gl::Shader shader, std::string lightType, unsigned int pos, const LightColor & color) const;
-		void setLightConstantsShader(gl::Shader shader, std::string lightType, unsigned int pos, const LightConstants & constants) const;
+		void setLightColorsShader(gl::IShader& shader, std::string lightType, unsigned int pos, const LightColor & color) const;
+		void setLightConstantsShader(gl::IShader& shader, std::string lightType, unsigned int pos, const LightConstants & constants) const;
 
-		void setDirLightShader(gl::Shader shader, unsigned int pos, std::shared_ptr<DirLight> light) const;
-		void setPointLightShader(gl::Shader shader, unsigned int pos, std::shared_ptr<PointLight> light) const;
+		void setDirLightShader(gl::IShader& shader, unsigned int pos, const std::shared_ptr<DirLight>& light) const;
+		void setPointLightShader(gl::IShader& shader, unsigned int pos, const std::shared_ptr<PointLight>& light) const;
 	};
 }

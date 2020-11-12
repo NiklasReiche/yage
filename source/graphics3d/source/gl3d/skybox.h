@@ -3,7 +3,7 @@
 #include <array>
 #include <string>
 
-#include <graphics/graphics.h>
+#include <core/gl/graphics.h>
 
 namespace gl3d
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "math/matrix.h"
+#include <gml/matrix.h>
 
 #include "sceneNode.h"
 

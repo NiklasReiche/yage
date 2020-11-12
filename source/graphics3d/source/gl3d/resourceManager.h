@@ -20,9 +20,9 @@ namespace gl3d
 		{
 			return materialCache.add(std::make_shared<Material>(material));
 		}
-		unsigned int add(Mesh mesh)
+		unsigned int add(std::shared_ptr<Mesh> mesh)
 		{
-			return meshCache.add(std::make_shared<Mesh>(mesh));
+			return meshCache.add(mesh);
 		}
 		unsigned int add(DirLight light)
 		{

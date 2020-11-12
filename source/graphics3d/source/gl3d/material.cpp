@@ -1,53 +1,55 @@
 #include "material.h"
 
+#include <utility>
+
 namespace gl3d
 {
-	void Material::addTexture(std::string name, gl::Texture2D tex)
+	void Material::addTexture(const std::string& name, std::shared_ptr<gl::ITexture2D> tex)
 	{
-		textures[name] = tex;
+		textures[name] = std::move(tex);
 	}
 
-	void Material::addVec3(std::string name, gml::Vec3f value)
+	void Material::addVec3(const std::string& name, const gml::Vec3f& value)
 	{
 		vec3Values[name] = value;
 	}
 
-	void Material::addFloat(std::string name, float value)
+	void Material::addFloat(const std::string& name, float value)
 	{
 		fValues[name] = value;
 	}
 
-	void Material::addInteger(std::string name, int value)
+	void Material::addInteger(const std::string& name, int value)
 	{
 		iValues[name] = value;
 	}
 
 	void Material::updateShader()
 	{
-		for (std::pair<std::string, gml::Vec3f> uniform : vec3Values)
+		for (const auto& uniform : vec3Values)
 		{
 			shader->setUniform("material." + uniform.first, uniform.second);
 		}
-		for (std::pair<std::string, float> uniform : fValues)
+		for (const auto& uniform : fValues)
 		{
 			shader->setUniform("material." + uniform.first, uniform.second);
 		}
-		for (std::pair<std::string, int> uniform : iValues)
+		for (const auto& uniform : iValues)
 		{
 			shader->setUniform("material." + uniform.first, uniform.second);
 		}
-		for (std::pair<std::string, gl::Texture2D> uniform : textures)
+		for (std::pair<std::string, std::shared_ptr<gl::ITexture2D>> uniform : textures)
 		{
 			//TODO 
 		}
 	}
 
-	void Material::setShader(gl::Shader shader)
+	void Material::setShader(std::shared_ptr<gl::IShader> _shader)
 	{
-		this->shader = shader;
+		this->shader = std::move(_shader);
 	}
 
-	gl::Shader Material::getShader() const
+	std::shared_ptr<gl::IShader> Material::getShader() const
 	{
 		return shader;
 	}

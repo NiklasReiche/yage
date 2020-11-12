@@ -72,17 +72,5 @@ namespace gml
 				length(Vec3<T>((*this)(0, 2), (*this)(1, 2), (*this)(2, 2)))
 			};
 		}
-
-		/**
-		* @brief Converts this matrix to a quaternion.
-		 *
-		* This assumes that the matrix is a pure rotation matrix.
-		*
-		* @return The quaternion.
-		*/
-		Quaternion<T> toQuaternion()
-		{
-			return Quaternion<T>::rotationMatrix(*this);
-		}
 	};
 }

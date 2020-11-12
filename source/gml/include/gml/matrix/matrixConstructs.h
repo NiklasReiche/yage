@@ -31,7 +31,7 @@ namespace gml::matrix
 	template<typename T>
 	Mat4<T> translate(const Vec3<T>& translation)
 	{
-		return Mat4<T>::translate(translation(0), translation(1), translation(2));
+		return translate(translation(0), translation(1), translation(2));
 	}
 
 	/**
@@ -199,6 +199,6 @@ namespace gml::matrix
 			{ direction.x, direction.y, direction.z, 0 },
 			{ 0,           0,           0,           1 }
 		};
-		return mat1 * Mat4<T>::translate(-pos.x, -pos.y, -pos.z);
+		return mat1 * translate<T>(-pos.x, -pos.y, -pos.z);
 	}
 }

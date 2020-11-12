@@ -5,7 +5,7 @@
 #include <memory>
 #include <functional>
 
-#include "math/matrix.h"
+#include <gml/matrix.h>
 
 
 namespace gl3d
