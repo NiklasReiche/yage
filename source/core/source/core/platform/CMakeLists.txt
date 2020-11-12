@@ -1,8 +1,10 @@
 target_sources(yage_core
 	PRIVATE
-		File.h
+		IFile.h
 		FileException.h
-		FileLoader.h
+		IFileReader.h
+		ITextFile.h
+		IBinaryFile.h
 		Window.h)
 
 if(WIN32 OR UNIX)

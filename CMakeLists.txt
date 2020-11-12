@@ -5,7 +5,6 @@ project(yage
 	DESCRIPTION "Yet Another Game Engine"
 	LANGUAGES CXX C)
 
-cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0076 NEW)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -57,7 +56,7 @@ add_subdirectory(source/gml)
 add_subdirectory(source/core)
 
 if(WIN32 OR UNIX)
-	#add_subdirectory( source/modules/image )
+	add_subdirectory(source/image)
 	#add_subdirectory( source/modules/font )
 	#add_subdirectory( source/modules/gui )
 	#add_subdirectory( source/modules/graphics3d )
@@ -67,6 +66,7 @@ if(ANDROID)
 	add_subdirectory( source/tools/yageApp)
 elseif(WIN32 OR UNIX)
 	add_subdirectory( source/tools/SimpleWindow )
+	add_subdirectory(source/tools/ImageViewer)
 	#add_subdirectory( source/tools/skyboxViewer )
 	#add_subdirectory( source/tools/guiEditor )
 	#add_subdirectory( source/tools/sandbox )
