@@ -90,7 +90,7 @@ namespace font
 		}
 
 		tempTexture.getTextureImage(image.data);
-		image.channels = 1;
+		image.depth = 1;
 		image.width = size.x;
 		image.height = size.y;
 	}
@@ -148,7 +148,7 @@ namespace font
 		// resize
 		output.width = input.width / resizeFactor;
 		output.height = input.height / resizeFactor;
-		output.channels = 1;
+		output.depth = 1;
 
 		sdf_texture.getTextureImage(output.data, (int)std::log2(resizeFactor));
 	}
@@ -268,7 +268,7 @@ namespace font
 
 		fontfile.sdfInfo.width = (uint32_t)convertMetrics.sdfImage.width;
 		fontfile.sdfInfo.height = (uint32_t)convertMetrics.sdfImage.height;
-		fontfile.sdfInfo.channels = (uint32_t)convertMetrics.sdfImage.channels;
+		fontfile.sdfInfo.channels = (uint32_t)convertMetrics.sdfImage.depth;
 
 		fontfile.maxGlyph.width = (uint32_t)convertMetrics.maxGlyph.size.x;
 		fontfile.maxGlyph.height = (uint32_t)convertMetrics.maxGlyph.size.y;

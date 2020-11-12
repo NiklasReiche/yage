@@ -44,7 +44,7 @@ namespace font
 	{
 		image.width = this->width;
 		image.height = this->height;
-		image.channels = 1;
+		image.depth = 1;
 		image.data.resize(0);
 		for (int y = 0; y < height; ++y)
 		{

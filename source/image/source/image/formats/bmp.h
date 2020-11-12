@@ -7,10 +7,10 @@
 #include <fstream>
 #include <cstdint>
 
-#include <platform/File.h>
+#include <core/platform/IBinaryFile.h>
 
-#include "../image.h"
-#include "../enum.h"
+#include <image/Image.h>
+#include <image/enum.h>
 
 namespace img::bmp
 {
@@ -95,10 +95,13 @@ namespace img::bmp
 	class Bitmap
 	{
 	public:
-		int load(const std::string & filename, FORCE_CHANNELS channel = FORCE_CHANNELS::AUTO);
-		int save(const std::string & filename, FORCE_CHANNELS channel = FORCE_CHANNELS::AUTO);
-		void toImage(Image & image);
-		void fromImage(Image & image, bool moveData = false);
+		void load(platform::IBinaryFile& file, FORCE_CHANNELS channel = FORCE_CHANNELS::AUTO);
+
+		void save(platform::IBinaryFile& file, FORCE_CHANNELS channel = FORCE_CHANNELS::AUTO);
+
+		Image toImage();
+
+		void fromImage(Image image, bool moveData = false);
 
 	private:
 		uint16_t magicNumber;
@@ -123,20 +126,18 @@ namespace img::bmp
 		int toBit8();
 		int toBit24();
 
-		void readVersion(sys::File & file);
+		void readVersion(platform::IBinaryFile& file);
 		void createPalette(int size);
 
-		int checkError(sys::File & file);
+		void readMagicNumber(platform::IBinaryFile& file);
+		void readBmpFileHeader(platform::IBinaryFile& file);
+		void readBmpInfoHeader(platform::IBinaryFile& file);
+		void readBmpV4Header(platform::IBinaryFile& file);
+		void readBitmask(platform::IBinaryFile& file);
+		void readPalette(platform::IBinaryFile& file, int offset, int size);
+		void readImageData(platform::IBinaryFile& file);
+		void readImageDataIndexed(platform::IBinaryFile& file);
 
-		void readMagicNumber(sys::File & file);
-		void readBmpFileHeader(sys::File & file);
-		void readBmpInfoHeader(sys::File & file);
-		void readBmpV4Header(sys::File & file);
-		void readBitmask(sys::File & file);
-		void readPalette(sys::File & file, int offset, int size);
-		void readImageData(sys::File & file);
-		void readImageDataIndexed(sys::File & file);
-
-		void writeImageData(sys::File & file);
+		void writeImageData(platform::IBinaryFile& file);
 	};
 }

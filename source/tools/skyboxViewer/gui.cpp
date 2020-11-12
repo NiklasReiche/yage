@@ -129,7 +129,7 @@ Gui::Gui(sys::PlatformHandle* platform, gl::GraphicsContext* gl, input::InputCon
 
 void Gui::setTexture(gui::PushButton* button, std::string filename)
 {
-	gl::Texture texture = reader.readFile(filename, img::FORCE_CHANNELS::RGBA).toTexture(gl);
+	gl::Texture texture = reader.openFile(filename, img::FORCE_CHANNELS::RGBA).toTexture(gl);
 	texture.resize(thumbnailSize, thumbnailSize);
 	gui::WidgetTextureTemplate temp;
 	temp.texture = texture;

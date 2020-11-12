@@ -2,7 +2,11 @@ target_sources(yage_core
 	PRIVATE
 		File.h
 		File.cpp
+		BinaryFile.h
+		BinaryFile.cpp
 		GlfwException.h
 		GlfwWindow.h
 		GlfwWindow.cpp
+		FileReader.h
+		FileReader.cpp
 	)
