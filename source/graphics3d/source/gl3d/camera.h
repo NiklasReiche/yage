@@ -1,6 +1,6 @@
 #pragma once
 
-#include <math/gml.h>
+#include <gml/gml.h>
 
 namespace gl3d
 {
@@ -8,9 +8,9 @@ namespace gl3d
 	{
 	public:
 		Camera();
-		Camera(gml::Vec3d position, gml::Quatd rotation);
+		Camera(const gml::Vec3d& position, gml::Quatd rotation);
 		
-		void move(gml::Vec3d vector);
+		void move(const gml::Vec3d& vector);
 		void moveTo(gml::Vec3d position);
 		void moveForward(double amount);
 		void moveBackward(double amount);
@@ -24,9 +24,9 @@ namespace gl3d
 		void rotateRoll(double degree);
 		void lookAt(gml::Vec3d target, double degree = 0.0f);
 
-		gml::Mat4d getViewMatrix() const;
-		gml::Vec3d getPosition() const;
-		gml::Quatd getRotation() const;
+		[[nodiscard]] gml::Mat4d getViewMatrix() const;
+		[[nodiscard]] gml::Vec3d getPosition() const;
+		[[nodiscard]] gml::Quatd getRotation() const;
 
 	private:
 		gml::Vec3d position;

@@ -1,12 +1,13 @@
 #pragma once
 
-#include <platform/Window.h>
-#include <platform/desktop/GlfwWindow.h>
-#include <math/gml.h>
+#include <core/platform/Window.h>
+#include <core/platform/desktop/GlfwWindow.h>
+#include <core/gl/Context.h>
+#include <gml/gml.h>
 
-#include <graphics3d/camera.h>
-#include <graphics3d/sceneRenderer.h>
-#include <graphics3d/resourceManager.h>
+#include <gl3d/camera.h>
+#include <gl3d/sceneRenderer.h>
+#include <gl3d/resourceManager.h>
 
 struct Mouse
 {
@@ -20,7 +21,7 @@ class InputListener : public input::InputListener
 {
 public:
 	InputListener() = default;
-	InputListener(sys::Window window, std::shared_ptr<gl3d::Camera> camera)
+	InputListener(std::shared_ptr<platform::IWindow> window, std::shared_ptr<gl3d::Camera> camera)
 		: window(window), camera(camera)
 	{
 		
@@ -36,8 +37,8 @@ public:
 			gml::Vec2f dist = mouse.pos - gml::Vec2f(x, y);
 			gml::Vec2f angle = dist * mouse.sensitivity;
 
-			gml::Quaternion<float> q_yaw = gml::Quatf::eulerAngle(0, angle.x, 0);
-			gml::Quaternion<float> q_pitch = gml::Quatf::eulerAngle(angle.y, 0, 0);
+			//gml::Quaternion<float> q_yaw = gml::quaternion::eulerAngle<float>(0, angle.x, 0);
+			//gml::Quaternion<float> q_pitch = gml::quaternion::eulerAngle<float>(angle.y, 0, 0);
 
 			//gml::Quaternion<float> newRotation = gml::normalize<float>(q_yaw * camera.rotation * q_pitch);
 			camera->rotateYaw(angle.x);
@@ -70,12 +71,12 @@ public:
 		{
 			if (mouse.isHidden)
 			{
-				std::static_pointer_cast<sys::desktop::GlfwWindow>(window)->showCursor();
+				std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->showCursor();
 				mouse.isHidden = false;
 			}
 			else
 			{
-				std::static_pointer_cast<sys::desktop::GlfwWindow>(window)->hideCursor();
+				std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->hideCursor();
 				mouse.isHidden = true;
 			}
 		}
@@ -83,19 +84,18 @@ public:
 
 private:
 	Mouse mouse;
-	sys::Window window;
+	std::shared_ptr<platform::IWindow> window;
 	std::shared_ptr<gl3d::Camera> camera;
 };
 
 class App
 {
 private:
-	sys::Window window;
-	gl::Context glContext;
+	std::shared_ptr<platform::IWindow> window;
+	std::shared_ptr<gl::IContext> glContext;
 	InputListener inputListener;
-	
 
-	gl::Shader shader;
+	std::shared_ptr<gl::IShader> shader;
 	std::shared_ptr<gl3d::Camera> camera;
 	gl3d::ResourceManager resourceManager;
 	gl3d::SceneRenderer renderer;
@@ -108,30 +108,32 @@ private:
 public:
 	App()
 	{
-		window = std::make_shared<sys::desktop::GlfwWindow>();
-		glContext = std::static_pointer_cast<sys::desktop::GlfwWindow>(window)->createContext(1500, 900, "YAGE Sandbox");
+		window = std::make_shared<platform::desktop::GlfwWindow>(1500, 900,"Sandbox");
+		glContext = gl::createContext(window);
 
-		camera = std::make_shared<gl3d::Camera>(gl3d::Camera(gml::Vec3f(0.0f, 0.0f, 5.0f), gml::Quatd::eulerAngle(gml::PI, 0, 0)));
+		camera = std::make_shared<gl3d::Camera>(gl3d::Camera(gml::Vec3f(0.0f, 0.0f, 5.0f),
+													   gml::quaternion::eulerAngle<double>(std::numbers::pi_v<float>, 0, 0)));
 
 		inputListener = InputListener(window, camera);
 		window->attach(inputListener);
 
-		renderer.renderer = glContext->getRenderer();
-		renderer.renderer->setClearColor(0x008080FFu);
-		renderer.renderer->enableDepthTest();
-		renderer.renderer->setViewport(0, 0, 1500, 900);
+
+		renderer = gl3d::SceneRenderer(glContext->getRenderer());
+		glContext->getRenderer()->setClearColor(0x008080FFu);
+		glContext->getRenderer()->enableDepthTest();
+		glContext->getRenderer()->setViewport(0, 0, 1500, 900);
 
 
 		std::string vertexShader =
-#include "graphics3d/shaders/singleColorShader.vert"
+#include "gl3d/shaders/singleColorShader.vert"
 			;
 		std::string fragmentShader =
-#include "graphics3d/shaders/singleColorShader.frag"
+#include "gl3d/shaders/singleColorShader.frag"
 			;
 
 		shader = glContext->getShaderCreator()->createShader(vertexShader, fragmentShader);
 
-		gml::Mat4f proj = gml::Mat4f::perspective(45.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
+		gml::Mat4f proj = gml::matrix::perspective<float>(45.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
 		shader->setUniform("projection", proj);
 
 		setupGraph();
@@ -183,9 +185,8 @@ public:
 			-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 		};
 
-		gl::Drawable cube = glContext->getDrawableCreator()->createDrawable(vertices, { 3, 3 }, gl::VertexFormat::INTERLEAVED);
-		std::shared_ptr<gl3d::Mesh> cubeMesh = std::make_shared<gl3d::Mesh>();;
-		cubeMesh->drawable = cube;
+		std::shared_ptr<gl3d::Mesh> cubeMesh = std::make_shared<gl3d::Mesh>();
+		cubeMesh->drawable = glContext->getDrawableCreator()->createDrawable(vertices, { 3, 3 }, gl::VertexFormat::INTERLEAVED);
 
 		std::shared_ptr<gl3d::Material> ruby = std::make_shared<gl3d::Material>();
 		ruby->addVec3("ambient", gml::Vec3f(0.1));
@@ -205,7 +206,9 @@ public:
 		cube1->bindMesh(cubeMesh);
 
 		light1 = std::make_shared<gl3d::SceneObject>("light");
-		light1->setTransform(gml::Mat4d::quaternion(gml::Quatd::eulerAngle(0, 0, 0)) * gml::Mat4d::translate(gml::Vec3d(0.0, 0.0, -3.0)) * gml::Mat4d::scale(0.1f));
+		light1->setTransform(gml::matrix::quaternion<float>(gml::quaternion::eulerAngle<float>(0, 0, 0)) * gml::matrix::translate<float>(gml::Vec3d(0.0, 0.0, -3.0)) * gml::matrix::scale<float>(0.1f,
+		                                                                                                                                                                                         0.1f,
+		                                                                                                                                                                                         0.1f));
 		light1->bindMaterial(ruby);
 		light1->bindMesh(cubeMesh);
 		light1->bindLight(lightRes);
@@ -222,31 +225,31 @@ public:
 	void run()
 	{
 		double coord = -1.0;
-		std::static_pointer_cast<sys::desktop::GlfwWindow>(window)->showWindow();
-		std::static_pointer_cast<sys::desktop::GlfwWindow>(window)->getTimeStep();
+		window->show();
+		std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
 		while (!window->shouldDestroy())
 		{
-			double dt = std::static_pointer_cast<sys::desktop::GlfwWindow>(window)->getTimeStep();
-			
-			renderer.renderer->clear();
+			double dt = std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
+
+			glContext->getRenderer()->clear();
 			
 			coord += 0.5 * dt;
 
 			gml::Mat4d localTransform =
-				gml::Mat4d::axisAngle(gml::Vec3d(1.0, 0.0, 0.0), coord) *
-				gml::Mat4d::translate(gml::Vec3d(0.0, 0.0, -3.0)) * 
-				gml::Mat4d::scale(0.1f);
+				gml::matrix::axisAngle<float>(gml::Vec3d(1.0, 0.0, 0.0), coord) *
+				gml::matrix::translate<float>(gml::Vec3d(0.0, 0.0, -3.0)) *
+				gml::matrix::scale<float>(0.1f, 0.1f, 0.1f);
 
 			light1->setTransform(localTransform);
 
-			renderer.renderer->useShader(shader);
+			glContext->getRenderer()->useShader(*shader);
 			shader->setUniform("view", camera->getViewMatrix());
 			shader->setUniform("viewPos", camera->getPosition());
 
 			renderer.renderGraph(scene);
 
-			std::static_pointer_cast<sys::desktop::GlfwWindow>(window)->swapBuffers();
-			std::static_pointer_cast<sys::desktop::GlfwWindow>(window)->pollEvents();
+			window->swapBuffers();
+			window->pollEvents();
 		}
 	}
 };

@@ -2,11 +2,11 @@
 # tools/sandbox				                                      #
 ###################################################################
 
-add_executable( sandbox 
+add_executable(sandbox
 	"main.cpp" 
 	"app.h" 
 )
+
 target_link_libraries( sandbox 
-	PUBLIC YAGEcore
-	PUBLIC YAGEgraphics3d 
+	PUBLIC yage_core yage_gl3d
 )

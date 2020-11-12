@@ -1,7 +1,7 @@
 #pragma once
 
-#include "math/vector.h"
-#include "graphics/color.h"
+#include <gml/vector.h>
+#include <core/gl/color.h>
 
 namespace gl3d
 {

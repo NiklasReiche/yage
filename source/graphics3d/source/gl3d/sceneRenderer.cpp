@@ -2,6 +2,12 @@
 
 namespace gl3d
 {
+	SceneRenderer::SceneRenderer(std::shared_ptr<gl::IRenderer> renderer)
+		: renderer(std::move(renderer))
+	{
+
+	}
+
 	void SceneRenderer::renderGraph(const std::shared_ptr<SceneNode>& root)
 	{
 		std::vector<Geom> drawablesLoop;
@@ -12,9 +18,9 @@ namespace gl3d
 		{
 			if (node->hasMaterial() && node->hasMesh())
 			{
-				drawablesLoop.push_back({ 
-					*node->getMesh(), 
-					*node->getMaterial(),
+				drawablesLoop.push_back({
+					node->getMesh(),
+					node->getMaterial(),
 					transform});
 			}
 			if (node->hasLight())
@@ -27,12 +33,14 @@ namespace gl3d
 					std::shared_ptr<DirLight> dirLight = std::static_pointer_cast<DirLight>(light);
 					uniformValues.dirLights.push_back(dirLight);
 					}
+					[[fallthrough]];
 				case LightType::POINT_LIGHT:
 					{
 					std::shared_ptr<PointLight> pointLight = std::static_pointer_cast<PointLight>(light);
 					pointLight->setPosition(gml::Vec3d(transform.getTranslation()));
 					uniformValues.pointLights.push_back(pointLight);
 					}
+					[[fallthrough]];
 				default:
 					break;
 				}
@@ -41,7 +49,7 @@ namespace gl3d
 			{
 				std::shared_ptr<Camera> camera = node->getCamera();
 				camera->moveTo(transform.getTranslation());
-				camera->rotateTo(transform.getRotation().toQuaternion());
+				camera->rotateTo(gml::quaternion::rotationMatrix<double>(transform.getRotation()));
 			}
 		};
 
@@ -49,50 +57,50 @@ namespace gl3d
 
 		for (Geom drawable : drawablesLoop)
 		{
-			gl::Shader shader = drawable.material.getShader();
+			std::shared_ptr<gl::IShader> shader = drawable.material->getShader();
 			shader->setUniform("model", drawable.transform);
 
 			shader->setUniform("number_dirLight", (int)uniformValues.dirLights.size());
-			for (int i = 0; i < uniformValues.dirLights.size(); ++i)
+			for (int i = 0; i < (int)uniformValues.dirLights.size(); ++i)
 			{
-				setDirLightShader(shader, i, uniformValues.dirLights.at(i));
+				setDirLightShader(*shader, i, uniformValues.dirLights.at(i));
 			}
 
 			shader->setUniform("number_pointLight", (int)uniformValues.pointLights.size());
-			for (int i = 0; i < uniformValues.pointLights.size(); ++i)
+			for (int i = 0; i < (int)uniformValues.pointLights.size(); ++i)
 			{
-				setPointLightShader(shader, i, uniformValues.pointLights.at(i));
+				setPointLightShader(*shader, i, uniformValues.pointLights.at(i));
 			}
 
-			drawable.material.updateShader();
-			this->renderer->draw(drawable.mesh.drawable);
+			drawable.material->updateShader();
+			this->renderer->draw(*drawable.mesh->drawable);
 		}
 	}
 
-	void SceneRenderer::setLightColorsShader(gl::Shader shader, std::string lightType, unsigned int pos, const LightColor& color) const
+	void SceneRenderer::setLightColorsShader(gl::IShader& shader, std::string lightType, unsigned int pos, const LightColor& color) const
 	{
-		shader->setUniform(lightType + "[" + util::toString(pos) + "].ambient", color.ambient);
-		shader->setUniform(lightType + "[" + util::toString(pos) + "].diffuse", color.diffuse);
-		shader->setUniform(lightType + "[" + util::toString(pos) + "].specular", color.specular);
+		shader.setUniform(lightType + "[" + utils::toString(pos) + "].ambient", color.ambient);
+		shader.setUniform(lightType + "[" + utils::toString(pos) + "].diffuse", color.diffuse);
+		shader.setUniform(lightType + "[" + utils::toString(pos) + "].specular", color.specular);
 	}
 
-	void SceneRenderer::setLightConstantsShader(gl::Shader shader, std::string lightType, unsigned int pos, const LightConstants& constants) const
+	void SceneRenderer::setLightConstantsShader(gl::IShader& shader, std::string lightType, unsigned int pos, const LightConstants& constants) const
 	{
-		shader->setUniform(lightType + "[" + util::toString(pos) + "].constant", constants.constant);
-		shader->setUniform(lightType + "[" + util::toString(pos) + "].linear", constants.linear);
-		shader->setUniform(lightType + "[" + util::toString(pos) + "].quadratic", constants.quadratic);
+		shader.setUniform(lightType + "[" + utils::toString(pos) + "].constant", constants.constant);
+		shader.setUniform(lightType + "[" + utils::toString(pos) + "].linear", constants.linear);
+		shader.setUniform(lightType + "[" + utils::toString(pos) + "].quadratic", constants.quadratic);
 	}
 
-	void SceneRenderer::setDirLightShader(gl::Shader shader, unsigned pos, std::shared_ptr<DirLight> light) const
+	void SceneRenderer::setDirLightShader(gl::IShader& shader, unsigned pos, const std::shared_ptr<DirLight>& light) const
 	{
 		setLightColorsShader(shader, "dirLights", pos, light->getColors());
-		shader->setUniform("dirLights[" + util::toString(pos) + "].direction", light->getDirection());
+		shader.setUniform("dirLights[" + utils::toString(pos) + "].direction", light->getDirection());
 	}
 
-	void SceneRenderer::setPointLightShader(gl::Shader shader, unsigned pos, std::shared_ptr<PointLight> light) const
+	void SceneRenderer::setPointLightShader(gl::IShader& shader, unsigned pos, const std::shared_ptr<PointLight>& light) const
 	{
 		setLightColorsShader(shader, "pointLights", pos, light->getColors());
 		setLightConstantsShader(shader, "pointLights", pos, light->getConstants());
-		shader->setUniform("pointLights[" + util::toString(pos) + "].position", light->getPosition());
+		shader.setUniform("pointLights[" + utils::toString(pos) + "].position", light->getPosition());
 	}
 }

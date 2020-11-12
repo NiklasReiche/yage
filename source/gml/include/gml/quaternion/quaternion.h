@@ -195,17 +195,6 @@ namespace gml
 			return std::asin(2 * test / unit);
 		}
 
-		/**
-		 * @brief Converts this quaternion into a rotation matrix.
-		 * 
-		 * @return the matrix
-		 */
-		[[nodiscard]]
-		constexpr Mat4<T> toMatrix() const
-		{
-			return Mat4<T>::quaternion(*this);
-		}
-
 		template<typename T2>
 		constexpr Quaternion<T>& operator*=(const T2& rhs)
 		{

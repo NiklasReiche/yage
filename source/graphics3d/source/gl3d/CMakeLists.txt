@@ -3,9 +3,6 @@ target_sources(yage_gl3d
 	camera.h
 	camera.cpp
 
-	skybox.h
-	skybox.cpp
-
 	light/light.h
 	light/light.cpp
 	light/pointLight.h
