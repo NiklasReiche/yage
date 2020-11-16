@@ -11,7 +11,7 @@ namespace gl3d
 	class Mesh
 	{
 	public:
-		Mesh(std::shared_ptr<gl::IDrawable> drawable);
+		explicit Mesh(std::shared_ptr<gl::IDrawable> drawable);
 
 	private:
 		std::shared_ptr<gl::IDrawable> drawable;

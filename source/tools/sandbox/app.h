@@ -9,6 +9,8 @@
 #include <gl3d/sceneRenderer.h>
 #include <gl3d/resourceManager.h>
 
+#include <physics3d/Simulation.h>
+
 struct Mouse
 {
 	gml::Vec2f pos;
@@ -100,12 +102,13 @@ private:
 	std::shared_ptr<gl::IRenderer> baseRenderer;
 	gl3d::SceneRenderer renderer;
 
+	std::shared_ptr<gl3d::Mesh> cubeMesh;
+	std::shared_ptr<gl3d::Material> cubeMaterial;
+
 	std::shared_ptr<gl3d::SceneGroup> scene;
 	std::shared_ptr<gl3d::SceneGroup> cubeGroup;
 	std::shared_ptr<gl3d::SceneObject> light1;
 	std::shared_ptr<gl3d::SceneObject> cube1;
-
-	std::shared_ptr<gl::IDrawable> cubeDrawable;
 
 public:
 	App()
@@ -138,66 +141,19 @@ public:
 		gml::Mat4f proj = gml::matrix::perspective<float>(45.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
 		shader->setUniform("projection", proj);
 
+		cubeMesh = setupMesh();
+
 		setupGraph();
 	}
 
 	void setupGraph()
 	{
-		std::vector<float> vertices = {
-			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-			0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-			0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-			0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-			-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-
-			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-			0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-			0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-			0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-			-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-
-			-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-			-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-			-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-			-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-			-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-			-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-
-			0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-			0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-			0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-			0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-			0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-			0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-
-			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-			0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-			0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-			0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-			-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-
-			-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-			0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-			0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-			0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-			-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-			-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-		};
-
-		cubeDrawable = glContext->getDrawableCreator()->createDrawable(
-			vertices, { 3, 3 }, gl::VertexFormat::INTERLEAVED);
-
-		std::shared_ptr<gl3d::Mesh> cubeMesh = std::make_shared<gl3d::Mesh>(cubeDrawable);
-
-		std::shared_ptr<gl3d::Material> rubyMaterial = std::make_shared<gl3d::Material>();
-		rubyMaterial->addVec3("ambient", gml::Vec3f(0.1));
-		rubyMaterial->addVec3("diffuse", gml::Vec3f(0.61f, 0.04f, 0.04f));
-		rubyMaterial->addVec3("specular", gml::Vec3f(0.7f, 0.6f, 0.6));
-		rubyMaterial->addFloat("shininess", 32.0f);
-		rubyMaterial->setShader(shader);
+		cubeMaterial = std::make_shared<gl3d::Material>();
+		cubeMaterial->addVec3("ambient", gml::Vec3f(0.1));
+		cubeMaterial->addVec3("diffuse", gml::Vec3f(0.61f, 0.04f, 0.04f));
+		cubeMaterial->addVec3("specular", gml::Vec3f(0.7f, 0.6f, 0.6));
+		cubeMaterial->addFloat("shininess", 32.0f);
+		cubeMaterial->setShader(shader);
 
 
 		std::shared_ptr<gl3d::PointLight> lightRes = 
@@ -206,14 +162,13 @@ public:
 				{ 1.0f, 0.09f, 0.032f }));
 
 		cube1 = std::make_shared<gl3d::SceneObject>("cube");
-		cube1->bindMaterial(rubyMaterial);
+		cube1->bindMaterial(cubeMaterial);
 		cube1->bindMesh(cubeMesh);
 
 		light1 = std::make_shared<gl3d::SceneObject>("light");
-		light1->bindMaterial(rubyMaterial);
+		light1->bindMaterial(cubeMaterial);
 		light1->bindMesh(cubeMesh);
 		light1->bindLight(lightRes);
-		//light1->bindCamera(camera);
 		light1->setTransform(
 			gml::matrix::quaternion<double>(gml::quaternion::eulerAngle<double>(0, 0, 0)) *
 					gml::matrix::translate<double>(gml::Vec3d(0.0, 0.0, -3.0)) *
@@ -233,11 +188,22 @@ public:
 		window->show();
 		std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
 
+		physics3d::Simulation simulation;
+		auto& particle1 = simulation.addParticle(gml::Vec3d(), gml::Vec3d(), 1);
+
+		auto particle1Model = std::make_shared<gl3d::SceneObject>("particle");
+		particle1Model->bindMesh(cubeMesh);
+		particle1Model->bindMaterial(cubeMaterial);
+		scene->addChild(particle1Model);
+
 		while (!window->shouldDestroy())
 		{
 			double dt = std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
-
 			baseRenderer->clear();
+
+			particle1.applyForce(gml::Vec3d(1, 1, 0));
+			simulation.integrate(1.0/60);
+			particle1Model->setTransform(gml::matrix::translate(particle1.getPosition()));
 
 			coord += 0.5 * dt;
 			gml::Mat4d localTransform =
@@ -255,5 +221,57 @@ public:
 			window->swapBuffers();
 			window->pollEvents();
 		}
+	}
+
+	std::shared_ptr<gl3d::Mesh> setupMesh()
+	{
+		const std::vector<float> vertices = {
+			-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+			0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+			0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+			0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+			-0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+			-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
+
+			-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+			0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+			0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+			0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+			-0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+			-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+
+			-0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+			-0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+			-0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+			-0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
+			-0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+			-0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
+
+			0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+			0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+			0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+			0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+			0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+			0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+
+			-0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+			0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+			0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+			0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+			-0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
+			-0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
+
+			-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+			0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+			-0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+			-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f
+		};
+
+		auto cubeDrawable = glContext->getDrawableCreator()->createDrawable(
+			vertices, { 3, 3 }, gl::VertexFormat::INTERLEAVED);
+
+		return std::make_shared<gl3d::Mesh>(std::move(cubeDrawable));
 	}
 };
