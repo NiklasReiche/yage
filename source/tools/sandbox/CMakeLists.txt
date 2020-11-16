@@ -8,5 +8,5 @@ add_executable(sandbox
 )
 
 target_link_libraries( sandbox 
-	PUBLIC yage_core yage_gl3d
+	PUBLIC yage_core yage_gl3d yage_physics3d
 )

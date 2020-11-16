@@ -32,6 +32,6 @@ namespace gl3d
 		 * 
 		 * @param node the node to add
 		 */
-		void addChild(const std::shared_ptr<SceneNode>& node);
+		void addChild(std::shared_ptr<SceneNode> node);
 	};
 }

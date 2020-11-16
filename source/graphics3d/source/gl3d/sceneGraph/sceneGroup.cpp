@@ -13,8 +13,8 @@ namespace gl3d
 	{
 	}
 
-	void SceneGroup::addChild(const std::shared_ptr<SceneNode>& node)
+	void SceneGroup::addChild(std::shared_ptr<SceneNode> node)
 	{
-		children.push_back(node);
+		children.push_back(std::move(node));
 	}
 }
