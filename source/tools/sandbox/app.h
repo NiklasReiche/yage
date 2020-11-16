@@ -97,13 +97,15 @@ private:
 
 	std::shared_ptr<gl::IShader> shader;
 	std::shared_ptr<gl3d::Camera> camera;
-	gl3d::ResourceManager resourceManager;
+	std::shared_ptr<gl::IRenderer> baseRenderer;
 	gl3d::SceneRenderer renderer;
 
 	std::shared_ptr<gl3d::SceneGroup> scene;
 	std::shared_ptr<gl3d::SceneGroup> cubeGroup;
 	std::shared_ptr<gl3d::SceneObject> light1;
 	std::shared_ptr<gl3d::SceneObject> cube1;
+
+	std::shared_ptr<gl::IDrawable> cubeDrawable;
 
 public:
 	App()
@@ -117,11 +119,11 @@ public:
 		inputListener = InputListener(window, camera);
 		window->attach(inputListener);
 
-
-		renderer = gl3d::SceneRenderer(glContext->getRenderer());
-		glContext->getRenderer()->setClearColor(0x008080FFu);
-		glContext->getRenderer()->enableDepthTest();
-		glContext->getRenderer()->setViewport(0, 0, 1500, 900);
+		baseRenderer = glContext->getRenderer();
+		baseRenderer->setClearColor(0x008080FFu);
+		baseRenderer->enableDepthTest();
+		baseRenderer->setViewport(0, 0, 1500, 900);
+		renderer = gl3d::SceneRenderer(baseRenderer);
 
 
 		std::string vertexShader =
@@ -185,15 +187,17 @@ public:
 			-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 		};
 
-		std::shared_ptr<gl3d::Mesh> cubeMesh = std::make_shared<gl3d::Mesh>();
-		cubeMesh->drawable = glContext->getDrawableCreator()->createDrawable(vertices, { 3, 3 }, gl::VertexFormat::INTERLEAVED);
+		cubeDrawable = glContext->getDrawableCreator()->createDrawable(
+			vertices, { 3, 3 }, gl::VertexFormat::INTERLEAVED);
 
-		std::shared_ptr<gl3d::Material> ruby = std::make_shared<gl3d::Material>();
-		ruby->addVec3("ambient", gml::Vec3f(0.1));
-		ruby->addVec3("diffuse", gml::Vec3f(0.61f, 0.04f, 0.04f));
-		ruby->addVec3("specular", gml::Vec3f(0.7f, 0.6f, 0.6));
-		ruby->addFloat("shininess", 32.0f);
-		ruby->setShader(shader);
+		std::shared_ptr<gl3d::Mesh> cubeMesh = std::make_shared<gl3d::Mesh>(cubeDrawable);
+
+		std::shared_ptr<gl3d::Material> rubyMaterial = std::make_shared<gl3d::Material>();
+		rubyMaterial->addVec3("ambient", gml::Vec3f(0.1));
+		rubyMaterial->addVec3("diffuse", gml::Vec3f(0.61f, 0.04f, 0.04f));
+		rubyMaterial->addVec3("specular", gml::Vec3f(0.7f, 0.6f, 0.6));
+		rubyMaterial->addFloat("shininess", 32.0f);
+		rubyMaterial->setShader(shader);
 
 
 		std::shared_ptr<gl3d::PointLight> lightRes = 
@@ -202,17 +206,18 @@ public:
 				{ 1.0f, 0.09f, 0.032f }));
 
 		cube1 = std::make_shared<gl3d::SceneObject>("cube");
-		cube1->bindMaterial(ruby);
+		cube1->bindMaterial(rubyMaterial);
 		cube1->bindMesh(cubeMesh);
 
 		light1 = std::make_shared<gl3d::SceneObject>("light");
-		light1->setTransform(gml::matrix::quaternion<float>(gml::quaternion::eulerAngle<float>(0, 0, 0)) * gml::matrix::translate<float>(gml::Vec3d(0.0, 0.0, -3.0)) * gml::matrix::scale<float>(0.1f,
-		                                                                                                                                                                                         0.1f,
-		                                                                                                                                                                                         0.1f));
-		light1->bindMaterial(ruby);
+		light1->bindMaterial(rubyMaterial);
 		light1->bindMesh(cubeMesh);
 		light1->bindLight(lightRes);
-		light1->bindCamera(camera);
+		//light1->bindCamera(camera);
+		light1->setTransform(
+			gml::matrix::quaternion<double>(gml::quaternion::eulerAngle<double>(0, 0, 0)) *
+					gml::matrix::translate<double>(gml::Vec3d(0.0, 0.0, -3.0)) *
+					gml::matrix::scale<double>(0.1f, 0.1f, 0.1f));
 
 		scene = std::make_shared<gl3d::SceneGroup>("world");
 		cubeGroup = std::make_shared<gl3d::SceneGroup>("cubeGroup");
@@ -227,22 +232,21 @@ public:
 		double coord = -1.0;
 		window->show();
 		std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
+
 		while (!window->shouldDestroy())
 		{
 			double dt = std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
 
-			glContext->getRenderer()->clear();
-			
-			coord += 0.5 * dt;
+			baseRenderer->clear();
 
+			coord += 0.5 * dt;
 			gml::Mat4d localTransform =
 				gml::matrix::axisAngle<float>(gml::Vec3d(1.0, 0.0, 0.0), coord) *
 				gml::matrix::translate<float>(gml::Vec3d(0.0, 0.0, -3.0)) *
 				gml::matrix::scale<float>(0.1f, 0.1f, 0.1f);
-
 			light1->setTransform(localTransform);
 
-			glContext->getRenderer()->useShader(*shader);
+			baseRenderer->useShader(*shader);
 			shader->setUniform("view", camera->getViewMatrix());
 			shader->setUniform("viewPos", camera->getPosition());
 

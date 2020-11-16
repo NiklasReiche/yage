@@ -1,6 +1,7 @@
 #include <core/platform/Window.h>
 #include <core/platform/desktop/GlfwWindow.h>
 #include <core/gl/Context.h>
+#include <core/gl/color.h>
 
 int main()
 {
@@ -32,11 +33,13 @@ int main()
 	auto shader = context->getShaderCreator()->createShader(vertexShaderSource, fragmentShaderSource);
 
 	auto renderer = context->getRenderer();
+	renderer->setClearColor(gl::Color::DARK_BLUE);
 	renderer->useShader(*shader);
 
 	window->show();
 	while (!window->shouldDestroy())
 	{
+		renderer->clear();
 		renderer->draw(*triangle);
 
 		window->swapBuffers();

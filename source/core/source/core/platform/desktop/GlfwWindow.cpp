@@ -200,8 +200,12 @@ namespace platform::desktop
 		}
 	}
 
-	void GlfwWindow::onCharEvent(GLFWwindow*, const unsigned int)
+	void GlfwWindow::onCharEvent(GLFWwindow* window, const unsigned int)
 	{
+		auto handle = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
+		if (!handle->isCharInputEnabled) {
+			return;
+		}
 		throw NotImplementedException();
 	}
 	void GlfwWindow::onKeyEvent(GLFWwindow* window, const int key, const int, const int action, const int)

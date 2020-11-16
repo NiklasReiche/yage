@@ -3,31 +3,31 @@
 namespace gl3d
 {
 	SceneObject::SceneObject()
-		: SceneNode(NodeType::OBJECT, "", gml::Mat4d())
+		: SceneNode(NodeType::OBJECT, "", gml::Id<double, 4>)
 	{
 	}
 
-	SceneObject::SceneObject(const std::string name, const gml::Mat4d transform)
+	SceneObject::SceneObject(const std::string& name, const gml::Mat4d transform)
 		: SceneNode(NodeType::OBJECT, name, transform)
 	{
 	}
 
-	void SceneObject::bindMaterial(const std::shared_ptr<Material> material)
+	void SceneObject::bindMaterial(const std::shared_ptr<Material>& material)
 	{
 		this->material = material;
 	}
 
-	void SceneObject::bindMesh(const std::shared_ptr<Mesh> mesh)
+	void SceneObject::bindMesh(const std::shared_ptr<Mesh>& mesh)
 	{
 		this->mesh = mesh;
 	}
 
-	void SceneObject::bindLight(const std::shared_ptr<Light> light)
+	void SceneObject::bindLight(const std::shared_ptr<Light>& light)
 	{
 		this->light = light;
 	}
 
-	void SceneObject::bindCamera(const std::shared_ptr<Camera> camera)
+	void SceneObject::bindCamera(const std::shared_ptr<Camera>& camera)
 	{
 		this->camera = camera;
 	}

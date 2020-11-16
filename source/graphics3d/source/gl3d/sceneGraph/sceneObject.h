@@ -11,10 +11,8 @@
 namespace gl3d
 {
 	/**
-	 * @brief Represents a group node in a scene graph. 
-	 * This node type doesn't own any children. Different integer id values can
-	 * be associated with a node to be used as pointers to objects in the 
-	 * resource manager.
+	 * @brief Represents a leaf node in a scene graph.
+	 * This node type doesn't own any children.
 	 */
 	class SceneObject : public SceneNode
 	{
@@ -36,35 +34,33 @@ namespace gl3d
 		 * @param name the node's name
 		 * @param transform the node's local transform
 		 */
-		explicit SceneObject(
-			std::string name,
-			gml::Mat4d transform = gml::Mat4d());
+		explicit SceneObject(const std::string& name, gml::Mat4d transform = gml::Id<double, 4>);
 
 
-		void bindMaterial(std::shared_ptr<Material> material);
+		void bindMaterial(const std::shared_ptr<Material>& material);
 
-		void bindMesh(std::shared_ptr<Mesh> mesh);
+		void bindMesh(const std::shared_ptr<Mesh>& mesh);
 
-		void bindLight(std::shared_ptr<Light> light);
+		void bindLight(const std::shared_ptr<Light>& light);
 
-		void bindCamera(std::shared_ptr<Camera> camera);
+		void bindCamera(const std::shared_ptr<Camera>& camera);
 
 		
-		bool hasMaterial() const;
+		[[nodiscard]] bool hasMaterial() const;
 
-		bool hasMesh() const;
+		[[nodiscard]] bool hasMesh() const;
 
-		bool hasLight() const;
+		[[nodiscard]] bool hasLight() const;
 
-		bool hasCamera() const;
+		[[nodiscard]] bool hasCamera() const;
 
 
-		std::shared_ptr<Material> getMaterial() const;
+		[[nodiscard]] std::shared_ptr<Material> getMaterial() const;
 
-		std::shared_ptr<Mesh> getMesh() const;
+		[[nodiscard]] std::shared_ptr<Mesh> getMesh() const;
 
-		std::shared_ptr<Light> getLight() const;
+		[[nodiscard]] std::shared_ptr<Light> getLight() const;
 
-		std::shared_ptr<Camera> getCamera() const;
+		[[nodiscard]] std::shared_ptr<Camera> getCamera() const;
 	};
 }

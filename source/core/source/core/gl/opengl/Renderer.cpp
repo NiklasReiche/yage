@@ -1,4 +1,5 @@
 // ReSharper disable CppClangTidyCppcoreguidelinesProTypeStaticCastDowncast
+#include <iostream>
 #include "Renderer.h"
 #include "../color.h"
 #include "Context.h"

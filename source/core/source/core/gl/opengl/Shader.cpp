@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Shader.h"
 #include "Context.h"
 
@@ -41,7 +42,7 @@ namespace opengl
 
 	void Shader::setUniform(const std::string& name, const int value)
 	{
-		if (!hasUniform(name)) 
+		if (!hasUniform(name))
 			return;
 		
 		lockContextPtr()->bindShader(program);
@@ -68,7 +69,7 @@ namespace opengl
 	
 	void Shader::setUniform(const std::string& name, const gml::Vec3f value)
 	{
-		if (!hasUniform(name)) 
+		if (!hasUniform(name))
 			return;
 		
 		lockContextPtr()->bindShader(program);

@@ -25,15 +25,13 @@ namespace gl3d
 		 * @param name the name
 		 * @param transform the transform
 		 */
-		explicit SceneGroup(
-			std::string name, 
-			gml::Mat4d transform = gml::Mat4d());
+		explicit SceneGroup(const std::string& name,  gml::Mat4d transform = gml::Mat4d::Id);
 
 		/**
 		 * @brief Adds a group node as a child to this node.
 		 * 
 		 * @param node the node to add
 		 */
-		void addChild(std::shared_ptr<SceneNode> node);
+		void addChild(const std::shared_ptr<SceneNode>& node);
 	};
 }
