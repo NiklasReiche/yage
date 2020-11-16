@@ -83,7 +83,7 @@ namespace gml::matrix
 		const T s = std::sin(angle);
 		const T t = 1 - c;
 
-		Mat4<T> result;
+		Mat4<T> result = Mat4<T>::Id;
 		result(0, 0) = x * x * t + c;
 		result(0, 1) = x * y * t - z * s;
 		result(0, 2) = x * z * t + y * s;
@@ -109,7 +109,7 @@ namespace gml::matrix
 	{
 		const Quaternion<T> q = normalize(quaternion);
 
-		Mat4<T> result;
+		Mat4<T> result = Mat4<T>::Id;
 		result(0, 0) = 1 - 2 * q.y * q.y - 2 * q.z * q.z;
 		result(0, 1) = 2 * q.x * q.y - 2 * q.z * q.w;
 		result(0, 2) = 2 * q.x * q.z + 2 * q.y * q.w;
@@ -136,7 +136,7 @@ namespace gml::matrix
 	template<typename T>
 	Mat4<T> perspective(const double fov, const double aspect, const double near, const double far)
 	{
-		Mat4<T> result;
+		Mat4<T> result = Mat4<T>::Id;
 		const double top = near * std::tan(toRad(fov / 2));
 		const double bottom = 0 - top;
 		const double right = top * aspect;
@@ -145,8 +145,8 @@ namespace gml::matrix
 		result(0, 2) = (right + left) / (right - left);
 		result(1, 1) = (2 * near) / (top - bottom);
 		result(1, 2) = (top + bottom) / (top - bottom);
-		result(2, 2) = 0 - ((far + near) / (far - near));
-		result(2, 3) = 0 - ((2 * far * near) / (far - near));
+		result(2, 2) = -((far + near) / (far - near));
+		result(2, 3) = -((2 * far * near) / (far - near));
 		result(3, 2) = -1;
 		result(3, 3) = 0;
 		return result;
@@ -169,7 +169,7 @@ namespace gml::matrix
 		const double bottom, const double top,
 		const double near, const double far)
 	{
-		Mat4<T> result;
+		Mat4<T> result = Mat4<T>::Id;
 		result(0, 0) = 2 / (right - left);
 		result(0, 3) = -((right + left) / (right - left));
 		result(1, 1) = 2 / (top - bottom);

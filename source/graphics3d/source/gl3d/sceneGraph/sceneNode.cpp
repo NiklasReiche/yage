@@ -45,9 +45,9 @@ namespace gl3d
 		return transform * this->transform;
 	}
 
-	void SceneNode::setTransform(const gml::Mat4d & tranform)
+	void SceneNode::setTransform(const gml::Mat4d & transform)
 	{
-		this->transform = tranform;
+		this->transform = transform;
 	}
 
 	gml::Mat4d SceneNode::getTransform() const

@@ -6,9 +6,16 @@
 
 namespace gl3d
 {
+	class SceneRenderer;
+
 	class Mesh
 	{
 	public:
-		std::unique_ptr<gl::IDrawable> drawable;
+		Mesh(std::shared_ptr<gl::IDrawable> drawable);
+
+	private:
+		std::shared_ptr<gl::IDrawable> drawable;
+
+		friend class SceneRenderer;
 	};
 }
