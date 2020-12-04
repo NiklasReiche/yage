@@ -2,9 +2,7 @@ add_executable(yage_gml_test
 	main.cpp
 	mathTest.cpp
 	vectorTest.cpp
-	vecXTest.cpp
 	matrixTest.cpp
-	matXTest.cpp
 	quaternionTest.cpp)
 
 target_link_libraries(yage_gml_test

@@ -4,7 +4,7 @@
 namespace gl3d
 {
 	SceneGroup::SceneGroup()
-		: SceneNode(NodeType::GROUP, "", gml::Id<double, 4>)
+		: SceneNode(NodeType::GROUP, "", gml::matrix::Id<double, 4>)
 	{
 	}
 

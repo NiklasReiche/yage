@@ -179,12 +179,71 @@ TEST_CASE("MatrixBase test")
 	}
 
 	SECTION("Identity") {
-		Matrix<int, 2, 2> id = gml::Id<int, 2>;
+		SECTION("generic") {
+			const Matrix<int, 2, 2> id = gml::matrix::Id<int, 2>;
 
-		CHECK(id(0, 0) == 1);
-		CHECK(id(0, 1) == 0);
-		CHECK(id(1, 0) == 0);
-		CHECK(id(1, 1) == 1);
+			CHECK(id(0, 0) == 1);
+			CHECK(id(0, 1) == 0);
+
+			CHECK(id(1, 0) == 0);
+			CHECK(id(1, 1) == 1);
+		}
+
+		SECTION("1x1") {
+			const Matrix<int, 1, 1> id = gml::matrix::Id1<int>;
+
+			CHECK(id(0, 0) == 1);
+		}
+
+		SECTION("2x2") {
+			const Mat2i id = gml::matrix::Id2<int>;
+
+			CHECK(id(0, 0) == 1);
+			CHECK(id(0, 1) == 0);
+
+			CHECK(id(1, 0) == 0);
+			CHECK(id(1, 1) == 1);
+		}
+
+		SECTION("3x3") {
+			const Mat3i id = gml::matrix::Id3<int>;
+
+			CHECK(id(0, 0) == 1);
+			CHECK(id(0, 1) == 0);
+			CHECK(id(0, 2) == 0);
+
+			CHECK(id(1, 0) == 0);
+			CHECK(id(1, 1) == 1);
+			CHECK(id(1, 2) == 0);
+
+			CHECK(id(2, 0) == 0);
+			CHECK(id(2, 1) == 0);
+			CHECK(id(2, 2) == 1);
+		}
+
+		SECTION("4x4") {
+			const Mat4i id = gml::matrix::Id4<int>;
+
+			CHECK(id(0, 0) == 1);
+			CHECK(id(0, 1) == 0);
+			CHECK(id(0, 2) == 0);
+			CHECK(id(0, 3) == 0);
+
+			CHECK(id(1, 0) == 0);
+			CHECK(id(1, 1) == 1);
+			CHECK(id(1, 2) == 0);
+			CHECK(id(1, 3) == 0);
+
+			CHECK(id(2, 0) == 0);
+			CHECK(id(2, 1) == 0);
+			CHECK(id(2, 2) == 1);
+			CHECK(id(2, 3) == 0);
+
+			CHECK(id(3, 0) == 0);
+			CHECK(id(3, 1) == 0);
+			CHECK(id(3, 2) == 0);
+			CHECK(id(3, 3) == 1);
+		}
 	}
 
 	SECTION("determinant") {
@@ -333,5 +392,25 @@ TEST_CASE("MatrixBase test")
 			expect_eq(mat, inverse(inv));
 			expect_eq(mat, inverse(inverse(mat)));
 		}
+	}
+
+	SECTION("extract scaling component") {
+		const Mat4d mat = Mat4d{
+			2, 0, 0, 5,
+			0, 5, 0, 1,
+			0, 0, 10, 8,
+			0, 0, 0, 1 };
+
+		CHECK(mat.getScale() == Vec3<double>(2, 5, 10));
+	}
+
+	SECTION("extract translation component") {
+		const Mat4d mat = Mat4d{
+			2, 3, 1, 5,
+			-4, 5, 5, 1,
+			9, 4, 10, 8,
+			0, 0, 0, 1 };
+
+		CHECK(mat.getTranslation() == Vec3<double>(5, 1, 8));
 	}
 }

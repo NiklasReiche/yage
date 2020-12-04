@@ -26,7 +26,6 @@ public:
 	InputListener(std::shared_ptr<platform::IWindow> window, std::shared_ptr<gl3d::Camera> camera)
 		: window(window), camera(camera)
 	{
-		
 	}
 
 	void onMousePosEvent(const input::MousePosEvent& event) override
@@ -43,8 +42,8 @@ public:
 			//gml::Quaternion<float> q_pitch = gml::quaternion::eulerAngle<float>(angle.y, 0, 0);
 
 			//gml::Quaternion<float> newRotation = gml::normalize<float>(q_yaw * camera.rotation * q_pitch);
-			camera->rotateYaw(angle.x);
-			camera->rotatePitch(angle.y);
+			camera->rotateYaw(angle.x());
+			camera->rotatePitch(angle.y());
 		}
 		mouse.pos = gml::Vec2f(x, y);
 	}
@@ -170,7 +169,7 @@ public:
 		light1->bindMesh(cubeMesh);
 		light1->bindLight(lightRes);
 		light1->setTransform(
-			gml::matrix::quaternion<double>(gml::quaternion::eulerAngle<double>(0, 0, 0)) *
+			gml::matrix::fromQuaternion<double>(gml::quaternion::eulerAngle<double>(0, 0, 0)) *
 					gml::matrix::translate<double>(gml::Vec3d(0.0, 0.0, -3.0)) *
 					gml::matrix::scale<double>(0.1f, 0.1f, 0.1f));
 
@@ -189,21 +188,22 @@ public:
 		std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
 
 		physics3d::Simulation simulation;
-		auto& particle1 = simulation.addParticle(gml::Vec3d(), gml::Vec3d(), 1);
+		auto& particle1 = simulation.addRigidBody(1, 1);
 
 		auto particle1Model = std::make_shared<gl3d::SceneObject>("particle");
 		particle1Model->bindMesh(cubeMesh);
 		particle1Model->bindMaterial(cubeMaterial);
 		scene->addChild(particle1Model);
 
+		particle1.applyForce(gml::Vec3d(5, 0, 0), gml::Vec3d(0, -0.5, 0));
 		while (!window->shouldDestroy())
 		{
 			double dt = std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
 			baseRenderer->clear();
 
-			particle1.applyForce(gml::Vec3d(1, 1, 0));
+
 			simulation.integrate(1.0/60);
-			particle1Model->setTransform(gml::matrix::translate(particle1.getPosition()));
+			particle1Model->setTransform(gml::matrix::translate(particle1.getPosition()) * gml::matrix::fromQuaternion(particle1.getOrientation()));
 
 			coord += 0.5 * dt;
 			gml::Mat4d localTransform =

@@ -71,7 +71,7 @@ namespace gl3d
 		 */
 		void updateChildren(
 			std::function<void(SceneObject*, gml::Mat4d)> func,
-			gml::Mat4d transform = gml::Mat4d::Id);
+			gml::Mat4d transform = gml::matrix::Id<double, 4>);
 
 		/**
 		* @brief Applies the given transform to this node's transform.

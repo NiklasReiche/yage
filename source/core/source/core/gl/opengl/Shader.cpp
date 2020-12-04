@@ -73,7 +73,7 @@ namespace opengl
 			return;
 		
 		lockContextPtr()->bindShader(program);
-		glUniform3f(uniformLocations.at(name), value.x, value.y, value.z);
+		glUniform3f(uniformLocations.at(name), value.x(), value.y(), value.z());
 	}
 	
 	void Shader::setUniform(const std::string& name, const gml::Mat4f value)

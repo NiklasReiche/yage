@@ -34,7 +34,7 @@ namespace gl3d
 		 * @param name the node's name
 		 * @param transform the node's local transform
 		 */
-		explicit SceneObject(const std::string& name, gml::Mat4d transform = gml::Id<double, 4>);
+		explicit SceneObject(const std::string& name, gml::Mat4d transform = gml::matrix::Id<double, 4>);
 
 
 		void bindMaterial(const std::shared_ptr<Material>& material);
