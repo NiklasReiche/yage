@@ -42,7 +42,7 @@ namespace gl3d
 			if (node->hasCamera()) {
 				std::shared_ptr<Camera> camera = node->getCamera();
 				camera->moveTo(transform.getTranslation());
-				camera->rotateTo(gml::quaternion::rotationMatrix<double>(transform.getRotation()));
+				camera->rotateTo(gml::quaternion::fromMatrix<double>(transform.getRotation()));
 			}
 		};
 

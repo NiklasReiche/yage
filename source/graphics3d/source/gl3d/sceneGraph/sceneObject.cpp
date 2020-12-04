@@ -3,7 +3,7 @@
 namespace gl3d
 {
 	SceneObject::SceneObject()
-		: SceneNode(NodeType::OBJECT, "", gml::Id<double, 4>)
+		: SceneNode(NodeType::OBJECT, "", gml::matrix::Id<double, 4>)
 	{
 	}
 

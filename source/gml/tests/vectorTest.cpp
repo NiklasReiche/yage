@@ -91,6 +91,30 @@ TEST_CASE("VectorBase test")
 			CHECK(Approx(1) == copy(1).real);
 			CHECK(Approx(8) == copy(1).imaginary);
 		}
+
+		SECTION("explicit 2-dimensional") {
+			Vec2<int> vec(25, 42);
+
+			CHECK(25 == vec.x());
+			CHECK(42 == vec.y());
+		}
+
+		SECTION("explicit 3-dimensional") {
+			Vec3<int> vec(25, 42, 63);
+
+			CHECK(25 == vec.x());
+			CHECK(42 == vec.y());
+			CHECK(63 == vec.z());
+		}
+
+		SECTION("explicit 4-dimensional") {
+			Vec4<int> vec(25, 42, 63, 10);
+
+			CHECK(25 == vec.x());
+			CHECK(42 == vec.y());
+			CHECK(63 == vec.z());
+			CHECK(10 == vec.w());
+		}
 	}
 
 	SECTION("Assignment") {
@@ -234,14 +258,14 @@ TEST_CASE("VectorBase test")
 		CHECK(Approx(std::sqrt(14)) == length(vec1));
 
 		Vec3d result = normalize(vec1);
-		CHECK(Approx(expected.x) == result.x);
-		CHECK(Approx(expected.y) == result.y);
-		CHECK(Approx(expected.z) == result.z);
+		CHECK(Approx(expected.x()) == result.x());
+		CHECK(Approx(expected.y()) == result.y());
+		CHECK(Approx(expected.z()) == result.z());
 
 		vec1.normalize();
-		CHECK(Approx(expected.x) == vec1.x);
-		CHECK(Approx(expected.y) == vec1.y);
-		CHECK(Approx(expected.z) == vec1.z);
+		CHECK(Approx(expected.x()) == vec1.x());
+		CHECK(Approx(expected.y()) == vec1.y());
+		CHECK(Approx(expected.z()) == vec1.z());
 
 		CHECK_THROWS_AS(static_cast<void>(Vec2i(0, 0).normalize()), DivideByZeroException);
 	}

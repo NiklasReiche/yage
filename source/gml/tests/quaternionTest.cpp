@@ -15,7 +15,7 @@ void EXPECT_QUAT(Quaternion<T> expected, Quaternion<T> result)
 	CHECK(expected.z == Approx(result.z));
 }
 template<typename T, size_t size>
-static void EXPECT_VEC(Vector<T, size> expected, VectorBase<T, size> result)
+static void EXPECT_VEC(Vector<T, size> expected, Vector<T, size> result)
 {
 	for (size_t i = 0; i < size; ++i)
 	{
