@@ -123,7 +123,7 @@ namespace opengl
 	{
 		auto& ptr = static_cast<const Drawable&>(drawable);
 		lockContextPtr()->bindVertexArray(ptr.VAO);
-		glDrawArrays(static_cast<GLenum>(ptr.primitive), 0, ptr.nVertices);
+		glDrawArrays(ptr.nVertices == 0 ? GL_POINTS : static_cast<GLenum>(ptr.primitive), 0, ptr.nVertices == 0 ? 1 : ptr.nVertices); // TODO
 	}
 
 	void Renderer::draw(const gl::IFrame & buffer)

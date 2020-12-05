@@ -3,7 +3,8 @@
 ###################################################################
 
 add_executable(sandbox
-	"main.cpp" 
+	"main.cpp"
+	"InputListener.h"
 	"app.h" 
 )
 

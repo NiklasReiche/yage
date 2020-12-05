@@ -13,7 +13,7 @@ namespace physics3d
 
 		gml::Vec3d getPosition();
 
-	private:
+	protected:
 		gml::Vec3d position;
 		gml::Vec3d velocity;
 		double mass;
