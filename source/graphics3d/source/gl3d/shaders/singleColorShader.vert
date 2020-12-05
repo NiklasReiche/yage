@@ -1,4 +1,4 @@
-R"(
+R""(
 
 #version 330 core
 
@@ -19,4 +19,4 @@ void main(){
 	gl_Position = projection * view * model * vec4(position, 1.0);
 }
 
-)"
+)""

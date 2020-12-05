@@ -14,7 +14,7 @@ namespace opengl
 	{
 		// check vertex layout
 		const unsigned int vertexSize = std::accumulate(vertexLayout.begin(), vertexLayout.end(), 0u);
-		if (vertexSize == 0)
+		if (vertexSize == 0 && !vertices.empty())
 			throw std::invalid_argument("Invalid vertex layout");
 		
 		auto context = lockContextPtr();
@@ -35,7 +35,7 @@ namespace opengl
 			static_cast<GLenum>(drawable->usage));
 
 		// configure vertex attributes
-		const unsigned int nVertices = vertices.size() / vertexSize;
+		const unsigned int nVertices = vertexSize == 0 ? 0 : vertices.size() / vertexSize;
 
 		switch(format)
 		{
