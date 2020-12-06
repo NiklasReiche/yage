@@ -9,7 +9,7 @@
 #include <gl3d/resourceManager.h>
 #include <physics3d/Simulation.h>
 
-#include "InputListener.h"
+#include "MovementListener.h"
 
 class App
 {
@@ -23,7 +23,7 @@ public:
 			gl3d::Camera(gml::Vec3f(0.0f, 0.0f, 5.0f),
 			             gml::quaternion::eulerAngle<double>(std::numbers::pi_v<float>, 0, 0)));
 
-		inputListener = InputListener(window, camera);
+		inputListener = MovementListener(window, camera);
 		window->attach(inputListener);
 
 		baseRenderer = glContext->getRenderer();
@@ -49,7 +49,7 @@ public:
 	;
 		std::string csGeometryShader =
 #include "shaders/pointShader.geom"
-		;
+	;
 		csShader = glContext->getShaderCreator()->createShader(csVertexShader, csFragmentShader, csGeometryShader);
 
 		gml::Mat4f proj = gml::matrix::perspective<float>(45.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
@@ -74,12 +74,15 @@ public:
 		auto cube3 = createCube();
 		cube3->applyForce(gml::Vec3d(3, -1, 0), gml::Vec3d(0, -0.5, 0));
 
-		auto point = glContext->getDrawableCreator()->createDrawable({}, {}, gl::VertexFormat::BATCHED);
+		auto point = glContext->getDrawableCreator()->createDrawable({ }, { }, gl::VertexFormat::BATCHED);
 
 		while (!window->shouldDestroy()) {
 			baseRenderer->clear();
 
+			inputListener.applyUpdate();
+
 			simulation.integrate(1.0 / 60);
+
 			updateSceneGraph();
 
 			baseRenderer->useShader(*csShader);
@@ -101,7 +104,7 @@ public:
 private:
 	std::shared_ptr<platform::IWindow> window;
 	std::shared_ptr<gl::IContext> glContext;
-	InputListener inputListener;
+	MovementListener inputListener;
 
 	std::shared_ptr<gl::IShader> shader;
 	std::shared_ptr<gl::IShader> csShader;
@@ -155,11 +158,11 @@ private:
 
 		scene = std::make_shared<gl3d::SceneGroup>("world");
 
-		auto lightRes = std::make_shared<gl3d::PointLight>(
-			gl3d::PointLight({ gml::Vec3f(0.2f),
-			                   gml::Vec3f(0.5f),
-			                   gml::Vec3f(1.0f) },
-			                 { 1.0f, 0.09f, 0.032f }));
+		auto lightRes = std::make_shared<gl3d::DirLight>(
+			gl3d::DirLight({ gml::Vec3f(0.2f),
+			                 gml::Vec3f(0.5f),
+			                 gml::Vec3f(1.0f) },
+			               gml::Vec3f(-1, -1, -1)));
 		light1 = std::make_shared<gl3d::SceneObject>("light");
 		light1->bindMaterial(cubeMaterial);
 		light1->bindMesh(cubeMesh);

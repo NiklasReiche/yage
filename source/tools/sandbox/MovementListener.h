@@ -16,14 +16,18 @@ struct Mouse
 	bool first = true;
 };
 
-class InputListener : public input::InputListener
+class MovementListener : public input::InputListener
 {
 public:
-	InputListener() = default;
+	MovementListener() = default;
 
-	InputListener(std::shared_ptr <platform::IWindow> window, std::shared_ptr <gl3d::Camera> camera)
+	MovementListener(std::shared_ptr <platform::IWindow> window, std::shared_ptr <gl3d::Camera> camera)
 		: window(std::move(window)), camera(std::move(camera))
 	{
+		keyStates[input::KeyEvent::Code::KEY_W] = false;
+		keyStates[input::KeyEvent::Code::KEY_A] = false;
+		keyStates[input::KeyEvent::Code::KEY_S] = false;
+		keyStates[input::KeyEvent::Code::KEY_D] = false;
 	}
 
 	void onMousePosEvent(const input::MousePosEvent& event) override
@@ -50,22 +54,8 @@ public:
 		auto code = static_cast<const input::KeyEvent&>(event).getKey();
 		auto action = static_cast<const input::KeyEvent&>(event).getAction();
 
-		if (code == input::KeyEvent::Code::KEY_W &&
-		    (action == input::KeyEvent::Action::REPEAT || action == input::KeyEvent::Action::PRESS)) {
-			camera->moveForward(0.1);
-		}
-		if (code == input::KeyEvent::Code::KEY_A &&
-		    (action == input::KeyEvent::Action::REPEAT || action == input::KeyEvent::Action::PRESS)) {
-			camera->moveLeft(0.1);
-		}
-		if (code == input::KeyEvent::Code::KEY_S &&
-		    (action == input::KeyEvent::Action::REPEAT || action == input::KeyEvent::Action::PRESS)) {
-			camera->moveBackward(0.1);
-		}
-		if (code == input::KeyEvent::Code::KEY_D &&
-		    (action == input::KeyEvent::Action::REPEAT || action == input::KeyEvent::Action::PRESS)) {
-			camera->moveRight(0.1);
-		}
+		keyStates[code] = action != input::KeyEvent::Action::RELEASE;
+
 		if (code == input::KeyEvent::Code::KEY_X && action == input::KeyEvent::Action::PRESS) {
 			if (mouse.isHidden) {
 				std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->showCursor();
@@ -77,8 +67,25 @@ public:
 		}
 	}
 
+	void applyUpdate()
+	{
+		if (keyStates[input::KeyEvent::Code::KEY_W]) {
+			camera->moveForward(0.1);
+		}
+		if (keyStates[input::KeyEvent::Code::KEY_A]) {
+			camera->moveLeft(0.1);
+		}
+		if (keyStates[input::KeyEvent::Code::KEY_S]) {
+			camera->moveBackward(0.1);
+		}
+		if (keyStates[input::KeyEvent::Code::KEY_D]) {
+			camera->moveRight(0.1);
+		}
+	}
+
 private:
 	Mouse mouse;
+	std::map<input::KeyEvent::Code, bool> keyStates;
 	std::shared_ptr <platform::IWindow> window;
 	std::shared_ptr <gl3d::Camera> camera;
 };
