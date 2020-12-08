@@ -18,6 +18,7 @@ namespace platform::desktop
 	{
 	public:
 		explicit File(const std::string & filename, FileType type, AccessMode mode);
+		~File() override = default;
 
 		void seek(int index, SeekOffset offset) override;
 

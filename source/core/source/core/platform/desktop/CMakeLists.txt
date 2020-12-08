@@ -4,6 +4,8 @@ target_sources(yage_core
 		File.cpp
 		BinaryFile.h
 		BinaryFile.cpp
+		TextFile.h
+		TextFile.cpp
 		GlfwException.h
 		GlfwWindow.h
 		GlfwWindow.cpp
