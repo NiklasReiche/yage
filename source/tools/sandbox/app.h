@@ -2,6 +2,8 @@
 
 #include <core/platform/Window.h>
 #include <core/platform/desktop/GlfwWindow.h>
+#include <core/platform/IFileReader.h>
+#include <core/platform/desktop/FileReader.h>
 #include <core/gl/Context.h>
 #include <gml/gml.h>
 #include <gl3d/camera.h>
@@ -41,15 +43,14 @@ public:
 	;
 		shader = glContext->getShaderCreator()->createShader(vertexShader, fragmentShader);
 
-		std::string csVertexShader =
-#include "shaders/pointShader.vert"
-	;
-		std::string csFragmentShader =
-#include "shaders/pointShader.frag"
-	;
-		std::string csGeometryShader =
-#include "shaders/pointShader.geom"
-	;
+
+		auto fileReader = platform::desktop::FileReader();
+		std::string csVertexShader = fileReader.
+			openTextFile("shaders/pointShader.vert", platform::IFile::AccessMode::READ)->readAll();
+		std::string csFragmentShader = fileReader.
+			openTextFile("shaders/pointShader.frag", platform::IFile::AccessMode::READ)->readAll();
+		std::string csGeometryShader = fileReader.
+			openTextFile("shaders/pointShader.geom", platform::IFile::AccessMode::READ)->readAll();
 		csShader = glContext->getShaderCreator()->createShader(csVertexShader, csFragmentShader, csGeometryShader);
 
 		gml::Mat4f proj = gml::matrix::perspective<float>(45.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);

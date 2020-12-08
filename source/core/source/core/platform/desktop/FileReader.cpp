@@ -1,10 +1,16 @@
 #include "FileReader.h"
 #include "BinaryFile.h"
+#include "TextFile.h"
 
 namespace platform::desktop
 {
 	std::unique_ptr<IBinaryFile> FileReader::openBinaryFile(const std::string& filename, IFile::AccessMode mode)
 	{
 		return std::make_unique<desktop::BinaryFile>(filename, mode);
+	}
+
+	std::unique_ptr<ITextFile> FileReader::openTextFile(const std::string& filename, IFile::AccessMode mode)
+	{
+		return std::make_unique<desktop::TextFile>(filename, mode);
 	}
 }

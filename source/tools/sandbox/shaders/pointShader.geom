@@ -1,5 +1,5 @@
-R"(
 #version 330 core
+
 layout (points) in;
 layout (line_strip, max_vertices = 6) out;
 
@@ -33,4 +33,3 @@ void main() {
     EmitVertex();
     EndPrimitive();
 }
-)"
