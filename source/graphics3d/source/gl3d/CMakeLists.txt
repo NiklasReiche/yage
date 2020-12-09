@@ -25,6 +25,9 @@ target_sources(yage_gl3d
 	sceneRenderer.h
 	sceneRenderer.cpp
 
+	resources/obj.h
+	resources/obj.cpp
+
 	#resourceCache.h
 	#resourceManager.h
 	)

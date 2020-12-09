@@ -68,4 +68,10 @@ namespace platform::desktop
 			throw std::invalid_argument("The given option is not supported");
 		}
 	}
+
+	bool File::eof()
+	{
+		fileStream->peek();
+		return fileStream->eof();
+	}
 }

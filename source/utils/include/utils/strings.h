@@ -37,4 +37,9 @@ namespace utils
 		}
 		return s;
 	}
-}// namespace utils
+
+	inline bool contains(const std::string& input, const std::string& search)
+	{
+		return input.find(search) != std::string::npos;
+	}
+}

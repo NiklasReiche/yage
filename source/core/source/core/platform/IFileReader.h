@@ -11,8 +11,10 @@ namespace platform
 	class IFileReader
 	{
 	public:
-		virtual std::unique_ptr<IBinaryFile> openBinaryFile(const std::string& filename, IFile::AccessMode mode) = 0;
+		[[nodiscard]]
+		virtual std::unique_ptr<IBinaryFile> openBinaryFile(const std::string& filename, IFile::AccessMode mode) const = 0;
 
-		virtual std::unique_ptr<ITextFile> openTextFile(const std::string& filename, IFile::AccessMode mode) = 0;
+		[[nodiscard]]
+		virtual std::unique_ptr<ITextFile> openTextFile(const std::string& filename, IFile::AccessMode mode) const = 0;
 	};
 }

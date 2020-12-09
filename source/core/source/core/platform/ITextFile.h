@@ -13,6 +13,8 @@ namespace platform
 
 		virtual std::string read() = 0;
 
+		virtual std::string readLine() = 0;
+
 		virtual std::stringstream& readAll(std::stringstream& output) = 0;
 
 		virtual std::string readAll() = 0;

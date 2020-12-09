@@ -13,6 +13,8 @@ namespace platform::desktop
 
 		std::string read() override;
 
+		std::string readLine() override;
+
 		std::stringstream& readAll(std::stringstream& output) override;
 
 		std::string readAll() override;
