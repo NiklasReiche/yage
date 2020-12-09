@@ -21,5 +21,7 @@ namespace platform
 		virtual void seek(int index, SeekOffset offset) = 0;
 
 		virtual std::string getFileName() = 0;
+
+		virtual bool eof() = 0;
 	};
 }

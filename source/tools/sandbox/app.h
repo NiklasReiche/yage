@@ -8,7 +8,7 @@
 #include <gml/gml.h>
 #include <gl3d/camera.h>
 #include <gl3d/sceneRenderer.h>
-#include <gl3d/resourceManager.h>
+#include <gl3d/resources/obj.h>
 #include <physics3d/Simulation.h>
 
 #include "MovementListener.h"
@@ -221,8 +221,12 @@ private:
 			-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f
 		};
 
-		auto cubeDrawable = glContext->getDrawableCreator()->createDrawable(
-			vertices, { 3, 3 }, gl::VertexFormat::INTERLEAVED);
+		//auto cubeDrawable = glContext->getDrawableCreator()->createDrawable(
+		//	vertices, { 3, 3 }, gl::VertexFormat::INTERLEAVED);
+
+		auto cubeDrawable = gl3d::resources::readObj(platform::desktop::FileReader(),
+											   "models/sphere.obj",
+											   *glContext->getDrawableCreator());
 
 		return std::make_shared<gl3d::Mesh>(std::move(cubeDrawable));
 	}

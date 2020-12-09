@@ -14,6 +14,13 @@ namespace platform::desktop
 		return output;
 	}
 
+	std::string TextFile::readLine()
+	{
+		std::string output;
+		std::getline(*fileStream, output);
+		return output;
+	}
+
 	std::stringstream& TextFile::readAll(std::stringstream& output)
 	{
 		output << fileStream->rdbuf();

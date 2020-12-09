@@ -24,6 +24,8 @@ namespace platform::desktop
 
 		std::string getFileName() override;
 
+		bool eof() override;
+
 	protected:
 		std::string filename;
 		std::unique_ptr<std::fstream> fileStream;
