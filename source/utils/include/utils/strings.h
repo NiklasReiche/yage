@@ -29,6 +29,15 @@ namespace utils
 		return out;
 	}
 
+	inline std::string join(const std::vector<std::string>& strings)
+	{
+		std::stringstream stream;
+		for (const auto& s : strings) {
+			stream << s;
+		}
+		return stream.str();
+	}
+
 	inline std::string& replaceAll(std::string& s, const std::string& find, const std::string& replace)
 	{
 		size_t pos;

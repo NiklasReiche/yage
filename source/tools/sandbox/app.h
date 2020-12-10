@@ -66,13 +66,13 @@ public:
 		window->show();
 		std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
 
-		auto cube1 = createCube();
+		auto cube1 = loadModel("models/sphere.obj");
 		cube1->applyForce(gml::Vec3d(0, 10, 0), gml::Vec3d(0.3, -0.5, 0));
 
-		auto cube2 = createCube();
+		auto cube2 = loadModel("models/cube.obj");
 		cube2->applyForce(gml::Vec3d(-30, 1, 10), gml::Vec3d(0.5, 0, 0.5));
 
-		auto cube3 = createCube();
+		auto cube3 = loadModel("models/cube.obj");
 		cube3->applyForce(gml::Vec3d(3, -1, 0), gml::Vec3d(0, -0.5, 0));
 
 		auto point = glContext->getDrawableCreator()->createDrawable({ }, { }, gl::VertexFormat::BATCHED);
@@ -113,9 +113,6 @@ private:
 	std::shared_ptr<gl::IRenderer> baseRenderer;
 	gl3d::SceneRenderer renderer;
 
-	std::shared_ptr<gl3d::Mesh> cubeMesh;
-	std::shared_ptr<gl3d::Material> cubeMaterial;
-
 	std::shared_ptr<gl3d::SceneGroup> scene;
 	std::shared_ptr<gl3d::SceneObject> light1;
 
@@ -125,38 +122,35 @@ private:
 	void updateSceneGraph()
 	{
 		for (auto& pair : objects) {
-			auto& model = std::get<0>(pair);
+			auto& object = std::get<0>(pair);
 			auto& rb = std::get<1>(pair);
-			model->setTransform(gml::matrix::translate(rb->getPosition()) *
+			object->setTransform(gml::matrix::translate(rb->getPosition()) *
 			                    gml::matrix::fromQuaternion(rb->getOrientation()));
 		}
 	}
 
-	std::shared_ptr<physics3d::RigidBody> createCube()
+	std::shared_ptr<physics3d::RigidBody> loadModel(const std::string& filename)
 	{
-		auto model = std::make_shared<gl3d::SceneObject>(&""[std::rand()]);
-		model->bindMaterial(cubeMaterial);
-		model->bindMesh(cubeMesh);
-		scene->addChild(model);
+		auto tuple = gl3d::resources::readObj(platform::desktop::FileReader(),
+		                                      filename,*glContext->getDrawableCreator());
+		auto mesh = std::make_shared<gl3d::Mesh>(std::move(std::get<0>(tuple)));
+		auto material = std::make_shared<gl3d::Material>(std::get<1>(tuple));
+		material->setShader(shader);
+
+		auto object = std::make_shared<gl3d::SceneObject>(&""[std::rand()]);
+		object->bindMaterial(material);
+		object->bindMesh(mesh);
+		scene->addChild(object);
 
 		auto rb = std::make_shared<physics3d::RigidBody>(1, 1);
 		simulation.addRigidBody(rb);
 
-		objects.emplace_back(model, rb);
+		objects.emplace_back(object, rb);
 		return rb;
 	}
 
 	void loadResources()
 	{
-		cubeMesh = setupMesh();
-
-		cubeMaterial = std::make_shared<gl3d::Material>();
-		cubeMaterial->addVec3("ambient", gml::Vec3f(0.1));
-		cubeMaterial->addVec3("diffuse", gml::Vec3f(0.61f, 0.04f, 0.04f));
-		cubeMaterial->addVec3("specular", gml::Vec3f(0.7f, 0.6f, 0.6));
-		cubeMaterial->addFloat("shininess", 32.0f);
-		cubeMaterial->setShader(shader);
-
 		scene = std::make_shared<gl3d::SceneGroup>("world");
 
 		auto lightRes = std::make_shared<gl3d::DirLight>(
@@ -165,8 +159,6 @@ private:
 			                 gml::Vec3f(1.0f) },
 			               gml::Vec3f(-1, -1, -1)));
 		light1 = std::make_shared<gl3d::SceneObject>("light");
-		light1->bindMaterial(cubeMaterial);
-		light1->bindMesh(cubeMesh);
 		light1->bindLight(lightRes);
 		light1->setTransform(
 			gml::matrix::fromQuaternion<double>(gml::quaternion::eulerAngle<double>(0, 0, 0)) *
@@ -177,57 +169,10 @@ private:
 
 	std::shared_ptr<gl3d::Mesh> setupMesh()
 	{
-		const std::vector<float> vertices = {
-			-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-			0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-			0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-			0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-			-0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-			-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-
-			-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-			0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-			0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-			0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-			-0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-			-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-
-			-0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-			-0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-			-0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-			-0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-			-0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-			-0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-
-			0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-			0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-			0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-			0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-			0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-			0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-
-			-0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-			0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-			0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-			0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-			-0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-			-0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-
-			-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-			0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-			0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-			0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-			-0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-			-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f
-		};
-
-		//auto cubeDrawable = glContext->getDrawableCreator()->createDrawable(
-		//	vertices, { 3, 3 }, gl::VertexFormat::INTERLEAVED);
-
-		auto cubeDrawable = gl3d::resources::readObj(platform::desktop::FileReader(),
+		auto tuple = gl3d::resources::readObj(platform::desktop::FileReader(),
 											   "models/sphere.obj",
 											   *glContext->getDrawableCreator());
 
-		return std::make_shared<gl3d::Mesh>(std::move(cubeDrawable));
+		return std::make_shared<gl3d::Mesh>(std::move(std::get<0>(tuple)));
 	}
 };
