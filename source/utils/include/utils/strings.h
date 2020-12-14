@@ -51,4 +51,9 @@ namespace utils
 	{
 		return input.find(search) != std::string::npos;
 	}
+
+	inline bool startsWith(const std::string& input, const std::string& prefix)
+	{
+		return input.rfind(prefix, 0) == 0;
+	}
 }
