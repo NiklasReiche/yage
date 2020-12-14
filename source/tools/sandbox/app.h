@@ -9,6 +9,7 @@
 #include <gl3d/camera.h>
 #include <gl3d/sceneRenderer.h>
 #include <gl3d/resources/obj.h>
+#include <gl3d/resources/gltf.h>
 #include <physics3d/Simulation.h>
 
 #include "MovementListener.h"
@@ -58,6 +59,10 @@ public:
 		csShader->setUniform("projection", proj);
 
 		loadResources();
+
+		gl3d::resources::readGltf(platform::desktop::FileReader(),
+		                          "models/cube.gltf",
+		                          *glContext->getDrawableCreator());
 	}
 
 
