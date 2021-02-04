@@ -10,6 +10,8 @@ target_sources(yage_gl3d
 	light/dirLight.h
 	light/dirLight.cpp
 
+	light/pbr/PointLight.h
+
 	material.h
 	material.cpp
 	mesh.h

@@ -13,6 +13,7 @@
 #include "resourceManager.h"
 #include "material.h"
 #include "mesh.h"
+#include "light/pbr/PointLight.h"
 
 namespace gl3d
 {
@@ -48,5 +49,7 @@ namespace gl3d
 
 		void setDirLightShader(gl::IShader& shader, unsigned int pos, const std::shared_ptr<DirLight>& light) const;
 		void setPointLightShader(gl::IShader& shader, unsigned int pos, const std::shared_ptr<PointLight>& light) const;
+
+		void setPBRPointLightShader(gl::IShader& shader, unsigned pos, const std::shared_ptr<pbr::PointLight>& light) const;
 	};
 }

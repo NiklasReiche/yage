@@ -54,15 +54,24 @@ public:
 			openTextFile("shaders/pointShader.geom", platform::IFile::AccessMode::READ)->readAll();
 		csShader = glContext->getShaderCreator()->createShader(csVertexShader, csFragmentShader, csGeometryShader);
 
+		std::string pbrVertexShader = fileReader.
+			openTextFile("shaders/pbrShader.vert", platform::IFile::AccessMode::READ)->readAll();
+		std::string pbrFragmentShader = fileReader.
+			openTextFile("shaders/pbrShader.frag", platform::IFile::AccessMode::READ)->readAll();
+		pbrShader = glContext->getShaderCreator()->createShader(pbrVertexShader, pbrFragmentShader);
+
 		gml::Mat4f proj = gml::matrix::perspective<float>(45.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
 		shader->setUniform("projection", proj);
 		csShader->setUniform("projection", proj);
+		pbrShader->setUniform("projection", proj);
 
 		loadResources();
 
+		/*
 		gl3d::resources::readGltf(platform::desktop::FileReader(),
 		                          "models/cube.gltf",
 		                          *glContext->getDrawableCreator());
+		                          * */
 	}
 
 
@@ -96,9 +105,9 @@ public:
 			csShader->setUniform("viewPos", camera->getPosition());
 			baseRenderer->draw(*point);
 
-			baseRenderer->useShader(*shader);
-			shader->setUniform("view", camera->getViewMatrix());
-			shader->setUniform("viewPos", camera->getPosition());
+			baseRenderer->useShader(*pbrShader);
+			pbrShader->setUniform("view", camera->getViewMatrix());
+			pbrShader->setUniform("camPos", camera->getPosition());
 
 			renderer.renderGraph(scene);
 
@@ -114,6 +123,7 @@ private:
 
 	std::shared_ptr<gl::IShader> shader;
 	std::shared_ptr<gl::IShader> csShader;
+	std::shared_ptr<gl::IShader> pbrShader;
 	std::shared_ptr<gl3d::Camera> camera;
 	std::shared_ptr<gl::IRenderer> baseRenderer;
 	gl3d::SceneRenderer renderer;
@@ -142,8 +152,15 @@ private:
 		auto material = std::make_shared<gl3d::Material>(std::get<1>(tuple));
 		material->setShader(shader);
 
+		auto pbrMaterial = std::make_shared<gl3d::Material>();
+		pbrMaterial->addVec3("albedo", gml::Vec3f(0.3, 0.1, 0.6));
+		pbrMaterial->addFloat("metallic", 0.0);
+		pbrMaterial->addFloat("roughness", 0.5);
+		pbrMaterial->addFloat("ao", 0.2);
+		pbrMaterial->setShader(pbrShader);
+
 		auto object = std::make_shared<gl3d::SceneObject>(&""[std::rand()]);
-		object->bindMaterial(material);
+		object->bindMaterial(pbrMaterial);
 		object->bindMesh(mesh);
 		scene->addChild(object);
 
@@ -169,7 +186,16 @@ private:
 			gml::matrix::fromQuaternion<double>(gml::quaternion::eulerAngle<double>(0, 0, 0)) *
 			gml::matrix::translate<double>(gml::Vec3d(0.0, 0.0, -3.0)) *
 			gml::matrix::scale<double>(0.1f, 0.1f, 0.1f));
-		scene->addChild(light1);
+
+		auto lightRes2 = std::make_shared<gl3d::PointLight>(
+			gl3d::PointLight(
+				{ gml::Vec3f(0.2f),gml::Vec3f(0.5f), gml::Vec3f(1.0f) },
+				{ 1.0f, 0.09f, 0.032f }));
+		auto light2 = std::make_shared<gl3d::SceneObject>("light2");
+		light2->bindLight(lightRes2);
+		light2->setTransform(gml::matrix::translate<double>(gml::Vec3d(1.0, 1.0, 1.0)));
+
+		scene->addChild(light2);
 	}
 
 	std::shared_ptr<gl3d::Mesh> setupMesh()
