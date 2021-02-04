@@ -3,65 +3,10 @@
 
 #include "Context.h"
 #include "Shader.h"
+#include "UniformBuffer.h"
 
 namespace opengl
 {
-#if 0
-	gl::Shader ShaderCreator::loadFromFile(std::string vertex_path, std::string fragment_path, std::string geometry_path)
-	{
-		std::string vertexCode(""), fragmentCode(""), geometryCode("");
-		std::string vertexCodeLine, fragmentCodeLine, geometryCodeLine;
-
-
-		sys::File vertexFileHandle = systemHandle->open(vertex_path);
-		if (!vertexFileHandle.is_open()) {
-			throw sys::FileException(sys::FileError::FILE_NOT_FOUND, "", vertex_path);
-		}
-
-		std::stringstream vertexFile;
-		vertexFileHandle.read(vertexFile);
-		while (getline(vertexFile, vertexCodeLine))
-		{
-			vertexCode += vertexCodeLine + "\n";
-		}
-
-		vertexFileHandle.close();
-
-
-		sys::File fragmentFileHandle = systemHandle->open(fragment_path);
-		if (!fragmentFileHandle.is_open()) {
-			throw sys::FileException(sys::FileError::FILE_NOT_FOUND, "", fragment_path);
-		}
-
-		std::stringstream fragmentFile;
-		fragmentFileHandle.read(fragmentFile);
-		while (getline(fragmentFile, fragmentCodeLine))
-		{
-			fragmentCode += fragmentCodeLine + "\n";
-		}
-
-		fragmentFileHandle.close();
-
-
-		if (geometry_path != "") {
-			sys::File geometryFileHandle = systemHandle->open(geometry_path);
-			if (!geometryFileHandle.is_open()) {
-				throw sys::FileException(sys::FileError::FILE_NOT_FOUND, "", geometry_path);
-			}
-
-			std::stringstream geometryFile;
-			geometryFileHandle.read(geometryFile);
-			while (getline(geometryFile, geometryCodeLine))
-			{
-				geometryCode += geometryCodeLine + "\n";
-			}
-
-			geometryFileHandle.close();
-		}
-
-		return context->createShader(vertexCode, fragmentCode, geometryCode);
-	}
-#endif
 	void ShaderCreator::checkShaderCompilationError(const GLuint program, const ShaderType type)
 	{
 		int success;
@@ -160,5 +105,18 @@ namespace opengl
 		delete[] name;
 
 		return shader;
+	}
+
+	std::unique_ptr<gl::IUniformBlock> ShaderCreator::createUniformBlock(const std::string& name)
+	{
+		auto uniformBuffer = std::unique_ptr<UniformBuffer>(new UniformBuffer(lockContextPtr()));
+
+		glGenBuffers(1, &uniformBuffer->id);
+		uniformBuffer->name = name;
+		uniformBuffer->ubo = uniformBuffer->id;
+
+		lockContextPtr()->linkUbo(uniformBuffer->id);
+
+		return uniformBuffer;
 	}
 }

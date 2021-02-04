@@ -5,8 +5,12 @@ layout (line_strip, max_vertices = 6) out;
 
 out vec3 fColor;
 
-uniform mat4 view = mat4(1.0);
-uniform mat4 projection = mat4(1.0);
+layout (std140) uniform ProjectionView
+{
+	mat4 projection;
+	mat4 view;
+};
+
 uniform float len = 1e20;
 
 void main() {    

@@ -5,6 +5,8 @@
 #include <gml/vector.h>
 #include <gml/matrix.h>
 
+#include "IUniformBlock.h"
+
 namespace gl
 {
 	class IShader
@@ -27,6 +29,8 @@ namespace gl
 		virtual void setUniform(const std::string& name, float value) = 0;
 		virtual void setUniform(const std::string& name, gml::Vec3f value) = 0;
 		virtual void setUniform(const std::string& name, gml::Mat4f value) = 0;
+
+		virtual void linkUniformBlock(const IUniformBlock& uniformBlock) = 0;
 
 	protected:
 		IShader() = default;

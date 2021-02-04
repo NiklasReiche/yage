@@ -22,6 +22,8 @@ target_sources(yage_core PRIVATE
 	Shader.cpp
 	ShaderCreator.h
 	ShaderCreator.cpp
+	UniformBuffer.h
+	UniformBuffer.cpp
 
 	Texture.h
 	Texture.cpp

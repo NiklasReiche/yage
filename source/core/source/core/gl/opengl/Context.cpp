@@ -182,6 +182,22 @@ namespace opengl
 		glState.shader = shader;
 	}
 
+	void Context::linkUbo(GLuint ubo)
+	{
+		glBindBufferBase(GL_UNIFORM_BUFFER, glState.uniformBuffers.size(), ubo);
+		glState.uniformBuffers.push_back(ubo);
+	}
+
+	int Context::getUboBindPoint(GLuint ubo)
+	{
+		auto it = std::find(glState.uniformBuffers.begin(), glState.uniformBuffers.end(), ubo);
+
+		if (it == glState.uniformBuffers.end())
+			throw std::exception(); // TODO
+
+		return it - glState.uniformBuffers.begin();
+	}
+
 	void Context::enableDepthTest(const GLenum func, const GLboolean flag)
 	{
 		if (!glState.isDepthTestEnabled) {

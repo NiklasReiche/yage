@@ -49,6 +49,9 @@ namespace opengl
 		void bindTexture(GLenum target, GLuint texture, int unit = 0);
 		void bindShader(GLuint shader);
 
+		void linkUbo(GLuint ubo);
+		int getUboBindPoint(GLuint ubo);
+
 		void enableDepthTest(GLenum func, GLboolean flag);
 		void disableDepthTest();
 		
@@ -79,6 +82,8 @@ namespace opengl
 			std::map<int, std::map<GLenum, GLuint>> textures;
 			std::map<GLenum, GLuint> buffers;
 			std::map<GLenum, GLuint> framebuffers;
+
+			std::vector<GLuint> uniformBuffers;
 
 			int packAlignment = 4;
 			int unpackAlignment = 4;
