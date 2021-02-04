@@ -5,6 +5,8 @@
 add_executable(sandbox
 	"main.cpp"
 	"MovementListener.h"
+	"ProjectionView.h"
+	"ProjectionView.cpp"
 	"app.h" 
 )
 

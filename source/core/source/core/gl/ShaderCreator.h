@@ -4,6 +4,7 @@
 #include <string>
 
 #include "Shader.h"
+#include "IUniformBlock.h"
 
 namespace gl
 {
@@ -15,10 +16,11 @@ namespace gl
 		IShaderCreator& operator=(IShaderCreator&& other) = default;
 
 		[[nodiscard]]
-		virtual std::unique_ptr<IShader> createShader(
-			const std::string& vertexCode, 
-			const std::string& fragmentCode,
+		virtual std::unique_ptr<IShader> createShader(const std::string& vertexCode, const std::string& fragmentCode,
 			const std::string& geometryCode = "") = 0;
+
+		[[nodiscard]]
+		virtual std::unique_ptr<IUniformBlock> createUniformBlock(const std::string& name) = 0;
 
 	protected:
 		IShaderCreator() = default;

@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Shader.h"
 #include "Context.h"
+#include "UniformBuffer.h"
 
 namespace opengl
 {
@@ -83,5 +84,15 @@ namespace opengl
 		
 		lockContextPtr()->bindShader(program);
 		glUniformMatrix4fv(uniformLocations.at(name), 1, GL_TRUE, value.data());
+	}
+
+	void Shader::linkUniformBlock(const gl::IUniformBlock& uniformBlock)
+	{
+		auto& ubo = static_cast<const UniformBuffer&>(uniformBlock);
+		auto context = lockContextPtr();
+
+		int bindPoint = context->getUboBindPoint(ubo.getId());
+		int blockIndex = glGetUniformBlockIndex(program, ubo.getName().c_str());
+		glUniformBlockBinding(program, blockIndex, bindPoint);
 	}
 }

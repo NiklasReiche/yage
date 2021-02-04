@@ -2,9 +2,8 @@
 
 #include <string>
 
-#include "OpenGL.h"
-
 #include "../ShaderCreator.h"
+#include "OpenGL.h"
 #include "BaseObject.h"
 #include "GlException.h"
 
@@ -13,10 +12,10 @@ namespace opengl
 	class ShaderCreator final : public BaseObject, public gl::IShaderCreator
 	{
 	public:
-		std::unique_ptr<gl::IShader> createShader(
-			const std::string& vertexCode, 
-			const std::string& fragmentCode, 
-			const std::string& geometryCode = "") override;
+		std::unique_ptr<gl::IShader> createShader(const std::string& vertexCode, const std::string& fragmentCode,
+			const std::string& geometryCode) override;
+
+		std::unique_ptr<gl::IUniformBlock> createUniformBlock(const std::string& name) override;
 
 	private:
 		using BaseObject::BaseObject;

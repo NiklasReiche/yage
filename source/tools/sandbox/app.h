@@ -13,6 +13,7 @@
 #include <physics3d/Simulation.h>
 
 #include "MovementListener.h"
+#include "ProjectionView.h"
 
 class App
 {
@@ -60,10 +61,13 @@ public:
 			openTextFile("shaders/pbrShader.frag", platform::IFile::AccessMode::READ)->readAll();
 		pbrShader = glContext->getShaderCreator()->createShader(pbrVertexShader, pbrFragmentShader);
 
-		gml::Mat4f proj = gml::matrix::perspective<float>(45.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
-		shader->setUniform("projection", proj);
-		csShader->setUniform("projection", proj);
-		pbrShader->setUniform("projection", proj);
+		auto ubo = glContext->getShaderCreator()->createUniformBlock("ProjectionView");
+		pbrShader->linkUniformBlock(*ubo);
+		csShader->linkUniformBlock(*ubo);
+
+		projViewUniform = ProjectionView(ubo);
+		projViewUniform.projection = gml::matrix::perspective<float>(45.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
+		projViewUniform.syncProjection();
 
 		loadResources();
 
@@ -100,13 +104,14 @@ public:
 
 			updateSceneGraph();
 
+			projViewUniform.view = camera->getViewMatrix();
+			projViewUniform.syncView();
+
 			baseRenderer->useShader(*csShader);
-			csShader->setUniform("view", camera->getViewMatrix());
 			csShader->setUniform("viewPos", camera->getPosition());
 			baseRenderer->draw(*point);
 
 			baseRenderer->useShader(*pbrShader);
-			pbrShader->setUniform("view", camera->getViewMatrix());
 			pbrShader->setUniform("camPos", camera->getPosition());
 
 			renderer.renderGraph(scene);
@@ -120,6 +125,8 @@ private:
 	std::shared_ptr<platform::IWindow> window;
 	std::shared_ptr<gl::IContext> glContext;
 	MovementListener inputListener;
+
+	ProjectionView projViewUniform;
 
 	std::shared_ptr<gl::IShader> shader;
 	std::shared_ptr<gl::IShader> csShader;
