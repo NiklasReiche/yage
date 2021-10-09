@@ -57,10 +57,10 @@ namespace gl3d
 				setDirLightShader(*shader, i, uniformValues.dirLights.at(i));
 			}
 
-			shader->setUniform("n_pointLights", (int)uniformValues.pointLights.size());
-			for (int i = 0; i < (int)uniformValues.pointLights.size(); ++i) {
-				setPointLightShader(*shader, i, uniformValues.pointLights.at(i));
-			}
+			//shader->setUniform("n_pointLights", (int)uniformValues.pointLights.size());
+			//for (int i = 0; i < (int)uniformValues.pointLights.size(); ++i) {
+			//	setPointLightShader(*shader, i, uniformValues.pointLights.at(i));
+			//}
 
 			drawable.material->updateShader();
 			this->renderer->draw(*(drawable.mesh->drawable));

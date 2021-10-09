@@ -29,11 +29,11 @@ namespace utils
 		return out;
 	}
 
-	inline std::string join(const std::vector<std::string>& strings)
+	inline std::string join(const std::vector<std::string>& strings, const std::string& insert = "")
 	{
 		std::stringstream stream;
 		for (const auto& s : strings) {
-			stream << s;
+			stream << s << insert;
 		}
 		return stream.str();
 	}

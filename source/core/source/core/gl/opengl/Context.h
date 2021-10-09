@@ -8,6 +8,8 @@
 #include <core/gl/Context.h>
 
 #include "GlEnum.h"
+#include "VertexBuffer.h"
+
 
 namespace platform
 {

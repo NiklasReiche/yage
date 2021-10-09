@@ -8,6 +8,12 @@ target_sources(yage_core PRIVATE
 	OpenGlObject.h
 	OpenGlObject.cpp
 
+	VertexBuffer.h
+	VertexBuffer.cpp
+	ElementBuffer.h
+	ElementBuffer.cpp
+	VertexArray.h
+	VertexArray.cpp
 	Drawable.h
 	Drawable.cpp
 	DrawableCreator.h

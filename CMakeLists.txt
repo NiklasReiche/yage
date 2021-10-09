@@ -9,6 +9,8 @@ cmake_policy(SET CMP0076 NEW)
 
 set(CMAKE_CXX_STANDARD 20)
 
+set(CMAKE_EXE_LINKER_FLAGS "-static")
+
 
 ######################
 # Global options     #
@@ -61,14 +63,15 @@ if(WIN32 OR UNIX)
 	add_subdirectory(source/physics3d)
 	#add_subdirectory( source/modules/font )
 	#add_subdirectory( source/modules/gui )
-
 endif()
 
 if(ANDROID)
 	add_subdirectory( source/tools/yageApp)
 elseif(WIN32 OR UNIX)
-	add_subdirectory( source/tools/SimpleWindow )
-	add_subdirectory(source/tools/ImageViewer)
+	add_subdirectory(demo/SimpleWindow)
+	add_subdirectory(demo/ImageViewer)
+	add_subdirectory(demo/ModelViewer)
+	
 	#add_subdirectory( source/tools/skyboxViewer )
 	#add_subdirectory( source/tools/guiEditor )
 	add_subdirectory(source/tools/sandbox)

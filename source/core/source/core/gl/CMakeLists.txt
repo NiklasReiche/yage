@@ -4,6 +4,9 @@ target_sources(yage_core
 		Context.h
 		Cubemap.h
 		Drawable.h
+		VertexArray.h
+		VertexBuffer.h
+		ElementBuffer.h
 		DrawableCreator.h
 		Frame.h
 		FrameCreator.h

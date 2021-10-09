@@ -13,10 +13,10 @@ namespace opengl
 			-1.0f, 1.0f, 0.0f, 1.0f, // Top Left
 			-1.0f, -1.0f, 0.0f, 0.0f,// Bottom Left
 			1.0f, -1.0f, 1.0f, 0.0f, // Bottom Right
-
-			1.0f, -1.0f, 1.0f, 0.0f,// Bottom Right
 			1.0f, 1.0f, 1.0f, 1.0f, // Top Right
-			-1.0f, 1.0f, 0.0f, 1.0f // Top Left
+		};
+		inline static std::vector<GLuint> indices = {
+			0, 1, 2, 2, 3, 0
 		};
 		inline static std::string vertexCode =
 			"	#version 330 core											\n"

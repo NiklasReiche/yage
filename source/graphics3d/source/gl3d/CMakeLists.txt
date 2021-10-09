@@ -31,7 +31,4 @@ target_sources(yage_gl3d
 	resources/obj.cpp
 	resources/gltf.h
 	resources/gltf.cpp
-
-	#resourceCache.h
-	#resourceManager.h
 	)

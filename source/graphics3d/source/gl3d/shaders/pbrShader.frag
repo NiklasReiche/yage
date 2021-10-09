@@ -1,3 +1,5 @@
+R"(
+
 #version 330 core
 
 in vec3 FragPosition;
@@ -33,6 +35,8 @@ void main() {
     vec3 N = normalize(FragNormal);
     vec3 V = normalize(camPos - FragPosition);
 
+    vec3 F0 = mix(vec3(0.04), material.albedo, material.metallic);
+
     vec3 Lo = vec3(0.0);
     for (int i = 0; i < n_pointLights; ++i) {
         vec3 L = normalize(pointLights[i].position - FragPosition);
@@ -42,11 +46,10 @@ void main() {
         float attenuation = 1.0 / (distance * distance);
         vec3 radiance = pointLights[i].color * attenuation;
 
-        vec3 F0 = mix(vec3(0.04), material.albedo, material.metallic);
-        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
-
+        // cook-torrance brdf
         float NDF = DistributionGGX(N, H, material.roughness);
         float G = GeometrySmith(N, V, L, material.roughness);
+        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
         vec3 numerator = NDF * G * F;
         float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
@@ -61,7 +64,7 @@ void main() {
     }
 
     vec3 ambient = vec3(0.03) * material.albedo * material.ao;
-    vec3 color = ambient + Lo;
+    vec3 color = Lo;//ambient + Lo;
 
     color = color / (color + vec3(1.0));
     color = pow(color, vec3(1.0/2.2));
@@ -74,7 +77,6 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
     return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }
 
-
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
     float a      = roughness*roughness;
@@ -86,7 +88,7 @@ float DistributionGGX(vec3 N, vec3 H, float roughness)
     float denom = (NdotH2 * (a2 - 1.0) + 1.0);
     denom = PI * denom * denom;
 
-    return num / denom;
+    return num / max(denom, 0.0000001);
 }
 
 float GeometrySchlickGGX(float NdotV, float roughness)
@@ -109,3 +111,5 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 
     return ggx1 * ggx2;
 }
+
+)"

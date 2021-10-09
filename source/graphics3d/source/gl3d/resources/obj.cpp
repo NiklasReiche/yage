@@ -152,7 +152,8 @@ namespace gl3d::resources
 			}
 		}
 
-		auto drawable = drawableCreator.createDrawable(vertexData, { 3, 3 }, gl::VertexFormat::INTERLEAVED);
+		// TODO indexing
+		auto drawable = drawableCreator.createDrawable(vertexData, {}, { 3, 3 }, gl::VertexFormat::INTERLEAVED);
 		return std::make_tuple<std::unique_ptr<gl::IDrawable>, gl3d::Material>(std::move(drawable),
 		                                                                       static_cast<Material&&>(material));
 	}

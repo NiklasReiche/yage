@@ -6,7 +6,7 @@ target_compile_options(yage_gl3d
 	PRIVATE -fdiagnostics-color=always -Wall -Wextra -Werror)
 
 target_link_libraries(yage_gl3d
-	PUBLIC yage_core yage_utils yage_image nlohmann_json::nlohmann_json)
+	PUBLIC yage_core yage_utils yage_image nlohmann_json::nlohmann_json tinygltf)
 
 target_include_directories(yage_gl3d
 	PUBLIC source)

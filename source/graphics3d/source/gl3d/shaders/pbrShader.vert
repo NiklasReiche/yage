@@ -1,3 +1,5 @@
+R"(
+
 #version 330 core
 
 layout (location = 0) in vec3 position;
@@ -21,3 +23,5 @@ void main() {
     FragPosition = vec3(model * vec4(position, 1.0f));
     FragNormal = mat3(transpose(inverse(model))) * normal; // Calculation better be done outside of shader
 }
+
+)"

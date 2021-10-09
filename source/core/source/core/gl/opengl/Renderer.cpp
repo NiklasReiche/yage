@@ -14,7 +14,7 @@ namespace opengl
 {
 	std::unique_ptr<gl::IDrawable> Renderer::unitDrawable;
 	std::unique_ptr<gl::IShader> Renderer::unitShader;
-	
+
 	void Renderer::enableDepthTest()
 	{
 		lockContextPtr()->enableDepthTest(GL_LESS, GL_TRUE);
@@ -27,9 +27,9 @@ namespace opengl
 
 	void Renderer::setDepthTest(const bool value)
 	{
-		if (value) 
+		if (value)
 			enableDepthTest();
-		else 
+		else
 			disableDepthTest();
 	}
 
@@ -92,13 +92,14 @@ namespace opengl
 
 	void Renderer::setViewport(const int x, const int y, const int width, const int height)
 	{
-		setViewport({x, y, width, height});
+		setViewport({ x, y, width, height });
 	}
-	
+
 	void Renderer::setViewport(const Viewport viewport)
 	{
 		auto ptr = lockContextPtr();
-		ptr->setViewport(viewport.x, ptr->getRenderTargetHeight() - (viewport.y + viewport.height), viewport.width, viewport.height);
+		ptr->setViewport(viewport.x, ptr->getRenderTargetHeight() - (viewport.y + viewport.height), viewport.width,
+		                 viewport.height);
 	}
 
 	void Renderer::clear()
@@ -112,21 +113,29 @@ namespace opengl
 		clearColor = gl::toVec4(color);
 	}
 
-	void Renderer::setRenderTarget(const gl::IFrame & target)
+	void Renderer::setRenderTarget(const gl::IFrame& target)
 	{
 		lockContextPtr()->bindFramebuffer(
-			GL_FRAMEBUFFER, 
+			GL_FRAMEBUFFER,
 			static_cast<const Framebuffer&>(target).FBO);
 	}
 
-	void Renderer::draw(const gl::IDrawable & drawable)
+	void Renderer::draw(const gl::IDrawable& drawable)
 	{
 		auto& ptr = static_cast<const Drawable&>(drawable);
-		lockContextPtr()->bindVertexArray(ptr.VAO);
-		glDrawArrays(ptr.nVertices == 0 ? GL_POINTS : static_cast<GLenum>(ptr.primitive), 0, ptr.nVertices == 0 ? 1 : ptr.nVertices); // TODO
+		lockContextPtr()->bindVertexArray(ptr.vertexArray->vao);
+		// TODO
+		if (ptr.nVertices == 0) {
+			glDrawArrays(GL_POINTS, 0, 1);
+		} else {
+			glDrawElements(static_cast<GLenum>(ptr.vertexArray->primitive),
+			               ptr.nVertices,
+			               ptr.indicesDataType,
+			               nullptr);
+		}
 	}
 
-	void Renderer::draw(const gl::IFrame & buffer)
+	void Renderer::draw(const gl::IFrame& buffer)
 	{
 		lockContextPtr()->bindFramebuffer(GL_FRAMEBUFFER, 0);
 		useShader(*unitShader);
@@ -134,19 +143,19 @@ namespace opengl
 		draw(*unitDrawable);
 	}
 
-	void Renderer::draw(const gl::ITexture2D & texture)
+	void Renderer::draw(const gl::ITexture2D& texture)
 	{
 		useShader(*unitShader);
 		bindTexture(texture);
 		draw(*unitDrawable);
 	}
 
-	void Renderer::useShader(const gl::IShader & shader)
+	void Renderer::useShader(const gl::IShader& shader)
 	{
 		lockContextPtr()->bindShader(static_cast<const Shader&>(shader).getId());
 	}
 
-	void Renderer::bindTexture(const gl::ITexture2D & texture, const int unit)
+	void Renderer::bindTexture(const gl::ITexture2D& texture, const int unit)
 	{
 		const auto& ptr = static_cast<const Texture2D&>(texture);
 		bindTexture(static_cast<const Texture&>(ptr), unit);
@@ -161,15 +170,15 @@ namespace opengl
 	Renderer::Renderer(std::weak_ptr<Context> contextPtr)
 		: BaseObject(std::move(contextPtr))
 	{
-		if (!unitDrawable)
-		{
+		if (!unitDrawable) {
 			unitDrawable = lockContextPtr()->getDrawableCreator()->createDrawable(
-			    UnitShaderTemplate::vertices,
-			    UnitShaderTemplate::vertexLayout,
+				UnitShaderTemplate::vertices,
+				UnitShaderTemplate::indices,
+				UnitShaderTemplate::vertexLayout,
 				gl::VertexFormat::INTERLEAVED);
 			unitShader = lockContextPtr()->getShaderCreator()->createShader(
-			    UnitShaderTemplate::vertexCode,
-			    UnitShaderTemplate::fragmentCode);
+				UnitShaderTemplate::vertexCode,
+				UnitShaderTemplate::fragmentCode);
 			unitShader->setUniform("screenTexture", 0);
 		}
 	}

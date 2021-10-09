@@ -26,35 +26,20 @@ int main(int argc, char* argv[], char*[])
 		-1.0f, 1.0f, 0.0f, 1.0f,    // Top Left
 		-1.0f, -1.0f, 0.0f, 0.0f,    // Bottom Left
 		1.0f, -1.0f, 1.0f, 0.0f,    // Bottom Right
-
-		1.0f, -1.0f, 1.0f, 0.0f,    // Bottom Right
 		1.0f, 1.0f, 1.0f, 1.0f,    // Top Right
-		-1.0f, 1.0f, 0.0f, 1.0f    // Top Left
 	};
-	auto quad = context->getDrawableCreator()->createDrawable(vertices, { 2, 2 }, gl::VertexFormat::INTERLEAVED);
+	const std::array<unsigned int, 6> indices = { 0, 1, 2, 2, 3, 0 };
+	auto quad = context->getDrawableCreator()->createDrawable(vertices, indices, { 2, 2 }, gl::VertexFormat::INTERLEAVED);
 
 
 	auto texture = context->getTextureCreator()->
 		createTexture2D(image.getWidth(), image.getHeight(), gl::ImageFormat::RGB, {image.data(), image.getSize()});
 
-
-	const std::string vertexCode =
-		"	#version 330 core											    \n"
-		"	layout (location = 0) in vec2 position;						    \n"
-		"	layout (location = 1) in vec2 texCoords;					    \n"
-		"	out vec2 TexCoords;											    \n"
-		"	void main() {												    \n"
-		"		gl_Position = vec4(position.x, -position.y, 0.0f, 1.0f);    \n"
-		"		TexCoords = vec2(texCoords.x, texCoords.y);				    \n"
-		"	}															    \n";
-	const std::string fragmentCode =
-		"	#version 330 core								\n"
-		"	in vec2 TexCoords;								\n"
-		"	out vec4 color;									\n"
-		"	uniform sampler2D screenTexture;				\n"
-		"	void main() {									\n"
-		"		color = texture(screenTexture, TexCoords);  \n"
-		"	}											    \n";
+	auto fileReader = platform::desktop::FileReader();
+	const std::string vertexCode = fileReader.
+		openTextFile("assets/shader.vert", platform::IFile::AccessMode::READ)->readAll();
+	const std::string fragmentCode = fileReader.
+		openTextFile("assets/shader.frag", platform::IFile::AccessMode::READ)->readAll();
 	auto shader = context->getShaderCreator()->createShader(vertexCode, fragmentCode);
 
 	auto renderer = context->getRenderer();

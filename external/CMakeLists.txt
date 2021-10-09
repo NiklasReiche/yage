@@ -85,5 +85,18 @@ if(NOT json_POPULATED)
 	add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 
+# - tiny_gltf -----------------------------------------------------------------------------------------------------------
+FetchContent_Declare(
+	tiny_gltf
+
+	GIT_REPOSITORY https://github.com/syoyo/tinygltf
+	GIT_TAG v2.5.0
+)
+FetchContent_MakeAvailable(tiny_gltf)
+
+add_library(tinygltf INTERFACE)
+target_sources(tinygltf INTERFACE $<BUILD_INTERFACE:${tiny_gltf_SOURCE_DIR}>)
+target_include_directories(tinygltf SYSTEM INTERFACE $<BUILD_INTERFACE:${tiny_gltf_SOURCE_DIR}>)
+
 # - TFD ----------------------------------------------------------------------------------------------------------------
 add_subdirectory(tfd)

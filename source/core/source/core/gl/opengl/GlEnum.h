@@ -89,7 +89,8 @@ namespace opengl
 
 	enum class PrimitiveType
 	{
-		TRIANGLES = GL_TRIANGLES
+		TRIANGLES = GL_TRIANGLES,
+		POINTS = GL_POINTS
 	};
 
 	inline InternalFormat convertToInternalFormat(const gl::ImageFormat format)
