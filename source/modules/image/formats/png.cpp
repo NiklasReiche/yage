@@ -113,7 +113,8 @@ namespace png
 		}
 		if (color & PNG_COLOR_MASK_ALPHA && (forceChannel == FORCE_CHANNELS::RGB || forceChannel == FORCE_CHANNELS::G)) {
 			png_set_strip_alpha(png_ptr);
-		}
+		}
+
 
 		png_read_update_info(png_ptr, info_ptr);
 		readInfoHeader();
