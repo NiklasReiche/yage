@@ -1,1 +1,0 @@
-add_library( tfd STATIC "tinyfiledialogs.h" "tinyfiledialogs.c" )

@@ -1,6 +1,0 @@
-set(ANDROID TRUE)
-set(WIN32 0)
-
-set(CMAKE_ANDROID_API 24)
-set(CMAKE_ANDROID_ARCH_ABI "x86")
-set(CMAKE_ANDROID_NDK "C:/DEV/Android/sdk/ndk-bundle")
