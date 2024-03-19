@@ -29,7 +29,7 @@ namespace gui
 		gml::Vec4f addTexture(const img::Image & image);
 		gml::Vec4f addTexture(const gl::Texture & image);
 
-		gml::Vec2f getAlphaTexCoords() { return gml::Vec2f(0.5f/float(2048), 0.5f / float(2048)); }
-		gl::Texture getTexture(int i) { return textures.at(i).texture; }
+		gml::Vec2f getAlphaTexCoords() const;
+		gl::Texture getTexture(int i) const;
 	};
 }

@@ -55,4 +55,14 @@ namespace gui
 	{
 		return addTexture(img::ImageReader(platform).readTexture(image));
 	}
+
+	gml::Vec2f TextureManager::getAlphaTexCoords() const
+	{
+		return gml::Vec2f(0.5f / float(2048), 0.5f / float(2048));
+	}
+
+	gl::Texture TextureManager::getTexture(const int i) const
+	{
+		return textures.at(i).texture;
+	}
 }

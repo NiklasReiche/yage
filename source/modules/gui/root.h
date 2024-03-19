@@ -9,6 +9,6 @@ namespace gui
 	public:
 		RootWidget();
 
-		void relayout();
+		void relayout() override;
 	};
 }
