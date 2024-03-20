@@ -1,11 +1,9 @@
 add_executable(yage_core_test)
 
-target_sources(yage_core_test PRIVATE main.cpp)
-
 target_link_libraries(yage_core_test
 	PRIVATE
 		yage_core
-		Catch2::Catch2
+		Catch2::Catch2WithMain
 	)
 
 add_subdirectory(gl)

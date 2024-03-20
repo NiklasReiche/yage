@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 
 #include <gml/quaternion.h>
 #include <gml/matrix.h>
@@ -9,17 +9,17 @@ using namespace std::numbers;
 template<typename T>
 void EXPECT_QUAT(Quaternion<T> expected, Quaternion<T> result)
 {
-	CHECK(expected.w == Approx(result.w));
-	CHECK(expected.x == Approx(result.x));
-	CHECK(expected.y == Approx(result.y));
-	CHECK(expected.z == Approx(result.z));
+	CHECK(expected.w == Catch::Approx(result.w));
+	CHECK(expected.x == Catch::Approx(result.x));
+	CHECK(expected.y == Catch::Approx(result.y));
+	CHECK(expected.z == Catch::Approx(result.z));
 }
 template<typename T, size_t size>
 static void EXPECT_VEC(Vector<T, size> expected, Vector<T, size> result)
 {
 	for (size_t i = 0; i < size; ++i)
 	{
-		CHECK(Approx(expected(i)).margin(1e-12) == result(i));
+		CHECK(Catch::Approx(expected(i)).margin(1e-12) == result(i));
 	}
 }
 
@@ -35,25 +35,25 @@ TEST_CASE("quaternion test")
 		SECTION("yaw") {
 			q = quaternion::eulerAngle<double>(0.5 * pi, 0, 0);
 			EXPECT_QUAT(Quatd(0.7071, 0, 0.7071, 0), q);
-			CHECK(Approx(0.5 * pi) == q.getYaw());
-			CHECK(Approx(0) == q.getRoll());
-			CHECK(Approx(0) == q.getPitch());
+			CHECK(Catch::Approx(0.5 * pi) == q.getYaw());
+			CHECK(Catch::Approx(0) == q.getRoll());
+			CHECK(Catch::Approx(0) == q.getPitch());
 		}
 
 		SECTION("roll") {
 			q = quaternion::eulerAngle<double>(0, 0.5 * pi, 0);
 			EXPECT_QUAT(Quatd(0.7071, 0, 0, 0.7071), q);
-			CHECK(Approx(0) == q.getYaw());
-			CHECK(Approx(0.5 * pi) == q.getRoll());
-			CHECK(Approx(0) == q.getPitch());
+			CHECK(Catch::Approx(0) == q.getYaw());
+			CHECK(Catch::Approx(0.5 * pi) == q.getRoll());
+			CHECK(Catch::Approx(0) == q.getPitch());
 		}
 
 		SECTION("pitch") {
 			q = quaternion::eulerAngle<double>(0, 0, 0.5 * pi);
 			EXPECT_QUAT(Quatd(0.7071, 0.7071, 0, 0), q);
-			CHECK(Approx(0) == q.getYaw());
-			CHECK(Approx(0) == q.getRoll());
-			CHECK(Approx(0.5 * pi) == q.getPitch());
+			CHECK(Catch::Approx(0) == q.getYaw());
+			CHECK(Catch::Approx(0) == q.getRoll());
+			CHECK(Catch::Approx(0.5 * pi) == q.getPitch());
 		}
 	}
 

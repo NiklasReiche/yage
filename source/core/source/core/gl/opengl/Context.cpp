@@ -32,7 +32,7 @@ namespace opengl
 			throw std::invalid_argument("Failed to get lock for window during opengl context creation");
 
 		// --- GLAD ---
-		if (!gladLoadGLLoader(GLADloadproc(glfwGetProcAddress))) {
+		if (!gladLoadGL(glfwGetProcAddress)) {
 			throw GlException(GLAD_ERROR, "Failed to initialize GLAD");
 		}
 

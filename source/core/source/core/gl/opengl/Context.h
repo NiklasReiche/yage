@@ -3,7 +3,7 @@
 #include <memory>
 #include <map>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include <core/gl/Context.h>
 
@@ -18,7 +18,7 @@ namespace platform
 
 namespace opengl
 {
-	void APIENTRY onGlError(
+	void onGlError(
 		GLenum source, GLenum type, GLuint id, GLenum severity, 
 		GLsizei length, const GLchar* message, const void* userParam);
 

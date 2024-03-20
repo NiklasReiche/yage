@@ -1,9 +1,8 @@
 add_executable(yage_utils_test
-	main.cpp
-	stringsTest.cpp
+        stringsTest.cpp
 	)
 
-target_link_libraries(yage_utils_test PRIVATE yage_utils Catch2::Catch2)
+target_link_libraries(yage_utils_test PRIVATE yage_utils Catch2::Catch2WithMain)
 
 add_test(
 	NAME yage_utils_CTest

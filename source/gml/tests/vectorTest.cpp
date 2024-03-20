@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 
 #include <gml/maths.h>
 #include <gml/vector.h>
@@ -71,8 +71,8 @@ TEST_CASE("VectorBase test")
 
 			CHECK(2 == initial(0));
 			CHECK(5 == initial(1));
-			CHECK(Approx(2) == copy(0));
-			CHECK(Approx(5) == copy(1));
+			CHECK(Catch::Approx(2) == copy(0));
+			CHECK(Catch::Approx(5) == copy(1));
 		}
 
 		SECTION("Conversion with classes") {
@@ -81,15 +81,15 @@ TEST_CASE("VectorBase test")
 
 			Vector<ComplexF, 2> copy = initial;
 
-			CHECK(Approx(2) == initial(0).real);
-			CHECK(Approx(5) == initial(0).imaginary);
-			CHECK(Approx(1) == initial(1).real);
-			CHECK(Approx(8) == initial(1).imaginary);
+			CHECK(Catch::Approx(2) == initial(0).real);
+			CHECK(Catch::Approx(5) == initial(0).imaginary);
+			CHECK(Catch::Approx(1) == initial(1).real);
+			CHECK(Catch::Approx(8) == initial(1).imaginary);
 
-			CHECK(Approx(2) == copy(0).real);
-			CHECK(Approx(5) == copy(0).imaginary);
-			CHECK(Approx(1) == copy(1).real);
-			CHECK(Approx(8) == copy(1).imaginary);
+			CHECK(Catch::Approx(2) == copy(0).real);
+			CHECK(Catch::Approx(5) == copy(0).imaginary);
+			CHECK(Catch::Approx(1) == copy(1).real);
+			CHECK(Catch::Approx(8) == copy(1).imaginary);
 		}
 
 		SECTION("explicit 2-dimensional") {
@@ -138,8 +138,8 @@ TEST_CASE("VectorBase test")
 
 			CHECK(2 == initial(0));
 			CHECK(5 == initial(1));
-			CHECK(Approx(2) == copy(0));
-			CHECK(Approx(5) == copy(1));
+			CHECK(Catch::Approx(2) == copy(0));
+			CHECK(Catch::Approx(5) == copy(1));
 		}
 
 		SECTION("Assignment_Conversion_WithClasses") {
@@ -149,15 +149,15 @@ TEST_CASE("VectorBase test")
 
 			copy = initial;
 
-			CHECK(Approx(2) == initial(0).real);
-			CHECK(Approx(5) == initial(0).imaginary);
-			CHECK(Approx(1) == initial(1).real);
-			CHECK(Approx(8) == initial(1).imaginary);
+			CHECK(Catch::Approx(2) == initial(0).real);
+			CHECK(Catch::Approx(5) == initial(0).imaginary);
+			CHECK(Catch::Approx(1) == initial(1).real);
+			CHECK(Catch::Approx(8) == initial(1).imaginary);
 
-			CHECK(Approx(2) == copy(0).real);
-			CHECK(Approx(5) == copy(0).imaginary);
-			CHECK(Approx(1) == copy(1).real);
-			CHECK(Approx(8) == copy(1).imaginary);
+			CHECK(Catch::Approx(2) == copy(0).real);
+			CHECK(Catch::Approx(5) == copy(0).imaginary);
+			CHECK(Catch::Approx(1) == copy(1).real);
+			CHECK(Catch::Approx(8) == copy(1).imaginary);
 		}
 	}
 
@@ -255,17 +255,17 @@ TEST_CASE("VectorBase test")
 
 		Vec3d expected(2 / std::sqrt(14), 1 / std::sqrt(14), 3 / std::sqrt(14));
 
-		CHECK(Approx(std::sqrt(14)) == length(vec1));
+		CHECK(Catch::Approx(std::sqrt(14)) == length(vec1));
 
 		Vec3d result = normalize(vec1);
-		CHECK(Approx(expected.x()) == result.x());
-		CHECK(Approx(expected.y()) == result.y());
-		CHECK(Approx(expected.z()) == result.z());
+		CHECK(Catch::Approx(expected.x()) == result.x());
+		CHECK(Catch::Approx(expected.y()) == result.y());
+		CHECK(Catch::Approx(expected.z()) == result.z());
 
 		vec1.normalize();
-		CHECK(Approx(expected.x()) == vec1.x());
-		CHECK(Approx(expected.y()) == vec1.y());
-		CHECK(Approx(expected.z()) == vec1.z());
+		CHECK(Catch::Approx(expected.x()) == vec1.x());
+		CHECK(Catch::Approx(expected.y()) == vec1.y());
+		CHECK(Catch::Approx(expected.z()) == vec1.z());
 
 		CHECK_THROWS_AS(static_cast<void>(Vec2i(0, 0).normalize()), DivideByZeroException);
 	}
@@ -273,8 +273,8 @@ TEST_CASE("VectorBase test")
 	SECTION("Length") {
 		const Vec3d vec1(2, 1, 3);
 
-		CHECK(Approx(14) == sqrLength(vec1));
-		CHECK(Approx(std::sqrt(14)) == length(vec1));
+		CHECK(Catch::Approx(14) == sqrLength(vec1));
+		CHECK(Catch::Approx(std::sqrt(14)) == length(vec1));
 	}
 
 	SECTION("Cross") {
@@ -289,14 +289,14 @@ TEST_CASE("VectorBase test")
 			const Vec2d vec1(1, 0);
 			const Vec2d vec2(1, 1);
 
-			CHECK(Approx(toRad(45.0)) == angle(vec1, vec2));
+			CHECK(Catch::Approx(toRad(45.0)) == angle(vec1, vec2));
 		}
 
 		SECTION("Angle_3D") {
 			const Vec3d vec1(1, 0, 0);
 			const Vec3d vec2(1, 1, 0);
 
-			CHECK(Approx(toRad(45.0)) == angle(vec1, vec2));
+			CHECK(Catch::Approx(toRad(45.0)) == angle(vec1, vec2));
 		}
 
 		SECTION("Angle_DivisionByZero") {

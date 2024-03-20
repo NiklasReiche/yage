@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 
 #include <gml/matrix.h>
 
@@ -383,7 +383,7 @@ TEST_CASE("MatrixBase test")
 			{
 				for (int i = 0; i < 4; ++i) {
 					for (int j = 0; j < 4; ++j) {
-						CHECK(a(i, j) == Approx(b(i, j)).epsilon(1e-10));
+						CHECK(a(i, j) == Catch::Approx(b(i, j)).epsilon(1e-10));
 					}
 				}
 			};

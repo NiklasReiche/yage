@@ -6,7 +6,7 @@ target_compile_options(yage_image
 	PRIVATE -fdiagnostics-color=always -Wall -Wextra -Werror)
 
 target_link_libraries(yage_image
-	PUBLIC yage_core yage_utils zlib png)
+	PUBLIC yage_core yage_utils zlib png_shared)
 
 target_include_directories(yage_image
 	PUBLIC source)

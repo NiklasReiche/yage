@@ -1,5 +1,4 @@
 add_executable(yage_gml_test
-	main.cpp
 	mathTest.cpp
 	vectorTest.cpp
 	matrixTest.cpp
@@ -8,7 +7,7 @@ add_executable(yage_gml_test
 target_link_libraries(yage_gml_test
 	PRIVATE
 		yage_gml
-		Catch2::Catch2
+		Catch2::Catch2WithMain
 	)
 
 add_test(
