@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #include <gml/vector.h>
 
 namespace gl

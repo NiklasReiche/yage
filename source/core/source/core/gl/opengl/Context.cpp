@@ -1,5 +1,7 @@
 #include "Context.h"
 
+#include <algorithm>
+
 #include <GLFW/glfw3.h>
 
 #include <core/platform/Window.h>
