@@ -1,6 +1,6 @@
 message(STATUS "> Configuring yage_physics3d")
 
-add_library(yage_physics3d)
+add_library(yage_physics3d SHARED)
 
 target_compile_options(yage_physics3d
 	PRIVATE -fdiagnostics-color=always -Wall -Wextra -Werror)

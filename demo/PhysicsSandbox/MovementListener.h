@@ -1,10 +1,10 @@
 #pragma once
 
-#include <core/platform/Window.h>
-#include <core/platform/desktop/GlfwWindow.h>
-#include <core/gl/Context.h>
-#include <gml/gml.h>
-#include <gl3d/camera.h>
+#include "core/platform/Window.h"
+#include "core/platform/desktop/GlfwWindow.h"
+#include "core/gl/Context.h"
+#include "gml/gml.h"
+#include "gl3d/camera.h"
 
 #include <utility>
 

@@ -1,8 +1,8 @@
 ###################################################################
-# tools/sandbox				                                      #
+# tools/PhysicsSandbox				                                      #
 ###################################################################
 
-add_executable(sandbox
+add_executable(physics_sandbox
 	"main.cpp"
 	"MovementListener.h"
 	"ProjectionView.h"
@@ -10,6 +10,6 @@ add_executable(sandbox
 	"app.h" 
 )
 
-target_link_libraries( sandbox 
+target_link_libraries(physics_sandbox
 	PUBLIC yage_core yage_gl3d yage_physics3d
 )

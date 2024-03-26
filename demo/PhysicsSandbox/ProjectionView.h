@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include <core/gl/IUniformBlock.h>
-#include <gml/matrix.h>
+#include "core/gl/IUniformBlock.h"
+#include "gml/matrix.h"
 
 class ProjectionView
 {

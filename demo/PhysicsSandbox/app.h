@@ -1,16 +1,16 @@
 #pragma once
 
-#include <core/platform/Window.h>
-#include <core/platform/desktop/GlfwWindow.h>
-#include <core/platform/IFileReader.h>
-#include <core/platform/desktop/FileReader.h>
-#include <core/gl/Context.h>
-#include <gml/gml.h>
-#include <gl3d/camera.h>
-#include <gl3d/sceneRenderer.h>
-#include <gl3d/resources/obj.h>
-#include <gl3d/resources/gltf.h>
-#include <physics3d/Simulation.h>
+#include "core/platform/Window.h"
+#include "core/platform/desktop/GlfwWindow.h"
+#include "core/platform/IFileReader.h"
+#include "core/platform/desktop/FileReader.h"
+#include "core/gl/Context.h"
+#include "gml/gml.h"
+#include "gl3d/camera.h"
+#include "gl3d/sceneRenderer.h"
+#include "gl3d/resources/obj.h"
+#include "gl3d/resources/gltf.h"
+#include "physics3d/Simulation.h"
 
 #include "MovementListener.h"
 #include "ProjectionView.h"
@@ -56,10 +56,12 @@ public:
 			openTextFile("shaders/pointShader.geom", platform::IFile::AccessMode::READ)->readAll();
 		csShader = glContext->getShaderCreator()->createShader(csVertexShader, csFragmentShader, csGeometryShader);
 
-		std::string pbrVertexShader = fileReader.
-			openTextFile("shaders/pbrShader.vert", platform::IFile::AccessMode::READ)->readAll();
-		std::string pbrFragmentShader = fileReader.
-			openTextFile("shaders/pbrShader.frag", platform::IFile::AccessMode::READ)->readAll();
+        std::string pbrVertexShader =
+#include "gl3d/shaders/pbrShader.vert"
+        ;
+        std::string pbrFragmentShader =
+#include "gl3d/shaders/pbrShader.frag"
+        ;
 		pbrShader = glContext->getShaderCreator()->createShader(pbrVertexShader, pbrFragmentShader);
 
 		auto ubo = glContext->getShaderCreator()->createUniformBlock("ProjectionView");
@@ -80,13 +82,13 @@ public:
 		std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
 
 		auto cube1 = loadModel("models/sphere.gltf");
-		//cube1->applyForce(gml::Vec3d(0, 10, 0), gml::Vec3d(0.3, -0.5, 0));
+		cube1->applyForce(gml::Vec3d(0, 10, 0), gml::Vec3d(0.3, -0.5, 0));
 
-		//auto cube2 = loadModel("models/cube.gltf");
-		//cube2->applyForce(gml::Vec3d(-30, 1, 10), gml::Vec3d(0.5, 0, 0.5));
+		auto cube2 = loadModel("models/cube.gltf");
+		cube2->applyForce(gml::Vec3d(-30, 1, 10), gml::Vec3d(0.5, 0, 0.5));
 
-		//auto cube3 = loadModel("models/cube.gltf");
-		//cube3->applyForce(gml::Vec3d(3, -1, 0), gml::Vec3d(0, -0.5, 0));
+		auto cube3 = loadModel("models/cube.gltf");
+		cube3->applyForce(gml::Vec3d(3, -1, 0), gml::Vec3d(0, -0.5, 0));
 
 		auto point = glContext->getDrawableCreator()->createDrawable(std::vector<float>{ },
 		                                                             std::vector<unsigned int>{ },

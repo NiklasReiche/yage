@@ -1,6 +1,6 @@
 message(STATUS "> Configuring yage_gl3d")
 
-add_library(yage_gl3d)
+add_library(yage_gl3d SHARED)
 
 target_compile_options(yage_gl3d
 	PRIVATE -fdiagnostics-color=always -Wall -Wextra -Werror)
