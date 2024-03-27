@@ -81,13 +81,19 @@ public:
 		window->show();
 		std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
 
-		auto cube1 = loadModel("models/sphere.gltf");
-		cube1->applyForce(gml::Vec3d(0, 10, 0), gml::Vec3d(0.3, -0.5, 0));
+		auto cube1 = loadModel("models/sphere.gltf",
+                               physics3d::SphereShape(1, 1),
+                               gml::Vec3d(0, 0, 0));
+		cube1->applyForce(gml::Vec3d(0, 20, 0), gml::Vec3d(0.3, -0.5, 0));
 
-		auto cube2 = loadModel("models/cube.gltf");
+		auto cube2 = loadModel("models/cube.gltf",
+                               physics3d::CubeShape(1, 100),
+                               gml::Vec3d(-5, 0, 0));
 		cube2->applyForce(gml::Vec3d(-30, 1, 10), gml::Vec3d(0.5, 0, 0.5));
 
-		auto cube3 = loadModel("models/cube.gltf");
+		auto cube3 = loadModel("models/cube.gltf",
+                               physics3d::CubeShape(1, 10),
+                               gml::Vec3d(5, 0, 0));
 		cube3->applyForce(gml::Vec3d(3, -1, 0), gml::Vec3d(0, -0.5, 0));
 
 		auto point = glContext->getDrawableCreator()->createDrawable(std::vector<float>{ },
@@ -154,7 +160,7 @@ private:
 		}
 	}
 
-	std::shared_ptr<physics3d::RigidBody> loadModel(const std::string& filename)
+	std::shared_ptr<physics3d::RigidBody> loadModel(const std::string& filename, physics3d::InertiaShape shape, gml::Vec3d position)
 	{
 		auto tuple = gl3d::resources::readGltf(platform::desktop::FileReader(),
 		                                       filename, *glContext->getDrawableCreator());
@@ -167,7 +173,7 @@ private:
 		object->bindMesh(mesh);
 		scene->addChild(object);
 
-		auto rb = std::make_shared<physics3d::RigidBody>(1, 1);
+		auto rb = std::make_shared<physics3d::RigidBody>(shape, position, gml::Quatd());
 		simulation.addRigidBody(rb);
 
 		objects.emplace_back(object, rb);

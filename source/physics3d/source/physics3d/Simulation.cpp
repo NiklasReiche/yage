@@ -14,13 +14,13 @@ namespace physics3d
 		for (auto& rigidBody : bodies) {
 			// linear component
 			rigidBody->momentum += rigidBody->force * dt;
-			rigidBody->velocity = rigidBody->momentum / rigidBody->mass;
+			rigidBody->velocity = rigidBody->momentum / rigidBody->shape.mass;
 			rigidBody->position += rigidBody->velocity * dt;
 			rigidBody->force = gml::Vec3d();
 
 			// angular component
 			rigidBody->angularMomentum += rigidBody->torque * dt;
-			rigidBody->angularVelocity = rigidBody->angularMomentum / rigidBody->inertia;
+			rigidBody->angularVelocity = rigidBody->shape.inverseInertiaTensor * rigidBody->angularMomentum;
 			rigidBody->orientation += 0.5 * gml::Quatd(rigidBody->angularVelocity) * rigidBody->orientation;
 			rigidBody->orientation.normalize();
 			rigidBody->torque = gml::Vec3d();

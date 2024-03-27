@@ -2,8 +2,8 @@
 
 namespace physics3d
 {
-	RigidBody::RigidBody(double mass, double inertia)
-		: mass(mass), inertia(inertia)
+	RigidBody::RigidBody(const InertiaShape &shape, const gml::Vec3d &position, const gml::Quatd &orientation)
+		: position(position), orientation(orientation), shape(shape)
 	{
 
 	}

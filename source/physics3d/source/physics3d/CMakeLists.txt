@@ -6,4 +6,6 @@ target_sources(yage_physics3d
 		RigidBody.cpp
 		Simulation.h
 		Simulation.cpp
+		InertiaShape.h
+		InertiaShape.cpp
 	)

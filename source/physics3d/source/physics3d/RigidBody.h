@@ -5,12 +5,14 @@
 #include <gml/vector.h>
 #include <gml/quaternion.h>
 
+#include "InertiaShape.h"
+
 namespace physics3d
 {
 	class RigidBody
 	{
 	public:
-		RigidBody(double mass, double inertia);
+		RigidBody(const InertiaShape& shape, const gml::Vec3d& position, const gml::Quatd& orientation);
 
 		void applyForce(const gml::Vec3d& _force, const gml::Vec3d& point);
 
@@ -28,13 +30,11 @@ namespace physics3d
 
 		gml::Vec3d velocity;
 		gml::Vec3d angularVelocity;
-		gml::Quatd spin;
 
 		gml::Vec3d force;
 		gml::Vec3d torque;
 
-		double mass;
-		double inertia;
+		InertiaShape shape;
 
 		friend class Simulation;
 	};
