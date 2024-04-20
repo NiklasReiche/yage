@@ -17,4 +17,4 @@
 #include "TextureCreator.h"
 
 #include "color.h"
-#include "ImageFormat.h"
+#include "TextureParams.h"

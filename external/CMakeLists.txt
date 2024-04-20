@@ -94,3 +94,26 @@ FetchContent_MakeAvailable(tiny_gltf)
 
 # - TFD ----------------------------------------------------------------------------------------------------------------
 add_subdirectory(tfd)
+
+# - FreeType -----------------------------------------------------------------------------------------------------------
+FetchContent_Declare(
+		freetype
+
+		GIT_REPOSITORY https://gitlab.freedesktop.org/freetype/freetype
+		GIT_TAG VER-2-13-2
+)
+
+option(FT_DISABLE_ZLIB
+		"Disable use of system zlib and use internal zlib library instead." ON)
+option(FT_DISABLE_BZIP2
+		"Disable support of bzip2 compressed fonts." ON)
+option(FT_DISABLE_PNG
+		"Disable support of PNG compressed OpenType embedded bitmaps." ON)
+option(FT_DISABLE_HARFBUZZ
+		"Disable HarfBuzz (used for improving auto-hinting of OpenType fonts)." ON)
+option(FT_DISABLE_BROTLI
+		"Disable support of compressed WOFF2 fonts." ON)
+option(FT_ENABLE_ERROR_STRINGS
+		"Enable support for meaningful error descriptions." OFF)
+
+FetchContent_MakeAvailable(freetype)

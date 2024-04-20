@@ -25,9 +25,9 @@ namespace font
 		return 0;
 	}
 
-	void FT_Loader::free(FT_Library ft)
+	void FT_Loader::free(FT_Library _ft)
 	{
-		FT_Done_FreeType(ft);
+		FT_Done_FreeType(_ft);
 	}
 	void FT_Loader::free(FT_Face face)
 	{
@@ -59,19 +59,19 @@ namespace font
 	/*****************************************
 	**			SDF Generator	 			**
 	*****************************************/
-	FontConverter::FontConverter(gl::GraphicsContext* glContext)
-		: glContext(glContext) {}
+	FontConverter::FontConverter(const std::shared_ptr<gl::ITextureCreator>& textureCreator)
+		: textureCreator(textureCreator) {}
 
 
-	void FontConverter::generateTextureAtlas(FT_Face face, img::Image & image, int padding)
+    img::Image FontConverter::generateTextureAtlas(FT_Face face, int padding)
 	{
-		gml::Vector2D<int> size = calcTextureSize(face, padding);
+		gml::Vec2<int> size = calcTextureSize(face, padding);
 		clampTo4(size);
 
-		std::vector<unsigned char> emptyImage(size.x * size.y, 0);
-		gl::Texture tempTexture = glContext->create2DTexture(&emptyImage[0], size.x, size.y, gl::ImageFormat::R, 1);
+		std::vector<unsigned char> emptyImage(size.x() * size.y(), 0);
+        std::unique_ptr<gl::ITexture2D> tempTexture = textureCreator->createTexture2D(size.x(), size.y(), gl::ImageFormat::R, emptyImage);
 
-		gml::Vector2D<int> tex_offset(0, 0);
+		gml::Vec2<int> tex_offset(0, 0);
 		for (unsigned char c = convertMetrics.c_min; c <= convertMetrics.c_max; ++c)
 		{
 			// Load character glyph 
@@ -83,21 +83,23 @@ namespace font
 				std::vector<unsigned char> image;
 				img::unpackBitmap(bitmap.buffer, image, bitmap.rows, bitmap.width, bitmap.pitch);
 				img::flip(image, bitmap.rows, bitmap.width, 1);
-				tempTexture.bufferSubData(tex_offset.x + padding, tempTexture.getHeight() - (bitmap.rows + padding), bitmap.width, bitmap.rows, image);
+                auto subArea = utils::Area(tex_offset.x() + padding,
+                                           tempTexture->getHeight() - (bitmap.rows + padding),
+                                           bitmap.width,
+                                           bitmap.rows);
+				tempTexture->setSubImage(subArea,image);
 			}
 			// Advance texture offset
-			tex_offset.x += bitmap.width + (padding * 2);
+			tex_offset.x() += bitmap.width + (padding * 2);
 		}
 
-		tempTexture.getTextureImage(image.data);
-		image.depth = 1;
-		image.width = size.x;
-		image.height = size.y;
+        auto data = tempTexture->getImage();
+        return { size.x(), size.y(), 1, data };
 	}
 
-	void FontConverter::uploadGlyphBitmaps(FT_Face face, gl::Texture & texture, int padding)
+	void FontConverter::uploadGlyphBitmaps(FT_Face face, gl::ITexture2D & texture, int padding)
 	{
-		gml::Vector2D<int> tex_offset(0, 0);
+		gml::Vec2<int> tex_offset(0, 0);
 		for (unsigned char c = convertMetrics.c_min; c <= convertMetrics.c_max; ++c)
 		{
 			// Load character glyph 
@@ -109,15 +111,19 @@ namespace font
 				std::vector<unsigned char> image;
 				img::unpackBitmap(bitmap.buffer, image, bitmap.rows, bitmap.width, bitmap.pitch);
 				img::flip(image, bitmap.rows, bitmap.width, 1);
-				texture.bufferSubData(tex_offset.x + padding, texture.getHeight() - (bitmap.rows + padding), bitmap.width, bitmap.rows, image);
+                auto subArea = utils::Area(tex_offset.x() + padding,
+                                           texture.getHeight() - (bitmap.rows + padding),
+                                           bitmap.width,
+                                           bitmap.rows);
+				texture.setSubImage(subArea, image);
 			}
 			// Advance texture offset
-			tex_offset.x += bitmap.width + (padding * 2);
+			tex_offset.x() += bitmap.width + (padding * 2);
 		}
 	}
 	void FontConverter::generateSdfTexMetrics(FT_Face face, std::map<unsigned char, TexMetrics> & metrics, int padding)
 	{
-		gml::Vector2D<int> tex_offset(0, 0);
+		gml::Vec2<int> tex_offset(0, 0);
 		for (unsigned char c = convertMetrics.c_min; c <= convertMetrics.c_max; ++c)
 		{
 			metrics[c] = TexMetrics();
@@ -127,30 +133,29 @@ namespace font
 			loadTextureMetrics(face, c, coords, tex_offset, padding);
 
 			// advance texture offset
-			tex_offset.x += face->glyph->bitmap.width + (padding * 2);
+			tex_offset.x() += face->glyph->bitmap.width + (padding * 2);
 		}
 	}
 
-	void FontConverter::generateSDF(FT_Face face, img::Image & input, img::Image & output, int loadSize, int loadPadding, int resizeFactor)
+    img::Image FontConverter::generateSDF(FT_Face face, img::Image & input, int _, int loadPadding, int resizeFactor)
 	{
 		// generate glyph texture metrics
 		std::map<unsigned char, TexMetrics> metrics;
 		generateSdfTexMetrics(face, metrics, loadPadding);
 
 		// Generate SDF Image
-		genDistanceFieldPerGlyph(input, metrics, output);
+		auto output = genDistanceFieldPerGlyph(input, metrics);
 
 		// Convert SDF-Image to texture and downscale through mipmaps
-		gl::Texture sdf_texture = glContext->create2DTexture(&output.data[0], input.width, input.height, gl::ImageFormat::R, 1);
-		sdf_texture.configTextureWrapper(gl::TextureWrapper::CLAMP_TO_BORDER, gl::TextureWrapper::CLAMP_TO_BORDER);
-		sdf_texture.configTextureFilter(gl::MipmapOption::LINEAR_LINEAR, gl::TextureFilter::NEAREST);
+        std::vector<unsigned char> tempData(output.data(), output.data() + output.getSize());
+		std::unique_ptr<gl::ITexture2D> sdf_texture = textureCreator->createTexture2D(input.getWidth(), input.getHeight(), gl::ImageFormat::R, tempData);
+		sdf_texture->configTextureWrapper(gl::TextureWrapper::CLAMP_TO_BORDER, gl::TextureWrapper::CLAMP_TO_BORDER);
+		sdf_texture->configTextureFilter(gl::MipmapOption::LINEAR_LINEAR, gl::TextureFilter::NEAREST);
 
 		// resize
-		output.width = input.width / resizeFactor;
-		output.height = input.height / resizeFactor;
-		output.depth = 1;
-
-		sdf_texture.getTextureImage(output.data, (int)std::log2(resizeFactor));
+        sdf_texture->generateMipmaps();
+		auto outData = sdf_texture->getMipmapImage((int)std::log2(resizeFactor));
+        return { input.getWidth() / resizeFactor, input.getHeight() / resizeFactor, 1, outData };
 	}
 
 	/*****************************************
@@ -160,43 +165,43 @@ namespace font
 	void FontConverter::loadGlyphMetrics(FT_Face face, unsigned char c, GlyphMetrics & metrics)
 	{
 		FT_GlyphSlot glyph = ft_loader.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::UNSCALED);
-		metrics.size.x = (float)glyph->metrics.width;
-		metrics.size.y = (float)glyph->metrics.height;
-		metrics.bearing.x = (float)glyph->metrics.horiBearingX;
-		metrics.bearing.y = (float)glyph->metrics.horiBearingY;
+		metrics.size.x() = (float)glyph->metrics.width;
+		metrics.size.y() = (float)glyph->metrics.height;
+		metrics.bearing.x() = (float)glyph->metrics.horiBearingX;
+		metrics.bearing.y() = (float)glyph->metrics.horiBearingY;
 		metrics.advance = (float)glyph->metrics.horiAdvance;
 	}
-	void FontConverter::loadTextureMetrics(FT_Face face, unsigned char c, TexMetrics & metrics, gml::Vector2D<int> offset, int padding)
+	void FontConverter::loadTextureMetrics(FT_Face face, unsigned char c, TexMetrics & metrics, gml::Vec2<int> offset, int padding)
 	{
 		FT_GlyphSlot glyph = ft_loader.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::MONO);
-		metrics.left = (float)offset.x;
-		metrics.right = (float)(offset.x + (int)glyph->bitmap.width + (padding * 2));
-		metrics.top = (float)offset.y;
-		metrics.bottom = (float)(offset.y + (int)glyph->bitmap.rows + (padding * 2));
+		metrics.left = (float)offset.x();
+		metrics.right = (float)(offset.x() + (int)glyph->bitmap.width + (padding * 2));
+		metrics.top = (float)offset.y();
+		metrics.bottom = (float)(offset.y() + (int)glyph->bitmap.rows + (padding * 2));
 	}
 
-	gml::Vector2D<int> FontConverter::calcTextureSize(FT_Face face, int padding)
+	gml::Vec2<int> FontConverter::calcTextureSize(FT_Face face, int padding)
 	{
-		gml::Vector2D<int> size;
+		gml::Vec2<int> size;
 		for (unsigned char c = convertMetrics.c_min; c <= convertMetrics.c_max; ++c)
 		{
 			FT_GlyphSlot glyph = ft_loader.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::MONO);
 			int width = (int)glyph->bitmap.width + padding * 2;
 			int height = (int)glyph->bitmap.rows + padding * 2;
-			size.x += width;
-			size.y = std::max(size.y, height);
+			size.x() += width;
+			size.y() = std::max(size.y(), height);
 		}
 		return size;
 	}
-	void FontConverter::clampTo4(gml::Vector2D<int> & size)
+	void FontConverter::clampTo4(gml::Vec2<int> & size)
 	{
-		while (size.x % 4 != 0)
+		while (size.x() % 4 != 0)
 		{
-			++size.x;
+			++size.x();
 		}
-		while (size.y % 4 != 0)
+		while (size.y() % 4 != 0)
 		{
-			++size.y;
+			++size.y();
 		}
 	}
 	
@@ -220,11 +225,11 @@ namespace font
 	}
 	void FontConverter::generateTexMetrics(FT_Face face, charactermap & characters, int padding)
 	{
-		gml::Vector2D<int> total_size = calcTextureSize(face, padding);
+		gml::Vec2<int> total_size = calcTextureSize(face, padding);
 		clampTo4(total_size);
 
 		TexMetrics tempTexMetrics;
-		gml::Vector2D<int> tex_offset(0, 0);
+		gml::Vec2<int> tex_offset(0, 0);
 		for (unsigned char c = convertMetrics.c_min; c <= convertMetrics.c_max; ++c)
 		{
 			Character & character = characters[c];
@@ -233,13 +238,13 @@ namespace font
 			loadTextureMetrics(face, c, tempTexMetrics, tex_offset, padding);
 
 			// convert to relative positions
-			character.texCoords.left = tempTexMetrics.left / (float)total_size.x;
-			character.texCoords.right = tempTexMetrics.right / (float)total_size.x;
-			character.texCoords.top	= 1 - tempTexMetrics.top / (float)total_size.y;
-			character.texCoords.bottom = 1 - tempTexMetrics.bottom / (float)total_size.y;
+			character.texCoords.left = tempTexMetrics.left / (float)total_size.x();
+			character.texCoords.right = tempTexMetrics.right / (float)total_size.x();
+			character.texCoords.top	= 1 - tempTexMetrics.top / (float)total_size.y();
+			character.texCoords.bottom = 1 - tempTexMetrics.bottom / (float)total_size.y();
 
 			// advance texture offset
-			tex_offset.x += face->glyph->bitmap.width + (padding * 2);
+			tex_offset.x() += face->glyph->bitmap.width + (padding * 2);
 		}
 	}
 	void FontConverter::generateMaxGlyph(const charactermap & characters, GlyphMetrics & maxGlyph)
@@ -249,10 +254,10 @@ namespace font
 			const Character & character = characters.at(c);
 
 			// Update MaxGlyphMetrics
-			maxGlyph.size.x = std::max(maxGlyph.size.x, character.glyph.size.x);
-			maxGlyph.size.y = std::max(maxGlyph.size.y, character.glyph.size.y);
-			maxGlyph.bearing.x = std::max(maxGlyph.bearing.x, character.glyph.bearing.x);
-			maxGlyph.bearing.y = std::max(maxGlyph.bearing.y, character.glyph.bearing.y);
+			maxGlyph.size.x() = std::max(maxGlyph.size.x(), character.glyph.size.x());
+			maxGlyph.size.y() = std::max(maxGlyph.size.y(), character.glyph.size.y());
+			maxGlyph.bearing.x() = std::max(maxGlyph.bearing.x(), character.glyph.bearing.x());
+			maxGlyph.bearing.y() = std::max(maxGlyph.bearing.y(), character.glyph.bearing.y());
 			maxGlyph.advance = std::max(maxGlyph.advance, character.glyph.advance);
 		}
 
@@ -266,14 +271,14 @@ namespace font
 		fontfile.fontInfo.emSize = convertMetrics.EM_size;
 		fontfile.fontInfo.nChars = convertMetrics.c_max - convertMetrics.c_min + 1;
 
-		fontfile.sdfInfo.width = (uint32_t)convertMetrics.sdfImage.width;
-		fontfile.sdfInfo.height = (uint32_t)convertMetrics.sdfImage.height;
-		fontfile.sdfInfo.channels = (uint32_t)convertMetrics.sdfImage.depth;
+		fontfile.sdfInfo.width = (uint32_t)convertMetrics.sdfImage.getWidth();
+		fontfile.sdfInfo.height = (uint32_t)convertMetrics.sdfImage.getHeight();
+		fontfile.sdfInfo.channels = (uint32_t)convertMetrics.sdfImage.getDepth();
 
-		fontfile.maxGlyph.width = (uint32_t)convertMetrics.maxGlyph.size.x;
-		fontfile.maxGlyph.height = (uint32_t)convertMetrics.maxGlyph.size.y;
-		fontfile.maxGlyph.xBearing = (int32_t)convertMetrics.maxGlyph.bearing.x;
-		fontfile.maxGlyph.yBearing = (int32_t)convertMetrics.maxGlyph.bearing.y;
+		fontfile.maxGlyph.width = (uint32_t)convertMetrics.maxGlyph.size.x();
+		fontfile.maxGlyph.height = (uint32_t)convertMetrics.maxGlyph.size.y();
+		fontfile.maxGlyph.xBearing = (int32_t)convertMetrics.maxGlyph.bearing.x();
+		fontfile.maxGlyph.yBearing = (int32_t)convertMetrics.maxGlyph.bearing.y();
 		fontfile.maxGlyph.advance = (uint32_t)convertMetrics.maxGlyph.advance;
 
 		for (int i = convertMetrics.c_min; i <= convertMetrics.c_max; ++i)
@@ -281,10 +286,10 @@ namespace font
 			Glyph glyph;
 			glyph.id = i;
 
-			glyph.width = (uint32_t)convertMetrics.characters[i].glyph.size.x;
-			glyph.height = (uint32_t)convertMetrics.characters[i].glyph.size.y;
-			glyph.xBearing = (int32_t)convertMetrics.characters[i].glyph.bearing.x;
-			glyph.yBearing = (int32_t)convertMetrics.characters[i].glyph.bearing.y;
+			glyph.width = (uint32_t)convertMetrics.characters[i].glyph.size.x();
+			glyph.height = (uint32_t)convertMetrics.characters[i].glyph.size.y();
+			glyph.xBearing = (int32_t)convertMetrics.characters[i].glyph.bearing.x();
+			glyph.yBearing = (int32_t)convertMetrics.characters[i].glyph.bearing.y();
 			glyph.advance = (uint32_t)convertMetrics.characters[i].glyph.advance;
 
 			glyph.texCoordLeft = convertMetrics.characters[i].texCoords.left;
@@ -295,7 +300,8 @@ namespace font
 			fontfile.glyphs.push_back(glyph);
 		}
 
-		fontfile.sdf = std::move(convertMetrics.sdfImage.data);
+		fontfile.sdf = std::vector<unsigned char>(convertMetrics.sdfImage.data(), convertMetrics.sdfImage.data() +
+                convertMetrics.sdfImage.getSize());
 
 		fontfile.fileHeader.identifier = 0x464f4e54;
 		fontfile.fileHeader.fSize = sizeof(fontfile);
@@ -338,8 +344,8 @@ namespace font
 		FT_Set_Pixel_Sizes(face, 0, loadSize);
 		generateTexMetrics(face, convertMetrics.characters, padding);
 
-		generateTextureAtlas(face, convertMetrics.glyphImage, padding);
-		generateSDF(face, convertMetrics.glyphImage, convertMetrics.sdfImage, loadSize, padding, resizeFactor);
+        convertMetrics.glyphImage = generateTextureAtlas(face, padding);
+        convertMetrics.sdfImage = generateSDF(face, convertMetrics.glyphImage, loadSize, padding, resizeFactor);
 
 		writeFontfile(filename_FONT);
 	}

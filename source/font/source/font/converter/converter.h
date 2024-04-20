@@ -11,10 +11,10 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H 
 
-#include <graphics\Graphics.h>
+#include <core/gl/Graphics.h>
 
-#include "../fileformat.h"
-#include "../font.h"
+#include "font/fileformat.h"
+#include "font/font.h"
 #include "ftMath.h"
 #include "img.h"
 
@@ -69,31 +69,38 @@ namespace font
 	private:
 		FT_Loader ft_loader;
 		ConvertMetrics convertMetrics;
-		gl::GraphicsContext* glContext;
+        std::shared_ptr<gl::ITextureCreator> textureCreator;
 	
 		void loadGlyphMetrics(FT_Face face, unsigned char c, GlyphMetrics & metrics);
-		void loadTextureMetrics(FT_Face face, unsigned char c, TexMetrics & metrics, gml::Vector2D<int> offset, int padding);
 
-		gml::Vector2D<int> calcTextureSize(FT_Face face, int padding);
-		void clampTo4(gml::Vector2D<int> & size);
+		void loadTextureMetrics(FT_Face face, unsigned char c, TexMetrics & metrics, gml::Vec2<int> offset, int padding);
+
+		gml::Vec2<int> calcTextureSize(FT_Face face, int padding);
+
+		void clampTo4(gml::Vec2<int> & size);
 
 		void generateCharacters(charactermap & characters);
 
 		void generateGlyphMetrics(FT_Face face, charactermap & characters);
+
 		void generateTexMetrics(FT_Face face, charactermap & characters, int padding);
+
 		void generateMaxGlyph(const charactermap & characters, GlyphMetrics & maxGlyph);
 
 		// SDF related
-		void generateTextureAtlas(FT_Face face, img::Image & image, int padding);
-		void uploadGlyphBitmaps(FT_Face face, gl::Texture & texture, int padding);
+        img::Image generateTextureAtlas(FT_Face face, int padding);
+
+		void uploadGlyphBitmaps(FT_Face face, gl::ITexture2D & texture, int padding);
+
 		void generateSdfTexMetrics(FT_Face face, std::map<unsigned char, TexMetrics> & metrics, int padding);
-		void generateSDF(FT_Face face, img::Image & input, img::Image & output, int loadSize, int loadPadding, int resizeFactor);
+
+        img::Image generateSDF(FT_Face face, img::Image & input, int loadSize, int loadPadding, int resizeFactor);
 
 		// file writing
 		void writeFontfile(std::string filename);
 
 	public:
-		FontConverter(gl::GraphicsContext* glContext);
+		FontConverter(const std::shared_ptr<gl::ITextureCreator>& textureCreator);
 
 		void convertFont(std::string filename_TTF, std::string filename_FONT, ENCODING encoding = ENCODING::ASCII);
 	};

@@ -3,8 +3,9 @@
 #include <string>
 #include <map>
 
-#include <math/gml.h>
-#include <graphics/Texture2D.h>
+#include <gml/gml.h>
+#include <core/gl/Texture2D.h>
+#include <memory>
 
 namespace font
 {
@@ -39,11 +40,11 @@ namespace font
 
 	struct Font
 	{
-		std::string name = "";
+		std::string name;
 		FontMetrics metrics;
 		GlyphMetrics maxGlyph;
 		//gml::Vec2f dimensions;
-		gl::Texture2D textureAtlas;
+		std::unique_ptr<gl::ITexture2D> textureAtlas;
 		std::map<unsigned char, Character> characters;
 	};
 }

@@ -19,13 +19,13 @@ namespace font
 		}
 	}
 	Grid::Grid(img::Image image)
-		: width(image.width), height(image.height)
+		: width(image.getWidth()), height(image.getHeight())
 	{
 		for (int y = 0; y < height; ++y)
 		{
 			for (int x = 0; x < width; ++x)
 			{
-				Pixel pixel{ x, y, image.data[y*width + x] };
+				Pixel pixel{ x, y, image.data()[y*width + x] };
 				this->data.push_back(pixel);
 			}
 		}
@@ -40,19 +40,17 @@ namespace font
 		return this->data[y*width + x];
 	}
 
-	void Grid::toImage(img::Image & image)
+    img::Image Grid::toImage()
 	{
-		image.width = this->width;
-		image.height = this->height;
-		image.depth = 1;
-		image.data.resize(0);
+        std::vector<unsigned char> pixelData;
 		for (int y = 0; y < height; ++y)
 		{
 			for (int x = 0; x < width; ++x)
 			{
-				image.data.push_back(getPixel(x, y).value);
+                pixelData.push_back(getPixel(x, y).value);
 			}
 		}
+        return { this->width, this->height, 1, pixelData };
 	}
 
 
@@ -160,10 +158,10 @@ namespace font
 	}
 
 
-	void genDistanceFieldPerGlyph(img::Image & inputImage, std::map<unsigned char, TexMetrics> & glyphs, img::Image & outputImage, int searchRange, float clampRange)
+    img::Image genDistanceFieldPerGlyph(img::Image & inputImage, std::map<unsigned char, TexMetrics> & glyphs, int searchRange, float clampRange)
 	{
-		int total_width = inputImage.width;
-		int total_height = inputImage.height;
+		int total_width = inputImage.getWidth();
+		int total_height = inputImage.getHeight();
 
 		// Create input & output grid
 		Grid grid_in(inputImage);
@@ -190,6 +188,6 @@ namespace font
 		}
 
 		// Convert grid_out to bitmap
-		grid_out.toImage(outputImage);
+		return grid_out.toImage();
 	}
 }

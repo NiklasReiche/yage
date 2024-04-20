@@ -3,9 +3,11 @@
 #include <string>
 #include <vector>
 
-#include <graphics/DrawableCreator.h>
+#include <core/gl/DrawableCreator.h>
+#include <gml/vector.h>
 
 #include "font.h"
+#include "core/gl/Texture2D.h"
 
 namespace font
 {
@@ -16,10 +18,10 @@ namespace font
 	class Text
 	{
 	public:
-		Text() = default;
-		Text(const gl::DrawableCreator& drawableCreator, 
+		Text() = delete;
+		Text(const std::shared_ptr<gl::IDrawableCreator>& drawableCreator,
 		     const std::string & text, 
-		     const Font & font,
+		     const std::shared_ptr<Font> & font,
 		     const gml::Vec2<float>& position = gml::Vec2<float>(0.0f), 
 		     unsigned int color = 0x000000FFu, 
 		     int size = 14);
@@ -31,29 +33,20 @@ namespace font
 		[[nodiscard]]
 		gml::Vec4<float> getColor() const;
 
-		void setText(const std::string& text, const Font & font);
-		void appendText(const std::string& text, const Font & font);
-		void insertText(const std::string& text, const Font & font, int offset = 0);
-
-		void setColor(unsigned int color);
-
-		void setPosition(const gml::Vec2<float>& position);
-
 		[[nodiscard]]
-		gl::Texture2D getTexture() const;
+		const gl::ITexture2D& getTexture() const;
 		[[nodiscard]]
-		gl::Drawable getDrawable() const;
+        const gl::IDrawable& getDrawable() const;
 		[[nodiscard]]
 		std::string getString() const;
 		[[nodiscard]]
 		gml::Vec2f getMaxDimensions() const;
-		gml::Vec2f getOffset(int index);
+		gml::Vec2f getOffset(unsigned int index);
 
 	private:
-		gl::DrawableCreator drawableCreator;
-		gl::Drawable drawable;
-		gl::Texture2D textureAtlas;
-		Font font;
+		std::shared_ptr<gl::IDrawableCreator> drawableCreator;
+        std::unique_ptr<gl::IDrawable> drawable;
+		std::shared_ptr<Font> font;
 
 		gml::Vec2<float> position;
 		gml::Vec2<float> size;
@@ -69,10 +62,10 @@ namespace font
 		int vertexOffsetTexCoords = 0;
 		int vertexOffsetColors = 0;
 
-		void constructVertices(std::vector<float> & vertices, const Font & font);
+		void constructVertices(std::vector<float> & vertices);
 
-		void constructVertexCoords(std::vector<float> & vertices, const Font & font);
-		void constructVertexTexCoords(std::vector<float> & vertices, const Font & font);
+		void constructVertexCoords(std::vector<float> & vertices);
+		void constructVertexTexCoords(std::vector<float> & vertices);
 		void constructVertexColors(std::vector<float> & vertices);
 	};
 }

@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "Frame.h"
-#include "ImageFormat.h"
+#include "TextureParams.h"
 
 namespace gl
 {

@@ -4,10 +4,10 @@
 #include <vector>
 #include <algorithm>
 
-#include <graphics\Graphics.h>
+#include <core/gl/Graphics.h>
 #include <image\image.h>
 
-#include "font.h"
+#include "../font.h"
 
 namespace font
 {
@@ -33,7 +33,7 @@ namespace font
 		void setPixel(Pixel pixel);
 		Pixel getPixel(int x, int y);
 
-		void toImage(img::Image & image);
+        img::Image toImage();
 	};
 
 	bool operator==(const Pixel & left, const Pixel & right);
@@ -51,5 +51,5 @@ namespace font
 
 	void distanceFunction(Grid & grid_in, Grid & grid_out, int x_min, int x_max, int y_min, int y_max, int searchRange = 16, float clampRange = 20.0f);
 
-	void genDistanceFieldPerGlyph(img::Image & inputImage, std::map<unsigned char, TexMetrics> & glyphs, img::Image & outputImage, int searchRange = 16, float clampRange = 20.0f);
+    img::Image genDistanceFieldPerGlyph(img::Image & inputImage, std::map<unsigned char, TexMetrics> & glyphs, int searchRange = 16, float clampRange = 20.0f);
 }

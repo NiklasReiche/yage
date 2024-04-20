@@ -149,6 +149,21 @@ namespace opengl
 		maxMipmapLevel = getMaxMipmapLevel();
 	}
 
+    void Texture2D::configTextureWrapper(gl::TextureWrapper xOption, gl::TextureWrapper yOption)
+    {
+        Texture::configTextureWrapper(xOption, yOption);
+    }
+
+    void Texture2D::configTextureFilter(gl::TextureFilter minOption, gl::TextureFilter magOption)
+    {
+        Texture::configTextureFilter(minOption, magOption);
+    }
+
+    void Texture2D::configTextureFilter(gl::MipmapOption minOption, gl::TextureFilter magOption)
+    {
+        Texture::configTextureFilter(minOption, magOption);
+    }
+
 	int Texture2D::getWidth() const
 	{
 		return width;

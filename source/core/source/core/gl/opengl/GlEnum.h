@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 #include "OpenGL.h"
-#include "../ImageFormat.h"
+#include "../TextureParams.h"
 
 namespace opengl
 {
@@ -127,7 +127,54 @@ namespace opengl
 		}
 	}
 
-	inline gl::ImageFormat convertToTextureFormat(const InternalFormat format)
+    inline TextureWrapper convertWrapper(const gl::TextureWrapper format)
+    {
+        switch (format)
+        {
+            case gl::TextureWrapper::CLAMP_TO_BORDER:
+                return TextureWrapper::CLAMP_TO_BORDER;
+            case gl::TextureWrapper::CLAMP_TO_EDGE:
+                return TextureWrapper::CLAMP_TO_EDGE;
+            case gl::TextureWrapper::MIRRORED_REPEAT:
+                return TextureWrapper::MIRRORED_REPEAT;
+            case gl::TextureWrapper::REPEAT:
+                return TextureWrapper::REPEAT;
+            default:
+                throw std::invalid_argument("unknown wrapper format");
+        }
+    }
+
+    inline TextureFilter convertFilter(const gl::TextureFilter format)
+    {
+        switch (format)
+        {
+            case gl::TextureFilter::NEAREST:
+                return TextureFilter::NEAREST;
+            case gl::TextureFilter::LINEAR:
+                return TextureFilter::LINEAR;
+            default:
+                throw std::invalid_argument("unknown filter format");
+        }
+    }
+
+    inline MipmapOption convertMipMapOption(const gl::MipmapOption format)
+    {
+        switch (format)
+        {
+            case gl::MipmapOption::NEAREST_NEAREST:
+                return MipmapOption::NEAREST_NEAREST;
+            case gl::MipmapOption::NEAREST_LINEAR:
+                return MipmapOption::NEAREST_LINEAR;
+            case gl::MipmapOption::LINEAR_NEAREST:
+                return MipmapOption::LINEAR_NEAREST;
+            case gl::MipmapOption::LINEAR_LINEAR:
+                return MipmapOption::LINEAR_LINEAR;
+            default:
+                throw std::invalid_argument("unknown mipmap option");
+        }
+    }
+
+    inline gl::ImageFormat convertToTextureFormat(const InternalFormat format)
 	{
 		switch (format)
 		{

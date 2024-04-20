@@ -11,8 +11,7 @@ target_sources(yage_core
 		Frame.h
 		FrameCreator.h
 		graphics.h
-		ImageFormat.h
-		PixelTransfer.h
+        TextureParams.h
 		Renderer.h
 		Shader.h
 		ShaderCreator.h

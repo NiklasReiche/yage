@@ -36,30 +36,30 @@ namespace opengl
 	}
 	
 	// ReSharper disable once CppMemberFunctionMayBeConst
-	void Texture::configTextureWrapper(TextureWrapper xOption, TextureWrapper yOption)
+	void Texture::configTextureWrapper(gl::TextureWrapper xOption, gl::TextureWrapper yOption)
 	{
 		lockContextPtr()->bindTexture(static_cast<GLenum>(target), texture);
 
-		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_WRAP_S, static_cast<GLenum>(xOption));
-		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_WRAP_T, static_cast<GLenum>(yOption));
+		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_WRAP_S, static_cast<GLenum>(convertWrapper(xOption)));
+		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_WRAP_T, static_cast<GLenum>(convertWrapper(yOption)));
 	}
 
 	// ReSharper disable once CppMemberFunctionMayBeConst
-	void Texture::configTextureFilter(TextureFilter minOption, TextureFilter magOption)
+	void Texture::configTextureFilter(gl::TextureFilter minOption, gl::TextureFilter magOption)
 	{
 		lockContextPtr()->bindTexture(static_cast<GLenum>(target), texture);
 
-		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MIN_FILTER, static_cast<GLenum>(minOption));
-		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MAG_FILTER, static_cast<GLenum>(magOption));
+		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MIN_FILTER, static_cast<GLenum>(convertFilter(minOption)));
+		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MAG_FILTER, static_cast<GLenum>(convertFilter(magOption)));
 	}
 
 	// ReSharper disable once CppMemberFunctionMayBeConst
-	void Texture::configTextureFilter(MipmapOption minOption, TextureFilter magOption)
+	void Texture::configTextureFilter(gl::MipmapOption minOption, gl::TextureFilter magOption)
 	{
 		lockContextPtr()->bindTexture(static_cast<GLenum>(target), texture);
 
 		glGenerateMipmap(static_cast<GLenum>(target));
-		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MIN_FILTER, static_cast<GLenum>(minOption));
-		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MAG_FILTER, static_cast<GLenum>(magOption));
+		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MIN_FILTER, static_cast<GLenum>(convertMipMapOption(minOption)));
+		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MAG_FILTER, static_cast<GLenum>(convertFilter(magOption)));
 	}
 }

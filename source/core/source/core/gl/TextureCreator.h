@@ -5,7 +5,7 @@
 
 #include "Texture2D.h"
 #include "Cubemap.h"
-#include "ImageFormat.h"
+#include "TextureParams.h"
 
 namespace gl
 {

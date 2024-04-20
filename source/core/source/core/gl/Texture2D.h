@@ -4,8 +4,7 @@
 
 #include <utils/Point.h>
 
-#include "ImageFormat.h"
-#include "PixelTransfer.h"
+#include "TextureParams.h"
 
 namespace gl
 {
@@ -167,6 +166,12 @@ namespace gl
 		 * @throws std::logic_error The graphics context of this Texture2D was destroyed.
 		 */
 		virtual void generateMipmaps() = 0;
+
+        virtual void configTextureWrapper(TextureWrapper xOption, TextureWrapper yOption) = 0;
+
+        virtual void configTextureFilter(TextureFilter minOption, TextureFilter magOption) = 0;
+
+        virtual void configTextureFilter(MipmapOption minOption, TextureFilter magOption) = 0;
 
 		[[nodiscard]]
 		virtual int getWidth() const = 0;

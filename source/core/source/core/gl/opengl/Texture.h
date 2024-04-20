@@ -14,9 +14,11 @@ namespace opengl
 		Texture(const Texture& other) = delete;
 		Texture& operator=(const Texture& other) = delete;
 
-		void configTextureWrapper(TextureWrapper xOption, TextureWrapper yOption);
-		void configTextureFilter(TextureFilter minOption, TextureFilter magOption);
-		void configTextureFilter(MipmapOption minOption, TextureFilter magOption);
+        void configTextureWrapper(gl::TextureWrapper xOption, gl::TextureWrapper yOption);
+
+        void configTextureFilter(gl::TextureFilter minOption, gl::TextureFilter magOption);
+
+        void configTextureFilter(gl::MipmapOption minOption, gl::TextureFilter magOption);
 
 	protected:
 		const GLenum pxType = GL_UNSIGNED_BYTE;

@@ -37,6 +37,12 @@ namespace opengl
 
 		void generateMipmaps() override;
 
+        void configTextureWrapper(gl::TextureWrapper xOption, gl::TextureWrapper yOption) override;
+
+        void configTextureFilter(gl::TextureFilter minOption, gl::TextureFilter magOption) override;
+
+        void configTextureFilter(gl::MipmapOption minOption, gl::TextureFilter magOption) override;
+
 		int getWidth() const override;
 
 		int getHeight() const override;
