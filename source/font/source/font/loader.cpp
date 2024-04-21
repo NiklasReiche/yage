@@ -1,6 +1,5 @@
 ﻿#include "loader.h"
 #include "fileformat.h"
-#include "TextureParams.h"
 #include <core/platform/IFileReader.h>
 #include <core/platform/IFile.h>
 

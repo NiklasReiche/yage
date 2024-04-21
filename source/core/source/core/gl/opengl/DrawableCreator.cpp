@@ -18,12 +18,13 @@ namespace opengl
 		auto context = lockContextPtr();
 		auto drawable = std::make_unique<Drawable>();
 
+        const unsigned int vertexSize = std::accumulate(vertexLayout.begin(), vertexLayout.end(), 0u);
+        drawable->nVertices = vertexSize == 0 ? 0 : indices.size();
+
 		const std::shared_ptr<gl::VertexBuffer> vertexBuffer = createVertexBuffer(vertices);
 		const std::shared_ptr<gl::ElementBuffer> elementBuffer = createElementBuffer(indices);
-		drawable->vertexArray = createVertexArrayInternal(vertexBuffer, elementBuffer, vertexLayout, format);
-
-		const unsigned int vertexSize = std::accumulate(vertexLayout.begin(), vertexLayout.end(), 0u);
-		drawable->nVertices = vertexSize == 0 ? 0 : indices.size();
+		drawable->vertexArray = createVertexArrayInternal(vertexBuffer, elementBuffer, vertexLayout,
+                                                          drawable->nVertices, format);
 
 		return drawable;
 	}
@@ -40,7 +41,7 @@ namespace opengl
 
 		const std::shared_ptr<gl::VertexBuffer> vertexBuffer = createVertexBuffer(vertices);
 		const std::shared_ptr<gl::ElementBuffer> elementBuffer = createElementBuffer(indices);
-		drawable->vertexArray = createVertexArrayInternal(vertexBuffer, elementBuffer, vertexLayout, format);
+		drawable->vertexArray = createVertexArrayInternal(vertexBuffer, elementBuffer, vertexLayout, nVertices, format);
 
 		drawable->nVertices = nVertices;
 		switch (indices.size() / nVertices) {
@@ -85,9 +86,10 @@ namespace opengl
 		const std::shared_ptr<gl::VertexBuffer>& vertexBuffer,
 		const std::shared_ptr<gl::ElementBuffer>& elementBuffer,
 		const std::vector<unsigned int>& vertexLayout,
+        unsigned int nVertices,
 		gl::VertexFormat format)
 	{
-		return createVertexArrayInternal(vertexBuffer, elementBuffer, vertexLayout, format);
+		return createVertexArrayInternal(vertexBuffer, elementBuffer, vertexLayout, nVertices, format);
 	}
 
 	std::unique_ptr<VertexArray>
@@ -95,6 +97,7 @@ namespace opengl
 		const std::shared_ptr<gl::VertexBuffer>& vertexBuffer,
 		const std::shared_ptr<gl::ElementBuffer>& elementBuffer,
 		const std::vector<unsigned int>& vertexLayout,
+        unsigned int nVertices,
 		gl::VertexFormat format)
 	{
 		auto context = lockContextPtr();
@@ -127,22 +130,20 @@ namespace opengl
 				}
 				break;
 			}
-			case gl::VertexFormat::BATCHED:
-#if 0
-				{
-				unsigned int attributeOffset = 0;
-				for (unsigned int i = 0; i < vertexLayout.size(); i++) {
-					glEnableVertexAttribArray(i);
-					glVertexAttribPointer(
-						i, vertexLayout[i],
-						GL_FLOAT, GL_FALSE,
-						vertexLayout[i] * sizeof(GLfloat),
-						reinterpret_cast<GLvoid*>(attributeOffset * sizeof(GLfloat)));
-					attributeOffset += vertexLayout[i] * nVertices;
-				}
-				break;
+			case gl::VertexFormat::BATCHED: {
+                unsigned int attributeOffset = 0;
+                for (unsigned int i = 0; i < vertexLayout.size(); i++) {
+                    glEnableVertexAttribArray(i);
+                    glVertexAttribPointer(
+                        i, vertexLayout[i],
+                        GL_FLOAT, GL_FALSE,
+                        vertexLayout[i] * sizeof(GLfloat),
+                        reinterpret_cast<GLvoid*>(attributeOffset * sizeof(GLfloat)));
+                    attributeOffset += vertexLayout[i] * nVertices;
+                }
+                break;
 			}
-#endif
+
 			default: throw std::invalid_argument("Unsupported vertex format");
 		}
 

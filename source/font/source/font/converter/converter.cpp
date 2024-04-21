@@ -137,7 +137,7 @@ namespace font
 		}
 	}
 
-    img::Image FontConverter::generateSDF(FT_Face face, img::Image & input, int _, int loadPadding, int resizeFactor)
+    img::Image FontConverter::generateSDF(FT_Face face, img::Image & input, int loadPadding, int resizeFactor)
 	{
 		// generate glyph texture metrics
 		std::map<unsigned char, TexMetrics> metrics;
@@ -329,7 +329,7 @@ namespace font
 		//convertMetrics.c_min = 65;
 		//convertMetrics.c_max = 66;
 		int padding = 16;
-		int loadSize = 256;
+		int loadSize = 256; // TODO: why is this unused?
 		int resizeFactor = 4;
 
 		ft_loader.initialize();
@@ -345,7 +345,7 @@ namespace font
 		generateTexMetrics(face, convertMetrics.characters, padding);
 
         convertMetrics.glyphImage = generateTextureAtlas(face, padding);
-        convertMetrics.sdfImage = generateSDF(face, convertMetrics.glyphImage, loadSize, padding, resizeFactor);
+        convertMetrics.sdfImage = generateSDF(face, convertMetrics.glyphImage, padding, resizeFactor);
 
 		writeFontfile(filename_FONT);
 	}

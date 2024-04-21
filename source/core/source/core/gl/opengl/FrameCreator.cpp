@@ -24,7 +24,7 @@ namespace opengl
 		const std::span<unsigned char> emptyData;
 		buffer->texture = std::static_pointer_cast<Texture2D>(std::shared_ptr<gl::ITexture2D>(context->getTextureCreator()->
 			createTexture2D(width, height, format, emptyData)));
-		buffer->texture->configTextureFilter(TextureFilter::LINEAR, TextureFilter::LINEAR);
+		buffer->texture->configTextureFilter(gl::TextureFilter::LINEAR, gl::TextureFilter::LINEAR);
 
 		// attach texture
 		glFramebufferTexture2D(

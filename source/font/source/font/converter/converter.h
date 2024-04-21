@@ -94,7 +94,7 @@ namespace font
 
 		void generateSdfTexMetrics(FT_Face face, std::map<unsigned char, TexMetrics> & metrics, int padding);
 
-        img::Image generateSDF(FT_Face face, img::Image & input, int loadSize, int loadPadding, int resizeFactor);
+        img::Image generateSDF(FT_Face face, img::Image & input, int loadPadding, int resizeFactor);
 
 		// file writing
 		void writeFontfile(std::string filename);

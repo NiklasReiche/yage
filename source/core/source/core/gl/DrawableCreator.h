@@ -22,7 +22,7 @@ namespace gl
 		virtual ~IDrawableCreator() = default;
 
 		/**
-		 * @brief 
+		 * Creates a drawable from float vertices and unsigned int indices.
 		 * 
 		 * @param vertices 
 		 * @param vertexLayout 
@@ -40,6 +40,16 @@ namespace gl
 			const std::vector<unsigned int>& vertexLayout,
 			VertexFormat format) = 0;
 
+        /**
+         * Creates a drawable from a continuous data source. Vertices and indices are interpreted as byte streams,
+         * where the the actual data type of the indices is computed by providing the total amount of vertices.
+         * @param vertices
+         * @param indices
+         * @param vertexLayout
+         * @param nVertices
+         * @param format
+         * @return
+         */
 		[[nodiscard]]
 		virtual std::unique_ptr<IDrawable> createDrawable(
 			const std::span<const unsigned char>& vertices,
@@ -65,6 +75,7 @@ namespace gl
 			const std::shared_ptr<VertexBuffer>& vertexBuffer,
 			const std::shared_ptr<ElementBuffer>& elementBuffer,
 			const std::vector<unsigned int>& vertexLayout,
+            unsigned int nVertices,
 			gl::VertexFormat format = gl::VertexFormat::INTERLEAVED) = 0;
 
 	protected:

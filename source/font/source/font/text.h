@@ -62,9 +62,9 @@ namespace font
 		int vertexOffsetTexCoords = 0;
 		int vertexOffsetColors = 0;
 
-		void constructVertices(std::vector<float> & vertices);
+		void constructVertices(std::vector<float> & vertices, std::vector<unsigned int> &indices);
 
-		void constructVertexCoords(std::vector<float> & vertices);
+		void constructVertexCoords(std::vector<float> & vertices, std::vector<unsigned int> &indices);
 		void constructVertexTexCoords(std::vector<float> & vertices);
 		void constructVertexColors(std::vector<float> & vertices);
 	};

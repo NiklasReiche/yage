@@ -6,14 +6,14 @@ namespace font
 {
 	struct ShaderTemplate
 	{
-#ifdef DESKTOP
+#ifdef WIN32 //TODO
 		const std::string textShader_vert =
 #include "shaders/textShader_GL3.vert"
 			;
 		const std::string textShader_frag =
 #include "shaders/textShader_GL3.frag"
-			;
-#endif // DESKTOP 
+        ;
+#endif // WIN32
 
 #ifdef ANDROID
 		const std::string textShader_vert =

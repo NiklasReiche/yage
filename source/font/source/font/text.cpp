@@ -16,12 +16,8 @@ namespace font
 	{
 		if (!text.empty()) {
 			std::vector<float> vertices;
-			constructVertices(vertices);
             std::vector<unsigned int> indices;
-            for (unsigned int i = 0; i < vertices.size(); ++i)
-            {
-                indices.push_back(i);
-            }
+			constructVertices(vertices, indices);
 			drawable = drawableCreator->createDrawable(vertices, indices, std::vector<unsigned int> { 2, 2, 4 }, gl::VertexFormat::BATCHED);
 		}
 	}
@@ -41,11 +37,11 @@ namespace font
 		return color;
 	}
 
-	void Text::constructVertices(std::vector<float>& vertices)
+	void Text::constructVertices(std::vector<float>& vertices, std::vector<unsigned int>& indices)
 	{
 		size = gml::Vec2f(0.0f);
 		std::vector<float> coords;
-		constructVertexCoords(coords);
+		constructVertexCoords(coords, indices);
 		vertices.insert(std::end(vertices), std::begin(coords), std::end(coords));
 
 		std::vector<float> texCoords;
@@ -57,7 +53,7 @@ namespace font
 		vertices.insert(std::end(vertices), std::begin(colors), std::end(colors));
 	}
 
-	void Text::constructVertexCoords(std::vector<float>& vertices)
+	void Text::constructVertexCoords(std::vector<float>& vertices, std::vector<unsigned int> &indices)
 	{
 		const float scale = static_cast<float>(fontSize) / static_cast<float>(font->metrics.ptSize);
 
@@ -65,6 +61,7 @@ namespace font
 		const float yPos = position.y();
 
 		std::vector<float> coords;
+        unsigned int index = 0;
 
 		// Iterate through all characters
 		for (char i : text)
@@ -81,14 +78,18 @@ namespace font
 				left, top,
 				left, bottom,
 				right,	bottom,
-
-				right,	bottom,
 				right,	top,
-				left,	top
 			};
 
 			// Append to global coords
 			coords.insert(std::end(coords), std::begin(localCoords), std::end(localCoords));
+            indices.push_back(index);
+            indices.push_back(index + 1);
+            indices.push_back(index + 2);
+            indices.push_back(index + 2);
+            indices.push_back(index + 3);
+            indices.push_back(index);
+            index += 6;
 
 			// Advance cursors for next glyph
 			xPos += ch.glyph.advance * scale;
@@ -121,10 +122,7 @@ namespace font
 				texLeft, texTop,
 				texLeft, texBottom,
 				texRight, texBottom,
-
-				texRight, texBottom,
-				texRight, texTop,
-				texLeft, texTop
+				texRight, texTop
 			};
 
 			// Append to global tex coords
@@ -148,8 +146,6 @@ namespace font
 				color.x(), color.y(), color.z(), color.w(),
 				color.x(), color.y(), color.z(), color.w(),
 				color.x(), color.y(), color.z(), color.w(),
-				color.x(), color.y(), color.z(), color.w(),
-				color.x(), color.y(), color.z(), color.w()
 			};
 
 			// Append to global colors

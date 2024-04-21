@@ -37,6 +37,7 @@ namespace opengl
 			const std::shared_ptr<gl::VertexBuffer>& vertexBuffer,
 			const std::shared_ptr<gl::ElementBuffer>& elementBuffer,
 			const std::vector<unsigned int>& vertexLayout,
+            unsigned int nVertices,
 			gl::VertexFormat format) override;
 
 	private:
@@ -46,6 +47,7 @@ namespace opengl
 			const std::shared_ptr<gl::VertexBuffer>& vertexBuffer,
 			const std::shared_ptr<gl::ElementBuffer>& elementBuffer,
 			const std::vector<unsigned int>& vertexLayout,
+            unsigned int nVertices,
 			gl::VertexFormat format);
 
 		std::unique_ptr<gl::ElementBuffer> createElementBuffer(const unsigned char* indices, std::size_t size);
