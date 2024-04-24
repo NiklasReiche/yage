@@ -17,13 +17,14 @@ namespace opengl
 		void setClearColor(uint32_t color) override;
 		
 		void setRenderTarget(const gl::IFrame& target) override;
+        void setDefaultRenderTarget() override;
 
 		void setViewport(int x, int y, int width, int height) override;
 		void setViewport(Viewport viewport) override;
 		
 		void draw(const gl::IDrawable & drawable) override;
 		void draw(const gl::IFrame & buffer) override;
-		void draw(const gl::ITexture2D & texture);
+		void draw(const gl::ITexture2D & texture) override;
 
 		void useShader(const gl::IShader & shader) override;
 

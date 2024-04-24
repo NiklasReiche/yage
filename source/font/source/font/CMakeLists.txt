@@ -4,7 +4,7 @@ target_sources(yage_font
         font.h
         text.h
         text.cpp
-        shaders.h
+        #shaders.h
         loader.h
         loader.cpp
         fontHeader.h

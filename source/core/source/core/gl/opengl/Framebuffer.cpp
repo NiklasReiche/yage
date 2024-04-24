@@ -8,6 +8,7 @@ namespace opengl
 	{
 		glDeleteFramebuffers(1, &FBO);
 		glDeleteRenderbuffers(1, &RBO);
+        lockContextPtr()->bindFramebuffer(GL_FRAMEBUFFER, 0); // TODO: make this a destroy method that just resets the bindings
 	}
 
 	Framebuffer::Framebuffer(Framebuffer&& other) noexcept

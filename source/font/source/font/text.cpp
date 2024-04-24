@@ -9,7 +9,7 @@ namespace font
 	Text::Text(const std::shared_ptr<gl::IDrawableCreator>& drawableCreator,
 	           const std::string & text, 
 	           const std::shared_ptr<Font> & font,
-	           const gml::Vec2<float>& position, 
+	           const gml::Vec3<float>& position,
 	           const unsigned int color, 
 	           const int size)
 		: drawableCreator(drawableCreator), font(font), position(position), color(gl::toVec4(color)), text(text), fontSize(size)
@@ -18,7 +18,7 @@ namespace font
 			std::vector<float> vertices;
             std::vector<unsigned int> indices;
 			constructVertices(vertices, indices);
-			drawable = drawableCreator->createDrawable(vertices, indices, std::vector<unsigned int> { 2, 2, 4 }, gl::VertexFormat::BATCHED);
+			drawable = drawableCreator->createDrawable(vertices, indices, std::vector<unsigned int> { 3, 2, 4 }, gl::VertexFormat::BATCHED);
 		}
 	}
 
@@ -27,7 +27,7 @@ namespace font
 		return size;
 	}
 	
-	gml::Vec2<float> Text::getPosition() const
+	gml::Vec3<float> Text::getPosition() const
 	{
 		return position;
 	}
@@ -59,6 +59,7 @@ namespace font
 
 		float xPos = position.x();
 		const float yPos = position.y();
+        const float zPos = position.z();
 
 		std::vector<float> coords;
         unsigned int index = 0;
@@ -75,10 +76,10 @@ namespace font
 
 			// Generate glyph quad for each character
 			std::array<float, 12> localCoords = {
-				left, top,
-				left, bottom,
-				right,	bottom,
-				right,	top,
+				left, top, zPos,
+				left, bottom, zPos,
+                right, bottom, zPos,
+				right, top, zPos,
 			};
 
 			// Append to global coords
@@ -89,7 +90,7 @@ namespace font
             indices.push_back(index + 2);
             indices.push_back(index + 3);
             indices.push_back(index);
-            index += 6;
+            index += 4;
 
 			// Advance cursors for next glyph
 			xPos += ch.glyph.advance * scale;
@@ -100,7 +101,6 @@ namespace font
 		}
 
 		// Append to global vertices
-		vertexOffsetCoords = 0;
 		vertices.insert(std::end(vertices), std::begin(coords), std::end(coords));
 	}
 	
@@ -118,11 +118,11 @@ namespace font
 			const float texTop = ch.texCoords.top;
 
 			// Generate glyph quad for each character
-			std::array<float, 12> localTexCoords = {
+			std::array<float, 8> localTexCoords = {
 				texLeft, texTop,
 				texLeft, texBottom,
 				texRight, texBottom,
-				texRight, texTop
+				texRight, texTop,
 			};
 
 			// Append to global tex coords
@@ -130,7 +130,6 @@ namespace font
 		}
 
 		// Append to global vertices
-		vertexOffsetTexCoords = VERTEX_SIZE_COORDS * text.length();
 		vertices.insert(std::end(vertices), std::begin(texCoords), std::end(texCoords));
 	}
 	
@@ -141,11 +140,11 @@ namespace font
 		for (unsigned int i = 0; i < text.length(); ++i)
 		{
 			// Generate glyph quad for each character
-			std::array<float, 24> localColors = {
+			std::array<float, 16> localColors = {
 				color.x(), color.y(), color.z(), color.w(),
 				color.x(), color.y(), color.z(), color.w(),
-				color.x(), color.y(), color.z(), color.w(),
-				color.x(), color.y(), color.z(), color.w(),
+                color.x(), color.y(), color.z(), color.w(),
+                color.x(), color.y(), color.z(), color.w(),
 			};
 
 			// Append to global colors
@@ -153,7 +152,6 @@ namespace font
 		}
 
 		// Append to global vertices
-		vertexOffsetColors = vertexOffsetTexCoords + VERTEX_SIZE_TEXCOORDS * text.length();
 		vertices.insert(std::end(vertices), std::begin(colors), std::end(colors));
 	}
 

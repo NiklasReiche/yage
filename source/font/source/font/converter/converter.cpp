@@ -1,352 +1,413 @@
-﻿#include "converter.h"
+﻿#include <chrono>
+#include "converter.h"
+#include "image/img.h"
+#include "core/platform/desktop/FileReader.h"
 
 namespace font
 {
-	/*****************************************
-	**			FreeType Loader 			**
-	*****************************************/
+    /*****************************************
+    **			FreeType Loader 			**
+    *****************************************/
 
-	FT_Loader::~FT_Loader()
-	{
-		for (unsigned int i = 0; i < faces.size(); ++i)
-		{
-			FT_Done_Face(faces[i]);
-			faces.erase(faces.begin() + i);
-		}
-		FT_Done_FreeType(ft);
-	}
+    FT_Loader::~FT_Loader()
+    {
+        // free all loaded faces
+        for (unsigned int i = 0; i < faces.size(); ++i)
+        {
+            FT_Done_Face(faces[i]);
+            faces.erase(faces.begin() + i);
+        }
+        // free library handle
+        FT_Done_FreeType(ft);
+    }
 
-	int FT_Loader::initialize()
-	{
-		if (FT_Init_FreeType(&ft)) {
-			std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
-			return 1;
-		}
-		return 0;
-	}
+    void FT_Loader::initialize()
+    {
+        if (FT_Init_FreeType(&ft))
+        {
+            std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+        }
+    }
 
-	void FT_Loader::free(FT_Library _ft)
-	{
-		FT_Done_FreeType(_ft);
-	}
-	void FT_Loader::free(FT_Face face)
-	{
-		FT_Done_Face(face);
-	}
+    FT_Face FT_Loader::loadFace(const std::string &filepath)
+    {
+        FT_Face face;
+        FT_Error error = FT_New_Face(ft, filepath.c_str(), 0, &face);
+        if (error)
+        {
+            std::cout << "ERROR::FREETYPE: Failed to load face \n" << error << std::endl; // TODO: throw exception
+        } else
+        {
+            faces.push_back(face);
+        }
+        return face;
+    }
 
-	FT_Face FT_Loader::loadFace(std::string filepath)
-	{
-		FT_Face face;
-		FT_Error error = FT_New_Face(ft, filepath.c_str(), 0, &face);
-		if (error) {
-			std::cout << "ERROR::FREETYPE: Failed to load font \n" << error << std::endl;
-		}
-		else {
-			faces.push_back(face);
-		}
-		return face;
-	}
-	FT_GlyphSlot FT_Loader::loadGlyph(FT_Face face, unsigned char c, FT_GLYPH_LOAD_FLAG load_flag)
-	{
-		FT_Error error = FT_Load_Char(face, c, (FT_Int32)load_flag);
-		if (error) {
-			std::cout << "ERROR::FREETYTPE: Failed to load Glyph \n" << error << std::endl;
-		}
-		return face->glyph;
-	}
+    FT_GlyphSlot
+    FT_Loader::loadGlyph(const FT_Face &face, unsigned char c, // NOLINT(*-convert-member-functions-to-static)
+                         FT_GLYPH_LOAD_FLAG load_flag)
+    {
+        FT_Error error = FT_Load_Char(face, c, (FT_Int32) load_flag);
+        if (error)
+        {
+            std::cout << "ERROR::FREETYPE: Failed to load glyph \n" << error << std::endl; // TODO: throw exception
+        }
+        return face->glyph;
+    }
 
 
-	/*****************************************
-	**			SDF Generator	 			**
-	*****************************************/
-	FontConverter::FontConverter(const std::shared_ptr<gl::ITextureCreator>& textureCreator)
-		: textureCreator(textureCreator) {}
+    /*****************************************
+    **			SDF Generator	 			**
+    *****************************************/
+
+    FontConverter::FontConverter(const std::shared_ptr<gl::IContext> &glContext)
+            : glContext(glContext)
+    {}
+
+    void FontConverter::convert(const std::string &filenameInput, const std::string &filenameOutput,
+                                const int loadResolution, const int spread, const int padding, const int sdfResolution)
+    {
+        // TODO: allow unicode
+        const unsigned char c_min = 32;
+        const unsigned char c_max = 127;
+
+        const int scaleFactor = loadResolution / sdfResolution;
+
+        FT_Loader ft;
+        ft.initialize();
+        FT_Face face = ft.loadFace(filenameInput);
+        FT_Set_Pixel_Sizes(face, 0, loadResolution);
+
+        // we place the glyphs into the atlas in a roughly square grid
+        const int nCharacters = c_max - c_min;
+        const int nColumns = std::ceil(std::sqrt(nCharacters));
+
+        std::map<unsigned char, img::Image> sdfMap;
+        gml::Vec2i atlasSize;
+        gml::Vec2i rowSize;
+        int column = 0;
+        // traverse characters and append them to the atlas grid from left to right and top to bottom (i.e. row-major)
+        for (unsigned char c = c_min; c < c_max; c++)
+        {
+            auto bitmap = getBitmap(face, c);
+            auto sdf = generateSdf(bitmap, spread * scaleFactor);
+            sdfMap[c] = downscale(sdf, gml::Vec2i(sdf.getWidth() / scaleFactor,
+                                                  sdf.getHeight() / scaleFactor));
+
+            rowSize.x() += sdfMap[c].getWidth() + 2 * padding;
+            rowSize.y() = std::max(rowSize.y(), sdfMap[c].getHeight() + 2 * padding);
+
+            column++;
+            // switch to new row
+            if (column > nColumns)
+            {
+                atlasSize.x() = std::max(atlasSize.x(), rowSize.x());
+                atlasSize.y() += rowSize.y();
+                rowSize = gml::Vec2i();
+                column = 0;
+            }
+            std::cout << c << std::endl;
+        }
+        // add the last row if it hasn't been added inside the loop
+        if (column > 0)
+        {
+            atlasSize.x() = std::max(atlasSize.x(), rowSize.x());
+            atlasSize.y() += rowSize.y();
+        }
+
+        // unbind the frame buffers used for downscaling the sdf
+        glContext->getRenderer()->setDefaultRenderTarget();
+
+        // we start with a black image and consecutively upload glyphs
+        std::vector<unsigned char> emptyImage(atlasSize.x() * atlasSize.y(), 0);
+        std::unique_ptr<gl::ITexture2D> textureAtlas = glContext->getTextureCreator()->createTexture2D(
+                atlasSize.x(), atlasSize.y(), gl::ImageFormat::R, emptyImage);
+
+        std::map<unsigned char, Character> characters;
+        GlyphMetrics maxGlyph;
+        gml::Vec2i offset;
+        rowSize = gml::Vec2i();
+        column = 0;
+        // traverse characters again and use same packing algorithm as above to get correct texture coordinates
+        for (unsigned char c = c_min; c < c_max; c++)
+        {
+            img::Image &sdf = sdfMap[c];
+
+            // compute glyph metrics
+            characters[c] = Character{
+                .glyph = getGlyphMetricsAndUpdateMax(face, c, maxGlyph),
+                .texCoords = getRelativeTextureMetrics(sdf, offset + gml::Vec2i(padding), atlasSize) // TODO: glyphs are still cut-off
+            };
+
+            // add sdf to texture atlas
+            auto subArea = utils::Area(offset.x() + padding, offset.y() + padding,
+                                       sdf.getWidth(), sdf.getHeight());
+            textureAtlas->setSubImage(subArea, {sdf.data(), sdf.getSize()});
+
+            // advance offsets
+            offset += gml::Vec2i(sdf.getWidth() + 2 * padding, 0);
+            rowSize.y() = std::max(rowSize.y(), sdf.getHeight() + 2 * padding);
+
+            column++;
+            // switch to new row
+            if (column > nColumns)
+            {
+                offset = gml::Vec2i(0, offset.y() + rowSize.y());
+                rowSize = gml::Vec2i();
+                column = 0;
+            }
+        }
+
+        auto atlasImageData = textureAtlas->getImage();
+        img::Image atlasImage(textureAtlas->getWidth(), textureAtlas->getHeight(), 1, atlasImageData);
+        writeFontFile(filenameOutput, face->units_per_EM, c_min, c_max, atlasImage, maxGlyph, characters);
+#if 1
+        {
+            platform::desktop::FileReader fileReader;
+            auto file = fileReader.openBinaryFile(R"(C:\Users\Niklas\Downloads\sdf.bmp)",
+                                                  platform::IFile::AccessMode::WRITE);
+            img::writeToFile(*file, atlasImage);
+        }
+#endif
+    }
+
+    img::Image FontConverter::getBitmap(const FT_Face &face, unsigned char c)
+    {
+        FT_GlyphSlot glyph = ft_loader.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::MONOCHROME_BITMAP);
+        FT_Bitmap &bitmap = glyph->bitmap;
+
+        std::vector<unsigned char> imageData = unpackBitmap(bitmap.buffer, bitmap.rows, bitmap.width, bitmap.pitch);
+        return {(int) bitmap.width, (int) bitmap.rows, 1, imageData};
+    }
+
+    GlyphMetrics FontConverter::getGlyphMetricsAndUpdateMax(const FT_Face &face, unsigned char c,
+                                                            GlyphMetrics &maxGlyph)
+    {
+        FT_GlyphSlot glyph = ft_loader.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::UNSCALED);
+
+        GlyphMetrics metrics{
+                .size = gml::Vec2f((float) glyph->metrics.width,
+                                   (float) glyph->metrics.height),
+                .bearing = gml::Vec2f((float) glyph->metrics.horiBearingX,
+                                      (float) glyph->metrics.horiBearingY),
+                .advance = (float) glyph->metrics.horiAdvance
+        };
+
+        maxGlyph.size.x() = std::max(maxGlyph.size.x(), metrics.size.x());
+        maxGlyph.size.y() = std::max(maxGlyph.size.y(), metrics.size.y());
+        maxGlyph.bearing.x() = std::max(maxGlyph.bearing.x(), metrics.bearing.x());
+        maxGlyph.bearing.y() = std::max(maxGlyph.bearing.y(), metrics.bearing.y());
+        maxGlyph.advance = std::max(maxGlyph.advance, metrics.advance);
+
+        return metrics;
+    }
+
+    TexMetrics
+    FontConverter::getRelativeTextureMetrics(const img::Image &characterBitmap, gml::Vec2i offset, gml::Vec2i atlasSize)
+    {
+        TexMetrics metrics;
+        metrics.left = (float) (offset.x()) / (float) atlasSize.x();
+        metrics.right = (float) (offset.x() + characterBitmap.getWidth()) / (float) atlasSize.x();
+        metrics.top = (float) (offset.y()) / (float) atlasSize.y();
+        metrics.bottom = (float) (offset.y() + characterBitmap.getHeight()) / (float) atlasSize.y();
+        return metrics;
+    }
+
+    img::Image FontConverter::generateSdf(const img::Image &bitmap, const int spread)
+    {
+        // Padding around the input bitmap must be at least equal to spread, so we don't cut off edges and corners.
+        // We add a small padding around the sdf to reduce interference when sampling the atlas for text rendering.
+        const int bitmapPadding = spread;
+        const gml::Vec2i sdfSize(bitmap.getWidth() + 2 * bitmapPadding, bitmap.getHeight() + 2 * bitmapPadding);
+        img::Image sdf(sdfSize.x(), sdfSize.y(), 1);
+
+        // squared distance is sufficient for comparisons
+        const double maxDistanceSqr = spread * spread;
+        const double maxDistance = spread;
+        // iterate through pixels
+        gml::Vec2i p;
+        for (p.y() = 0; p.y() < sdfSize.y(); p.y()++)
+        {
+            for (p.x() = 0; p.x() < sdfSize.x(); p.x()++)
+            {
+                const unsigned char value = getPaddedValue(bitmap, p.y(), p.x(), bitmapPadding);
+
+                // The search area must at least encompass a circle around the pixel with a radius of 'spread'.
+                // We use a rectangle around this circle for simplicity. Pixels within this search area but outside
+                // the circle (i.e. the corners) will have an actual distance larger than the max distance (i.e. the
+                // radius), and so will be assigned the max distance in the end.
+                const gml::Vec2i searchAreaStart(std::max(0, p.x() - spread),
+                                                 std::max(0, p.y() - spread));
+                const gml::Vec2i searchAreaEnd(std::min(sdfSize.x(), p.x() + spread),
+                                               std::min(sdfSize.y(), p.y() + spread));
+
+                // iterate through search area around pixel, tracking the minimal distance to an opposite color pixel
+                auto minDistanceSqr = maxDistanceSqr;
+                gml::Vec2i neighbour;
+                for (neighbour.y() = searchAreaStart.y(); neighbour.y() < searchAreaEnd.y(); neighbour.y()++)
+                {
+                    for (neighbour.x() = searchAreaStart.x(); neighbour.x() < searchAreaEnd.x(); neighbour.x()++)
+                    {
+                        // find pixel with the opposite value
+                        const unsigned char neighbourValue = getPaddedValue(bitmap, neighbour.y(), neighbour.x(),
+                                                                            bitmapPadding);
+                        if (neighbourValue == value)
+                        {
+                            continue;
+                        }
+
+                        // squared distance is sufficient for comparisons
+                        const double distanceSqr = gml::sqrLength(neighbour - p);
+                        if (distanceSqr < minDistanceSqr)
+                        {
+                            minDistanceSqr = distanceSqr;
+                        }
+                    }
+                }
+
+                // use actual distance for the normalization instead of squared for a smoother output range
+                double minDistance = std::sqrt(minDistanceSqr);
+                // outer pixels get negative distances, inner pixels get positive distances, so that the edge is at zero
+                if (value == 0)
+                {
+                    minDistance *= -1;
+                }
+                sdf(p.y(), p.x(), 0) = (unsigned char) gml::normalize(minDistance,
+                                                                      -maxDistance, maxDistance,
+                                                                      0, 255);
+            }
+        }
+
+        return sdf;
+    }
+
+    unsigned char FontConverter::getPaddedValue(const img::Image &bitmap, const int y, const int x, const int padding)
+    {
+        if (y < padding || x < padding || y > bitmap.getHeight() - 1 + padding || x > bitmap.getWidth() - 1 + padding)
+            return 0; // we pad with black pixels
+        else
+            return bitmap(y - padding, x - padding, 0);
+    }
+
+    img::Image FontConverter::downscale(const img::Image &image, gml::Vec2i targetResolution)
+    {
+        // load image into texture
+        std::unique_ptr<gl::ITexture2D> texture = glContext->getTextureCreator()
+                ->createTexture2D(image.getWidth(), image.getHeight(), gl::ImageFormat::R,
+                                  {image.data(), image.data() + image.getSize()});
+        texture->configTextureWrapper(gl::TextureWrapper::CLAMP_TO_BORDER, gl::TextureWrapper::CLAMP_TO_BORDER);
+        texture->configTextureFilter(gl::TextureFilter::LINEAR, gl::TextureFilter::LINEAR);
+
+        // render texture to frame buffer of the target resolution and let the GPU handle the down-sampling
+        auto frame = glContext->getFrameCreator()
+                ->createFrame(targetResolution.x(), targetResolution.y(), gl::ImageFormat::R);
+        auto renderer = glContext->getRenderer();
+        renderer->setRenderTarget(*frame);
+        renderer->setViewport(0, 0, targetResolution.x(), targetResolution.y());
+        renderer->draw(*texture); // draws the texture on a quad that fills the viewport
+
+        // download image data from GPU
+        auto scaledTexture = frame->getTexture();
+        auto scaledImageData = scaledTexture->getImage();
+        return {
+                scaledTexture->getWidth(),
+                scaledTexture->getHeight(),
+                1,
+                scaledImageData
+        };
+    }
+
+    void
+    FontConverter::writeFontFile(const std::string &filename, int unitsPerEM, unsigned char c_min, unsigned char c_max,
+                                 const img::Image &atlas, GlyphMetrics maxGlyph,
+                                 const std::map<unsigned char, Character> &characters)
+    {
+        FontFile fontFile;
+
+        fontFile.fontInfo.encoding = 1;
+        fontFile.fontInfo.unitsPerEM = unitsPerEM;
+        fontFile.fontInfo.nChars = c_max - c_min;
+
+        fontFile.sdfInfo.width = (uint32_t) atlas.getWidth();
+        fontFile.sdfInfo.height = (uint32_t) atlas.getHeight();
+        fontFile.sdfInfo.channels = (uint32_t) atlas.getDepth();
+
+        fontFile.maxGlyph.width = (uint32_t) maxGlyph.size.x();
+        fontFile.maxGlyph.height = (uint32_t) maxGlyph.size.y();
+        fontFile.maxGlyph.xBearing = (int32_t) maxGlyph.bearing.x();
+        fontFile.maxGlyph.yBearing = (int32_t) maxGlyph.bearing.y();
+        fontFile.maxGlyph.advance = (uint32_t) maxGlyph.advance;
+
+        for (unsigned char c = c_min; c < c_max; ++c)
+        {
+            // TODO: whats up with the data types?
+            Glyph glyph{
+                    .id = c,
+                    .width = (uint32_t) characters.at(c).glyph.size.x(),
+                    .height = (uint32_t) characters.at(c).glyph.size.y(),
+                    .xBearing = (int32_t) characters.at(c).glyph.bearing.x(),
+                    .yBearing = (int32_t) characters.at(c).glyph.bearing.y(),
+                    .advance = (uint32_t) characters.at(c).glyph.advance,
+
+                    .texCoordLeft = characters.at(c).texCoords.left,
+                    .texCoordRight = characters.at(c).texCoords.right,
+                    .texCoordTop = characters.at(c).texCoords.top,
+                    .texCoordBottom = characters.at(c).texCoords.bottom
+            };
+            fontFile.glyphs.push_back(glyph);
+        }
+
+        fontFile.sdf = std::vector<unsigned char>(atlas.data(), atlas.data() + atlas.getSize());
+
+        fontFile.fileHeader.identifier = 0x464f4e54;
+        fontFile.fileHeader.fSize = sizeof(fontFile);
+        fontFile.fileHeader.glyphOffset = sizeof(FileHeader) + sizeof(FontInfo) + sizeof(SdfInfo) + sizeof(MaxGlyph);
+        fontFile.fileHeader.imgOffset = sizeof(FileHeader) + sizeof(FontInfo) + sizeof(SdfInfo) + sizeof(MaxGlyph) +
+                                        sizeof(Glyph) * fontFile.glyphs.size();
 
 
-    img::Image FontConverter::generateTextureAtlas(FT_Face face, int padding)
-	{
-		gml::Vec2<int> size = calcTextureSize(face, padding);
-		clampTo4(size);
+        std::ofstream file(filename, std::ios::binary);
+        file.seekp(0, std::ios::beg);
+        file.write((char *) &fontFile.fileHeader, sizeof(fontFile.fileHeader));
+        file.write((char *) &fontFile.fontInfo, sizeof(fontFile.fontInfo));
+        file.write((char *) &fontFile.sdfInfo, sizeof(fontFile.sdfInfo));
+        file.write((char *) &fontFile.maxGlyph, sizeof(fontFile.maxGlyph));
+        file.write((char *) &fontFile.glyphs[0], sizeof(Glyph) * fontFile.glyphs.size());
+        file.write((char *) &fontFile.sdf[0], sizeof(uint8_t) * fontFile.sdf.size());
+    }
 
-		std::vector<unsigned char> emptyImage(size.x() * size.y(), 0);
-        std::unique_ptr<gl::ITexture2D> tempTexture = textureCreator->createTexture2D(size.x(), size.y(), gl::ImageFormat::R, emptyImage);
+    unsigned char FontConverter::rightGetBit(unsigned char c, unsigned int n)
+    {
+        return ((c << n) & 128) >> 7;
+    }
 
-		gml::Vec2<int> tex_offset(0, 0);
-		for (unsigned char c = convertMetrics.c_min; c <= convertMetrics.c_max; ++c)
-		{
-			// Load character glyph 
-			FT_GlyphSlot glyph = ft_loader.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::MONO);
-			FT_Bitmap & bitmap = glyph->bitmap;
+    std::vector<unsigned char>
+    FontConverter::unpackBitmap(unsigned char *data, unsigned int rows, unsigned int width, unsigned int pitch)
+    {
+        std::vector<unsigned char> image;
+        unsigned int bit_pointer = 0;
 
-			// Extract Bitmap Metrics
-			if (bitmap.buffer != nullptr) {
-				std::vector<unsigned char> image;
-				img::unpackBitmap(bitmap.buffer, image, bitmap.rows, bitmap.width, bitmap.pitch);
-				img::flip(image, bitmap.rows, bitmap.width, 1);
-                auto subArea = utils::Area(tex_offset.x() + padding,
-                                           tempTexture->getHeight() - (bitmap.rows + padding),
-                                           bitmap.width,
-                                           bitmap.rows);
-				tempTexture->setSubImage(subArea,image);
-			}
-			// Advance texture offset
-			tex_offset.x() += bitmap.width + (padding * 2);
-		}
+        for (unsigned int i = 0; i < rows; i++)
+        {
+            unsigned char *row = &data[i * pitch];
 
-        auto data = tempTexture->getImage();
-        return { size.x(), size.y(), 1, data };
-	}
+            while (bit_pointer < width)
+            {
+                unsigned char v;
 
-	void FontConverter::uploadGlyphBitmaps(FT_Face face, gl::ITexture2D & texture, int padding)
-	{
-		gml::Vec2<int> tex_offset(0, 0);
-		for (unsigned char c = convertMetrics.c_min; c <= convertMetrics.c_max; ++c)
-		{
-			// Load character glyph 
-			FT_GlyphSlot glyph = ft_loader.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::MONO);
-			FT_Bitmap & bitmap = glyph->bitmap;
+                if (rightGetBit(row[bit_pointer / 8], bit_pointer % 8) == 1)
+                {
+                    v = 255;
+                } else if (rightGetBit(row[bit_pointer / 8], bit_pointer % 8) == 0)
+                {
+                    v = 0;
+                }
+                image.push_back(v);
 
-			// Extract Bitmap Metrics
-			if (bitmap.buffer != nullptr) {
-				std::vector<unsigned char> image;
-				img::unpackBitmap(bitmap.buffer, image, bitmap.rows, bitmap.width, bitmap.pitch);
-				img::flip(image, bitmap.rows, bitmap.width, 1);
-                auto subArea = utils::Area(tex_offset.x() + padding,
-                                           texture.getHeight() - (bitmap.rows + padding),
-                                           bitmap.width,
-                                           bitmap.rows);
-				texture.setSubImage(subArea, image);
-			}
-			// Advance texture offset
-			tex_offset.x() += bitmap.width + (padding * 2);
-		}
-	}
-	void FontConverter::generateSdfTexMetrics(FT_Face face, std::map<unsigned char, TexMetrics> & metrics, int padding)
-	{
-		gml::Vec2<int> tex_offset(0, 0);
-		for (unsigned char c = convertMetrics.c_min; c <= convertMetrics.c_max; ++c)
-		{
-			metrics[c] = TexMetrics();
-			TexMetrics & coords = metrics[c];
-
-			// load absolute positions
-			loadTextureMetrics(face, c, coords, tex_offset, padding);
-
-			// advance texture offset
-			tex_offset.x() += face->glyph->bitmap.width + (padding * 2);
-		}
-	}
-
-    img::Image FontConverter::generateSDF(FT_Face face, img::Image & input, int loadPadding, int resizeFactor)
-	{
-		// generate glyph texture metrics
-		std::map<unsigned char, TexMetrics> metrics;
-		generateSdfTexMetrics(face, metrics, loadPadding);
-
-		// Generate SDF Image
-		auto output = genDistanceFieldPerGlyph(input, metrics);
-
-		// Convert SDF-Image to texture and downscale through mipmaps
-        std::vector<unsigned char> tempData(output.data(), output.data() + output.getSize());
-		std::unique_ptr<gl::ITexture2D> sdf_texture = textureCreator->createTexture2D(input.getWidth(), input.getHeight(), gl::ImageFormat::R, tempData);
-		sdf_texture->configTextureWrapper(gl::TextureWrapper::CLAMP_TO_BORDER, gl::TextureWrapper::CLAMP_TO_BORDER);
-		sdf_texture->configTextureFilter(gl::MipmapOption::LINEAR_LINEAR, gl::TextureFilter::NEAREST);
-
-		// resize
-        sdf_texture->generateMipmaps();
-		auto outData = sdf_texture->getMipmapImage((int)std::log2(resizeFactor));
-        return { input.getWidth() / resizeFactor, input.getHeight() / resizeFactor, 1, outData };
-	}
-
-	/*****************************************
-	**			Font  Converter 			**
-	*****************************************/
-
-	void FontConverter::loadGlyphMetrics(FT_Face face, unsigned char c, GlyphMetrics & metrics)
-	{
-		FT_GlyphSlot glyph = ft_loader.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::UNSCALED);
-		metrics.size.x() = (float)glyph->metrics.width;
-		metrics.size.y() = (float)glyph->metrics.height;
-		metrics.bearing.x() = (float)glyph->metrics.horiBearingX;
-		metrics.bearing.y() = (float)glyph->metrics.horiBearingY;
-		metrics.advance = (float)glyph->metrics.horiAdvance;
-	}
-	void FontConverter::loadTextureMetrics(FT_Face face, unsigned char c, TexMetrics & metrics, gml::Vec2<int> offset, int padding)
-	{
-		FT_GlyphSlot glyph = ft_loader.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::MONO);
-		metrics.left = (float)offset.x();
-		metrics.right = (float)(offset.x() + (int)glyph->bitmap.width + (padding * 2));
-		metrics.top = (float)offset.y();
-		metrics.bottom = (float)(offset.y() + (int)glyph->bitmap.rows + (padding * 2));
-	}
-
-	gml::Vec2<int> FontConverter::calcTextureSize(FT_Face face, int padding)
-	{
-		gml::Vec2<int> size;
-		for (unsigned char c = convertMetrics.c_min; c <= convertMetrics.c_max; ++c)
-		{
-			FT_GlyphSlot glyph = ft_loader.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::MONO);
-			int width = (int)glyph->bitmap.width + padding * 2;
-			int height = (int)glyph->bitmap.rows + padding * 2;
-			size.x() += width;
-			size.y() = std::max(size.y(), height);
-		}
-		return size;
-	}
-	void FontConverter::clampTo4(gml::Vec2<int> & size)
-	{
-		while (size.x() % 4 != 0)
-		{
-			++size.x();
-		}
-		while (size.y() % 4 != 0)
-		{
-			++size.y();
-		}
-	}
-	
-	void FontConverter::generateCharacters(charactermap & characters)
-	{
-		for (unsigned char c = convertMetrics.c_min; c <= convertMetrics.c_max; ++c)
-		{
-			characters[c] = Character();
-		}
-	}
-
-	void FontConverter::generateGlyphMetrics(FT_Face face, charactermap & characters)
-	{
-		for (unsigned char c = convertMetrics.c_min; c <= convertMetrics.c_max; ++c)
-		{
-			Character & character = characters[c];
-
-			// Load Metrics into Character
-			loadGlyphMetrics(face, c, character.glyph);
-		}
-	}
-	void FontConverter::generateTexMetrics(FT_Face face, charactermap & characters, int padding)
-	{
-		gml::Vec2<int> total_size = calcTextureSize(face, padding);
-		clampTo4(total_size);
-
-		TexMetrics tempTexMetrics;
-		gml::Vec2<int> tex_offset(0, 0);
-		for (unsigned char c = convertMetrics.c_min; c <= convertMetrics.c_max; ++c)
-		{
-			Character & character = characters[c];
-
-			// load absolute positions
-			loadTextureMetrics(face, c, tempTexMetrics, tex_offset, padding);
-
-			// convert to relative positions
-			character.texCoords.left = tempTexMetrics.left / (float)total_size.x();
-			character.texCoords.right = tempTexMetrics.right / (float)total_size.x();
-			character.texCoords.top	= 1 - tempTexMetrics.top / (float)total_size.y();
-			character.texCoords.bottom = 1 - tempTexMetrics.bottom / (float)total_size.y();
-
-			// advance texture offset
-			tex_offset.x() += face->glyph->bitmap.width + (padding * 2);
-		}
-	}
-	void FontConverter::generateMaxGlyph(const charactermap & characters, GlyphMetrics & maxGlyph)
-	{
-		for (unsigned char c = convertMetrics.c_min; c <= convertMetrics.c_max; ++c)
-		{
-			const Character & character = characters.at(c);
-
-			// Update MaxGlyphMetrics
-			maxGlyph.size.x() = std::max(maxGlyph.size.x(), character.glyph.size.x());
-			maxGlyph.size.y() = std::max(maxGlyph.size.y(), character.glyph.size.y());
-			maxGlyph.bearing.x() = std::max(maxGlyph.bearing.x(), character.glyph.bearing.x());
-			maxGlyph.bearing.y() = std::max(maxGlyph.bearing.y(), character.glyph.bearing.y());
-			maxGlyph.advance = std::max(maxGlyph.advance, character.glyph.advance);
-		}
-
-	}
-
-	void FontConverter::writeFontfile(std::string filename)
-	{
-		FontFile fontfile;
-
-		fontfile.fontInfo.encoding = 1;
-		fontfile.fontInfo.emSize = convertMetrics.EM_size;
-		fontfile.fontInfo.nChars = convertMetrics.c_max - convertMetrics.c_min + 1;
-
-		fontfile.sdfInfo.width = (uint32_t)convertMetrics.sdfImage.getWidth();
-		fontfile.sdfInfo.height = (uint32_t)convertMetrics.sdfImage.getHeight();
-		fontfile.sdfInfo.channels = (uint32_t)convertMetrics.sdfImage.getDepth();
-
-		fontfile.maxGlyph.width = (uint32_t)convertMetrics.maxGlyph.size.x();
-		fontfile.maxGlyph.height = (uint32_t)convertMetrics.maxGlyph.size.y();
-		fontfile.maxGlyph.xBearing = (int32_t)convertMetrics.maxGlyph.bearing.x();
-		fontfile.maxGlyph.yBearing = (int32_t)convertMetrics.maxGlyph.bearing.y();
-		fontfile.maxGlyph.advance = (uint32_t)convertMetrics.maxGlyph.advance;
-
-		for (int i = convertMetrics.c_min; i <= convertMetrics.c_max; ++i)
-		{
-			Glyph glyph;
-			glyph.id = i;
-
-			glyph.width = (uint32_t)convertMetrics.characters[i].glyph.size.x();
-			glyph.height = (uint32_t)convertMetrics.characters[i].glyph.size.y();
-			glyph.xBearing = (int32_t)convertMetrics.characters[i].glyph.bearing.x();
-			glyph.yBearing = (int32_t)convertMetrics.characters[i].glyph.bearing.y();
-			glyph.advance = (uint32_t)convertMetrics.characters[i].glyph.advance;
-
-			glyph.texCoordLeft = convertMetrics.characters[i].texCoords.left;
-			glyph.texCoordRight = convertMetrics.characters[i].texCoords.right;
-			glyph.texCoordTop = convertMetrics.characters[i].texCoords.top;
-			glyph.texCoordBottom = convertMetrics.characters[i].texCoords.bottom;
-
-			fontfile.glyphs.push_back(glyph);
-		}
-
-		fontfile.sdf = std::vector<unsigned char>(convertMetrics.sdfImage.data(), convertMetrics.sdfImage.data() +
-                convertMetrics.sdfImage.getSize());
-
-		fontfile.fileHeader.identifier = 0x464f4e54;
-		fontfile.fileHeader.fSize = sizeof(fontfile);
-		fontfile.fileHeader.glyphOffset = sizeof(FileHeader) + sizeof(FontInfo) + sizeof(SdfInfo) + sizeof(MaxGlyph);
-		fontfile.fileHeader.imgOffset = sizeof(FileHeader) + sizeof(FontInfo) + sizeof(SdfInfo) + sizeof(MaxGlyph) + sizeof(Glyph) * fontfile.glyphs.size();
-
-
-		std::ofstream file(filename, std::ios::binary);
-		file.seekp(0, std::ios::beg);
-		file.write((char*)&fontfile.fileHeader, sizeof(fontfile.fileHeader));
-		file.write((char*)&fontfile.fontInfo, sizeof(fontfile.fontInfo));
-		file.write((char*)&fontfile.sdfInfo, sizeof(fontfile.sdfInfo));
-		file.write((char*)&fontfile.maxGlyph, sizeof(fontfile.maxGlyph));
-		file.write((char*)&fontfile.glyphs[0], sizeof(Glyph) * fontfile.glyphs.size());
-		file.write((char*)&fontfile.sdf[0], sizeof(uint8_t) * fontfile.sdf.size());
-	}
-
-	void FontConverter::convertFont(std::string filename_TTF, std::string filename_FONT, ENCODING encoding)
-	{
-		if (encoding == ENCODING::ASCII) {
-			convertMetrics.c_min = 32;
-			convertMetrics.c_max = 126;
-		}
-
-		//convertMetrics.c_min = 65;
-		//convertMetrics.c_max = 66;
-		int padding = 16;
-		int loadSize = 256; // TODO: why is this unused?
-		int resizeFactor = 4;
-
-		ft_loader.initialize();
-		FT_Face face = ft_loader.loadFace(filename_TTF);
-
-		generateCharacters(convertMetrics.characters);
-
-		convertMetrics.EM_size = face->units_per_EM;
-		generateGlyphMetrics(face, convertMetrics.characters);
-		generateMaxGlyph(convertMetrics.characters, convertMetrics.maxGlyph);
-
-		FT_Set_Pixel_Sizes(face, 0, loadSize);
-		generateTexMetrics(face, convertMetrics.characters, padding);
-
-        convertMetrics.glyphImage = generateTextureAtlas(face, padding);
-        convertMetrics.sdfImage = generateSDF(face, convertMetrics.glyphImage, padding, resizeFactor);
-
-		writeFontfile(filename_FONT);
-	}
+                bit_pointer++;
+            }
+            bit_pointer = 0;
+        }
+        return image;
+    }
 }

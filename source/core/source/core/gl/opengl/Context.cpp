@@ -13,6 +13,7 @@
 #include "ShaderCreator.h"
 #include "TextureCreator.h"
 
+// TODO: we need to set the gl state to unbound when destroying resources
 namespace opengl
 {
 	void APIENTRY onGlError(
@@ -42,9 +43,6 @@ namespace opengl
 
 		glState.renderTargetWidth = windowLock->getPixelWidth();
 		glState.renderTargetHeight = windowLock->getPixelHeight();
-
-		glState.viewportWidth = glState.renderTargetWidth;
-		glState.viewportHeight = glState.renderTargetHeight;
 
 		makeCurrent();
 	}
@@ -268,16 +266,6 @@ namespace opengl
 			glPolygonMode(GL_FRONT_AND_BACK, mode);
 			glState.polygonMode = mode;
 		}
-	}
-
-	int Context::getRenderTargetWidth() const
-	{
-		return glState.renderTargetWidth;
-	}
-
-	int Context::getRenderTargetHeight() const
-	{
-		return glState.renderTargetHeight;
 	}
 }// namespace gl3
 

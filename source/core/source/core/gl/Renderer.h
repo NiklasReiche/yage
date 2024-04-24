@@ -24,12 +24,14 @@ namespace gl
 		virtual void setClearColor(uint32_t color) = 0;
 
 		virtual void setRenderTarget(const IFrame& target) = 0;
+        virtual void setDefaultRenderTarget() = 0;
 		
 		virtual void setViewport(int x, int y, int width, int height) = 0;
 		virtual void setViewport(Viewport viewport) = 0;
 
 		virtual void draw(const IDrawable& drawable) = 0;
 		virtual void draw(const IFrame& buffer) = 0;
+        virtual void draw(const ITexture2D& texture) = 0;
 
 		virtual void useShader(const IShader& shader) = 0;
 

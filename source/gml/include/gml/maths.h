@@ -40,4 +40,9 @@ namespace gml
 	{
 		return rad * (180.0f / std::numbers::pi_v<float>);
 	}
+
+    inline double normalize(double val, double min_in, double max_in, double min_out, double max_out)
+    {
+        return (((val - min_in) / (max_in - min_in)) * (max_out - min_out)) + min_out;
+    }
 }

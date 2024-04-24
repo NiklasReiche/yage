@@ -4,7 +4,7 @@
 #include <vector>
 #include <algorithm>
 
-#include <core/gl/Graphics.h>
+#include <core/gl/graphics.h>
 #include <image\image.h>
 
 #include "../font.h"
@@ -26,28 +26,30 @@ namespace font
 		int height = 0;
 		std::vector<Pixel> data;
 
-		Grid() {}
+		Grid() = default;
 		Grid(int width, int height);
-		Grid(img::Image image);
+		explicit Grid(img::Image image);
 
 		void setPixel(Pixel pixel);
+
 		Pixel getPixel(int x, int y);
 
         img::Image toImage();
 	};
 
 	bool operator==(const Pixel & left, const Pixel & right);
+
 	bool operator!=(const Pixel & left, const Pixel & right);
 
 	float dist(Pixel left, Pixel right);
-	unsigned char getInverse(Pixel pixel);
 
+	unsigned char getInverse(Pixel pixel);
 
 	template <typename T>
 	T clamp(T value, T lo, T hi);
+
 	template <typename T, typename T2>
 	T2 remap(T o_value, T o_lo, T o_hi, T2 n_lo, T2 n_hi);
-
 
 	void distanceFunction(Grid & grid_in, Grid & grid_out, int x_min, int x_max, int y_min, int y_max, int searchRange = 16, float clampRange = 20.0f);
 

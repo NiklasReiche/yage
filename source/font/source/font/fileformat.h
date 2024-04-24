@@ -16,7 +16,7 @@ namespace font
 	struct FontInfo
 	{
 		uint32_t encoding;
-		uint32_t emSize;
+		uint32_t unitsPerEM;
 		uint32_t nChars;
 	};
 

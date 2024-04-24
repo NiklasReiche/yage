@@ -98,8 +98,7 @@ namespace opengl
 	void Renderer::setViewport(const Viewport viewport)
 	{
 		auto ptr = lockContextPtr();
-		ptr->setViewport(viewport.x, ptr->getRenderTargetHeight() - (viewport.y + viewport.height), viewport.width,
-		                 viewport.height);
+		ptr->setViewport(viewport.x, viewport.y, viewport.width,viewport.height);
 	}
 
 	void Renderer::clear()
@@ -119,6 +118,11 @@ namespace opengl
 			GL_FRAMEBUFFER,
 			static_cast<const Framebuffer&>(target).FBO);
 	}
+
+    void Renderer::setDefaultRenderTarget()
+    {
+        lockContextPtr()->bindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
 
 	void Renderer::draw(const gl::IDrawable& drawable)
 	{

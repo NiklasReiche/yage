@@ -7,8 +7,12 @@
 #include <core/gl/Texture2D.h>
 #include <memory>
 
+// TODO: add info about spread so that we can inflate text quads appropriately for tex coords
 namespace font
 {
+    /**
+     * Encodes positioning and size values for a single glyph.
+     */
 	struct GlyphMetrics
 	{
 		gml::Vec2<float> size;
@@ -16,6 +20,9 @@ namespace font
 		float advance = 0;
 	};
 
+    /**
+     * Encodes texture coordinates from a texture atlas for a single glyph (range: [0,1]x[0,1]).
+     */
 	struct TexMetrics
 	{
 		float top = 0;

@@ -9,9 +9,9 @@
 #include <fstream>
 
 #include <ft2build.h>
-#include FT_FREETYPE_H 
+#include FT_FREETYPE_H
 
-#include <core/gl/Graphics.h>
+#include <core/gl/graphics.h>
 
 #include "font/fileformat.h"
 #include "font/font.h"
@@ -21,87 +21,97 @@
 
 namespace font
 {
-	typedef std::map<unsigned char, Character> charactermap;
+    enum class FT_GLYPH_LOAD_FLAG : FT_Int32
+    {
+        MONOCHROME_BITMAP = FT_LOAD_RENDER | FT_LOAD_TARGET_MONO,
+        UNSCALED = FT_LOAD_NO_SCALE
+    };
 
-	enum class FT_GLYPH_LOAD_FLAG : FT_Int32
-	{
-		BITMAP = FT_LOAD_RENDER,
-		MONO = FT_LOAD_RENDER | FT_LOAD_TARGET_MONO,
-		UNSCALED = FT_LOAD_RENDER | FT_LOAD_NO_SCALE
-	};
-	enum class ENCODING
-	{
-		ASCII,
-		UTF8,
-		UTF16
-	};
+    class FT_Loader
+    {
+    public:
+        ~FT_Loader();
 
-	struct ConvertMetrics
-	{
-		unsigned char c_min;
-		unsigned char c_max;
+        /**
+         * Must be called before loading faces or glyphs.
+         */
+        void initialize();
 
-		int EM_size;
-		GlyphMetrics maxGlyph;
-		std::map<unsigned char, Character> characters;
+        FT_Face loadFace(const std::string &filepath);
 
-		img::Image glyphImage;
-		img::Image sdfImage;
-	};
+        FT_GlyphSlot loadGlyph(const FT_Face &face, unsigned char c, FT_GLYPH_LOAD_FLAG load_flag);
 
-	class FT_Loader
-	{
-	private:
-		FT_Library ft;
-		std::vector<FT_Face> faces;
-	public:
-		FT_Face loadFace(std::string filepath);
-		FT_GlyphSlot loadGlyph(FT_Face face, unsigned char c, FT_GLYPH_LOAD_FLAG load_flag);
+    private:
+        /**
+         * Handle for the freetype library
+         */
+        FT_Library ft;
 
-		~FT_Loader();
-		int initialize();
-		void free(FT_Library ft);
-		void free(FT_Face face);
-	};
+        /**
+         * Tracks all faces loaded through freetype, so that we can free them in the destructor.
+         */
+        std::vector<FT_Face> faces;
+    };
 
-	class FontConverter
-	{
-	private:
-		FT_Loader ft_loader;
-		ConvertMetrics convertMetrics;
-        std::shared_ptr<gl::ITextureCreator> textureCreator;
-	
-		void loadGlyphMetrics(FT_Face face, unsigned char c, GlyphMetrics & metrics);
+    class FontConverter
+    {
+    public:
+        explicit FontConverter(const std::shared_ptr<gl::IContext> &glContext);
 
-		void loadTextureMetrics(FT_Face face, unsigned char c, TexMetrics & metrics, gml::Vec2<int> offset, int padding);
+        /**
+         * Converts a font from a .ttf file to an sdf font and writes the result to a .font file (internal format).
+         *
+         * @param filenameInput Path of the .ttf file containing the font to convert.
+         * @param filenameOutput Path to which the .font file should be written.
+         * @param loadResolution Size in pixels with which to read glyphs from the .ttf file. The larger this is, the higher quality the resulting sdf will be.
+         * @param spread Size in pixels (in the sdf resolution space) that the sdf extends from the glyph edges.
+         * @param padding Padding in pixels (in the sdf resolution space) added around sdf glyphs in the texture atlas.
+         * @param sdfResolution Size in pixels at which to down-sample the sdf glyphs. The smaller this is the smaller the resulting texture atlas will be.
+         */
+        void convert(const std::string &filenameInput, const std::string &filenameOutput, int loadResolution = 512,
+                     int spread = 4, int padding = 2, int sdfResolution = 64);
 
-		gml::Vec2<int> calcTextureSize(FT_Face face, int padding);
+    private:
+        FT_Loader ft_loader;
 
-		void clampTo4(gml::Vec2<int> & size);
+        std::shared_ptr<gl::IContext> glContext;
 
-		void generateCharacters(charactermap & characters);
+        GlyphMetrics getGlyphMetricsAndUpdateMax(const FT_Face &face, unsigned char c, GlyphMetrics &maxGlyph);
 
-		void generateGlyphMetrics(FT_Face face, charactermap & characters);
+        img::Image getBitmap(FT_Face const &face, unsigned char c);
 
-		void generateTexMetrics(FT_Face face, charactermap & characters, int padding);
+        static img::Image generateSdf(const img::Image &bitmap, int spread);
 
-		void generateMaxGlyph(const charactermap & characters, GlyphMetrics & maxGlyph);
+        /**
+         * Reads a color value from an non-padded input image using coordinates from a padded image space.
+         * @param bitmap input image without padding
+         * @param y vertical lookup coordinate in padded space
+         * @param x horizontal lookup coordinate in padded space
+         * @param padding padding in texture coordinate fractions around the input bitmap
+         * @return value taken from the input image or zero if the coordinates fall within the padded space
+         */
+        static unsigned char getPaddedValue(const img::Image &bitmap, int y, int x, int padding);
 
-		// SDF related
-        img::Image generateTextureAtlas(FT_Face face, int padding);
+        static TexMetrics
+        getRelativeTextureMetrics(const img::Image &characterBitmap, gml::Vec2i offset, gml::Vec2i atlasSize);
 
-		void uploadGlyphBitmaps(FT_Face face, gl::ITexture2D & texture, int padding);
+        img::Image downscale(const img::Image &image, gml::Vec2i targetResolution);
 
-		void generateSdfTexMetrics(FT_Face face, std::map<unsigned char, TexMetrics> & metrics, int padding);
+        static void writeFontFile(const std::string &filename, int unitsPerEM, unsigned char c_min, unsigned char c_max,
+                                  const img::Image &atlas,
+                                  GlyphMetrics maxGlyph, const std::map<unsigned char, Character> &characters);
 
-        img::Image generateSDF(FT_Face face, img::Image & input, int loadPadding, int resizeFactor);
+        static unsigned char rightGetBit(unsigned char c, unsigned int n);
 
-		// file writing
-		void writeFontfile(std::string filename);
-
-	public:
-		FontConverter(const std::shared_ptr<gl::ITextureCreator>& textureCreator);
-
-		void convertFont(std::string filename_TTF, std::string filename_FONT, ENCODING encoding = ENCODING::ASCII);
-	};
+        /**
+         * Unpacks a tightly packed bitmap image to a byte-map.
+         * @param data Data where 1 byte encodes 8 values.
+         * @param image unpacked output image
+         * @param rows input rows
+         * @param width input row width
+         * @param pitch
+         */
+        static std::vector<unsigned char>
+        unpackBitmap(unsigned char *data, unsigned int rows, unsigned int width, unsigned int pitch);
+    };
 }

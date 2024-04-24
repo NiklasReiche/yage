@@ -40,9 +40,6 @@ namespace opengl
 		void setPackAlignment(int value);
 		void setUnpackAlignment(int value);
 
-		int getRenderTargetWidth() const;
-		int getRenderTargetHeight() const;
-
 		void setViewport(GLint x, GLint y, GLsizei width, GLsizei height);
 		
 		void bindBuffer(GLenum target, GLuint buffer);
@@ -112,5 +109,5 @@ namespace opengl
 		std::shared_ptr<gl::IDrawableCreator> drawableCreator;
 		std::shared_ptr<gl::ITextureCreator> textureCreator;
 		std::shared_ptr<gl::IFrameCreator> frameCreator;
-	};
+    };
 }

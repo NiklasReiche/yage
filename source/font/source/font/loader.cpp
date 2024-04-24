@@ -50,10 +50,10 @@ namespace font
 		fontFile.sdf.resize(fontFile.sdfInfo.width * fontFile.sdfInfo.height * fontFile.sdfInfo.channels);
 		file.read((char*)&fontFile.sdf[0], sizeof(uint8_t) * fontFile.sdf.size());
 
-		gml::Vec2<float> scale = calcScale(ptSize, fontFile.fontInfo.emSize, dpi);
+		gml::Vec2<float> scale = calcScale(ptSize, fontFile.fontInfo.unitsPerEM, dpi);
 
 		std::unique_ptr<Font> font = std::make_unique<Font>();
-		font->metrics.emSize = fontFile.fontInfo.emSize;
+		font->metrics.emSize = fontFile.fontInfo.unitsPerEM;
 		font->metrics.ptSize = ptSize;
 
 		font->maxGlyph.size.x() = fontFile.maxGlyph.width * scale.x();

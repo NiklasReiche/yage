@@ -22,14 +22,14 @@ namespace font
 		Text(const std::shared_ptr<gl::IDrawableCreator>& drawableCreator,
 		     const std::string & text, 
 		     const std::shared_ptr<Font> & font,
-		     const gml::Vec2<float>& position = gml::Vec2<float>(0.0f), 
+		     const gml::Vec3<float>& position = gml::Vec3<float>(0.0f),
 		     unsigned int color = 0x000000FFu, 
 		     int size = 14);
 
 		[[nodiscard]]
 		gml::Vec2<float> getSize() const;
 		[[nodiscard]]
-		gml::Vec2<float> getPosition() const;
+		gml::Vec3<float> getPosition() const;
 		[[nodiscard]]
 		gml::Vec4<float> getColor() const;
 
@@ -48,19 +48,12 @@ namespace font
         std::unique_ptr<gl::IDrawable> drawable;
 		std::shared_ptr<Font> font;
 
-		gml::Vec2<float> position;
+		gml::Vec3<float> position;
 		gml::Vec2<float> size;
 		gml::Vec4<float> color;
 
 		std::string text;
 		int fontSize = 16;
-
-		int VERTEX_SIZE_COORDS = 12;
-		int VERTEX_SIZE_TEXCOORDS = 12;
-		int VERTEX_SIZE_COLORS = 24;
-		int vertexOffsetCoords = 0;
-		int vertexOffsetTexCoords = 0;
-		int vertexOffsetColors = 0;
 
 		void constructVertices(std::vector<float> & vertices, std::vector<unsigned int> &indices);
 
