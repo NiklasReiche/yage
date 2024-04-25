@@ -167,7 +167,7 @@ namespace gl
 		 */
 		virtual void generateMipmaps() = 0;
 
-        virtual void configTextureWrapper(TextureWrapper xOption, TextureWrapper yOption) = 0;
+        virtual void configTextureWrapper(TextureWrapper xOption, TextureWrapper yOption) = 0; //TODO: add parameter for border color
 
         virtual void configTextureFilter(TextureFilter minOption, TextureFilter magOption) = 0;
 

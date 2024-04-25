@@ -72,13 +72,11 @@ namespace font
                      int spread = 4, int padding = 2, int sdfResolution = 64);
 
     private:
-        FT_Loader ft_loader;
-
         std::shared_ptr<gl::IContext> glContext;
 
-        GlyphMetrics getGlyphMetricsAndUpdateMax(const FT_Face &face, unsigned char c, GlyphMetrics &maxGlyph);
+        static GlyphMetrics getGlyphMetricsAndUpdateMax(FT_Loader &ft, const FT_Face &face, unsigned char c, GlyphMetrics &maxGlyph);
 
-        img::Image getBitmap(FT_Face const &face, unsigned char c);
+        static img::Image getBitmap(FT_Loader &ft, FT_Face const &face, unsigned char c);
 
         static img::Image generateSdf(const img::Image &bitmap, int spread);
 

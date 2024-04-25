@@ -89,7 +89,7 @@ namespace font
         // traverse characters and append them to the atlas grid from left to right and top to bottom (i.e. row-major)
         for (unsigned char c = c_min; c < c_max; c++)
         {
-            auto bitmap = getBitmap(face, c);
+            auto bitmap = getBitmap(ft, face, c);
             auto sdf = generateSdf(bitmap, spread * scaleFactor);
             sdfMap[c] = downscale(sdf, gml::Vec2i(sdf.getWidth() / scaleFactor,
                                                   sdf.getHeight() / scaleFactor));
@@ -135,8 +135,8 @@ namespace font
 
             // compute glyph metrics
             characters[c] = Character{
-                .glyph = getGlyphMetricsAndUpdateMax(face, c, maxGlyph),
-                .texCoords = getRelativeTextureMetrics(sdf, offset + gml::Vec2i(padding), atlasSize) // TODO: glyphs are still cut-off
+                .glyph = getGlyphMetricsAndUpdateMax(ft, face, c, maxGlyph),
+                .texCoords = getRelativeTextureMetrics(sdf, offset + gml::Vec2i(padding), atlasSize)
             };
 
             // add sdf to texture atlas
@@ -171,19 +171,19 @@ namespace font
 #endif
     }
 
-    img::Image FontConverter::getBitmap(const FT_Face &face, unsigned char c)
+    img::Image FontConverter::getBitmap(FT_Loader &ft, const FT_Face &face, unsigned char c)
     {
-        FT_GlyphSlot glyph = ft_loader.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::MONOCHROME_BITMAP);
+        FT_GlyphSlot glyph = ft.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::MONOCHROME_BITMAP);
         FT_Bitmap &bitmap = glyph->bitmap;
 
         std::vector<unsigned char> imageData = unpackBitmap(bitmap.buffer, bitmap.rows, bitmap.width, bitmap.pitch);
         return {(int) bitmap.width, (int) bitmap.rows, 1, imageData};
     }
 
-    GlyphMetrics FontConverter::getGlyphMetricsAndUpdateMax(const FT_Face &face, unsigned char c,
+    GlyphMetrics FontConverter::getGlyphMetricsAndUpdateMax(FT_Loader &ft, const FT_Face &face, unsigned char c,
                                                             GlyphMetrics &maxGlyph)
     {
-        FT_GlyphSlot glyph = ft_loader.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::UNSCALED);
+        FT_GlyphSlot glyph = ft.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::UNSCALED);
 
         GlyphMetrics metrics{
                 .size = gml::Vec2f((float) glyph->metrics.width,
@@ -205,10 +205,12 @@ namespace font
     TexMetrics
     FontConverter::getRelativeTextureMetrics(const img::Image &characterBitmap, gml::Vec2i offset, gml::Vec2i atlasSize)
     {
+        // TODO: incorporate spread
         TexMetrics metrics;
-        metrics.left = (float) (offset.x()) / (float) atlasSize.x();
+        metrics.left = (float) offset.x() / (float) atlasSize.x();
+        metrics.top = (float) offset.y() / (float) atlasSize.y();
+        // range must be inclusive of width and height, since dividing by size samples the left edge of the pixel
         metrics.right = (float) (offset.x() + characterBitmap.getWidth()) / (float) atlasSize.x();
-        metrics.top = (float) (offset.y()) / (float) atlasSize.y();
         metrics.bottom = (float) (offset.y() + characterBitmap.getHeight()) / (float) atlasSize.y();
         return metrics;
     }

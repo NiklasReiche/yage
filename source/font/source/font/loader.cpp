@@ -4,6 +4,7 @@
 #include <core/platform/IFile.h>
 
 #include <utility>
+#include <iostream>
 
 namespace font
 {
@@ -74,10 +75,10 @@ namespace font
 			character.glyph.bearing.y() = fontFile.glyphs[i].yBearing * scale.y();
 			character.glyph.advance = fontFile.glyphs[i].advance * scale.x();
 
-			character.texCoords.left = fontFile.glyphs[i].texCoordLeft + 4.0f / fontFile.sdfInfo.width;
-			character.texCoords.right = fontFile.glyphs[i].texCoordRight -4.0f / fontFile.sdfInfo.width;
-			character.texCoords.top = fontFile.glyphs[i].texCoordTop - 4.0f / fontFile.sdfInfo.height;
-			character.texCoords.bottom = fontFile.glyphs[i].texCoordBottom + 4.0f / fontFile.sdfInfo.height;
+			character.texCoords.left = fontFile.glyphs[i].texCoordLeft;
+			character.texCoords.right = fontFile.glyphs[i].texCoordRight;
+			character.texCoords.top = fontFile.glyphs[i].texCoordTop;
+			character.texCoords.bottom = fontFile.glyphs[i].texCoordBottom;
 		}
 
 		font->textureAtlas = textureCreator->createTexture2D(fontFile.sdfInfo.width, fontFile.sdfInfo.height,
