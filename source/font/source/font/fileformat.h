@@ -23,6 +23,7 @@ namespace font
         float ySpreadInTexCoords;
 	};
 
+    // TODO: add information about padding, spread, input and target resolutions
 	struct SdfInfo
 	{
 		uint32_t width;

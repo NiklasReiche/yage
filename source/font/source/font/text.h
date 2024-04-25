@@ -20,14 +20,11 @@ namespace font
 		Text(const std::shared_ptr<gl::IDrawableCreator>& drawableCreator,
 		     const std::string & text, 
 		     const std::shared_ptr<Font> & font,
-		     const gml::Vec3<float>& position = gml::Vec3<float>(0.0f),
 		     unsigned int color = 0x000000FFu, 
 		     int size = 14); // TODO: param struct could make sense here
 
 		[[nodiscard]]
 		gml::Vec2<float> getSize() const;
-		[[nodiscard]]
-		gml::Vec3<float> getPosition() const;
 		[[nodiscard]]
 		gml::Vec4<float> getColor() const;
 
@@ -38,8 +35,8 @@ namespace font
 		[[nodiscard]]
 		std::string getString() const;
 		[[nodiscard]]
-		gml::Vec2f getMaxDimensions() const;
-		gml::Vec2f getOffset(unsigned int index);
+		gml::Vec2f getMaxDimensions() const; // TODO: this might be better suited as a method of the font
+		gml::Vec2f getOffset(unsigned int index); //TODO: is this needed?
 
 	private:
         const float SPREAD_KEEP_PERCENT = 0.05; // TODO: make this configurable
@@ -48,7 +45,6 @@ namespace font
         std::unique_ptr<gl::IDrawable> drawable;
 		std::shared_ptr<Font> font;
 
-		gml::Vec3<float> position;
 		gml::Vec2<float> size;
 		gml::Vec4<float> color;
 

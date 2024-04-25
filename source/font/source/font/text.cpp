@@ -2,34 +2,27 @@
 #include <core/gl/color.h>
 #include <array>
 #include <algorithm>
-#include <map>
 
 namespace font
 {
 	Text::Text(const std::shared_ptr<gl::IDrawableCreator>& drawableCreator,
 	           const std::string & text, 
 	           const std::shared_ptr<Font> & font,
-	           const gml::Vec3<float>& position,
 	           const unsigned int color, 
 	           const int size)
-		: drawableCreator(drawableCreator), font(font), position(position), color(gl::toVec4(color)), text(text), fontSize(size)
+		: drawableCreator(drawableCreator), font(font), color(gl::toVec4(color)), text(text), fontSize(size)
 	{
 		if (!text.empty()) {
 			std::vector<float> vertices;
             std::vector<unsigned int> indices;
 			constructVertices(vertices, indices);
-			drawable = drawableCreator->createDrawable(vertices, indices, std::vector<unsigned int> { 3, 2, 4 }, gl::VertexFormat::BATCHED);
+			drawable = drawableCreator->createDrawable(vertices, indices, std::vector<unsigned int> { 2, 2, 4 }, gl::VertexFormat::BATCHED);
 		}
 	}
 
 	gml::Vec2<float> Text::getSize() const
 	{
 		return size;
-	}
-	
-	gml::Vec3<float> Text::getPosition() const
-	{
-		return position;
 	}
 	
 	gml::Vec4<float> Text::getColor() const
@@ -57,9 +50,8 @@ namespace font
 	{
 		const float scale = static_cast<float>(fontSize) / static_cast<float>(font->metrics.ptSize);
 
-		float xPos = position.x();
-        float yPos = position.y();
-        const float zPos = position.z();
+		float xPos = 0;
+        float yPos = 0;
 
 		std::vector<float> coords;
         unsigned int index = 0;
@@ -68,7 +60,7 @@ namespace font
 		for (char i : text)
 		{
             if (i == '\n') {
-                xPos = position.x();
+                xPos = 0;
                 yPos += font->metrics.lineHeight * scale;
                 size.y() += font->metrics.lineHeight * scale;
                 continue;
@@ -86,11 +78,11 @@ namespace font
 			const float bottom = top + ch.glyph.size.y() * scale;
 
 			// Generate glyph quad for each character
-			std::array<float, 12> localCoords = {
-				left, top, zPos,
-				left, bottom, zPos,
-                right, bottom, zPos,
-				right, top, zPos,
+			std::array<float, 8> localCoords = {
+				left, top,
+				left, bottom,
+                right, bottom,
+				right, top,
 			};
 
 			// Append to global coords
@@ -107,8 +99,8 @@ namespace font
 			xPos += ch.glyph.advance * scale;
 
 			// Update text geometry
-			size.x() = std::max(size.x(), xPos - position.x());
-			size.y() = std::max(size.y(), yPos - position.y() + bottom - position.y());
+			size.x() = std::max(size.x(), xPos);
+			size.y() = std::max(size.y(), yPos + bottom);
 		}
 
 		// Append to global vertices
