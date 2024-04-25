@@ -8,6 +8,7 @@ namespace font
 	struct FileHeader
 	{
 		uint32_t identifier;
+        uint32_t version;
 		uint32_t fSize;
 		uint32_t glyphOffset;
 		uint32_t imgOffset;
@@ -15,7 +16,6 @@ namespace font
 
 	struct FontInfo
 	{
-		uint32_t encoding;
 		uint32_t unitsPerEM;
         uint32_t lineHeight;
 		uint32_t nChars;

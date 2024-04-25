@@ -332,7 +332,6 @@ namespace font
     {
         FontFile fontFile;
 
-        fontFile.fontInfo.encoding = 1;
         fontFile.fontInfo.unitsPerEM = unitsPerEM;
         fontFile.fontInfo.lineHeight = face->height;
         fontFile.fontInfo.nChars = c_max - c_min;
@@ -371,11 +370,11 @@ namespace font
         fontFile.sdf = std::vector<unsigned char>(atlas.data(), atlas.data() + atlas.getSize());
 
         fontFile.fileHeader.identifier = 0x464f4e54;
+        fontFile.fileHeader.version = 1;
         fontFile.fileHeader.fSize = sizeof(fontFile);
         fontFile.fileHeader.glyphOffset = sizeof(FileHeader) + sizeof(FontInfo) + sizeof(SdfInfo) + sizeof(MaxGlyph);
         fontFile.fileHeader.imgOffset = sizeof(FileHeader) + sizeof(FontInfo) + sizeof(SdfInfo) + sizeof(MaxGlyph) +
                                         sizeof(Glyph) * fontFile.glyphs.size();
-
 
         std::ofstream file(filename, std::ios::binary);
         file.seekp(0, std::ios::beg);

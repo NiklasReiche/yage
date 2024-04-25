@@ -11,10 +11,8 @@
 
 namespace font
 {
-	/**
-	 * @brief 
-	 * 
-	 */
+    // TODO: maybe use a builder pattern to append text with different parameters (e.g. font, size or color)
+
 	class Text
 	{
 	public:

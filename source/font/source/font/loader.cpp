@@ -54,7 +54,6 @@ namespace font
 		gml::Vec2<float> scale = calcScale(ptSize, fontFile.fontInfo.unitsPerEM, dpi);
 
 		std::unique_ptr<Font> font = std::make_unique<Font>();
-		font->metrics.emSize = fontFile.fontInfo.unitsPerEM;
 		font->metrics.ptSize = ptSize;
         font->metrics.lineHeight = fontFile.fontInfo.lineHeight * scale.y();
         font->metrics.spreadInTexCoords = {
