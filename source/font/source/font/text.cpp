@@ -74,6 +74,10 @@ namespace font
                 continue;
             }
 
+            if (!font->characters.contains(i)) {
+                i = '?';
+            }
+
 			const Character & ch = font->characters.at(i);
 
 			const float left = xPos + ch.glyph.bearing.x() * scale;
@@ -120,6 +124,11 @@ namespace font
             if (i == '\n')
                 continue;
 
+            if (!font->characters.contains(i))
+            {
+                i = '?';
+            }
+
 			const Character & ch = font->characters.at(i);
 
             const float spreadX = font->metrics.spreadInTexCoords.x() * (1 - SPREAD_KEEP_PERCENT);
@@ -154,6 +163,8 @@ namespace font
 		{
             if (text[i] == '\n')
                 continue;
+
+            // add values even for unknown characters, since we substitute them with '?'
 
 			// Generate glyph quad for each character
 			std::array<float, 16> localColors = {
