@@ -35,6 +35,7 @@ namespace font
 	{
 		int ptSize = 0;
 		int emSize = 0;
+        float lineHeight = 0;
 		unsigned char cMin = 0;
 		unsigned char cMax = 0;
         gml::Vec2f spreadInTexCoords;

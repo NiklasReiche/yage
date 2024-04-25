@@ -58,7 +58,7 @@ namespace font
 		const float scale = static_cast<float>(fontSize) / static_cast<float>(font->metrics.ptSize);
 
 		float xPos = position.x();
-		const float yPos = position.y();
+        float yPos = position.y();
         const float zPos = position.z();
 
 		std::vector<float> coords;
@@ -67,6 +67,13 @@ namespace font
 		// Iterate through all characters
 		for (char i : text)
 		{
+            if (i == '\n') {
+                xPos = position.x();
+                yPos += font->metrics.lineHeight * scale;
+                size.y() += font->metrics.lineHeight * scale;
+                continue;
+            }
+
 			const Character & ch = font->characters.at(i);
 
 			const float left = xPos + ch.glyph.bearing.x() * scale;
@@ -110,6 +117,9 @@ namespace font
 
 		for (char i : text)
 		{
+            if (i == '\n')
+                continue;
+
 			const Character & ch = font->characters.at(i);
 
             const float spreadX = font->metrics.spreadInTexCoords.x() * (1 - SPREAD_KEEP_PERCENT);
@@ -142,6 +152,9 @@ namespace font
 
 		for (unsigned int i = 0; i < text.length(); ++i)
 		{
+            if (text[i] == '\n')
+                continue;
+
 			// Generate glyph quad for each character
 			std::array<float, 16> localColors = {
 				color.x(), color.y(), color.z(), color.w(),

@@ -12,11 +12,10 @@
 #include FT_FREETYPE_H
 
 #include <core/gl/graphics.h>
+#include <image/img.h>
 
-#include "font/fileformat.h"
-#include "font/font.h"
-#include "ftMath.h"
-#include "img.h"
+#include "fileformat.h"
+#include "font.h"
 
 
 namespace font
@@ -98,7 +97,7 @@ namespace font
         static void writeFontFile(const std::string &filename, int unitsPerEM, unsigned char c_min, unsigned char c_max,
                                   const img::Image &atlas,
                                   GlyphMetrics maxGlyph, const std::map<unsigned char, Character> &characters,
-                                  gml::Vec2f spreadInTexCoords);
+                                  gml::Vec2f spreadInTexCoords, const FT_Face &face);
 
         static unsigned char rightGetBit(unsigned char c, unsigned int n);
 

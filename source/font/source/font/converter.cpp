@@ -166,7 +166,7 @@ namespace font
 
         auto atlasImageData = textureAtlas->getImage();
         img::Image atlasImage(textureAtlas->getWidth(), textureAtlas->getHeight(), 1, atlasImageData);
-        writeFontFile(filenameOutput, face->units_per_EM, c_min, c_max, atlasImage, maxGlyph, characters, spreadInTexCoords);
+        writeFontFile(filenameOutput, face->units_per_EM, c_min, c_max, atlasImage, maxGlyph, characters, spreadInTexCoords, face);
 #if 1 // TODO: make this an output option
         {
             platform::desktop::FileReader fileReader;
@@ -328,12 +328,13 @@ namespace font
     FontConverter::writeFontFile(const std::string &filename, int unitsPerEM, unsigned char c_min, unsigned char c_max,
                                  const img::Image &atlas, GlyphMetrics maxGlyph,
                                  const std::map<unsigned char, Character> &characters,
-                                 const gml::Vec2f spreadInTexCoords)
+                                 const gml::Vec2f spreadInTexCoords, const FT_Face & face)
     {
         FontFile fontFile;
 
         fontFile.fontInfo.encoding = 1;
         fontFile.fontInfo.unitsPerEM = unitsPerEM;
+        fontFile.fontInfo.lineHeight = face->height;
         fontFile.fontInfo.nChars = c_max - c_min;
         fontFile.fontInfo.xSpreadInTexCoords = spreadInTexCoords.x();
         fontFile.fontInfo.ySpreadInTexCoords = spreadInTexCoords.y();

@@ -9,10 +9,6 @@ target_sources(yage_font
         loader.cpp
         fontHeader.h
 
-        converter/converter.h
-        converter/converter.cpp
-        converter/ftMath.h
-        converter/ftMath.cpp
-        converter/img.h
-        converter/img.cpp
+        converter.h
+        converter.cpp
 )

@@ -56,6 +56,7 @@ namespace font
 		std::unique_ptr<Font> font = std::make_unique<Font>();
 		font->metrics.emSize = fontFile.fontInfo.unitsPerEM;
 		font->metrics.ptSize = ptSize;
+        font->metrics.lineHeight = fontFile.fontInfo.lineHeight * scale.y();
         font->metrics.spreadInTexCoords = {
                 fontFile.fontInfo.xSpreadInTexCoords,
                 fontFile.fontInfo.ySpreadInTexCoords,
@@ -87,8 +88,8 @@ namespace font
 
 		font->textureAtlas = textureCreator->createTexture2D(fontFile.sdfInfo.width, fontFile.sdfInfo.height,
                                                              gl::ImageFormat::R, fontFile.sdf);
-		//font.textureAtlas.configTextureWrapper(gl::TextureWrapper::CLAMP_TO_EDGE, gl::TextureWrapper::CLAMP_TO_EDGE);
-		//font.textureAtlas.configTextureFilter(gl::TextureFilter::LINEAR, gl::TextureFilter::LINEAR);
+		font->textureAtlas->configTextureWrapper(gl::TextureWrapper::CLAMP_TO_BORDER, gl::TextureWrapper::CLAMP_TO_BORDER);
+		font->textureAtlas->configTextureFilter(gl::TextureFilter::LINEAR, gl::TextureFilter::LINEAR);
 
 		return font;
 	}
