@@ -6,39 +6,45 @@
 #include "core/platform/desktop/FileReader.h"
 #include "font/converter.h"
 
-int main()
+int main(int argc, char *argv[], char *[])
 {
+    if (argc < 2) {
+        std::cout << "Missing path to font file" << std::endl;
+        return 1;
+    }
+    std::vector<std::string> args;
+    args.assign(argv, argv + argc);
+
     std::shared_ptr<platform::IWindow> window = std::make_shared<platform::desktop::GlfwWindow>(1200, 500,
                                                                                                 "Text Renderer");
     std::shared_ptr<gl::IContext> context = gl::createContext(window);
 
     auto fileReader = platform::desktop::FileReader();
 
+    std::string fontPath = args[1];
 
-
-#if 1
-    std::vector<font::Codepoint> additionalCharacters = {
-            0x00c4, // Ä
-            0x00d6, // Ö
-            0x00dc, // Ü
-            0x00e4, // ä
-            0x00f6, // ö
-            0x00fc  // ü
-    };
-    auto codepoints = font::FontConverter::codepointSetAscii();
-    codepoints.insert(std::end(codepoints), std::begin(additionalCharacters), std::end(additionalCharacters));
-    std::cout << "Starting font conversion." << std::endl;
-    auto converter = font::FontConverter(context);
-    converter.convert("assets/OpenSans-Regular.ttf",
-                      "assets/OpenSans-Regular.font",
-                      codepoints,512, 4, 4, 64);
-    std::cout << "Finished font conversion." << std::endl;
-#endif
+    if (std::find(args.begin(), args.end(), "-generate") != args.end()) {
+        std::vector<font::Codepoint> additionalCharacters = {
+                0x00c4, // Ä
+                0x00d6, // Ö
+                0x00dc, // Ü
+                0x00e4, // ä
+                0x00f6, // ö
+                0x00fc  // ü
+        };
+        auto codepoints = font::FontConverter::codepointSetAscii();
+        codepoints.insert(std::end(codepoints), std::begin(additionalCharacters), std::end(additionalCharacters));
+        std::cout << "Starting font conversion." << std::endl;
+        auto converter = font::FontConverter(context);
+        converter.convert(fontPath + ".ttf",fontPath + ".font",
+                          codepoints, 512, 4, 4, 64);
+        std::cout << "Finished font conversion." << std::endl;
+    }
 
     std::shared_ptr<font::Font> font;
     {
         auto loader = font::FontLoader(context->getTextureCreator());
-        auto fontFile = fileReader.openBinaryFile("assets/OpenSans-Regular.font", platform::IFile::AccessMode::READ);
+        auto fontFile = fileReader.openBinaryFile(fontPath + ".font", platform::IFile::AccessMode::READ);
         font = loader.loadFont(*fontFile);
     }
 

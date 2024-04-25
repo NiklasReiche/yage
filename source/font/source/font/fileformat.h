@@ -5,6 +5,8 @@
 
 namespace font
 {
+    // TODO: make binary file format writing & reading robust against struct alignment, so we have more freedom choosing data types
+
 	struct FileHeader
 	{
 		uint32_t identifier;

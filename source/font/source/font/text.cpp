@@ -2,7 +2,6 @@
 #include <core/gl/color.h>
 #include <array>
 #include <algorithm>
-#include <locale>
 #include <codecvt>
 
 namespace font

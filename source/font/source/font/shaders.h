@@ -8,11 +8,9 @@ namespace font
 	{
 #ifdef WIN32 //TODO
 		const std::string textShader_vert =
-#include "shaders/textShader_GL3.vert"
-			;
+#include "font/shaders/textShader.vert";
 		const std::string textShader_frag =
-#include "shaders/textShader_GL3.frag"
-        ;
+#include "font/shaders/textShader.frag";
 #endif // WIN32
 
 #ifdef ANDROID
