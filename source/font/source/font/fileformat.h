@@ -18,6 +18,8 @@ namespace font
 		uint32_t encoding;
 		uint32_t unitsPerEM;
 		uint32_t nChars;
+        float xSpreadInTexCoords;
+        float ySpreadInTexCoords;
 	};
 
 	struct SdfInfo

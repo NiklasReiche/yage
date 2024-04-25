@@ -112,10 +112,13 @@ namespace font
 		{
 			const Character & ch = font->characters.at(i);
 
-			const float texLeft = ch.texCoords.left;
-			const float texRight = ch.texCoords.right;
-			const float texBottom = ch.texCoords.bottom;
-			const float texTop = ch.texCoords.top;
+            const float spreadX = font->metrics.spreadInTexCoords.x() * (1 - SPREAD_KEEP_PERCENT);
+            const float spreadY = font->metrics.spreadInTexCoords.y() * (1 - SPREAD_KEEP_PERCENT);
+
+			const float texLeft = ch.texCoords.left + spreadX;
+			const float texRight = ch.texCoords.right - spreadX;
+			const float texBottom = ch.texCoords.bottom - spreadY;
+			const float texTop = ch.texCoords.top + spreadY;
 
 			// Generate glyph quad for each character
 			std::array<float, 8> localTexCoords = {

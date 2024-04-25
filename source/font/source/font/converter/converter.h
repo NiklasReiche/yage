@@ -97,7 +97,8 @@ namespace font
 
         static void writeFontFile(const std::string &filename, int unitsPerEM, unsigned char c_min, unsigned char c_max,
                                   const img::Image &atlas,
-                                  GlyphMetrics maxGlyph, const std::map<unsigned char, Character> &characters);
+                                  GlyphMetrics maxGlyph, const std::map<unsigned char, Character> &characters,
+                                  gml::Vec2f spreadInTexCoords);
 
         static unsigned char rightGetBit(unsigned char c, unsigned int n);
 

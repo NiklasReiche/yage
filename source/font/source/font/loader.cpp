@@ -56,6 +56,10 @@ namespace font
 		std::unique_ptr<Font> font = std::make_unique<Font>();
 		font->metrics.emSize = fontFile.fontInfo.unitsPerEM;
 		font->metrics.ptSize = ptSize;
+        font->metrics.spreadInTexCoords = {
+                fontFile.fontInfo.xSpreadInTexCoords,
+                fontFile.fontInfo.ySpreadInTexCoords,
+        };
 
 		font->maxGlyph.size.x() = fontFile.maxGlyph.width * scale.x();
 		font->maxGlyph.size.y() = fontFile.maxGlyph.height * scale.y();

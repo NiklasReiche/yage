@@ -67,7 +67,7 @@ namespace font
     void FontConverter::convert(const std::string &filenameInput, const std::string &filenameOutput,
                                 const int loadResolution, const int spread, const int padding, const int sdfResolution)
     {
-        // TODO: allow unicode
+        // TODO: allow unicode (give a set of codepoints instead of a char range)
         const unsigned char c_min = 32;
         const unsigned char c_max = 127;
 
@@ -90,6 +90,7 @@ namespace font
         for (unsigned char c = c_min; c < c_max; c++)
         {
             auto bitmap = getBitmap(ft, face, c);
+            // the spread is given in target resolution pixels, so we need to upscale it here
             auto sdf = generateSdf(bitmap, spread * scaleFactor);
             sdfMap[c] = downscale(sdf, gml::Vec2i(sdf.getWidth() / scaleFactor,
                                                   sdf.getHeight() / scaleFactor));
@@ -158,10 +159,15 @@ namespace font
             }
         }
 
+        const gml::Vec2f spreadInTexCoords = {
+                (float) spread / (float) atlasSize.x(),
+                (float) spread / (float) atlasSize.y()
+        };
+
         auto atlasImageData = textureAtlas->getImage();
         img::Image atlasImage(textureAtlas->getWidth(), textureAtlas->getHeight(), 1, atlasImageData);
-        writeFontFile(filenameOutput, face->units_per_EM, c_min, c_max, atlasImage, maxGlyph, characters);
-#if 1
+        writeFontFile(filenameOutput, face->units_per_EM, c_min, c_max, atlasImage, maxGlyph, characters, spreadInTexCoords);
+#if 1 // TODO: make this an output option
         {
             platform::desktop::FileReader fileReader;
             auto file = fileReader.openBinaryFile(R"(C:\Users\Niklas\Downloads\sdf.bmp)",
@@ -205,7 +211,6 @@ namespace font
     TexMetrics
     FontConverter::getRelativeTextureMetrics(const img::Image &characterBitmap, gml::Vec2i offset, gml::Vec2i atlasSize)
     {
-        // TODO: incorporate spread
         TexMetrics metrics;
         metrics.left = (float) offset.x() / (float) atlasSize.x();
         metrics.top = (float) offset.y() / (float) atlasSize.y();
@@ -322,13 +327,16 @@ namespace font
     void
     FontConverter::writeFontFile(const std::string &filename, int unitsPerEM, unsigned char c_min, unsigned char c_max,
                                  const img::Image &atlas, GlyphMetrics maxGlyph,
-                                 const std::map<unsigned char, Character> &characters)
+                                 const std::map<unsigned char, Character> &characters,
+                                 const gml::Vec2f spreadInTexCoords)
     {
         FontFile fontFile;
 
         fontFile.fontInfo.encoding = 1;
         fontFile.fontInfo.unitsPerEM = unitsPerEM;
         fontFile.fontInfo.nChars = c_max - c_min;
+        fontFile.fontInfo.xSpreadInTexCoords = spreadInTexCoords.x();
+        fontFile.fontInfo.ySpreadInTexCoords = spreadInTexCoords.y();
 
         fontFile.sdfInfo.width = (uint32_t) atlas.getWidth();
         fontFile.sdfInfo.height = (uint32_t) atlas.getHeight();

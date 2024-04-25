@@ -37,6 +37,7 @@ namespace font
 		int emSize = 0;
 		unsigned char cMin = 0;
 		unsigned char cMax = 0;
+        gml::Vec2f spreadInTexCoords;
 	};
 
 	struct Character
