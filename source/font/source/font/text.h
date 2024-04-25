@@ -13,6 +13,10 @@ namespace font
 {
     // TODO: maybe use a builder pattern to append text with different parameters (e.g. font, size or color)
 
+    /**
+     * Represent geometry for a string of text that can be rendered.
+     * The geometry is constructed in 2D model space, i.e. scaling, translation, etc.. should be done in the shader.
+     */
 	class Text
 	{
 	public:

@@ -12,9 +12,11 @@ const float spread = 4.0f;
 const float scale = 16.0f / 100.0f;
 const float smoothing = 0.25f / (spread * scale);
 
+uniform float smoothing2 = 0;
+
 void main()
 {
 	float dist = texture(text, TexCoords).r;
-	float alpha = smoothstep(edge - 0.01, edge + 0.01, dist);
+	float alpha = smoothstep(edge - smoothing2, edge + smoothing2, dist);
 	color = vec4( Color.rgb, alpha * Color.a );
 }
