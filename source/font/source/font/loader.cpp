@@ -69,7 +69,7 @@ namespace font
 
 		for (unsigned int i = 0; i < fontFile.fontInfo.nChars; ++i)
 		{
-			unsigned char c = fontFile.glyphs[i].id;
+			Codepoint c = fontFile.glyphs[i].id;
 			font->characters[c] = Character();
 			Character & character = font->characters[c];
 			

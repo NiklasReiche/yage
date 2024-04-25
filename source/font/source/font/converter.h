@@ -17,6 +17,7 @@
 #include "fileformat.h"
 #include "font.h"
 
+// TODO: handle grapheme clusters
 
 namespace font
 {
@@ -38,7 +39,7 @@ namespace font
 
         FT_Face loadFace(const std::string &filepath);
 
-        FT_GlyphSlot loadGlyph(const FT_Face &face, unsigned char c, FT_GLYPH_LOAD_FLAG load_flag);
+        FT_GlyphSlot loadGlyph(const FT_Face &face, Codepoint c, FT_GLYPH_LOAD_FLAG load_flag);
 
     private:
         /**
@@ -67,15 +68,18 @@ namespace font
          * @param padding Padding in pixels (in the sdf resolution space) added around sdf glyphs in the texture atlas.
          * @param sdfResolution Size in pixels at which to down-sample the sdf glyphs. The smaller this is the smaller the resulting texture atlas will be.
          */
-        void convert(const std::string &filenameInput, const std::string &filenameOutput, int loadResolution = 512,
+        void convert(const std::string &filenameInput, const std::string &filenameOutput,
+                     const std::vector<Codepoint> &charCodes, int loadResolution = 512,
                      int spread = 4, int padding = 2, int sdfResolution = 64);
+
+        static std::vector<Codepoint> codepointSetAscii();
 
     private:
         std::shared_ptr<gl::IContext> glContext;
 
-        static GlyphMetrics getGlyphMetricsAndUpdateMax(FT_Loader &ft, const FT_Face &face, unsigned char c, GlyphMetrics &maxGlyph);
+        static GlyphMetrics getGlyphMetricsAndUpdateMax(FT_Loader &ft, const FT_Face &face, Codepoint c, GlyphMetrics &maxGlyph);
 
-        static img::Image getBitmap(FT_Loader &ft, FT_Face const &face, unsigned char c);
+        static img::Image getBitmap(FT_Loader &ft, FT_Face const &face, Codepoint c);
 
         static img::Image generateSdf(const img::Image &bitmap, int spread);
 
@@ -94,9 +98,10 @@ namespace font
 
         img::Image downscale(const img::Image &image, gml::Vec2i targetResolution);
 
-        static void writeFontFile(const std::string &filename, int unitsPerEM, unsigned char c_min, unsigned char c_max,
+        static void writeFontFile(const std::string &filename, int unitsPerEM,
+                                  const std::vector<Codepoint> &charCodes,
                                   const img::Image &atlas,
-                                  GlyphMetrics maxGlyph, const std::map<unsigned char, Character> &characters,
+                                  GlyphMetrics maxGlyph, const std::map<Codepoint, Character> &characters,
                                   gml::Vec2f spreadInTexCoords, const FT_Face &face);
 
         static unsigned char rightGetBit(unsigned char c, unsigned int n);

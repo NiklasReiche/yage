@@ -14,14 +14,24 @@ int main()
 
     auto fileReader = platform::desktop::FileReader();
 
-    std::vector<unsigned long> characters = {
-            0x0938094d,
-    };
 
-#if 0
+
+#if 1
+    std::vector<font::Codepoint> additionalCharacters = {
+            0x00c4, // Ä
+            0x00d6, // Ö
+            0x00dc, // Ü
+            0x00e4, // ä
+            0x00f6, // ö
+            0x00fc  // ü
+    };
+    auto codepoints = font::FontConverter::codepointSetAscii();
+    codepoints.insert(std::end(codepoints), std::begin(additionalCharacters), std::end(additionalCharacters));
     std::cout << "Starting font conversion." << std::endl;
-	auto converter = font::FontConverter(context);
-    converter.convert("assets/OpenSans-Regular.ttf", "assets/OpenSans-Regular.font", 512, 4, 4, 64);
+    auto converter = font::FontConverter(context);
+    converter.convert("assets/OpenSans-Regular.ttf",
+                      "assets/OpenSans-Regular.font",
+                      codepoints,512, 4, 4, 64);
     std::cout << "Finished font conversion." << std::endl;
 #endif
 
@@ -38,7 +48,7 @@ int main()
             openTextFile("assets/text.frag", platform::IFile::AccessMode::READ)->readAll();
     auto textShader = context->getShaderCreator()->createShader(vertexCodeText, fragmentCodeText);
 
-    auto string = "The quick brown fox jumps over the lazy dog.";
+    std::u32string string = U"ÜÄÖ The quick brown fox jumps over the lazy dog.";
     auto text100 = font::Text(context->getDrawableCreator(), string, font,
                            gl::Color::BLACK, 100);
     auto text50 = font::Text(context->getDrawableCreator(), string, font,

@@ -10,6 +10,11 @@
 namespace font
 {
     /**
+     * Represents Unicode code points.
+     */
+    typedef uint32_t Codepoint;
+
+    /**
      * Encodes positioning and size values for a single glyph. Values are given in pixel coordinates (i.e. scaled to
      * the pt size and dpi given when the font was loaded).
      */
@@ -83,7 +88,7 @@ namespace font
         /**
          * Metrics for the individual characters.
          */
-        std::map<unsigned char, Character> characters;
+        std::map<Codepoint, Character> characters;
 
         /**
          * Texture atlas containing the glyph sdf bitmaps.

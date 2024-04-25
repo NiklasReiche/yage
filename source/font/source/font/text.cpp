@@ -2,11 +2,13 @@
 #include <core/gl/color.h>
 #include <array>
 #include <algorithm>
+#include <locale>
+#include <codecvt>
 
 namespace font
 {
 	Text::Text(const std::shared_ptr<gl::IDrawableCreator>& drawableCreator,
-	           const std::string & text, 
+	           const std::u32string & text,
 	           const std::shared_ptr<Font> & font,
 	           const unsigned int color, 
 	           const int size)
@@ -57,20 +59,20 @@ namespace font
         unsigned int index = 0;
 
 		// Iterate through all characters
-		for (char i : text)
+		for (char32_t c : text)
 		{
-            if (i == '\n') {
+            if (c == '\n') {
                 xPos = 0;
                 yPos += font->metrics.lineHeight * scale;
                 size.y() += font->metrics.lineHeight * scale;
                 continue;
             }
 
-            if (!font->characters.contains(i)) {
-                i = '?';
+            if (!font->characters.contains(c)) {
+                c = '?';
             }
 
-			const Character & ch = font->characters.at(i);
+			const Character & ch = font->characters.at(c);
 
 			const float left = xPos + ch.glyph.bearing.x() * scale;
 			const float right = left + ch.glyph.size.x() * scale;
@@ -111,17 +113,17 @@ namespace font
 	{
 		std::vector<float> texCoords;
 
-		for (char i : text)
+		for (char32_t c : text)
 		{
-            if (i == '\n')
+            if (c == '\n')
                 continue;
 
-            if (!font->characters.contains(i))
+            if (!font->characters.contains(c))
             {
-                i = '?';
+                c = '?';
             }
 
-			const Character & ch = font->characters.at(i);
+			const Character & ch = font->characters.at(c);
 
             const float spreadX = font->metrics.spreadInTexCoords.x() * (1 - SPREAD_KEEP_PERCENT);
             const float spreadY = font->metrics.spreadInTexCoords.y() * (1 - SPREAD_KEEP_PERCENT);
@@ -151,9 +153,9 @@ namespace font
 	{
 		std::vector<float> colors;
 
-		for (unsigned int i = 0; i < text.length(); ++i)
+		for (char32_t c : text)
 		{
-            if (text[i] == '\n')
+            if (c == '\n')
                 continue;
 
             // add values even for unknown characters, since we substitute them with '?'
@@ -184,7 +186,7 @@ namespace font
 		return *drawable;
 	}
 
-	std::string Text::getString() const
+	std::u32string Text::getString() const
 	{
 		return text;
 	}

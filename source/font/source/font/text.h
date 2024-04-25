@@ -14,7 +14,7 @@ namespace font
     // TODO: maybe use a builder pattern to append text with different parameters (e.g. font, size or color)
 
     /**
-     * Represent geometry for a string of text that can be rendered.
+     * Represent geometry for a string of UTF-32 encoded text that can be rendered.
      * The geometry is constructed in 2D model space, i.e. scaling, translation, etc.. should be done in the shader.
      */
 	class Text
@@ -22,7 +22,7 @@ namespace font
 	public:
 		Text() = delete;
 		Text(const std::shared_ptr<gl::IDrawableCreator>& drawableCreator,
-		     const std::string & text, 
+		     const std::u32string & text,
 		     const std::shared_ptr<Font> & font,
 		     unsigned int color = 0x000000FFu, 
 		     int size = 14); // TODO: param struct could make sense here
@@ -37,7 +37,7 @@ namespace font
 		[[nodiscard]]
         const gl::IDrawable& getDrawable() const;
 		[[nodiscard]]
-		std::string getString() const;
+		std::u32string getString() const;
 		[[nodiscard]]
 		gml::Vec2f getMaxDimensions() const; // TODO: this might be better suited as a method of the font
 		gml::Vec2f getOffset(unsigned int index); //TODO: is this needed?
@@ -52,7 +52,7 @@ namespace font
 		gml::Vec2<float> size;
 		gml::Vec4<float> color;
 
-		std::string text;
+        std::u32string text;
 		int fontSize = 16;
 
 		void constructVertices(std::vector<float> & vertices, std::vector<unsigned int> &indices);

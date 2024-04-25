@@ -44,7 +44,7 @@ namespace font
     }
 
     FT_GlyphSlot
-    FT_Loader::loadGlyph(const FT_Face &face, unsigned char c, // NOLINT(*-convert-member-functions-to-static)
+    FT_Loader::loadGlyph(const FT_Face &face, Codepoint c, // NOLINT(*-convert-member-functions-to-static)
                          FT_GLYPH_LOAD_FLAG load_flag)
     {
         FT_Error error = FT_Load_Char(face, c, (FT_Int32) load_flag);
@@ -65,12 +65,9 @@ namespace font
     {}
 
     void FontConverter::convert(const std::string &filenameInput, const std::string &filenameOutput,
+                                const std::vector<Codepoint> &charCodes,
                                 const int loadResolution, const int spread, const int padding, const int sdfResolution)
     {
-        // TODO: allow unicode (give a set of codepoints instead of a char range)
-        const unsigned char c_min = 32;
-        const unsigned char c_max = 127;
-
         const int scaleFactor = loadResolution / sdfResolution;
 
         FT_Loader ft;
@@ -79,15 +76,16 @@ namespace font
         FT_Set_Pixel_Sizes(face, 0, loadResolution);
 
         // we place the glyphs into the atlas in a roughly square grid
-        const int nCharacters = c_max - c_min;
+        const unsigned int nCharacters = charCodes.size();
         const int nColumns = std::ceil(std::sqrt(nCharacters));
 
-        std::map<unsigned char, img::Image> sdfMap;
+        std::map<Codepoint, img::Image> sdfMap;
         gml::Vec2i atlasSize;
         gml::Vec2i rowSize;
         int column = 0;
+        int count = 0;
         // traverse characters and append them to the atlas grid from left to right and top to bottom (i.e. row-major)
-        for (unsigned char c = c_min; c < c_max; c++)
+        for (Codepoint c : charCodes)
         {
             auto bitmap = getBitmap(ft, face, c);
             // the spread is given in target resolution pixels, so we need to upscale it here
@@ -107,7 +105,9 @@ namespace font
                 rowSize = gml::Vec2i();
                 column = 0;
             }
-            std::cout << c << std::endl;
+
+            count++;
+            std::cout << "Converted " << count << "/" << nCharacters << " characters." << std::endl;
         }
         // add the last row if it hasn't been added inside the loop
         if (column > 0)
@@ -124,13 +124,13 @@ namespace font
         std::unique_ptr<gl::ITexture2D> textureAtlas = glContext->getTextureCreator()->createTexture2D(
                 atlasSize.x(), atlasSize.y(), gl::ImageFormat::R, emptyImage);
 
-        std::map<unsigned char, Character> characters;
+        std::map<Codepoint, Character> characters;
         GlyphMetrics maxGlyph;
         gml::Vec2i offset;
         rowSize = gml::Vec2i();
         column = 0;
         // traverse characters again and use same packing algorithm as above to get correct texture coordinates
-        for (unsigned char c = c_min; c < c_max; c++)
+        for (Codepoint c: charCodes)
         {
             img::Image &sdf = sdfMap[c];
 
@@ -166,7 +166,7 @@ namespace font
 
         auto atlasImageData = textureAtlas->getImage();
         img::Image atlasImage(textureAtlas->getWidth(), textureAtlas->getHeight(), 1, atlasImageData);
-        writeFontFile(filenameOutput, face->units_per_EM, c_min, c_max, atlasImage, maxGlyph, characters, spreadInTexCoords, face);
+        writeFontFile(filenameOutput, face->units_per_EM, charCodes, atlasImage, maxGlyph, characters, spreadInTexCoords, face);
 #if 1 // TODO: make this an output option
         {
             platform::desktop::FileReader fileReader;
@@ -175,9 +175,11 @@ namespace font
             img::writeToFile(*file, atlasImage);
         }
 #endif
+
+
     }
 
-    img::Image FontConverter::getBitmap(FT_Loader &ft, const FT_Face &face, unsigned char c)
+    img::Image FontConverter::getBitmap(FT_Loader &ft, const FT_Face &face, Codepoint c)
     {
         FT_GlyphSlot glyph = ft.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::MONOCHROME_BITMAP);
         FT_Bitmap &bitmap = glyph->bitmap;
@@ -186,7 +188,7 @@ namespace font
         return {(int) bitmap.width, (int) bitmap.rows, 1, imageData};
     }
 
-    GlyphMetrics FontConverter::getGlyphMetricsAndUpdateMax(FT_Loader &ft, const FT_Face &face, unsigned char c,
+    GlyphMetrics FontConverter::getGlyphMetricsAndUpdateMax(FT_Loader &ft, const FT_Face &face, Codepoint c,
                                                             GlyphMetrics &maxGlyph)
     {
         FT_GlyphSlot glyph = ft.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::UNSCALED);
@@ -325,16 +327,17 @@ namespace font
     }
 
     void
-    FontConverter::writeFontFile(const std::string &filename, int unitsPerEM, unsigned char c_min, unsigned char c_max,
+    FontConverter::writeFontFile(const std::string &filename, int unitsPerEM,
+                                 const std::vector<Codepoint> &charCodes,
                                  const img::Image &atlas, GlyphMetrics maxGlyph,
-                                 const std::map<unsigned char, Character> &characters,
+                                 const std::map<Codepoint, Character> &characters,
                                  const gml::Vec2f spreadInTexCoords, const FT_Face & face)
     {
         FontFile fontFile;
 
         fontFile.fontInfo.unitsPerEM = unitsPerEM;
         fontFile.fontInfo.lineHeight = face->height;
-        fontFile.fontInfo.nChars = c_max - c_min;
+        fontFile.fontInfo.nChars = charCodes.size();
         fontFile.fontInfo.xSpreadInTexCoords = spreadInTexCoords.x();
         fontFile.fontInfo.ySpreadInTexCoords = spreadInTexCoords.y();
 
@@ -348,7 +351,7 @@ namespace font
         fontFile.maxGlyph.yBearing = (int32_t) maxGlyph.bearing.y();
         fontFile.maxGlyph.advance = (uint32_t) maxGlyph.advance;
 
-        for (unsigned char c = c_min; c < c_max; ++c)
+        for (auto c : charCodes)
         {
             // TODO: whats up with the data types?
             Glyph glyph{
@@ -419,5 +422,13 @@ namespace font
             bit_pointer = 0;
         }
         return image;
+    }
+
+    std::vector<Codepoint> FontConverter::codepointSetAscii()
+    {
+        std::vector<Codepoint> set;
+        for (auto i = 32; i < 127; ++i)
+            set.push_back(i);
+        return set;
     }
 }
