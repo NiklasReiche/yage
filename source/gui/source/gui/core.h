@@ -1,4 +1,4 @@
 #pragma once
 
-#include <graphics/graphics.h>
+#include <core/gl/graphics.h>
 #include <font/fontHeader.h>

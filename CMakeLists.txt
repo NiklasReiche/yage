@@ -62,7 +62,7 @@ if(WIN32 OR UNIX)
 	add_subdirectory(source/graphics3d)
 	add_subdirectory(source/physics3d)
 	add_subdirectory(source/font)
-	#add_subdirectory( source/modules/gui )
+	add_subdirectory(source/gui)
 endif()
 
 if(ANDROID)
