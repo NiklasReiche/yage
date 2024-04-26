@@ -5,6 +5,7 @@
 #include <font/fontHeader.h>
 #include "core/platform/desktop/FileReader.h"
 #include "font/converter.h"
+#include "font/shaders.h"
 
 int main(int argc, char *argv[], char *[])
 {
@@ -48,11 +49,8 @@ int main(int argc, char *argv[], char *[])
         font = loader.loadFont(*fontFile);
     }
 
-    const std::string vertexCodeText = fileReader.
-            openTextFile("assets/text.vert", platform::IFile::AccessMode::READ)->readAll();
-    const std::string fragmentCodeText = fileReader.
-            openTextFile("assets/text.frag", platform::IFile::AccessMode::READ)->readAll();
-    auto textShader = context->getShaderCreator()->createShader(vertexCodeText, fragmentCodeText);
+    auto textShader = context->getShaderCreator()->createShader(font::shaders::TextShader::vert,
+                                                                font::shaders::TextShader::frag);
 
     std::u32string string = U"ÜÄÖ The quick brown fox jumps over the lazy dog.";
     auto text100 = font::Text(context->getDrawableCreator(), string, font,
@@ -84,41 +82,42 @@ int main(int argc, char *argv[], char *[])
                                                            0.1, 100);
 
         renderer->useShader(*textShader);
+        textShader->setUniform("spread", 1.0f);
         renderer->bindTexture(*font->textureAtlas);
 
         float yPos = 0;
         textShader->setUniform("projection", projection);
-        textShader->setUniform("smoothing2", 0.05f);
+        textShader->setUniform("scale", 100.0f / 16.0f);
         renderer->draw(text100.getDrawable());
         yPos += 150;
 
         textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
-        textShader->setUniform("smoothing2", 0.07f);
+        textShader->setUniform("scale", 50.0f / 16.0f);
         renderer->draw(text50.getDrawable());
         yPos += 90;
 
         textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
-        textShader->setUniform("smoothing2", 0.15f);
+        textShader->setUniform("scale", 24.0f / 16.0f);
         renderer->draw(text24.getDrawable());
         yPos += 50;
 
         textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
-        textShader->setUniform("smoothing2", 0.25f);
+        textShader->setUniform("scale", 16.0f / 16.0f);
         renderer->draw(text16.getDrawable());
         yPos += 40;
 
         textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
-        textShader->setUniform("smoothing2", 0.3f);
+        textShader->setUniform("scale", 12.0f / 16.0f);
         renderer->draw(text12.getDrawable());
         yPos += 30;
 
         textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
-        textShader->setUniform("smoothing2", 0.3f);
+        textShader->setUniform("scale", 11.0f / 16.0f);
         renderer->draw(text11.getDrawable());
         yPos += 30;
 
         textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
-        textShader->setUniform("smoothing2", 0.4f);
+        textShader->setUniform("scale", 9.0f / 16.0f);
         renderer->draw(text9.getDrawable());
 
 		window->swapBuffers();
