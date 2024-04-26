@@ -16,7 +16,7 @@ int main(int argc, char *argv[], char *[])
     std::vector<std::string> args;
     args.assign(argv, argv + argc);
 
-    std::shared_ptr<platform::IWindow> window = std::make_shared<platform::desktop::GlfwWindow>(1200, 500,
+    std::shared_ptr<platform::IWindow> window = std::make_shared<platform::desktop::GlfwWindow>(1200, 800,
                                                                                                 "Text Renderer");
     std::shared_ptr<gl::IContext> context = gl::createContext(window);
 
@@ -72,6 +72,7 @@ int main(int argc, char *argv[], char *[])
 	window->show();
     renderer->setClearColor(gl::Color::WHITE);
     renderer->enableBlending();
+    int step = 0;
 	while (!window->shouldDestroy())
 	{
 		renderer->clear();
@@ -79,7 +80,7 @@ int main(int argc, char *argv[], char *[])
         renderer->setViewport(0, 0, window->getPixelWidth(), window->getPixelHeight());
         auto projection = gml::matrix::orthographic<float>(0, window->getPixelWidth(),
                                                            window->getPixelHeight(), 0,
-                                                           0.1, 100);
+                                                           0.1, 10000);
 
         renderer->useShader(*textShader);
         textShader->setUniform("spread", 1.0f);
@@ -119,6 +120,17 @@ int main(int argc, char *argv[], char *[])
         textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
         textShader->setUniform("scale", 9.0f / 16.0f);
         renderer->draw(text9.getDrawable());
+        yPos += 30;
+
+        textShader->setUniform("projection",
+                               projection *
+                               gml::matrix::translate<float>(700, yPos + 100, -1000) *
+                               gml::matrix::axisAngle(gml::Vec3f(0, 1, 1), gml::toRad((float)((step) % 360))) *
+                               gml::matrix::translate<float>(-250, -20, 0)
+                               );
+        step++;
+        textShader->setUniform("scale", 16.0f / 16.0f);
+        renderer->draw(text16.getDrawable());
 
 		window->swapBuffers();
 		window->pollEvents();
