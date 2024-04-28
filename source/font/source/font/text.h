@@ -23,7 +23,7 @@ namespace font
 		Text() = delete;
 		Text(const std::shared_ptr<gl::IDrawableCreator>& drawableCreator,
 		     const std::u32string & text,
-		     const std::shared_ptr<Font> & font,
+		     const std::shared_ptr<Font> & font, // TODO: maybe this should be weak_ptr?
 		     unsigned int color = 0x000000FFu, 
 		     int size = 14); // TODO: param struct could make sense here
 

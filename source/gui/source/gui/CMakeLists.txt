@@ -7,5 +7,35 @@
 
 target_sources(yage_gui
         PRIVATE
+        widgets/button.h
+        widgets/button.cpp
+        widgets/entry.h
+        widgets/entry.cpp
+        widgets/frame.h
+        widgets/frame.cpp
+        widgets/label.h
+        widgets/label.cpp
+        animation.h
+        animation.cpp
         core.h
+        fontmanager.h
+        fontmanager.cpp
+        gui.h
+        inputmanager.h
+        inputmanager.cpp
+        interface.h
+        layouts.h
+        layouts.cpp
+        master.h
+        master.cpp
+        renderer.h
+        renderer.cpp
+        root.h
+        root.cpp
+        shaders.h
+        texturemanager.h
+        texturemanager.cpp
+        widget.h
+        widget.cpp
+        widgettemplate.h
 )

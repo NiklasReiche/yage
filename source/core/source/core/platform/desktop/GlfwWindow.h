@@ -8,6 +8,7 @@
 #include <core/input/KeyEvent.h>
 #include <core/input/MousePosEvent.h>
 #include <core/platform/Window.h>
+#include <core/platform/IFileReader.h>
 
 #include "File.h"
 
@@ -27,6 +28,9 @@ namespace platform::desktop
 		void swapBuffers() override;
 		void show() override;
 		void hide() override;
+
+        [[nodiscard]]
+        std::unique_ptr<IFileReader> getFileReader() override;
 
 		[[nodiscard]] int getWidth() const override;
 		[[nodiscard]] int getHeight() const override;

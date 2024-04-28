@@ -4,6 +4,7 @@
 #include <string>
 
 #include <core/input/InputListener.h>
+#include "IFileReader.h"
 
 namespace platform
 {
@@ -30,6 +31,9 @@ namespace platform
 		virtual void disableCharInput() = 0;
 		virtual void enableKeyInput() = 0;
 		virtual void disableKeyInput() = 0;
+
+        [[nodiscard]]
+        virtual std::unique_ptr<IFileReader> getFileReader() = 0;
 
 		[[nodiscard]]
 		virtual double getTime() const = 0;

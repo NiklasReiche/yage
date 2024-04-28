@@ -2,19 +2,25 @@
 
 namespace gui
 {
-	FontManager::FontManager(const gl::TextureCreator& textureCreator, const int dpi)
-		: fontLoader(textureCreator), dpi(dpi) {}
+	FontManager::FontManager(const std::shared_ptr<gl::ITextureCreator> &textureCreator,
+                             const std::shared_ptr<platform::IFileReader> &fileReader, int dpi)
+		: textureCreator(textureCreator),
+        fileReader(fileReader),
+        fontLoader(font::FontLoader(textureCreator)),
+        dpi(dpi) {}
 
-	void FontManager::addFont(const std::string& filename)
+	void FontManager::addFont(const std::string &name, const std::string& filename)
 	{
-		const auto font = fontLoader.loadFont(filename, 16, dpi);
-		fonts[font.name] = font;
+        auto file = fileReader->openBinaryFile(filename, platform::IFile::AccessMode::READ);
+        fonts[name] = fontLoader.loadFont(*file, 16, dpi);
 	}
+
 	void FontManager::removeFont(const std::string& name)
 	{
 		fonts.erase(name);
 	}
-	font::Font& FontManager::getFont(const std::string& name)
+
+	std::shared_ptr<font::Font> FontManager::getFont(const std::string& name)
 	{
 		return fonts.at(name);
 	}

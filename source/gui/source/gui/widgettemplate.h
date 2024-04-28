@@ -1,8 +1,8 @@
 #pragma once
 
-#include "math/vector.h"
-#include "graphics/color.h"
-#include <graphics/graphics.h>
+#include "gml/vector.h"
+#include "core/gl/color.h"
+#include <core/gl/graphics.h>
 
 #include "layouts.h"
 
@@ -41,7 +41,7 @@ namespace gui
 	{
 		std::string filename = "";
 		img::Image image;
-		gl::Texture2D texture;
+		std::shared_ptr<gl::ITexture2D> texture; // TODO: don't do this
 
 		float resizeFactor = 1.0f;
 	};

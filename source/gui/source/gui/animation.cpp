@@ -5,7 +5,7 @@
 namespace gui
 {
 	Animation::Animation(Widget* widget, Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time)
-		: widget(widget), master(master), beg(beg), goal(goal), timeEnd(time) {}
+		: master(master), widget(widget), timeEnd(time), beg(beg), goal(goal) {}
 
 	void Animation::setOnAnimationStop(std::function<void()> callback)
 	{

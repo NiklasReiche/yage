@@ -9,10 +9,11 @@ namespace gui
 	class GuiRenderer;
 	class TextureManager;
 
+    // TODO: we can probably do away with this - it is quite ugly
 	struct MasterInterface
 	{
-		sys::Window platform;
-		gl::Context glContext;
+		std::shared_ptr<platform::IWindow> platform;
+		std::shared_ptr<gl::IContext> glContext;
 
 		FontManager* fontManager;
 		TextureManager* textureManager;

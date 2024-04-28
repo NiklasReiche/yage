@@ -3,6 +3,8 @@
 #include <vector>
 #include <memory>
 
+#include <core/platform/Window.h>
+
 #include "core.h"
 #include "renderer.h"
 #include "fontmanager.h"
@@ -18,11 +20,11 @@ namespace gui
 	class Master
 	{
 	public:
-		Master(sys::Window window, gl::Context glContext);
+		Master(const std::shared_ptr<platform::IWindow> &window, const std::shared_ptr<gl::IContext> &glContext);
 
 		void update(double dt);
 
-		void addFont(std::string filename) { fontManager.addFont(filename); }
+		void addFont(std::string name, std::string filename) { fontManager.addFont(name, filename); }
 
 		void activateAnimation(Animation * animation);
 		void deactivateAnimation(Animation * animation);
@@ -40,8 +42,8 @@ namespace gui
 		MasterInterface getInterface() { return MasterInterface{ window, glContext, &fontManager, &textureManager, &inputManager, &renderer }; }
 
 	private:
-		sys::Window window;
-		gl::Context glContext;
+		std::shared_ptr<platform::IWindow> window;
+		std::shared_ptr<gl::IContext> glContext;
 
 		FontManager fontManager;
 		TextureManager textureManager;
@@ -52,6 +54,6 @@ namespace gui
 		std::vector<Animation*> animations;
 		std::vector<Animation*> finishedAnimations;
 
-		void sortWidgets(std::vector<gl::Drawable>& vector_widget, std::vector<font::Text*>& vector_text, Widget& widget);
+		void sortWidgets(std::vector<gl::IDrawable*>& vector_widget, std::vector<font::Text*>& vector_text, Widget& widget);
 	};
 }

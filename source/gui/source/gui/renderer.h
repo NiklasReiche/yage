@@ -14,20 +14,23 @@ namespace gui
 	class GuiRenderer
 	{
 	public:
-		std::vector<gl::Drawable> widgets;
+		std::vector<gl::IDrawable*> widgets;
 		std::vector<font::Text*> text;
 
-		GuiRenderer() {}
-		GuiRenderer(gl::Renderer glContext, gl::ShaderCreator s, gl::IRenderer::Viewport viewport);
+		GuiRenderer() = default;
+		GuiRenderer(const std::shared_ptr<gl::IRenderer> &glRenderer,
+                    const std::shared_ptr<gl::IShaderCreator> &shaderCreator,
+                    const gl::IRenderer::Viewport &viewport);
 
 		void render();
 
-		void setTexture(gl::Texture2D texture);
+        // TODO: this is probably not good
+		void setTexture(std::shared_ptr<gl::ITexture2D> texture);
 
 	private:
-		gl::Renderer glRenderer;
-		gl::Shader guiShader;
-		gl::Shader textShader;
-		gl::Texture2D guiTexture;
+        std::shared_ptr<gl::IRenderer> glRenderer;
+        std::unique_ptr<gl::IShader> guiShader;
+        std::unique_ptr<gl::IShader> textShader;
+        std::shared_ptr<gl::ITexture2D> guiTexture; // TODO: don't have this as a field
 	};
 }

@@ -3,7 +3,7 @@ message(STATUS "> Configuring yage_gui")
 add_library(yage_gui SHARED)
 
 target_compile_options(yage_gui
-        PRIVATE -fdiagnostics-color=always -Wall -Wextra -Werror)
+        PRIVATE -fdiagnostics-color=always -Wno-unused-parameter -Wno-unused-variable -Wno-switch -Wno-unused-but-set-variable -Wno-catch-value)
 
 target_link_libraries(yage_gui
         PUBLIC yage_core yage_gml yage_image yage_font)

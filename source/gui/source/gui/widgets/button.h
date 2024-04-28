@@ -47,7 +47,7 @@ namespace gui
 
 		void setCallback(std::function<void(void)> command) { this->command = command; }
 		void setText(TextTemplate text) { label->setText(text); }
-		void setTextColor(unsigned int color) { label->setTextColor(color); }
+		//void setTextColor(unsigned int color) { label->setTextColor(color); }
 
 		void setIdleTexture(WidgetTextureTemplate texture) { this->idleTexCoords = loadTexture(texture); /*setTexCoords(idleTexCoords); updateParams();*/ }
 		void setHoverTexture(WidgetTextureTemplate texture) { this->hoverTexCoords = loadTexture(texture); }
@@ -126,7 +126,7 @@ namespace gui
 			this->buttonLayout.geometry.offset = gml::Vec2<float>();
 		}
 
-		void addButton(std::string text, T value, bool isDefault = false)
+		void addButton(std::u32string text, T value, bool isDefault = false)
 		{
 			buttonLayout.text.text = text;
 

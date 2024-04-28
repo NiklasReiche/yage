@@ -88,7 +88,7 @@ namespace font
         /**
          * Metrics for the individual characters.
          */
-        std::map<Codepoint, Character> characters;
+        std::map<Codepoint, Character> characters; // TODO: unordered_map?
 
         /**
          * Texture atlas containing the glyph sdf bitmaps.

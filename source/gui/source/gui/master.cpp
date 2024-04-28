@@ -2,9 +2,9 @@
 
 namespace gui
 {
-	Master::Master(sys::Window window, gl::Context glContext)
+	Master::Master(const std::shared_ptr<platform::IWindow> &window, const std::shared_ptr<gl::IContext> &glContext)
 		: window(window), glContext(glContext), 
-		fontManager(FontManager(glContext->getTextureCreator(), window->getDpi())),
+		fontManager(FontManager(glContext->getTextureCreator(), window->getFileReader(), window->getDpi())),
 		textureManager(TextureManager(window, glContext->getTextureCreator())),
 		inputManager(InputManager(&root)),
 		renderer(GuiRenderer(glContext->getRenderer(), glContext->getShaderCreator(), gl::IRenderer::Viewport{ 0, 0, window->getWidth(), window->getHeight() }))
@@ -16,13 +16,13 @@ namespace gui
 		window->attach(inputManager);
 	}
 
-	void Master::sortWidgets(std::vector<gl::Drawable> & vector_widget, std::vector<font::Text*> & vector_text, Widget & widget)
+	void Master::sortWidgets(std::vector<gl::IDrawable*> & vector_widget, std::vector<font::Text*> & vector_text, Widget & widget)
 	{
 		for (unsigned int i = 0; i < widget.getChildrenCount(); ++i)
 		{
 			Widget & child = widget.getChild(i);
 			if (child.is_Active()) {
-				vector_widget.push_back(child.drawable);
+				vector_widget.push_back(child.drawable.get());
 				if (child.has_Text()) {
 					vector_text.push_back(child.getText());
 				}
@@ -45,7 +45,7 @@ namespace gui
 			animations.at(i)->update(dt);
 		}
 
-		std::vector<gl::Drawable> vector_widget;
+		std::vector<gl::IDrawable*> vector_widget;
 		std::vector<font::Text*> vector_text;
 
 		sortWidgets(vector_widget, vector_text, root);
@@ -60,6 +60,7 @@ namespace gui
 	{
 		animations.push_back(animation);
 	}
+
 	void Master::deactivateAnimation(Animation * animation)
 	{
 		finishedAnimations.push_back(animation);

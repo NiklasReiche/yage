@@ -6,7 +6,7 @@
 #include <tuple>
 #include <functional>
 
-#include <image/imageReader.h>
+#include <core/input/KeyEvent.h>
 
 #include "core.h"
 #include "interface.h"
@@ -23,7 +23,7 @@ namespace gui
 	class Widget
 	{
 	public:
-		gl::Drawable drawable;
+		std::unique_ptr<gl::IDrawable> drawable;
 		
 		Widget();
 		Widget(Widget * parent, MasterInterface master, const WidgetTemplate & widgetTemplate);
@@ -90,16 +90,16 @@ namespace gui
 		
 
 		/* Setter */
-		void setColor(int color) { this->color = gl::toVec4(color); }
-		void setColor(gml::Vec4<float> color) { this->color = color; }
-		void setSizeHint(gml::Vec2<SizeHint> sizeHint) { this->sizeHint = sizeHint; }
-		void setPreferredSize(gml::Vec2f size) { this->prefSize = size; }
-		void setTexCoords(gml::Vec4f texCoords) { this->texCoords = texCoords; }
+		void setColor(int _color) { this->color = gl::toVec4(_color); }
+		void setColor(gml::Vec4<float> _color) { this->color = _color; }
+		void setSizeHint(gml::Vec2<SizeHint> _sizeHint) { this->sizeHint = _sizeHint; }
+		void setPreferredSize(gml::Vec2f _size) { this->prefSize = _size; }
+		void setTexCoords(gml::Vec4f _texCoords) { this->texCoords = _texCoords; }
 		
 		void setTexture(WidgetTextureTemplate texture);
 		void setTexture(std::string filename);
 		void setTexture(img::Image image);
-		void setTexture(gl::Texture2D texture);
+		void setTexture(gl::ITexture2D &texture);
 		void removeTexture();
 
 
@@ -108,12 +108,12 @@ namespace gui
 		virtual void updateGeometry();
 		virtual void relayout();
 
-		virtual void setAnchor(Anchor anchor);
+		virtual void setAnchor(Anchor _anchor);
 
-		virtual void setSize(gml::Vec2f size);
-		virtual void resize(gml::Vec2f size);
-		virtual void setOffset(gml::Vec2f offset);
-		virtual void move(gml::Vec2f offset);
+		virtual void setSize(gml::Vec2f _size);
+		virtual void resize(gml::Vec2f _size);
+		virtual void setOffset(gml::Vec2f _offset);
+		virtual void move(gml::Vec2f _cellMargin);
 
 
 		gml::Vec2f toAbs(gml::Vec2f value);
@@ -178,9 +178,9 @@ namespace gui
 		friend class InputManager;
 		friend class Animation;
 
-		void constructCoords(std::vector<float>& vertices);
+		void constructCoords(std::vector<float>& vertices, std::vector<unsigned int> &indices);
 		void constructColors(std::vector<float>& vertices);
-		void constructTexCoords(std::vector<float>& vertices, gml::Vec4f texCoords);
-		void constructVertices(std::vector<float>& vertices, gml::Vec4f texCoords);
+		void constructTexCoords(std::vector<float>& vertices, gml::Vec4f _texCoords);
+		void constructVertices(std::vector<float>& vertices, gml::Vec4f _texCoords, std::vector<unsigned int> &indices);
 	};
 }

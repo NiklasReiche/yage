@@ -11,6 +11,8 @@ namespace platform
 	class IFileReader
 	{
 	public:
+        virtual ~IFileReader() = default;
+
 		[[nodiscard]]
 		virtual std::unique_ptr<IBinaryFile> openBinaryFile(const std::string& filename, IFile::AccessMode mode) const = 0;
 

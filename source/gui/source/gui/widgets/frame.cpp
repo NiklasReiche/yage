@@ -30,8 +30,8 @@ namespace gui
 	gml::Vec2f Frame::calcPrefSize()
 	{
 		gml::Vec2f mSize;
-		mSize.x = layout->calcPrefSizeX(this) + gml::Vec2f((float)borderSize).x;
-		mSize.y = layout->calcPrefSizeY(this) + gml::Vec2f((float)borderSize).y;
+		mSize.x() = layout->calcPrefSizeX(this) + gml::Vec2f((float)borderSize).x();
+		mSize.y() = layout->calcPrefSizeY(this) + gml::Vec2f((float)borderSize).y();
 		return mSize;
 	}
 }

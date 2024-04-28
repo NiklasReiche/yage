@@ -1,4 +1,7 @@
 #include "widget.h"
+#include "image/enum.h"
+#include <core/platform/Window.h>
+#include <image/img.h>
 
 namespace gui
 {
@@ -7,12 +10,12 @@ namespace gui
 		this->layout = std::make_unique<Layout>();
 	}
 	Widget::Widget(Widget * parent, MasterInterface master, const WidgetTemplate & wTemplate)
-		: parent(parent), master(master), 
+		: master(master), parent(parent),
+		sizeHint(wTemplate.geometry.sizeHint),
+		offsetHint(wTemplate.geometry.offsetHint),
 		anchor(wTemplate.geometry.anchor),
 		cellMargin(wTemplate.geometry.offset),
 		prefSize(wTemplate.geometry.size),
-		sizeHint(wTemplate.geometry.sizeHint),
-		offsetHint(wTemplate.geometry.offsetHint),
 		color(gl::toVec4(wTemplate.color)),
 		borderSize(wTemplate.border.size),
 		borderColor(gl::toVec4(wTemplate.border.color)),
@@ -27,23 +30,26 @@ namespace gui
 		this->texCoords = loadTexture(wTemplate.texture);
 
 		std::vector<float> vertices;
-		constructVertices(vertices, texCoords);
-		drawable = master.glContext->getDrawableCreator()->createDrawable(vertices, std::vector<int> { 2, 4, 2 }, gl::VertexFormat::BATCHED);
+        std::vector<unsigned int> indices;
+		constructVertices(vertices, texCoords, indices);
+		drawable = master.glContext->getDrawableCreator()->createDrawable(vertices, indices, std::vector<unsigned int> { 2, 4, 2 }, gl::VertexFormat::BATCHED);
 
 		updateGeometry();
 	}
 	
-	void Widget::constructCoords(std::vector<float> & vertices)
+	void Widget::constructCoords(std::vector<float> & vertices, std::vector<unsigned int> &indices)
 	{
 		vertices.resize(0);
 
-		float left = position.x;
-		float top = position.y;
-		float right = position.x + size.x;
-		float bottom = position.y + size.y;
+		float left = position.x();
+		float top = position.y();
+		float right = position.x() + size.x();
+		float bottom = position.y() + size.y();
 
 		int so = shadowOffset;
 		int bs = borderSize;
+
+        unsigned int index = 0;
 
 		if (so != 0)
 		{
@@ -55,7 +61,11 @@ namespace gui
 				right + so,	top + so,
 				left + so,	top + so,
 			};
-			vertices.insert(std::end(vertices), std::begin(pos_shadow), std::end(pos_shadow));
+            vertices.insert(std::end(vertices), std::begin(pos_shadow), std::end(pos_shadow));
+            std::array<unsigned int, 6> indices_shadow = {
+                    index, ++index, ++index, ++index, ++index, ++index
+            };
+            indices.insert(std::end(indices), std::begin(indices_shadow), std::end(indices_shadow));
 		}
 
 		if (bs != 0)
@@ -100,6 +110,13 @@ namespace gui
 				left,		top,
 				left,		bottom
 			};
+            std::array<unsigned int, 24> indices_border = {
+                    ++index, ++index, ++index, ++index, ++index, ++index,
+                    ++index, ++index, ++index, ++index, ++index, ++index,
+                    ++index, ++index, ++index, ++index, ++index, ++index,
+                    ++index, ++index, ++index, ++index, ++index, ++index,
+            };
+            indices.insert(std::end(indices), std::begin(indices_border), std::end(indices_border));
 			vertices.insert(std::end(vertices), std::begin(pos_border), std::end(pos_border));
 		}
 
@@ -112,6 +129,10 @@ namespace gui
 			left,	top,
 		};
 		vertices.insert(std::end(vertices), std::begin(pos_plain), std::end(pos_plain));
+        std::array<unsigned int, 6> indices_plain = {
+                ++index, ++index, ++index, ++index, ++index, ++index,
+        };
+        indices.insert(std::end(indices), std::begin(indices_plain), std::end(indices_plain));
 	}
 
 	void Widget::constructColors(std::vector<float> & vertices)
@@ -136,131 +157,133 @@ namespace gui
 		if (borderSize != 0)
 		{
 			std::array<float, 96> color_border = {
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
 
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
 
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
 
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w,
-				gl_bc.x, gl_bc.y, gl_bc.z, gl_bc.w
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
+				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w()
 			};
 			vertices.insert(std::end(vertices), std::begin(color_border), std::end(color_border));
 		}
 
 		std::array<float, 24> color_plain = {
-			gl_color.x, gl_color.y, gl_color.z, gl_color.w,
-			gl_color.x, gl_color.y, gl_color.z, gl_color.w,
-			gl_color.x, gl_color.y, gl_color.z, gl_color.w,
-			gl_color.x, gl_color.y, gl_color.z, gl_color.w,
-			gl_color.x, gl_color.y, gl_color.z, gl_color.w,
-			gl_color.x, gl_color.y, gl_color.z, gl_color.w
+			gl_color.x(), gl_color.y(), gl_color.z(), gl_color.w(),
+			gl_color.x(), gl_color.y(), gl_color.z(), gl_color.w(),
+			gl_color.x(), gl_color.y(), gl_color.z(), gl_color.w(),
+			gl_color.x(), gl_color.y(), gl_color.z(), gl_color.w(),
+			gl_color.x(), gl_color.y(), gl_color.z(), gl_color.w(),
+			gl_color.x(), gl_color.y(), gl_color.z(), gl_color.w()
 		};
 		vertices.insert(std::end(vertices), std::begin(color_plain), std::end(color_plain));
 	}
 
-	void Widget::constructTexCoords(std::vector<float> & vertices, gml::Vec4f texCoords)
+	void Widget::constructTexCoords(std::vector<float> & vertices, gml::Vec4f _texCoords)
 	{
 		gml::Vec2f alpha = master.textureManager->getAlphaTexCoords();
 
 		if (shadowOffset != 0)
 		{
 			std::array<float, 12> tex_shadow = {
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
 			};
 			vertices.insert(std::end(vertices), std::begin(tex_shadow), std::end(tex_shadow));
 		}
 
 		if (borderSize != 0) {
 			std::array<float, 48> tex_border = {
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
 
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
 
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
 
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
-				alpha.x,	alpha.y,
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
+				alpha.x(),	alpha.y(),
 			};
 			vertices.insert(std::end(vertices), std::begin(tex_border), std::end(tex_border));
 		}
 
 		std::array<float, 12> tex_plain = {
-			texCoords.x,	texCoords.y,
-			texCoords.x,	texCoords.w,
-			texCoords.z,	texCoords.w,
-			texCoords.z,	texCoords.w,
-			texCoords.z,	texCoords.y,
-			texCoords.x,	texCoords.y,
+                _texCoords.x(), _texCoords.y(),
+                _texCoords.x(), _texCoords.w(),
+                _texCoords.z(), _texCoords.w(),
+                _texCoords.z(), _texCoords.w(),
+                _texCoords.z(), _texCoords.y(),
+                _texCoords.x(), _texCoords.y(),
 		};
 		vertices.insert(std::end(vertices), std::begin(tex_plain), std::end(tex_plain));
 	}
 
-	void Widget::constructVertices(std::vector<float>& vertices, gml::Vec4f texCoords)
+	void Widget::constructVertices(std::vector<float>& vertices, gml::Vec4f _texCoords,
+                                   std::vector<unsigned int> &indices)
 	{
-		constructCoords(vertices);
+		constructCoords(vertices, indices);
 		constructColors(vertices);
-		constructTexCoords(vertices, texCoords);
+		constructTexCoords(vertices, _texCoords);
 	}
 
 	gml::Vec4f Widget::loadTexture(WidgetTextureTemplate tTemplate)
 	{
 		if (tTemplate.filename.size() > 0) {
-			img::ImageReader reader();
-			img::Image image = img::ImageReader::readFile(tTemplate.filename, img::FORCE_CHANNELS::RGBA);
+            auto reader = master.platform->getFileReader();
+            auto file = reader->openBinaryFile(tTemplate.filename, platform::IFile::AccessMode::READ);
+			img::Image image = img::readFromFile(*file, img::FORCE_CHANNELS::RGBA);
 			return master.textureManager->addTexture(image);
 		}
 		else if (!tTemplate.image.isEmpty()) {
 			return master.textureManager->addTexture(tTemplate.image);
 		}
 		else if (!tTemplate.texture) {
-			return master.textureManager->addTexture(tTemplate.texture);
+			return master.textureManager->addTexture(*tTemplate.texture);
 		}
 		else {
-			return gml::Vec4f(master.textureManager->getAlphaTexCoords().x, master.textureManager->getAlphaTexCoords().y, master.textureManager->getAlphaTexCoords().x, master.textureManager->getAlphaTexCoords().y);
+			return gml::Vec4f(master.textureManager->getAlphaTexCoords().x(), master.textureManager->getAlphaTexCoords().y(), master.textureManager->getAlphaTexCoords().x(), master.textureManager->getAlphaTexCoords().y());
 		}
 	}
 
@@ -268,8 +291,11 @@ namespace gui
 	void Widget::updateParams()
 	{
 		std::vector<float> vertices;
+        // TODO
+#if 0
 		constructVertices(vertices, texCoords);
 		drawable->setSubData(0, vertices);
+#endif
 	}
 	
 	void Widget::relayout()
@@ -280,42 +306,42 @@ namespace gui
 		}
 		layout->update(this);
 	}
-	void Widget::setSize(gml::Vec2f size)
+	void Widget::setSize(gml::Vec2f _size)
 	{
-		if (this->size != size) {
-			this->size = size;
-			this->innerSize = size - gml::Vec2f((float)borderSize) * 2.0f;
+		if (this->size != _size) {
+			this->size = _size;
+			this->innerSize = _size - gml::Vec2f((float)borderSize) * 2.0f;
 			updateGeometry();
 			layout->update(this);
 		}
 	}
-	void Widget::resize(gml::Vec2f size)
+	void Widget::resize(gml::Vec2f _size)
 	{
-		if (this->prefSize != size) {
-			prefSize = size;
+		if (this->prefSize != _size) {
+			prefSize = _size;
 			parent->relayout();
 			layout->update(this);
 		}
 	}
-	void Widget::setOffset(gml::Vec2f offset)
+	void Widget::setOffset(gml::Vec2f _offset)
 	{
-		if (this->offset != offset) {
-			this->offset = offset;
+		if (this->offset != _offset) {
+			this->offset = _offset;
 			updateGeometry();
 		}
 	}
-	void Widget::move(gml::Vec2f cellMargin)
+	void Widget::move(gml::Vec2f _cellMargin)
 	{
-		if (this->cellMargin != cellMargin) {
-			this->cellMargin = cellMargin;
+		if (this->cellMargin != _cellMargin) {
+			this->cellMargin = _cellMargin;
 			parent->relayout();
 			layout->update(this);
 		}
 	}
-	void Widget::setAnchor(Anchor anchor) 
+	void Widget::setAnchor(Anchor _anchor)
 	{
-		if (this->anchor != anchor) {
-			this->anchor = anchor;
+		if (this->anchor != _anchor) {
+			this->anchor = _anchor;
 			updateGeometry();
 		}
 	}
@@ -332,18 +358,18 @@ namespace gui
 				break;
 
 			case Anchor::BOTTOM_LEFT:
-				position.x = parent->getInnerPosition().x + (offset).x;
-				position.y = (parent->getInnerPosition().y + parent->getInnerSize().y) - ((offset).y + size.y);
+				position.x() = parent->getInnerPosition().x() + (offset).x();
+				position.y() = (parent->getInnerPosition().y() + parent->getInnerSize().y()) - ((offset).y() + size.y());
 				break;
 
 			case Anchor::TOP_RIGHT:
-				position.x = (parent->getInnerPosition().x + parent->getInnerSize().x) - ((offset).x + size.x);
-				position.y = parent->getInnerPosition().y + (offset).y;
+				position.x() = (parent->getInnerPosition().x() + parent->getInnerSize().x()) - ((offset).x() + size.x());
+				position.y() = parent->getInnerPosition().y() + (offset).y();
 				break;
 
 			case Anchor::BOTTOM_RIGHT:
-				position.x = (parent->getInnerPosition().x + parent->getInnerSize().x) - ((offset).x + size.x);
-				position.y = (parent->getInnerPosition().y + parent->getInnerSize().y) - ((offset).y + size.y);
+				position.x() = (parent->getInnerPosition().x() + parent->getInnerSize().x()) - ((offset).x() + size.x());
+				position.y() = (parent->getInnerPosition().y() + parent->getInnerSize().y()) - ((offset).y() + size.y());
 				break;
 
 			case Anchor::CENTER:
@@ -368,29 +394,29 @@ namespace gui
 	{
 		gml::Vec2f vec;
 		gml::Vec2f parentSize = parent->getSize();
-		vec.x = value.x * parentSize.x;
-		vec.y = value.y * parentSize.y;
+		vec.x() = value.x() * parentSize.x();
+		vec.y() = value.y() * parentSize.y();
 		return vec;
 	}
 	float Widget::toAbsX(float value)
 	{
-		return value * parent->getSize().x;
+		return value * parent->getSize().x();
 	}
 	float Widget::toAbsY(float value)
 	{
-		return value * parent->getSize().y;
+		return value * parent->getSize().y();
 	}
 
 	float Widget::fromAspect()
 	{
-		if (sizeHint.x == SizeHint::INFINITE) {
-			return toAbsX(prefSize.x) * prefSize.y;
+		if (sizeHint.x() == SizeHint::INFINITE) {
+			return toAbsX(prefSize.x()) * prefSize.y();
 		}
-		else if (sizeHint.y == SizeHint::INFINITE) {
-			return prefSize.x * toAbsY(prefSize.y);
+		else if (sizeHint.y() == SizeHint::INFINITE) {
+			return prefSize.x() * toAbsY(prefSize.y());
 		}
 		else {
-			return prefSize.x * prefSize.y;
+			return prefSize.x() * prefSize.y();
 		}
 	}
 
@@ -401,12 +427,13 @@ namespace gui
 	void Widget::setTexture(std::string filename)
 	{
 		if (filename.size() > 0) {
-			img::ImageReader reader();
-			img::Image image = img::ImageReader::readFile(filename, img::FORCE_CHANNELS::RGBA);
+            auto reader = master.platform->getFileReader();
+            auto file = reader->openBinaryFile(filename, platform::IFile::AccessMode::READ);
+			img::Image image = img::readFromFile(*file, img::FORCE_CHANNELS::RGBA);
 			this->texCoords = master.textureManager->addTexture(image);
 		}
 		else {
-			this->texCoords = gml::Vec4f(master.textureManager->getAlphaTexCoords().x, master.textureManager->getAlphaTexCoords().y, master.textureManager->getAlphaTexCoords().x, master.textureManager->getAlphaTexCoords().y);
+			this->texCoords = gml::Vec4f(master.textureManager->getAlphaTexCoords().x(), master.textureManager->getAlphaTexCoords().y(), master.textureManager->getAlphaTexCoords().x(), master.textureManager->getAlphaTexCoords().y());
 		}
 		updateParams();
 	}
@@ -415,13 +442,13 @@ namespace gui
 		this->texCoords = master.textureManager->addTexture(image);
 		updateParams();
 	}
-	void Widget::setTexture(gl::Texture2D texture)
+	void Widget::setTexture(gl::ITexture2D &texture)
 	{
 		this->texCoords = master.textureManager->addTexture(texture);
 		updateParams();
 	}
 	void Widget::removeTexture() {
-		this->texCoords = gml::Vec4f(master.textureManager->getAlphaTexCoords().x, master.textureManager->getAlphaTexCoords().y, master.textureManager->getAlphaTexCoords().x, master.textureManager->getAlphaTexCoords().y);
+		this->texCoords = gml::Vec4f(master.textureManager->getAlphaTexCoords().x(), master.textureManager->getAlphaTexCoords().y(), master.textureManager->getAlphaTexCoords().x(), master.textureManager->getAlphaTexCoords().y());
 		updateParams();
 	}
 }

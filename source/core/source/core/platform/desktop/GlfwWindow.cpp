@@ -8,6 +8,7 @@
 #include <utils/NotImplementedException.h>
 
 #include "GlfwException.h"
+#include "FileReader.h"
 
 namespace platform::desktop
 {
@@ -419,4 +420,9 @@ namespace platform::desktop
 			default: return input::KeyEvent::Code::KEY_UNKNOWN;
 		}
 	}
+
+    std::unique_ptr<platform::IFileReader> GlfwWindow::getFileReader()
+    {
+        return std::make_unique<FileReader>(FileReader());
+    }
 }

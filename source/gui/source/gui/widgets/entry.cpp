@@ -1,12 +1,13 @@
 #include "entry.h"
+#include <core/platform/Window.h>
 
 namespace gui
 {
 	TextCursor::TextCursor(Widget* parent, MasterInterface master, WidgetTemplate widgetTemplate)
 		: Widget(parent, master, widgetTemplate)
 	{
-		sizeHint.x = SizeHint::FIXED;
-		sizeHint.y = SizeHint::FIXED;
+		sizeHint.x() = SizeHint::FIXED;
+		sizeHint.y() = SizeHint::FIXED;
 		prefSize = widgetTemplate.geometry.size;
 	}
 
@@ -36,19 +37,19 @@ namespace gui
 	void TextEntry::moveCursor()
 	{
 		gml::Vec2f cursorOffset;
-		cursorOffset.x = label->getOffset().x + label->getText()->getOffset(cursorPosition).x;
-		cursorOffset.y = cursor->getOffset().y;
+		cursorOffset.x() = label->getOffset().x() + label->getText()->getOffset(cursorPosition).x();
+		cursorOffset.y() = cursor->getOffset().y();
 		cursor->move(cursorOffset);
 	}
 
 	TextEntry::TextEntry(Widget * parent, MasterInterface master, TextEntryTemplate entryTemplate, Master* m)
 		: Widget(parent, master, entryTemplate), 
-		defaultTextTemplate(entryTemplate.defaultText), 
-		inputTextTemplate(entryTemplate.inputText),
 		padding(entryTemplate.padding),
 		callback(entryTemplate.command),
+		cursorColor(entryTemplate.cursorColor),
 		cursorWidth(entryTemplate.cursorWidth),
-		cursorColor(entryTemplate.cursorColor)
+		defaultTextTemplate(entryTemplate.defaultText),
+		inputTextTemplate(entryTemplate.inputText)
 	{
 		this->isInteractable = true;
 		this->keepFocus = true;
@@ -68,8 +69,8 @@ namespace gui
 		label = this->createWidget<Label>(master, labelTemplate);
 
 		WidgetTemplate cursorTemplate;
-		cursorTemplate.geometry.offset = gml::Vec2f(padding.x, padding.y);
-		cursorTemplate.geometry.size = gml::Vec2f(cursorWidth, label->getPreferredSize().y - padding.y * 2);
+		cursorTemplate.geometry.offset = gml::Vec2f(padding.x(), padding.y());
+		cursorTemplate.geometry.size = gml::Vec2f(cursorWidth, label->getPreferredSize().y() - padding.y() * 2);
 		cursorTemplate.color = cursorColor;
 
 		cursor = this->createWidget<TextCursor>(master, cursorTemplate);
@@ -80,8 +81,8 @@ namespace gui
 
 		if (prefSize == gml::Vec2f(0.0f)) {
 			prefSize = calcPrefSize();
-			sizeHint.x = SizeHint::EXPANDING;
-			sizeHint.y = SizeHint::FIXED;
+			sizeHint.x() = SizeHint::EXPANDING;
+			sizeHint.y() = SizeHint::FIXED;
 		}
 	}
 
@@ -91,7 +92,7 @@ namespace gui
 		cursor->show();
 		cursorAnimation->start();
 		if (inputText.length() == 0) {
-			inputTextTemplate.text = "";
+			inputTextTemplate.text = U"";
 			label->setText(inputTextTemplate);
 		}
 	}
@@ -136,7 +137,7 @@ namespace gui
 			break;
 
 		case input::KeyEvent::Code::KEY_RIGHT:
-			if (cursorPosition < inputText.length()) {
+			if (cursorPosition < (int)inputText.length()) {
 				cursorPosition++;
 				moveCursor();
 			}
