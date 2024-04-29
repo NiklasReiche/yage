@@ -51,10 +51,9 @@ namespace font
 	struct FontMetrics
 	{
         /**
-         * Pt size at which the font was loaded. Use this for calculating scaling factors when rendering text at
-         * different pt sizes.
+         * Font units per EM square.
          */
-		int ptSize = 0; // TODO: maybe instead store unitsPerEM and offer a method to calculate scale for a given pt size and dpi
+        int unitsPerEM = 0;
 
         /**
          * Vertical space between two baselines. Use this to calculate newlines.
@@ -94,5 +93,19 @@ namespace font
          * Texture atlas containing the glyph sdf bitmaps.
          */
         std::unique_ptr<gl::ITexture2D> textureAtlas;
+
+        /**
+         * Returns the scaling factor to derive pixel coordinates for glyph metrics for a given font size and dpi
+         * resolution.
+         * @param ptSize Font size at which to draw text.
+         * @param dpi DPI resolution of the target canvas.
+         * @return Scaling factor to convert glyph metrics into pixel coordinates.
+         */
+        gml::Vec2f getScaling(float ptSize, gml::Vec2i dpi)
+        {
+            // pt = 1/72 inch
+            const gml::Vec2f pixelsPerEM = static_cast<gml::Vec2f>(dpi) * ptSize / 72.f;
+            return pixelsPerEM / static_cast<float>(metrics.unitsPerEM);
+        }
 	};
 }

@@ -42,31 +42,28 @@ int main(int argc, char *argv[], char *[])
         std::cout << "Finished font conversion." << std::endl;
     }
 
-    std::shared_ptr<font::Font> font;
-    {
-        auto loader = font::FontLoader(context->getTextureCreator());
-        auto fontFile = fileReader.openBinaryFile(fontPath + ".font", platform::IFile::AccessMode::READ);
-        font = loader.loadFont(*fontFile);
-    }
+    res::Store<font::Font> fontStore;
+    font::FontFileLoader fontLoader(context->getTextureCreator(), window->getFileReader());
+    res::Resource<font::Font> font = fontStore.loadResource(fontLoader, fontPath + ".font");
 
     auto textShader = context->getShaderCreator()->createShader(font::shaders::TextShader::vert,
                                                                 font::shaders::TextShader::frag);
 
     std::u32string string = U"ÜÄÖ The quick brown fox jumps over the lazy dog.";
     auto text100 = font::Text(context->getDrawableCreator(), string, font,
-                           gl::Color::BLACK, 100);
+                              {.color = gl::Color::BLACK, .ptSize = 100});
     auto text50 = font::Text(context->getDrawableCreator(), string, font,
-                           gl::Color::BLACK, 50);
+                             {.color = gl::Color::BLACK, .ptSize = 50});
     auto text24 = font::Text(context->getDrawableCreator(), string, font,
-                            gl::Color::BLACK, 24);
+                             {.color = gl::Color::BLACK, .ptSize = 24});
     auto text16 = font::Text(context->getDrawableCreator(), string, font,
-                            gl::Color::BLACK, 16);
+                             {.color = gl::Color::BLACK, .ptSize = 16});
     auto text12 = font::Text(context->getDrawableCreator(), string, font,
-                             gl::Color::BLACK, 12);
+                             {.color = gl::Color::BLACK, .ptSize = 12});
     auto text11 = font::Text(context->getDrawableCreator(), string, font,
-                             gl::Color::BLACK, 11);
+                             {.color = gl::Color::BLACK, .ptSize = 11});
     auto text9 = font::Text(context->getDrawableCreator(), string, font,
-                             gl::Color::BLACK, 9);
+                            {.color = gl::Color::BLACK, .ptSize = 9});
 
     auto renderer = context->getRenderer();
 	window->show();
@@ -84,7 +81,7 @@ int main(int argc, char *argv[], char *[])
 
         renderer->useShader(*textShader);
         textShader->setUniform("spread", 1.0f);
-        renderer->bindTexture(*font->textureAtlas);
+        renderer->bindTexture(*font.get().textureAtlas);
 
         float yPos = 0;
         textShader->setUniform("projection", projection);

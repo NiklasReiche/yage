@@ -3,23 +3,23 @@
 #include <string>
 
 #include <core/gl/graphics.h>
-
+#include <resource/Loader.h>
 #include "font.h"
+#include "core/platform/IFileReader.h"
 #include "core/platform/IBinaryFile.h"
 
 namespace font
 {
-	class FontLoader
+    class FontFileLoader : public res::Loader<Font, std::string>
 	{
 	public:
-		explicit FontLoader(const std::shared_ptr<gl::ITextureCreator>& textureCreator) noexcept;
+		explicit FontFileLoader(const std::shared_ptr<gl::ITextureCreator>& textureCreator,
+                                const std::shared_ptr<platform::IFileReader>& fileReader) noexcept;
 
-		[[nodiscard]]
-		std::unique_ptr<Font> loadFont(platform::IBinaryFile& file, int ptSize = 16, int dpi = 96) const;
+        Font load(std::string location) override;
 
 	private:
         std::shared_ptr<gl::ITextureCreator> textureCreator;
-
-		static gml::Vec2<float> calcScale(int ptSize, int emSize, int dpiHorizontal = 0, int dpiVertical = 0);
+        std::shared_ptr<platform::IFileReader> fileReader;
 	};
 }

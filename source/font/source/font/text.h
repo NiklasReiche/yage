@@ -5,60 +5,99 @@
 
 #include <core/gl/DrawableCreator.h>
 #include <gml/vector.h>
-
+#include "resource/Resource.h"
 #include "font.h"
 #include "core/gl/Texture2D.h"
+#include "core/gl/color.h"
 
 namespace font
 {
-    // TODO: maybe use a builder pattern to append text with different parameters (e.g. font, size or color)
+    /**
+     * Optional constructor parameters for text objects.
+     */
+    struct TextParameters
+    {
+        /**
+         * Text color.
+         */
+        uint32_t color = gl::Color::BLACK;
+
+        /**
+         * Font size in pt. Used to compute the size of the text geometry.
+         */
+        float ptSize = 14;
+
+        /**
+         * Resolution (dots per inch) of the target canvas. Used to compute the size of the text geometry.
+         */
+        gml::Vec2i dpi = gml::Vec2i(72);
+
+        /**
+         * Offset in model space for the text geometry. By default, text geometry starts at the origin of the model
+         * space.
+         */
+        gml::Vec3f offset = gml::Vec3f(0, 0, 0);
+
+        /**
+         * How much of the sdf spread is used. Increase this if you need thicker spread for shader effects
+         * (e.g. borders, glow, etc.).
+         */
+        float spreadFactor = 0.05;
+    };
 
     /**
      * Represent geometry for a string of UTF-32 encoded text that can be rendered.
      * The geometry is constructed in 2D model space, i.e. scaling, translation, etc.. should be done in the shader.
      */
-	class Text
-	{
-	public:
-		Text() = delete;
-		Text(const std::shared_ptr<gl::IDrawableCreator>& drawableCreator,
-		     const std::u32string & text,
-		     const std::shared_ptr<Font> & font, // TODO: maybe this should be weak_ptr?
-		     unsigned int color = 0x000000FFu, 
-		     int size = 14); // TODO: param struct could make sense here
+    class Text
+    {
+    public:
+        Text() = delete;
 
-		[[nodiscard]]
-		gml::Vec2<float> getSize() const;
-		[[nodiscard]]
-		gml::Vec4<float> getColor() const;
+        Text(const std::shared_ptr<gl::IDrawableCreator>& drawableCreator,
+             const std::u32string& text,
+             const res::Resource<Font>& font,
+             const TextParameters& params = TextParameters{});
 
-		[[nodiscard]]
-		const gl::ITexture2D& getTexture() const;
-		[[nodiscard]]
+        [[nodiscard]]
+        gml::Vec2<float> getSize() const;
+
+        [[nodiscard]]
+        gml::Vec4<float> getColor() const;
+
+        [[nodiscard]]
+        const gl::ITexture2D& getTexture();
+
+        [[nodiscard]]
         const gl::IDrawable& getDrawable() const;
-		[[nodiscard]]
-		std::u32string getString() const;
-		[[nodiscard]]
-		gml::Vec2f getMaxDimensions() const; // TODO: this might be better suited as a method of the font
-		gml::Vec2f getOffset(unsigned int index); //TODO: is this needed?
 
-	private:
-        const float SPREAD_KEEP_PERCENT = 0.05; // TODO: make this configurable
+        [[nodiscard]]
+        std::u32string getString() const;
 
-		std::shared_ptr<gl::IDrawableCreator> drawableCreator;
+        [[nodiscard]]
+        gml::Vec2f getMaxDimensions(); // TODO: this might be better suited as a method of the font
+
+        gml::Vec2f getOffset(unsigned int index); //TODO: is this needed?
+
+    private:
+        std::shared_ptr<gl::IDrawableCreator> drawableCreator;
         std::unique_ptr<gl::IDrawable> drawable;
-		std::shared_ptr<Font> font;
-
-		gml::Vec2<float> size;
-		gml::Vec4<float> color;
+        res::Resource<Font> fontResource;
 
         std::u32string text;
-		int fontSize = 16;
+        float spreadFactor = 0.05;
+        float fontSize;
+        gml::Vec2i dpi;
+        gml::Vec4<float> color;
 
-		void constructVertices(std::vector<float> & vertices, std::vector<unsigned int> &indices);
+        gml::Vec2<float> size;
 
-		void constructVertexCoords(std::vector<float> & vertices, std::vector<unsigned int> &indices);
-		void constructVertexTexCoords(std::vector<float> & vertices);
-		void constructVertexColors(std::vector<float> & vertices);
-	};
+        void constructVertices(std::vector<float>& vertices, std::vector<unsigned int>& indices);
+
+        void constructVertexCoords(std::vector<float>& vertices, std::vector<unsigned int>& indices);
+
+        void constructVertexTexCoords(std::vector<float>& vertices);
+
+        void constructVertexColors(std::vector<float>& vertices);
+    };
 }
