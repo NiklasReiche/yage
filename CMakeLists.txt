@@ -58,6 +58,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_OLD}")
 add_subdirectory(source/utils)
 add_subdirectory(source/gml)
 add_subdirectory(source/core)
+add_subdirectory(source/resource)
 
 if(WIN32 OR UNIX)
 	add_subdirectory(source/image)
