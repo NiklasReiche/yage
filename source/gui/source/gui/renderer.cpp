@@ -31,6 +31,8 @@ namespace gui
 	void GuiRenderer::render()
 	{
 		//prepareRenderTarget();
+        glRenderer->setClearColor(gl::Color::WHITE);
+        glRenderer->clear();
 		glRenderer->enableBlending();
 
 		glRenderer->useShader(*guiShader);

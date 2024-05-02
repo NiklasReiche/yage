@@ -7,7 +7,6 @@
 
 #include "core.h"
 #include "renderer.h"
-#include "fontmanager.h"
 #include "inputmanager.h"
 #include "texturemanager.h"
 #include "interface.h"
@@ -24,28 +23,25 @@ namespace gui
 
 		void update(double dt);
 
-		void addFont(std::string name, std::string filename) { fontManager.addFont(name, filename); }
-
 		void activateAnimation(Animation * animation);
 		void deactivateAnimation(Animation * animation);
 
 		template <typename Element, typename... Args>
 		Element* createWidget(Widget* parent, Args... args)
 		{
-			MasterInterface master { window, glContext, &fontManager, &textureManager, &inputManager, &renderer };
+			MasterInterface master { window, glContext, &textureManager, &inputManager, &renderer };
 			if (parent == nullptr) {
 				return root.createWidget<Element>(master, args...);
 			}
 			return parent->createWidget<Element>(master, args...);
 		}
 
-		MasterInterface getInterface() { return MasterInterface{ window, glContext, &fontManager, &textureManager, &inputManager, &renderer }; }
+		MasterInterface getInterface() { return MasterInterface{ window, glContext, &textureManager, &inputManager, &renderer }; }
 
 	private:
 		std::shared_ptr<platform::IWindow> window;
 		std::shared_ptr<gl::IContext> glContext;
 
-		FontManager fontManager;
 		TextureManager textureManager;
 		InputManager inputManager;
 		GuiRenderer renderer;

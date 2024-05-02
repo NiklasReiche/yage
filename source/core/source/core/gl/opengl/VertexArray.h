@@ -17,6 +17,8 @@ namespace opengl
 
 		VertexArray& operator=(const VertexArray& other) = delete;
 
+        void setSubData(unsigned int offset, const std::vector<float>& vertices);
+
 	private:
 		GLuint vao = 0;
 		std::shared_ptr<VertexBuffer> vertexBuffer = nullptr;

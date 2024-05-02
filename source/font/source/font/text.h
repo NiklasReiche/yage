@@ -20,7 +20,7 @@ namespace font
         /**
          * Text color.
          */
-        uint32_t color = gl::Color::BLACK;
+        gl::Color_t color = gl::Color::BLACK;
 
         /**
          * Font size in pt. Used to compute the size of the text geometry.
@@ -77,7 +77,9 @@ namespace font
         [[nodiscard]]
         gml::Vec2f getMaxDimensions(); // TODO: this might be better suited as a method of the font
 
-        gml::Vec2f getOffset(unsigned int index); //TODO: is this needed?
+        gml::Vec3f getOffset(unsigned int index); //TODO: is this needed?
+
+        void setOffset(gml::Vec3f offset);
 
     private:
         std::shared_ptr<gl::IDrawableCreator> drawableCreator;
@@ -88,9 +90,9 @@ namespace font
         float spreadFactor = 0.05;
         float fontSize;
         gml::Vec2i dpi;
-        gml::Vec4<float> color;
-
-        gml::Vec2<float> size;
+        gml::Vec4f color;
+        gml::Vec3f offset;
+        gml::Vec2f size;
 
         void constructVertices(std::vector<float>& vertices, std::vector<unsigned int>& indices);
 

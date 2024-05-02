@@ -15,7 +15,6 @@ namespace gui
 		std::shared_ptr<platform::IWindow> platform;
 		std::shared_ptr<gl::IContext> glContext;
 
-		FontManager* fontManager;
 		TextureManager* textureManager;
 		InputManager* inputManger;
 		GuiRenderer* renderer;

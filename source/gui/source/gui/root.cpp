@@ -3,7 +3,7 @@
 namespace gui
 {
 	RootWidget::RootWidget()
-		: Widget(nullptr, MasterInterface(), WidgetTemplate())
+		: Widget()
 	{
 		layout = std::make_unique<AbsoluteLayout>();
 	}

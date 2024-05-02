@@ -121,7 +121,7 @@ namespace gui
 
 	public:
 		RadioGroup(Widget * parent, MasterInterface master, const FrameTemplate & layout, const ButtonTemplate & buttonLayout, T defaultValue)
-			: Frame(parent, master, layout), buttonLayout(buttonLayout), state(defaultValue) 
+			: Frame(parent, master, layout), state(defaultValue), buttonLayout(buttonLayout)
 		{
 			this->buttonLayout.geometry.offset = gml::Vec2<float>();
 		}

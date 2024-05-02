@@ -76,7 +76,7 @@ elseif(WIN32 OR UNIX)
 	add_subdirectory(demo/ModelViewer)
 	add_subdirectory(demo/PhysicsSandbox)
 	add_subdirectory(demo/TextRenderer)
+	add_subdirectory(demo/GuiDemo)
 	
 	#add_subdirectory( source/tools/skyboxViewer )
-	#add_subdirectory( source/tools/guiEditor )
 endif()

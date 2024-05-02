@@ -18,8 +18,6 @@ target_sources(yage_gui
         animation.h
         animation.cpp
         core.h
-        fontmanager.h
-        fontmanager.cpp
         gui.h
         inputmanager.h
         inputmanager.cpp

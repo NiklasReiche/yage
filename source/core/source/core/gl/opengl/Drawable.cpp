@@ -19,4 +19,9 @@ namespace opengl
 		}
 		return *this;
 	}
+
+    void Drawable::setSubData(unsigned int offset, const std::vector<float>& vertices)
+    {
+        vertexArray->setSubData(offset, vertices);
+    }
 }

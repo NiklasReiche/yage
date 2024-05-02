@@ -1,4 +1,5 @@
 #include "entry.h"
+#include "utils/strings.h"
 #include <core/platform/Window.h>
 
 namespace gui
@@ -57,14 +58,15 @@ namespace gui
 		inputTextTemplate.size = defaultTextTemplate.size;
 		inputTextTemplate.font = defaultTextTemplate.font;
 
-		LabelTemplate labelTemplate;
+		LabelTemplate labelTemplate{
+            .text = entryTemplate.defaultText
+        };
 		labelTemplate.geometry.offset = entryTemplate.padding;
 		labelTemplate.geometry.size = gml::Vec2f();
 		labelTemplate.color = 0x00000000u;
 		labelTemplate.shadow.offset = 0;
 		labelTemplate.border.size = 0;
 		labelTemplate.padding = gml::Vec2f(0.0f);
-		labelTemplate.text = entryTemplate.defaultText;
 
 		label = this->createWidget<Label>(master, labelTemplate);
 
@@ -109,7 +111,7 @@ namespace gui
 	void TextEntry::onCharInput(char character)
 	{
 		inputText.insert(cursorPosition, std::string(1, character));
-		label->setText(inputText);
+		label->setText(utils::toUTF32(inputText));
 
 		if (cursorPosition < (int)inputText.length()) {
 			cursorPosition++;
@@ -124,7 +126,7 @@ namespace gui
 			if (cursorPosition > 0) {
 				cursorPosition--;
 				this->inputText.erase(cursorPosition, 1);
-				label->setText(inputText);
+				label->setText(utils::toUTF32(inputText));
 				moveCursor();
 			}
 			break;

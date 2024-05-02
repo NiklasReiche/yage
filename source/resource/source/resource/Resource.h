@@ -21,7 +21,7 @@ namespace res
 
         Resource(std::size_t key, Store<ResourceType>* store);
 
-        friend class Store<ResourceType>;
+        friend class Store<ResourceType>; // TODO: is there a better way to do this?
     };
 }
 

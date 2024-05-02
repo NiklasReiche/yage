@@ -13,13 +13,14 @@ namespace gui
 		this->hoverTexCoords = loadTexture(buttonTemplate.hoverTexture);
 		this->clickTexCoords = loadTexture(buttonTemplate.clickTexture);
 
-		LabelTemplate labelTemplate;
+		LabelTemplate labelTemplate{
+            .text = buttonTemplate.text
+        };
 		labelTemplate.geometry.offset = gml::Vec2f(0.0f);
 		labelTemplate.geometry.size = prefSize;
 		labelTemplate.color = 0x00000000u;
 		labelTemplate.shadow.offset = 0;
 		labelTemplate.border.size = 0;
-		labelTemplate.text = buttonTemplate.text;
 
 		label = this->createWidget<Label>(master, labelTemplate);
 

@@ -19,6 +19,8 @@ namespace opengl
 		Drawable(const Drawable& other) = delete;
 		Drawable& operator=(const Drawable& other) = delete;
 
+        void setSubData(unsigned int offset, const std::vector<float>& vertices) override;
+
 	private:
 		std::unique_ptr<VertexArray> vertexArray;
 		GLint nVertices = 0;

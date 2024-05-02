@@ -49,7 +49,7 @@ namespace gui
 		int so = shadowOffset;
 		int bs = borderSize;
 
-        unsigned int index = 0;
+        int index = -1;
 
 		if (so != 0)
 		{
@@ -63,7 +63,7 @@ namespace gui
 			};
             vertices.insert(std::end(vertices), std::begin(pos_shadow), std::end(pos_shadow));
             std::array<unsigned int, 6> indices_shadow = {
-                    index, ++index, ++index, ++index, ++index, ++index
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index)
             };
             indices.insert(std::end(indices), std::begin(indices_shadow), std::end(indices_shadow));
 		}
@@ -111,10 +111,10 @@ namespace gui
 				left,		bottom
 			};
             std::array<unsigned int, 24> indices_border = {
-                    ++index, ++index, ++index, ++index, ++index, ++index,
-                    ++index, ++index, ++index, ++index, ++index, ++index,
-                    ++index, ++index, ++index, ++index, ++index, ++index,
-                    ++index, ++index, ++index, ++index, ++index, ++index,
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
             };
             indices.insert(std::end(indices), std::begin(indices_border), std::end(indices_border));
 			vertices.insert(std::end(vertices), std::begin(pos_border), std::end(pos_border));
@@ -130,7 +130,7 @@ namespace gui
 		};
 		vertices.insert(std::end(vertices), std::begin(pos_plain), std::end(pos_plain));
         std::array<unsigned int, 6> indices_plain = {
-                ++index, ++index, ++index, ++index, ++index, ++index,
+                static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),static_cast<unsigned int>(++index), static_cast<unsigned int>(++index)
         };
         indices.insert(std::end(indices), std::begin(indices_plain), std::end(indices_plain));
 	}
@@ -276,12 +276,6 @@ namespace gui
 			img::Image image = img::readFromFile(*file, img::FORCE_CHANNELS::RGBA);
 			return master.textureManager->addTexture(image);
 		}
-		else if (!tTemplate.image.isEmpty()) {
-			return master.textureManager->addTexture(tTemplate.image);
-		}
-		else if (!tTemplate.texture) {
-			return master.textureManager->addTexture(*tTemplate.texture);
-		}
 		else {
 			return gml::Vec4f(master.textureManager->getAlphaTexCoords().x(), master.textureManager->getAlphaTexCoords().y(), master.textureManager->getAlphaTexCoords().x(), master.textureManager->getAlphaTexCoords().y());
 		}
@@ -290,12 +284,12 @@ namespace gui
 
 	void Widget::updateParams()
 	{
-		std::vector<float> vertices;
-        // TODO
-#if 0
-		constructVertices(vertices, texCoords);
-		drawable->setSubData(0, vertices);
-#endif
+        if (drawable != nullptr){
+            std::vector<float> vertices;
+            std::vector<unsigned int> indices;
+            constructVertices(vertices, texCoords, indices);
+            drawable->setSubData(0, vertices);
+        }
 	}
 	
 	void Widget::relayout()

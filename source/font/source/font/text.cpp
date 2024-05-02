@@ -10,11 +10,10 @@ namespace font
                const std::u32string& text,
                const res::Resource<Font>& font,
                const TextParameters& params)
-            : drawableCreator(drawableCreator), fontResource(font), text(text), fontSize(params.ptSize),
-              dpi(params.dpi), color(gl::toVec4(params.color))
+            : drawableCreator(drawableCreator), fontResource(font), text(text), spreadFactor(params.spreadFactor),
+              fontSize(params.ptSize), dpi(params.dpi), color(gl::toVec4(params.color)), offset(params.offset)
     {
-        if (!text.empty())
-        {
+        if (!text.empty()) {
             std::vector<float> vertices;
             std::vector<unsigned int> indices;
             constructVertices(vertices, indices);
@@ -54,25 +53,22 @@ namespace font
         auto& font = fontResource.get();
         const auto scale = font.getScaling(fontSize, dpi);
 
-        float xPos = 0;
-        float yPos = 0;
+        float xPos = offset.x();
+        float yPos = offset.y();
 
         std::vector<float> coords;
         unsigned int index = 0;
 
         // Iterate through all characters
-        for (char32_t c: text)
-        {
-            if (c == '\n')
-            {
-                xPos = 0;
+        for (char32_t c: text) {
+            if (c == '\n') {
+                xPos = offset.x();
                 yPos += font.metrics.lineHeight * scale.y();
                 size.y() += font.metrics.lineHeight * scale.y();
                 continue;
             }
 
-            if (!font.characters.contains(c))
-            {
+            if (!font.characters.contains(c)) {
                 c = '?';
             }
 
@@ -118,13 +114,11 @@ namespace font
         auto& font = fontResource.get();
         std::vector<float> texCoords;
 
-        for (char32_t c: text)
-        {
+        for (char32_t c: text) {
             if (c == '\n')
                 continue;
 
-            if (!font.characters.contains(c))
-            {
+            if (!font.characters.contains(c)) {
                 c = '?';
             }
 
@@ -158,8 +152,7 @@ namespace font
     {
         std::vector<float> colors;
 
-        for (char32_t c: text)
-        {
+        for (char32_t c: text) {
             if (c == '\n')
                 continue;
 
@@ -208,27 +201,34 @@ namespace font
         return dimensions;
     }
 
-    gml::Vec2f Text::getOffset(const unsigned int index)
+    gml::Vec3f Text::getOffset(const unsigned int index)
     {
-        if (index > text.length())
-        {
-            return gml::Vec2f(-1.0f);
+        if (index > text.length()) {
+            return gml::Vec3f(-1.0f); // TODO: throw
         }
 
         auto& font = fontResource.get();
         const auto scale = font.getScaling(fontSize, dpi);
 
-        gml::Vec2f offset(0.0f);
-        for (unsigned int i = 0; i < index; ++i)
-        {
+        gml::Vec3f _offset = offset;
+        for (unsigned int i = 0; i < index; ++i) {
             const Character& ch = font.characters.at(text[i]);
-            offset.x() += ch.glyph.advance * scale.x();
+            _offset.x() += ch.glyph.advance * scale.x();
         }
 
         // TODO: ?
         //const Character & ch = font.characters.at(text[index]);
         //offset.y = font.maxGlyph.bearing.y * scale - ch.glyph.bearing.y * scale;
 
-        return offset;
+        return _offset;
+    }
+
+    void Text::setOffset(gml::Vec3f offset)
+    {
+        this->offset = offset;
+        std::vector<float> vertices;
+        std::vector<unsigned int> indices;
+        constructVertices(vertices, indices);
+        drawable->setSubData(0, vertices);
     }
 }

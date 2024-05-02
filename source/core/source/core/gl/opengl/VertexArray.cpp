@@ -30,4 +30,9 @@ namespace opengl
 		}
 		return *this;
 	}
+
+    void VertexArray::setSubData(unsigned int offset, const std::vector<float>& vertices)
+    {
+        vertexBuffer->setSubData(offset, vertices);
+    }
 }

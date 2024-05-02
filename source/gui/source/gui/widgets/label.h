@@ -13,6 +13,7 @@ namespace gui
 		BOTTOM,
 		CENTER
 	};
+
 	enum class TextAlignmentX
 	{
 		LEFT, 
@@ -22,13 +23,14 @@ namespace gui
 
 	struct TextTemplate
 	{
-		std::u32string text = U"";
-		std::string font = "arial";
+		std::u32string text;
+        res::Resource<font::Font> font;
 		int size = 16;
-		unsigned int color = gl::Color::BLACK;
+		gl::Color_t color = gl::Color::BLACK;
 		TextAlignmentX alignX = TextAlignmentX::LEFT;
 		TextAlignmentY alignY = TextAlignmentY::TOP;
 	};
+
 	struct LabelTemplate : public WidgetTemplate
 	{
 		TextTemplate text;
@@ -38,8 +40,8 @@ namespace gui
 	class Label : public Widget
 	{
 	private:
+        LabelTemplate params;
 		std::unique_ptr<font::Text> text;
-		std::string font = "arial";
 
 		gml::Vec2f padding = gml::Vec2f(2.0f);
 		TextAlignmentX alignX = TextAlignmentX::LEFT;
@@ -50,18 +52,9 @@ namespace gui
 
 		font::Text* getText() { return text.get(); } // TODO
 
-
 		void setText(TextTemplate text);
 
-
-		void setText(font::Text text);
-		void setText(std::string text);
-		void setTextColor(unsigned int color) {
-#if 0
-            text.setColor(color);
-#endif
-        }
-
+		void setText(const std::u32string &string);
 
 		void updateGeometry();
 

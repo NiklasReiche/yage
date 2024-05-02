@@ -10,7 +10,6 @@
 
 #include "core.h"
 #include "interface.h"
-#include "fontmanager.h"
 #include "texturemanager.h"
 #include "animation.h"
 #include "widgettemplate.h"
@@ -27,7 +26,7 @@ namespace gui
 		
 		Widget();
 		Widget(Widget * parent, MasterInterface master, const WidgetTemplate & widgetTemplate);
-		virtual ~Widget() {}
+		virtual ~Widget() = default;
 
 		template <typename Element, typename... Args>
 		Element* createWidget(MasterInterface mInterface, Args... args)
@@ -38,9 +37,9 @@ namespace gui
 		}
 
 		template <typename Element, typename... Args>
-		Element* createAnimation(Master* master, Args... args)
+		Element* createAnimation(Master* _master, Args... args)
 		{
-			animations.push_back( std::make_unique<Element>(this, master, std::forward<Args>(args)...) );
+			animations.push_back( std::make_unique<Element>(this, _master, std::forward<Args>(args)...) );
 			return (Element*)animations.back().get();
 		}
 		

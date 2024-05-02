@@ -39,10 +39,7 @@ namespace gui
 	};
 	struct WidgetTextureTemplate
 	{
-		std::string filename = "";
-		img::Image image;
-		std::shared_ptr<gl::ITexture2D> texture; // TODO: don't do this
-
+		std::string filename;
 		float resizeFactor = 1.0f;
 	};
 

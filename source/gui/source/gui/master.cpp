@@ -3,8 +3,7 @@
 namespace gui
 {
 	Master::Master(const std::shared_ptr<platform::IWindow> &window, const std::shared_ptr<gl::IContext> &glContext)
-		: window(window), glContext(glContext), 
-		fontManager(FontManager(glContext->getTextureCreator(), window->getFileReader(), window->getDpi())),
+		: window(window), glContext(glContext),
 		textureManager(TextureManager(window, glContext->getTextureCreator())),
 		inputManager(InputManager(&root)),
 		renderer(GuiRenderer(glContext->getRenderer(), glContext->getShaderCreator(), gl::IRenderer::Viewport{ 0, 0, window->getWidth(), window->getHeight() }))

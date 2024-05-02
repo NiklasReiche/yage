@@ -6,7 +6,6 @@
 
 #include "renderer.h"
 #include "inputmanager.h"
-#include "fontmanager.h"
 #include "interface.h"
 
 #include "widget.h"

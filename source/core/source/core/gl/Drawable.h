@@ -13,6 +13,8 @@ namespace gl
 	public:
 		virtual ~IDrawable() = default;
 
+        virtual void setSubData(unsigned int offset, const std::vector<float>& vertices) = 0;
+
 	protected:
 		IDrawable() = default;
 		IDrawable(const IDrawable& other) = default;
