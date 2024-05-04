@@ -6,65 +6,58 @@
 
 namespace font
 {
-    Text::Text(const std::shared_ptr<gl::IDrawableCreator>& drawableCreator,
+    Text::Text(const std::shared_ptr<gl::IDrawableCreator>& drawable_creator,
                const std::u32string& text,
                const res::Resource<Font>& font,
                const TextParameters& params)
-            : drawableCreator(drawableCreator), fontResource(font), text(text), spreadFactor(params.spreadFactor),
-              fontSize(params.ptSize), dpi(params.dpi), color(gl::toVec4(params.color)), offset(params.offset)
+            : m_drawable_creator(drawable_creator), m_font_resource(font), m_text(text), m_spread_factor(params.spread_factor),
+              m_font_size(params.pt_size), m_dpi(params.dpi), m_color(gl::toVec4(params.color)), m_offset(params.offset)
     {
         if (!text.empty()) {
-            std::vector<float> vertices;
-            std::vector<unsigned int> indices;
-            constructVertices(vertices, indices);
-            drawable = drawableCreator->createDrawable(vertices, indices, std::vector<unsigned int>{2, 2, 4},
-                                                       gl::VertexFormat::BATCHED);
+            std::vector<float> vertices = construct_vertices();
+            std::vector<unsigned int> indices = construct_indices();
+            m_drawable = drawable_creator->createDrawable(vertices, indices, std::vector<unsigned int>{3, 2, 4},
+                                                          gl::VertexFormat::BATCHED);
         }
     }
 
-    gml::Vec2<float> Text::getSize() const
+    std::vector<float> Text::construct_vertices()
     {
-        return size;
-    }
+        m_dimensions = gml::Vec2f(0.0f);
+        std::vector<float> vertices;
 
-    gml::Vec4<float> Text::getColor() const
-    {
-        return color;
-    }
-
-    void Text::constructVertices(std::vector<float>& vertices, std::vector<unsigned int>& indices)
-    {
-        size = gml::Vec2f(0.0f);
-        std::vector<float> coords;
-        constructVertexCoords(coords, indices);
+        m_data_offset_coords = 0;
+        std::vector<float> coords = construct_vertex_coords();
         vertices.insert(std::end(vertices), std::begin(coords), std::end(coords));
 
-        std::vector<float> texCoords;
-        constructVertexTexCoords(texCoords);
+        m_data_offset_tex_coords = coords.size();
+        std::vector<float> texCoords = construct_vertex_tex_coords();
         vertices.insert(std::end(vertices), std::begin(texCoords), std::end(texCoords));
 
-        std::vector<float> colors;
-        constructVertexColors(colors);
+        m_data_offset_colors = m_data_offset_tex_coords + texCoords.size();
+        std::vector<float> colors = construct_vertex_colors();
         vertices.insert(std::end(vertices), std::begin(colors), std::end(colors));
+
+        return vertices;
     }
 
-    void Text::constructVertexCoords(std::vector<float>& vertices, std::vector<unsigned int>& indices)
+    std::vector<float> Text::construct_vertex_coords()
     {
-        auto& font = fontResource.get();
-        const auto scale = font.getScaling(fontSize, dpi);
+        auto& font = m_font_resource.get();
+        const auto scale = font.scaling(m_font_size, m_dpi);
 
-        float xPos = offset.x();
-        float yPos = offset.y();
+        float xPos = m_offset.x();
+        float yPos = m_offset.y();
+        float zPos = m_offset.z();
 
         std::vector<float> coords;
-        unsigned int index = 0;
 
         // Iterate through all characters
-        for (char32_t c: text) {
+        for (char32_t c: m_text) {
             if (c == '\n') {
-                xPos = offset.x();
+                xPos = m_offset.x();
                 yPos += font.metrics.lineHeight * scale.y();
-                size.y() += font.metrics.lineHeight * scale.y();
+                m_dimensions.y() += font.metrics.lineHeight * scale.y();
                 continue;
             }
 
@@ -80,41 +73,34 @@ namespace font
             const float bottom = top + ch.glyph.size.y() * scale.y();
 
             // Generate glyph quad for each character
-            std::array<float, 8> localCoords = {
-                    left, top,
-                    left, bottom,
-                    right, bottom,
-                    right, top,
+            std::array<float, 12> localCoords = {
+                    left, top, zPos,
+                    left, bottom, zPos,
+                    right, bottom, zPos,
+                    right, top, zPos
             };
 
             // Append to global coords
             coords.insert(std::end(coords), std::begin(localCoords), std::end(localCoords));
-            indices.push_back(index);
-            indices.push_back(index + 1);
-            indices.push_back(index + 2);
-            indices.push_back(index + 2);
-            indices.push_back(index + 3);
-            indices.push_back(index);
-            index += 4;
 
             // Advance cursors for next glyph
             xPos += ch.glyph.advance * scale.x();
 
             // Update text geometry
-            size.x() = std::max(size.x(), xPos);
-            size.y() = std::max(size.y(), yPos + bottom);
+            m_dimensions.x() = std::max(m_dimensions.x(), xPos);
+            m_dimensions.y() = std::max(m_dimensions.y(), yPos + bottom);
         }
 
         // Append to global vertices
-        vertices.insert(std::end(vertices), std::begin(coords), std::end(coords));
+        return coords;
     }
 
-    void Text::constructVertexTexCoords(std::vector<float>& vertices)
+    std::vector<float> Text::construct_vertex_tex_coords()
     {
-        auto& font = fontResource.get();
-        std::vector<float> texCoords;
+        auto& font = m_font_resource.get();
+        std::vector<float> tex_coords;
 
-        for (char32_t c: text) {
+        for (char32_t c: m_text) {
             if (c == '\n')
                 continue;
 
@@ -124,46 +110,46 @@ namespace font
 
             const Character& ch = font.characters.at(c);
 
-            const float spreadX = font.metrics.spreadInTexCoords.x() * (1 - spreadFactor);
-            const float spreadY = font.metrics.spreadInTexCoords.y() * (1 - spreadFactor);
+            const float spread_x = font.metrics.spreadInTexCoords.x() * (1 - m_spread_factor);
+            const float spread_y = font.metrics.spreadInTexCoords.y() * (1 - m_spread_factor);
 
-            const float texLeft = ch.texCoords.left + spreadX;
-            const float texRight = ch.texCoords.right - spreadX;
-            const float texBottom = ch.texCoords.bottom - spreadY;
-            const float texTop = ch.texCoords.top + spreadY;
+            const float tex_left = ch.texCoords.left + spread_x;
+            const float tex_right = ch.texCoords.right - spread_x;
+            const float tex_bottom = ch.texCoords.bottom - spread_y;
+            const float tex_top = ch.texCoords.top + spread_y;
 
             // Generate glyph quad for each character
-            std::array<float, 8> localTexCoords = {
-                    texLeft, texTop,
-                    texLeft, texBottom,
-                    texRight, texBottom,
-                    texRight, texTop,
+            std::array<float, 8> local_tex_coords = {
+                    tex_left, tex_top,
+                    tex_left, tex_bottom,
+                    tex_right, tex_bottom,
+                    tex_right, tex_top,
             };
 
             // Append to global tex coords
-            texCoords.insert(std::end(texCoords), std::begin(localTexCoords), std::end(localTexCoords));
+            tex_coords.insert(std::end(tex_coords), std::begin(local_tex_coords), std::end(local_tex_coords));
         }
 
         // Append to global vertices
-        vertices.insert(std::end(vertices), std::begin(texCoords), std::end(texCoords));
+        return tex_coords;
     }
 
-    void Text::constructVertexColors(std::vector<float>& vertices)
+    std::vector<float> Text::construct_vertex_colors()
     {
         std::vector<float> colors;
 
-        for (char32_t c: text) {
+        for (char32_t c: m_text) {
             if (c == '\n')
                 continue;
 
-            // add values even for unknown characters, since we substitute them with '?'
+            // add values even for unknown characters, since we substitute them with some glyph
 
             // Generate glyph quad for each character
             std::array<float, 16> localColors = {
-                    color.x(), color.y(), color.z(), color.w(),
-                    color.x(), color.y(), color.z(), color.w(),
-                    color.x(), color.y(), color.z(), color.w(),
-                    color.x(), color.y(), color.z(), color.w(),
+                    m_color.x(), m_color.y(), m_color.z(), m_color.w(),
+                    m_color.x(), m_color.y(), m_color.z(), m_color.w(),
+                    m_color.x(), m_color.y(), m_color.z(), m_color.w(),
+                    m_color.x(), m_color.y(), m_color.z(), m_color.w(),
             };
 
             // Append to global colors
@@ -171,28 +157,49 @@ namespace font
         }
 
         // Append to global vertices
-        vertices.insert(std::end(vertices), std::begin(colors), std::end(colors));
+        return colors;
     }
 
-    const gl::ITexture2D& Text::getTexture()
+    std::vector<unsigned int> Text::construct_indices()
     {
-        return *(fontResource.get().textureAtlas);
+        std::vector<unsigned int> indices;
+        unsigned int index = 0;
+        for (char32_t c: m_text) {
+            if (c == '\n')
+                continue;
+
+            // add values even for unknown characters, since we substitute them with some glyph
+
+            indices.push_back(index);
+            indices.push_back(index + 1);
+            indices.push_back(index + 2);
+            indices.push_back(index + 2);
+            indices.push_back(index + 3);
+            indices.push_back(index);
+            index += 4;
+        }
+        return indices;
     }
 
-    const gl::IDrawable& Text::getDrawable() const
+    const gl::ITexture2D& Text::texture()
     {
-        return *drawable;
+        return *(m_font_resource.get().textureAtlas);
     }
 
-    std::u32string Text::getString() const
+    const gl::IDrawable& Text::drawable() const
     {
-        return text;
+        return *m_drawable;
     }
 
-    gml::Vec2f Text::getMaxDimensions()
+    std::u32string Text::text() const
     {
-        auto& font = fontResource.get();
-        const auto scale = font.getScaling(fontSize, dpi);
+        return m_text;
+    }
+
+    gml::Vec2f Text::max_font_dimensions()
+    {
+        auto& font = m_font_resource.get();
+        const auto scale = font.scaling(m_font_size, m_dpi);
 
         gml::Vec2f dimensions;
         dimensions.x() = font.maxGlyph.size.x() * scale.x();
@@ -201,34 +208,53 @@ namespace font
         return dimensions;
     }
 
-    gml::Vec3f Text::getOffset(const unsigned int index)
+    gml::Vec3f Text::offset(unsigned int i)
     {
-        if (index > text.length()) {
-            return gml::Vec3f(-1.0f); // TODO: throw
+        if (i > m_text.length()) {
+            throw std::invalid_argument("index out of bounds");
         }
 
-        auto& font = fontResource.get();
-        const auto scale = font.getScaling(fontSize, dpi);
+        auto& font = m_font_resource.get();
+        const auto scale = font.scaling(m_font_size, m_dpi);
 
-        gml::Vec3f _offset = offset;
-        for (unsigned int i = 0; i < index; ++i) {
-            const Character& ch = font.characters.at(text[i]);
+        gml::Vec3f _offset = m_offset;
+        for (unsigned int j = 0; j < i; ++i) {
+            const Character& ch = font.characters.at(m_text[j]);
             _offset.x() += ch.glyph.advance * scale.x();
         }
-
-        // TODO: ?
-        //const Character & ch = font.characters.at(text[index]);
-        //offset.y = font.maxGlyph.bearing.y * scale - ch.glyph.bearing.y * scale;
 
         return _offset;
     }
 
-    void Text::setOffset(gml::Vec3f offset)
+    gml::Vec2<float> Text::dimensions() const
     {
-        this->offset = offset;
-        std::vector<float> vertices;
-        std::vector<unsigned int> indices;
-        constructVertices(vertices, indices);
-        drawable->setSubData(0, vertices);
+        return m_dimensions;
+    }
+
+    gml::Vec4<float> Text::color() const
+    {
+        return m_color;
+    }
+
+    void Text::update_offset(gml::Vec3f offset)
+    {
+        m_offset = offset;
+        std::vector<float> vertices = construct_vertex_coords();
+        m_drawable->setSubData(m_data_offset_coords, vertices);
+    }
+
+    void Text::update_color(gl::Color_t color)
+    {
+        m_color = gl::toVec4(color);
+        std::vector<float> vertices = construct_vertex_colors();
+        m_drawable->setSubData(m_data_offset_colors, vertices);
+    }
+
+    void Text::update_size(float pt_size, gml::Vec2i dpi)
+    {
+        m_font_size = pt_size;
+        m_dpi = dpi;
+        std::vector<float> vertices = construct_vertex_coords();
+        m_drawable->setSubData(m_data_offset_coords, vertices);
     }
 }

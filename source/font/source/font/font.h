@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <map>
+#include <unordered_map>
 
 #include <gml/gml.h>
 #include <core/gl/Texture2D.h>
@@ -23,13 +23,13 @@ namespace font
         /**
          * Size of the glyph's bounding box in pixel coordinates.
          */
-		gml::Vec2<float> size;
+		gml::Vec2f size;
 
         /**
          * x: Vertical distance from the cursor position to the left edge of the glyph's bounding box in pixel coordinates.
          * y: Horizontal distance from the baseline to the top edge of the glyph's bounding box in pixel coordinates.
          */
-        gml::Vec2<float> bearing;
+        gml::Vec2f bearing;
 
         /**
          * Distance that the cursor should increment after drawing this glyph in pixel coordinates.
@@ -87,7 +87,7 @@ namespace font
         /**
          * Metrics for the individual characters.
          */
-        std::map<Codepoint, Character> characters; // TODO: unordered_map?
+        std::unordered_map<Codepoint, Character> characters;
 
         /**
          * Texture atlas containing the glyph sdf bitmaps.
@@ -101,9 +101,10 @@ namespace font
          * @param dpi DPI resolution of the target canvas.
          * @return Scaling factor to convert glyph metrics into pixel coordinates.
          */
-        gml::Vec2f getScaling(float ptSize, gml::Vec2i dpi)
+        [[nodiscard]]
+        gml::Vec2f scaling(float ptSize, gml::Vec2i dpi) const
         {
-            // pt = 1/72 inch
+            // 1 pt = 1/72 inch
             const gml::Vec2f pixelsPerEM = static_cast<gml::Vec2f>(dpi) * ptSize / 72.f;
             return pixelsPerEM / static_cast<float>(metrics.unitsPerEM);
         }

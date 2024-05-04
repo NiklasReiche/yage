@@ -29,7 +29,7 @@ namespace font
         }
     }
 
-    FT_Face FT_Loader::loadFace(const std::string &filepath)
+    FT_Face FT_Loader::load_face(const std::string &filepath)
     {
         FT_Face face;
         FT_Error error = FT_New_Face(ft, filepath.c_str(), 0, &face);
@@ -44,7 +44,7 @@ namespace font
     }
 
     FT_GlyphSlot
-    FT_Loader::loadGlyph(const FT_Face &face, Codepoint c, // NOLINT(*-convert-member-functions-to-static)
+    FT_Loader::load_glyph(const FT_Face &face, Codepoint c, // NOLINT(*-convert-member-functions-to-static)
                          FT_GLYPH_LOAD_FLAG load_flag)
     {
         FT_Error error = FT_Load_Char(face, c, (FT_Int32) load_flag);
@@ -72,7 +72,7 @@ namespace font
 
         FT_Loader ft;
         ft.initialize();
-        FT_Face face = ft.loadFace(filenameInput);
+        FT_Face face = ft.load_face(filenameInput);
         FT_Set_Pixel_Sizes(face, 0, loadResolution);
 
         // we place the glyphs into the atlas in a roughly square grid
@@ -87,9 +87,9 @@ namespace font
         // traverse characters and append them to the atlas grid from left to right and top to bottom (i.e. row-major)
         for (Codepoint c : charCodes)
         {
-            auto bitmap = getBitmap(ft, face, c);
+            auto bitmap = load_bitmap(ft, face, c);
             // the spread is given in target resolution pixels, so we need to upscale it here
-            auto sdf = generateSdf(bitmap, spread * scaleFactor);
+            auto sdf = generate_sdf(bitmap, spread * scaleFactor);
             sdfMap[c] = downscale(sdf, gml::Vec2i(sdf.getWidth() / scaleFactor,
                                                   sdf.getHeight() / scaleFactor));
 
@@ -136,8 +136,8 @@ namespace font
 
             // compute glyph metrics
             characters[c] = Character{
-                .glyph = getGlyphMetricsAndUpdateMax(ft, face, c, maxGlyph),
-                .texCoords = getRelativeTextureMetrics(sdf, offset + gml::Vec2i(padding), atlasSize)
+                .glyph = load_glyph_metrics_and_update_max(ft, face, c, maxGlyph),
+                .texCoords = relative_texture_metrics(sdf, offset + gml::Vec2i(padding), atlasSize)
             };
 
             // add sdf to texture atlas
@@ -166,7 +166,8 @@ namespace font
 
         auto atlasImageData = textureAtlas->getImage();
         img::Image atlasImage(textureAtlas->getWidth(), textureAtlas->getHeight(), 1, atlasImageData);
-        writeFontFile(filenameOutput, face->units_per_EM, charCodes, atlasImage, maxGlyph, characters, spreadInTexCoords, face);
+        write_font_file(filenameOutput, face->units_per_EM, charCodes, atlasImage, maxGlyph, characters,
+                        spreadInTexCoords, face);
 #if 1 // TODO: make this an output option
         {
             platform::desktop::FileReader fileReader;
@@ -179,19 +180,19 @@ namespace font
 
     }
 
-    img::Image FontConverter::getBitmap(FT_Loader &ft, const FT_Face &face, Codepoint c)
+    img::Image FontConverter::load_bitmap(FT_Loader &ft, const FT_Face& face, Codepoint c)
     {
-        FT_GlyphSlot glyph = ft.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::MONOCHROME_BITMAP);
+        FT_GlyphSlot glyph = ft.load_glyph(face, c, FT_GLYPH_LOAD_FLAG::MONOCHROME_BITMAP);
         FT_Bitmap &bitmap = glyph->bitmap;
 
-        std::vector<unsigned char> imageData = unpackBitmap(bitmap.buffer, bitmap.rows, bitmap.width, bitmap.pitch);
+        std::vector<unsigned char> imageData = unpack_bitmap(bitmap.buffer, bitmap.rows, bitmap.width, bitmap.pitch);
         return {(int) bitmap.width, (int) bitmap.rows, 1, imageData};
     }
 
-    GlyphMetrics FontConverter::getGlyphMetricsAndUpdateMax(FT_Loader &ft, const FT_Face &face, Codepoint c,
-                                                            GlyphMetrics &maxGlyph)
+    GlyphMetrics FontConverter::load_glyph_metrics_and_update_max(FT_Loader &ft, const FT_Face &face, Codepoint c,
+                                                                  GlyphMetrics &maxGlyph)
     {
-        FT_GlyphSlot glyph = ft.loadGlyph(face, c, FT_GLYPH_LOAD_FLAG::UNSCALED);
+        FT_GlyphSlot glyph = ft.load_glyph(face, c, FT_GLYPH_LOAD_FLAG::UNSCALED);
 
         GlyphMetrics metrics{
                 .size = gml::Vec2f((float) glyph->metrics.width,
@@ -211,7 +212,7 @@ namespace font
     }
 
     TexMetrics
-    FontConverter::getRelativeTextureMetrics(const img::Image &characterBitmap, gml::Vec2i offset, gml::Vec2i atlasSize)
+    FontConverter::relative_texture_metrics(const img::Image &characterBitmap, gml::Vec2i offset, gml::Vec2i atlasSize)
     {
         TexMetrics metrics;
         metrics.left = (float) offset.x() / (float) atlasSize.x();
@@ -222,7 +223,7 @@ namespace font
         return metrics;
     }
 
-    img::Image FontConverter::generateSdf(const img::Image &bitmap, const int spread)
+    img::Image FontConverter::generate_sdf(const img::Image &bitmap, int spread)
     {
         // Padding around the input bitmap must be at least equal to spread, so we don't cut off edges and corners.
         // We add a small padding around the sdf to reduce interference when sampling the atlas for text rendering.
@@ -239,7 +240,7 @@ namespace font
         {
             for (p.x() = 0; p.x() < sdfSize.x(); p.x()++)
             {
-                const unsigned char value = getPaddedValue(bitmap, p.y(), p.x(), bitmapPadding);
+                const unsigned char value = padded_value(bitmap, p.y(), p.x(), bitmapPadding);
 
                 // The search area must at least encompass a circle around the pixel with a radius of 'spread'.
                 // We use a rectangle around this circle for simplicity. Pixels within this search area but outside
@@ -258,8 +259,8 @@ namespace font
                     for (neighbour.x() = searchAreaStart.x(); neighbour.x() < searchAreaEnd.x(); neighbour.x()++)
                     {
                         // find pixel with the opposite value
-                        const unsigned char neighbourValue = getPaddedValue(bitmap, neighbour.y(), neighbour.x(),
-                                                                            bitmapPadding);
+                        const unsigned char neighbourValue = padded_value(bitmap, neighbour.y(), neighbour.x(),
+                                                                          bitmapPadding);
                         if (neighbourValue == value)
                         {
                             continue;
@@ -290,7 +291,7 @@ namespace font
         return sdf;
     }
 
-    unsigned char FontConverter::getPaddedValue(const img::Image &bitmap, const int y, const int x, const int padding)
+    unsigned char FontConverter::padded_value(const img::Image &bitmap, int y, int x, int padding)
     {
         if (y < padding || x < padding || y > bitmap.getHeight() - 1 + padding || x > bitmap.getWidth() - 1 + padding)
             return 0; // we pad with black pixels
@@ -327,11 +328,11 @@ namespace font
     }
 
     void
-    FontConverter::writeFontFile(const std::string &filename, int unitsPerEM,
-                                 const std::vector<Codepoint> &charCodes,
-                                 const img::Image &atlas, GlyphMetrics maxGlyph,
-                                 const std::map<Codepoint, Character> &characters,
-                                 const gml::Vec2f spreadInTexCoords, const FT_Face & face)
+    FontConverter::write_font_file(const std::string &filename, int unitsPerEM,
+                                   const std::vector<Codepoint> &charCodes,
+                                   const img::Image &atlas, GlyphMetrics maxGlyph,
+                                   const std::map<Codepoint, Character> &characters,
+                                   gml::Vec2f spreadInTexCoords, const FT_Face & face)
     {
         FontFile fontFile;
 
@@ -389,13 +390,13 @@ namespace font
         file.write((char *) &fontFile.sdf[0], sizeof(uint8_t) * fontFile.sdf.size());
     }
 
-    unsigned char FontConverter::rightGetBit(unsigned char c, unsigned int n)
+    unsigned char FontConverter::right_get_bit(unsigned char c, unsigned int n)
     {
         return ((c << n) & 128) >> 7;
     }
 
     std::vector<unsigned char>
-    FontConverter::unpackBitmap(unsigned char *data, unsigned int rows, unsigned int width, unsigned int pitch)
+    FontConverter::unpack_bitmap(unsigned char *data, unsigned int rows, unsigned int width, unsigned int pitch)
     {
         std::vector<unsigned char> image;
         unsigned int bit_pointer = 0;
@@ -408,10 +409,10 @@ namespace font
             {
                 unsigned char v;
 
-                if (rightGetBit(row[bit_pointer / 8], bit_pointer % 8) == 1)
+                if (right_get_bit(row[bit_pointer / 8], bit_pointer % 8) == 1)
                 {
                     v = 255;
-                } else if (rightGetBit(row[bit_pointer / 8], bit_pointer % 8) == 0)
+                } else if (right_get_bit(row[bit_pointer / 8], bit_pointer % 8) == 0)
                 {
                     v = 0;
                 }
@@ -424,7 +425,7 @@ namespace font
         return image;
     }
 
-    std::vector<Codepoint> FontConverter::codepointSetAscii()
+    std::vector<Codepoint> FontConverter::codepoint_set_ascii()
     {
         std::vector<Codepoint> set;
         for (auto i = 32; i < 127; ++i)
