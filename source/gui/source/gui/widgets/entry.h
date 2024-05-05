@@ -15,7 +15,7 @@ namespace gui
 	class TextCursor : public Widget
 	{
 	public:
-		TextCursor(Widget* parent, MasterInterface master, WidgetTemplate widgetTemplate);
+		TextCursor(Widget* parent, Master* master, WidgetTemplate widgetTemplate);
 	};
 
 	class CursorAnimation : public Animation
@@ -57,7 +57,7 @@ namespace gui
 		void moveCursor();
 
 	public:
-		TextEntry(Widget * parent, MasterInterface master, TextEntryTemplate entryTemplate, Master* m);
+		TextEntry(Widget * parent, Master* master, TextEntryTemplate entryTemplate, Master* m);
 
 		void onFocus();
 		void onFocusRelease();

@@ -26,35 +26,45 @@ namespace gui
 
 		//clearColor = gml::Vec4<float>(1, 1, 1, 1);
 	}
+    
+    void GuiRenderer::render(RootWidget& root)
+    {
+        std::vector<Widget*> widgets;
+        std::vector<font::Text*> texts;
+        collect_drawables(widgets, texts, root);
 
-
-	void GuiRenderer::render()
-	{
-		//prepareRenderTarget();
         glRenderer->setClearColor(gl::Color::WHITE);
         glRenderer->clear();
-		glRenderer->enableBlending();
+        glRenderer->enableBlending();
 
-		glRenderer->useShader(*guiShader);
-		glRenderer->bindTexture(*guiTexture);
-		for (unsigned int i = 0; i < widgets.size(); ++i)
-		{
-			glRenderer->draw(*widgets[i]);
-		}
+        glRenderer->useShader(*guiShader);
+        for (auto widget : widgets) {
+            glRenderer->bindTexture(widget->texture_atlas_view().get());
+            glRenderer->draw(*widget->drawable);
+        }
 
-		glRenderer->useShader(*textShader);
-		for (unsigned int i = 0; i < text.size(); ++i)
-		{
-			glRenderer->bindTexture(text[i]->getTexture(), 0);
-			glRenderer->draw(text[i]->getDrawable());
-		}
+        glRenderer->useShader(*textShader);
+        for (auto text : texts) {
+            glRenderer->bindTexture(text->texture(), 0);
+            glRenderer->draw(text->drawable());
+        }
 
-		glRenderer->disableBlending();
-		//renderToScreen();
-	}
+        glRenderer->disableBlending();
+    }
 
-	void GuiRenderer::setTexture(std::shared_ptr<gl::ITexture2D> texture)
-	{
-		guiTexture = texture;
-	}
+    void GuiRenderer::collect_drawables(std::vector<Widget*>& vector_widget,
+                                        std::vector<font::Text*>& vector_text,
+                                        Widget& widget)
+    {
+        for (unsigned int i = 0; i < widget.getChildrenCount(); ++i) {
+            Widget& child = widget.getChild(i);
+            if (child.is_Active()) {
+                vector_widget.push_back(&child);
+                if (child.has_Text()) {
+                    vector_text.push_back(child.getText());
+                }
+            }
+            collect_drawables(vector_widget, vector_text, child);
+        }
+    }
 }

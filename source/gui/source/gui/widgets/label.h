@@ -48,7 +48,7 @@ namespace gui
 		TextAlignmentY alignY = TextAlignmentY::TOP;
 
 	public:
-		Label(Widget * parent, MasterInterface master, LabelTemplate labelTemplate);
+		Label(Widget * parent, Master* master, LabelTemplate labelTemplate);
 
 		font::Text* getText() { return text.get(); } // TODO
 
@@ -56,7 +56,7 @@ namespace gui
 
 		void setText(const std::u32string &string);
 
-		void updateGeometry();
+		void update_geometry();
 
 		gml::Vec2f calcPrefSize();
 	};

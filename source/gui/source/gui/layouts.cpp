@@ -3,8 +3,6 @@
 
 namespace gui
 {
-	AbsoluteLayout::AbsoluteLayout()
-		: Layout(LayoutType::ABSOLUTE_LAYOUT) {}
 	void AbsoluteLayout::update(Widget* widget)
 	{
 		for (unsigned int i = 0; i < widget->getChildrenCount(); ++i)
@@ -31,9 +29,6 @@ namespace gui
 		}
 	}
 
-
-	VListLayout::VListLayout()
-		:Layout(LayoutType::V_LIST_LAYOUT) {}
 	float VListLayout::calcPrefSizeX(Widget* parent)
 	{
 		float parentPrefSize = 0.0f;
@@ -80,6 +75,7 @@ namespace gui
 
 		return parentPrefSize + parent->getLayoutMargin().x() * 2;
 	}
+
 	float VListLayout::calcPrefSizeY(Widget* parent)
 	{
 		float parentPrefSize = 0.0f;
@@ -253,9 +249,6 @@ namespace gui
 		}	
 	}
 
-
-	HListLayout::HListLayout()
-		: Layout(LayoutType::H_LIST_LAYOUT) {}
 	float HListLayout::calcPrefSizeX(Widget* parent)
 	{
 		float parentPrefSize = 0.0f;
@@ -302,6 +295,7 @@ namespace gui
 
 		return parentPrefSize + parent->getLayoutMargin().x() * 2;
 	}
+
 	float HListLayout::calcPrefSizeY(Widget* parent)
 	{
 		float parentPrefSize = 0.0f;
@@ -474,8 +468,4 @@ namespace gui
 			offset.x() += childSize.x();
 		}
 	}
-	
-
-	GridLayout::GridLayout()
-		: Layout(LayoutType::GRID_LAYOUT) {}
 }

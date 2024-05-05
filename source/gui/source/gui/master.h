@@ -9,47 +9,62 @@
 #include "renderer.h"
 #include "inputmanager.h"
 #include "texturemanager.h"
-#include "interface.h"
 #include "widget.h"
 #include "root.h"
 #include "animation.h"
 
 namespace gui
 {
-	class Master
-	{
-	public:
-		Master(const std::shared_ptr<platform::IWindow> &window, const std::shared_ptr<gl::IContext> &glContext);
+    class Master
+    {
+    public:
+        Master(const std::shared_ptr<platform::IWindow>& window, const std::shared_ptr<gl::IContext>& glContext);
 
-		void update(double dt);
+        void update(double dt);
 
-		void activateAnimation(Animation * animation);
-		void deactivateAnimation(Animation * animation);
+        void activateAnimation(Animation* animation);
 
-		template <typename Element, typename... Args>
-		Element* createWidget(Widget* parent, Args... args)
-		{
-			MasterInterface master { window, glContext, &textureManager, &inputManager, &renderer };
-			if (parent == nullptr) {
-				return root.createWidget<Element>(master, args...);
-			}
-			return parent->createWidget<Element>(master, args...);
-		}
+        void deactivateAnimation(Animation* animation);
 
-		MasterInterface getInterface() { return MasterInterface{ window, glContext, &textureManager, &inputManager, &renderer }; }
+        template<typename Element, typename... Args>
+        Element* createWidget(Widget* parent, Args... args)
+        {
+            if (parent == nullptr) {
+                return m_root.createWidget<Element>(this, args...);
+            }
+            return parent->createWidget<Element>(this, args...);
+        }
 
-	private:
-		std::shared_ptr<platform::IWindow> window;
-		std::shared_ptr<gl::IContext> glContext;
+        TextureAtlasStore& texture_atlas_store()
+        {
+            return m_texture_manager;
+        }
 
-		TextureManager textureManager;
-		InputManager inputManager;
-		GuiRenderer renderer;
+        InputManager& input_manager()
+        {
+            return m_input_manager;
+        }
 
-		RootWidget root;
-		std::vector<Animation*> animations;
-		std::vector<Animation*> finishedAnimations;
+        gl::IContext& gl_context()
+        {
+            return *m_gl_context;
+        }
 
-		void sortWidgets(std::vector<gl::IDrawable*>& vector_widget, std::vector<font::Text*>& vector_text, Widget& widget);
-	};
+        platform::IWindow& window()
+        {
+            return *m_window;
+        }
+
+    private:
+        std::shared_ptr<platform::IWindow> m_window;
+        std::shared_ptr<gl::IContext> m_gl_context;
+
+        TextureAtlasStore m_texture_manager;
+        InputManager m_input_manager;
+        GuiRenderer m_renderer;
+
+        RootWidget m_root;
+        std::vector<Animation*> m_animations;
+        std::vector<Animation*> m_finished_animations;
+    };
 }

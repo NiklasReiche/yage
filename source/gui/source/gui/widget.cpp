@@ -1,15 +1,12 @@
 #include "widget.h"
+#include "master.h"
 #include "image/enum.h"
 #include <core/platform/Window.h>
 #include <image/img.h>
 
 namespace gui
 {
-	Widget::Widget()
-	{
-		this->layout = std::make_unique<Layout>();
-	}
-	Widget::Widget(Widget * parent, MasterInterface master, const WidgetTemplate & wTemplate)
+	Widget::Widget(Widget * parent, Master* master, const WidgetTemplate & wTemplate)
 		: master(master), parent(parent),
 		sizeHint(wTemplate.geometry.sizeHint),
 		offsetHint(wTemplate.geometry.offsetHint),
@@ -20,26 +17,66 @@ namespace gui
 		borderSize(wTemplate.border.size),
 		borderColor(gl::toVec4(wTemplate.border.color)),
 		shadowOffset(wTemplate.shadow.offset),
-		shadowHardness(wTemplate.shadow.hardness)
+		shadowHardness(wTemplate.shadow.hardness),
+        m_texture_atlas_view(loadTexture(wTemplate.texture))
 	{
 		this->innerPosition = position + gml::Vec2f((float)borderSize);
 		this->innerSize = size - gml::Vec2f((float)borderSize * 2);
 
-		this->layout = std::make_unique<Layout>();
+		this->m_layout = std::make_unique<Layout>();
 
-		this->texCoords = loadTexture(wTemplate.texture);
+        std::vector<unsigned int> indices = construct_indices();
+		std::vector<float> vertices = constructVertices(m_texture_atlas_view);
+		drawable = master->gl_context().getDrawableCreator()
+                ->createDrawable(vertices, indices, std::vector<unsigned int> { 2, 4, 2 }, gl::VertexFormat::BATCHED);
 
-		std::vector<float> vertices;
-        std::vector<unsigned int> indices;
-		constructVertices(vertices, texCoords, indices);
-		drawable = master.glContext->getDrawableCreator()->createDrawable(vertices, indices, std::vector<unsigned int> { 2, 4, 2 }, gl::VertexFormat::BATCHED);
-
-		updateGeometry();
+        update_geometry();
 	}
-	
-	void Widget::constructCoords(std::vector<float> & vertices, std::vector<unsigned int> &indices)
+
+    std::vector<unsigned int> Widget::construct_indices()
+    {
+        int index = -1;
+
+        std::vector<unsigned int> indices;
+        if (shadowOffset > 0) {
+            std::array<unsigned int, 6> indices_shadow = {
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index)
+            };
+            indices.insert(std::end(indices), std::begin(indices_shadow), std::end(indices_shadow));
+        }
+
+        if (borderSize > 0) {
+            std::array<unsigned int, 24> indices_border = {
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+            };
+            indices.insert(std::end(indices), std::begin(indices_border), std::end(indices_border));
+        }
+
+        std::array<unsigned int, 6> indices_plain = {
+                static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
+                static_cast<unsigned int>(++index), static_cast<unsigned int>(++index)
+        };
+        indices.insert(std::end(indices), std::begin(indices_plain), std::end(indices_plain));
+        return indices;
+    }
+
+    std::vector<float> Widget::constructCoords()
 	{
-		vertices.resize(0);
+        std::vector<float> vertices;
 
 		float left = position.x();
 		float top = position.y();
@@ -62,10 +99,6 @@ namespace gui
 				left + so,	top + so,
 			};
             vertices.insert(std::end(vertices), std::begin(pos_shadow), std::end(pos_shadow));
-            std::array<unsigned int, 6> indices_shadow = {
-                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index)
-            };
-            indices.insert(std::end(indices), std::begin(indices_shadow), std::end(indices_shadow));
 		}
 
 		if (bs != 0)
@@ -110,13 +143,6 @@ namespace gui
 				left,		top,
 				left,		bottom
 			};
-            std::array<unsigned int, 24> indices_border = {
-                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
-                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
-                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
-                    static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
-            };
-            indices.insert(std::end(indices), std::begin(indices_border), std::end(indices_border));
 			vertices.insert(std::end(vertices), std::begin(pos_border), std::end(pos_border));
 		}
 
@@ -129,14 +155,14 @@ namespace gui
 			left,	top,
 		};
 		vertices.insert(std::end(vertices), std::begin(pos_plain), std::end(pos_plain));
-        std::array<unsigned int, 6> indices_plain = {
-                static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),static_cast<unsigned int>(++index), static_cast<unsigned int>(++index)
-        };
-        indices.insert(std::end(indices), std::begin(indices_plain), std::end(indices_plain));
+
+        return vertices;
 	}
 
-	void Widget::constructColors(std::vector<float> & vertices)
+    std::vector<float> Widget::constructColors()
 	{
+        std::vector<float> vertices;
+
 		gml::Vec4<float> gl_color = color;
 		gml::Vec4<float> gl_bc = borderColor;
 		float sh = shadowHardness;
@@ -197,150 +223,167 @@ namespace gui
 			gl_color.x(), gl_color.y(), gl_color.z(), gl_color.w()
 		};
 		vertices.insert(std::end(vertices), std::begin(color_plain), std::end(color_plain));
+
+        return vertices;
 	}
 
-	void Widget::constructTexCoords(std::vector<float> & vertices, gml::Vec4f _texCoords)
+    std::vector<float> Widget::constructTexCoords(TextureAtlasView texture_atlas_view)
 	{
-		gml::Vec2f alpha = master.textureManager->getAlphaTexCoords();
+        std::vector<float> vertices;
+
+        TextureAtlasView transparent = master->texture_atlas_store().transparent();
+        auto left = transparent.coordinates_start().x();
+        auto right = transparent.coordinates_end().x();
+        auto top = transparent.coordinates_start().y();
+        auto bottom = transparent.coordinates_end().y();
 
 		if (shadowOffset != 0)
 		{
 			std::array<float, 12> tex_shadow = {
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
+                    left, top,
+                    left, bottom,
+                    right, bottom,
+                    right, bottom,
+                    right, top,
+                    left, top,
 			};
 			vertices.insert(std::end(vertices), std::begin(tex_shadow), std::end(tex_shadow));
 		}
 
 		if (borderSize != 0) {
 			std::array<float, 48> tex_border = {
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
+                    left, top,
+                    left, bottom,
+                    right, bottom,
+                    right, bottom,
+                    right, top,
+                    left, top,
 
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
+                    left, top,
+                    left, bottom,
+                    right, bottom,
+                    right, bottom,
+                    right, top,
+                    left, top,
 
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
+                    left, top,
+                    left, bottom,
+                    right, bottom,
+                    right, bottom,
+                    right, top,
+                    left, top,
 
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
-				alpha.x(),	alpha.y(),
+                    left, top,
+                    left, bottom,
+                    right, bottom,
+                    right, bottom,
+                    right, top,
+                    left, top,
 			};
 			vertices.insert(std::end(vertices), std::begin(tex_border), std::end(tex_border));
 		}
 
 		std::array<float, 12> tex_plain = {
-                _texCoords.x(), _texCoords.y(),
-                _texCoords.x(), _texCoords.w(),
-                _texCoords.z(), _texCoords.w(),
-                _texCoords.z(), _texCoords.w(),
-                _texCoords.z(), _texCoords.y(),
-                _texCoords.x(), _texCoords.y(),
+                texture_atlas_view.coordinates_start().x(), texture_atlas_view.coordinates_start().y(),
+                texture_atlas_view.coordinates_start().x(), texture_atlas_view.coordinates_end().y(),
+                texture_atlas_view.coordinates_end().x(), texture_atlas_view.coordinates_end().y(),
+                texture_atlas_view.coordinates_end().x(), texture_atlas_view.coordinates_end().y(),
+                texture_atlas_view.coordinates_end().x(), texture_atlas_view.coordinates_start().y(),
+                texture_atlas_view.coordinates_start().x(), texture_atlas_view.coordinates_start().y(),
 		};
 		vertices.insert(std::end(vertices), std::begin(tex_plain), std::end(tex_plain));
+
+        return vertices;
 	}
 
-	void Widget::constructVertices(std::vector<float>& vertices, gml::Vec4f _texCoords,
-                                   std::vector<unsigned int> &indices)
+    std::vector<float> Widget::constructVertices(TextureAtlasView texture_atlas_view)
 	{
-		constructCoords(vertices, indices);
-		constructColors(vertices);
-		constructTexCoords(vertices, _texCoords);
+        std::vector<float> vertices;
+
+        auto coords = constructCoords();
+        vertices.insert(std::end(vertices), std::begin(coords), std::end(coords));
+
+		auto colors = constructColors();
+        vertices.insert(std::end(vertices), std::begin(colors), std::end(colors));
+
+		auto tex_coords = constructTexCoords(texture_atlas_view);
+        vertices.insert(std::end(vertices), std::begin(tex_coords), std::end(tex_coords));
+
+        return vertices;
 	}
 
-	gml::Vec4f Widget::loadTexture(WidgetTextureTemplate tTemplate)
+    TextureAtlasView Widget::loadTexture(WidgetTextureTemplate tTemplate)
 	{
 		if (tTemplate.filename.size() > 0) {
-            auto reader = master.platform->getFileReader();
+            auto reader = master->window().getFileReader();
             auto file = reader->openBinaryFile(tTemplate.filename, platform::IFile::AccessMode::READ);
 			img::Image image = img::readFromFile(*file, img::FORCE_CHANNELS::RGBA);
-			return master.textureManager->addTexture(image);
+			return master->texture_atlas_store().add(image);
 		}
 		else {
-			return gml::Vec4f(master.textureManager->getAlphaTexCoords().x(), master.textureManager->getAlphaTexCoords().y(), master.textureManager->getAlphaTexCoords().x(), master.textureManager->getAlphaTexCoords().y());
+			return master->texture_atlas_store().transparent();
 		}
 	}
 
 
-	void Widget::updateParams()
+	void Widget::update_parameters()
 	{
         if (drawable != nullptr){
-            std::vector<float> vertices;
-            std::vector<unsigned int> indices;
-            constructVertices(vertices, texCoords, indices);
+            std::vector<float> vertices = constructVertices(m_texture_atlas_view);
             drawable->setSubData(0, vertices);
         }
 	}
 	
-	void Widget::relayout()
+	void Widget::update_layout()
 	{
 		if (fitChildren) {
 			prefSize = calcPrefSize();
-			parent->relayout();
+            parent->update_layout();
 		}
-		layout->update(this);
+		m_layout->update(this);
 	}
+
 	void Widget::setSize(gml::Vec2f _size)
 	{
 		if (this->size != _size) {
 			this->size = _size;
 			this->innerSize = _size - gml::Vec2f((float)borderSize) * 2.0f;
-			updateGeometry();
-			layout->update(this);
+            update_geometry();
+			m_layout->update(this);
 		}
 	}
 	void Widget::resize(gml::Vec2f _size)
 	{
 		if (this->prefSize != _size) {
 			prefSize = _size;
-			parent->relayout();
-			layout->update(this);
+            parent->update_layout();
+			m_layout->update(this);
 		}
 	}
 	void Widget::setOffset(gml::Vec2f _offset)
 	{
 		if (this->offset != _offset) {
 			this->offset = _offset;
-			updateGeometry();
+            update_geometry();
 		}
 	}
 	void Widget::move(gml::Vec2f _cellMargin)
 	{
 		if (this->cellMargin != _cellMargin) {
 			this->cellMargin = _cellMargin;
-			parent->relayout();
-			layout->update(this);
+            parent->update_layout();
+			m_layout->update(this);
 		}
 	}
 	void Widget::setAnchor(Anchor _anchor)
 	{
 		if (this->anchor != _anchor) {
 			this->anchor = _anchor;
-			updateGeometry();
+            update_geometry();
 		}
 	}
 
-	void Widget::updateGeometry()
+	void Widget::update_geometry()
 	{
 		gml::Vec2f lastPosition = position;
 
@@ -376,11 +419,11 @@ namespace gui
 
 		if (lastPosition != position) {
 			for (auto & child : children) {
-				child->updateGeometry();
+                child->update_geometry();
 			}
 		}
 
-		updateParams();
+        update_parameters();
 	}
 
 
@@ -414,35 +457,8 @@ namespace gui
 		}
 	}
 
-	void Widget::setTexture(WidgetTextureTemplate texture)
-	{
-		this->texCoords = loadTexture(texture);
-	}
-	void Widget::setTexture(std::string filename)
-	{
-		if (filename.size() > 0) {
-            auto reader = master.platform->getFileReader();
-            auto file = reader->openBinaryFile(filename, platform::IFile::AccessMode::READ);
-			img::Image image = img::readFromFile(*file, img::FORCE_CHANNELS::RGBA);
-			this->texCoords = master.textureManager->addTexture(image);
-		}
-		else {
-			this->texCoords = gml::Vec4f(master.textureManager->getAlphaTexCoords().x(), master.textureManager->getAlphaTexCoords().y(), master.textureManager->getAlphaTexCoords().x(), master.textureManager->getAlphaTexCoords().y());
-		}
-		updateParams();
-	}
-	void Widget::setTexture(img::Image image)
-	{
-		this->texCoords = master.textureManager->addTexture(image);
-		updateParams();
-	}
-	void Widget::setTexture(gl::ITexture2D &texture)
-	{
-		this->texCoords = master.textureManager->addTexture(texture);
-		updateParams();
-	}
-	void Widget::removeTexture() {
-		this->texCoords = gml::Vec4f(master.textureManager->getAlphaTexCoords().x(), master.textureManager->getAlphaTexCoords().y(), master.textureManager->getAlphaTexCoords().x(), master.textureManager->getAlphaTexCoords().y());
-		updateParams();
-	}
+    TextureAtlasView Widget::texture_atlas_view()
+    {
+        return m_texture_atlas_view;
+    }
 }

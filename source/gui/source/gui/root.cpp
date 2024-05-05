@@ -1,15 +1,18 @@
 #include "root.h"
 
+#include <utility>
+
 namespace gui
 {
-	RootWidget::RootWidget()
-		: Widget()
+	RootWidget::RootWidget(Master* master) : Widget(nullptr, master, {
+        .color = gl::Color::TRANSPARENT
+    })
 	{
-		layout = std::make_unique<AbsoluteLayout>();
+        m_layout = std::make_unique<AbsoluteLayout>();
 	}
 
-	void RootWidget::relayout()
+	void RootWidget::update_layout()
 	{
-		layout->update(this);
+		m_layout->update(this);
 	}
 }

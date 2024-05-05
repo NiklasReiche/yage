@@ -2,16 +2,16 @@
 
 namespace gui
 {
-	PushButton::PushButton(Widget * parent, MasterInterface master, const ButtonTemplate & buttonTemplate)
-		: Widget(parent, master, buttonTemplate), command(buttonTemplate.command)
+	PushButton::PushButton(Widget * parent, Master* master, const ButtonTemplate & buttonTemplate)
+		: Widget(parent, master, buttonTemplate), command(buttonTemplate.command),
+        idleTexCoords(m_texture_atlas_view),
+        hoverTexCoords(loadTexture(buttonTemplate.hoverTexture)),
+        clickTexCoords(loadTexture(buttonTemplate.clickTexture))
 	{
 		this->isInteractable = true;
 		this->idleColor = gl::toVec4(buttonTemplate.color);
 		this->hoverColor = gl::toVec4(buttonTemplate.hoverColor);
 		this->clickColor = gl::toVec4(buttonTemplate.clickColor);
-		this->idleTexCoords = this->texCoords;
-		this->hoverTexCoords = loadTexture(buttonTemplate.hoverTexture);
-		this->clickTexCoords = loadTexture(buttonTemplate.clickTexture);
 
 		LabelTemplate labelTemplate{
             .text = buttonTemplate.text
@@ -24,7 +24,7 @@ namespace gui
 
 		label = this->createWidget<Label>(master, labelTemplate);
 
-		this->layout = std::make_unique<VListLayout>();
+		this->m_layout = std::make_unique<VListLayout>();
 
 		if (prefSize == gml::Vec2f(0.0f)) {
 			fitChildren = true;
@@ -36,15 +36,15 @@ namespace gui
 	void PushButton::onClick()
 	{
 		setColor(clickColor);
-		setTexCoords(clickTexCoords);
-		updateParams();
+		setTextureAtlasView(clickTexCoords);
+        update_parameters();
 	}
 
 	void PushButton::onClickRelease()
 	{
 		setColor(idleColor);
-		setTexCoords(idleTexCoords);
-		updateParams();
+        setTextureAtlasView(idleTexCoords);
+        update_parameters();
 
 		try {
 			command();
@@ -55,29 +55,29 @@ namespace gui
 	void PushButton::onHover()
 	{
 		setColor(hoverColor);
-		setTexCoords(hoverTexCoords);
-		updateParams();
+        setTextureAtlasView(hoverTexCoords);
+        update_parameters();
 	}
 
 	void PushButton::onHoverRelease()
 	{
 		setColor(idleColor);
-		setTexCoords(idleTexCoords);
-		updateParams();
+        setTextureAtlasView(idleTexCoords);
+        update_parameters();
 	}
 
 	void PushButton::onCancel() 
 	{
 		setColor(idleColor);
-		setTexCoords(idleTexCoords);
-		updateParams();
+        setTextureAtlasView(idleTexCoords);
+        update_parameters();
 	}
 
 	void PushButton::onResume()
 	{
 		setColor(clickColor);
-		setTexCoords(clickTexCoords);
-		updateParams();
+        setTextureAtlasView(clickTexCoords);
+        update_parameters();
 	}
 
 	gml::Vec2f PushButton::calcPrefSize()
@@ -86,13 +86,13 @@ namespace gui
 	}
 
 
-	CheckButton::CheckButton(Widget * parent, MasterInterface master, const ButtonTemplate & layout, bool activate)
+	CheckButton::CheckButton(Widget * parent, Master* master, const ButtonTemplate & layout, bool activate)
 		: PushButton(parent, master, layout)
 	{
 		if (activate) {
 			setColor(clickColor);
-			setTexCoords(clickTexCoords);
-			updateParams();
+            setTextureAtlasView(clickTexCoords);
+            update_parameters();
 			state = true;
 		}
 	}
@@ -101,14 +101,14 @@ namespace gui
 	{
 		if (state) {
 			setColor(idleColor);
-			setTexCoords(idleTexCoords);
+            setTextureAtlasView(idleTexCoords);
 		}
 		else {
 			setColor(clickColor);
-			setTexCoords(clickTexCoords);
+            setTextureAtlasView(clickTexCoords);
 		}
 
-		updateParams();
+        update_parameters();
 	}
 
 	void CheckButton::onClickRelease()
@@ -131,8 +131,8 @@ namespace gui
 		if (!state)
 		{
 			setColor(hoverColor);
-			setTexCoords(hoverTexCoords);
-			updateParams();
+            setTextureAtlasView(hoverTexCoords);
+            update_parameters();
 		}
 	}
 
@@ -140,27 +140,27 @@ namespace gui
 	{
 		if (!state) {
 			setColor(idleColor);
-			setTexCoords(idleTexCoords);
+            setTextureAtlasView(idleTexCoords);
 		}
 		else {
 			setColor(clickColor);
-			setTexCoords(clickTexCoords);
+            setTextureAtlasView(clickTexCoords);
 		}
-		updateParams();
+        update_parameters();
 	}
 
 	void CheckButton::onCancel()
 	{
 		if (state) {
 			setColor(clickColor);
-			setTexCoords(clickTexCoords);
+            setTextureAtlasView(clickTexCoords);
 		}
 		else {
 			setColor(idleColor);
-			setTexCoords(idleTexCoords);
+            setTextureAtlasView(idleTexCoords);
 		}
 
-		updateParams();
+        update_parameters();
 	}
 
 }

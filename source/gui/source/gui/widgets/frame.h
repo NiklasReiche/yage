@@ -19,7 +19,7 @@ namespace gui
 	private:
 		
 	public:
-		Frame(Widget * parent, MasterInterface master, FrameTemplate frameTemplate);
+		Frame(Widget * parent, Master* master, FrameTemplate frameTemplate);
 
 		gml::Vec2f calcPrefSize();
 	};

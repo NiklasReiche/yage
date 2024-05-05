@@ -7,8 +7,8 @@ namespace gui
 	class RootWidget : public Widget
 	{
 	public:
-		RootWidget();
+		explicit RootWidget(Master* master);
 
-		void relayout();
+		void update_layout() override;
 	};
 }

@@ -15,6 +15,7 @@ namespace gui
 		INFINITE,
 		ASPECT
 	};
+
 	enum class OffsetHint
 	{
 		FIXED,
@@ -25,7 +26,6 @@ namespace gui
 		ABSOLUTE_LAYOUT,
 		V_LIST_LAYOUT,
 		H_LIST_LAYOUT,
-		GRID_LAYOUT
 	};
 
 	class Layout
@@ -34,47 +34,50 @@ namespace gui
 		LayoutType type;
 
 	public:
-		Layout(){}
-		Layout(LayoutType type)
-			: type(type) {}
-		virtual ~Layout() {}
+        Layout() = default;
+
+        explicit Layout(LayoutType type) : type(type){}
+
+		virtual ~Layout() = default;
+
 		virtual float calcPrefSizeX(Widget* parent) { return 0.0f; }
+
 		virtual float calcPrefSizeY(Widget* parent) { return 0.0f; }
+
 		virtual void update(Widget* widget) {}
 	};
-
 
 	class AbsoluteLayout : public Layout
 	{
 	public:
-		AbsoluteLayout();
-		void update(Widget* parent);
-	};
+        AbsoluteLayout() : Layout(LayoutType::ABSOLUTE_LAYOUT){}
 
+		void update(Widget* parent) override;
+	};
 
 	class VListLayout : public Layout
 	{
 	public:
-		VListLayout();
-		float calcPrefSizeX(Widget* parent);
-		float calcPrefSizeY(Widget* parent);
-		void update(Widget* parent);
-	};
+        VListLayout() : Layout(LayoutType::V_LIST_LAYOUT)
+        {}
 
+		float calcPrefSizeX(Widget* parent) override;
+
+        float calcPrefSizeY(Widget* parent) override;
+
+		void update(Widget* parent) override;
+	};
 
 	class HListLayout : public Layout
 	{
 	public:
-		HListLayout();
-		float calcPrefSizeX(Widget* parent);
-		float calcPrefSizeY(Widget* parent);
-		void update(Widget* parent);
-	};
+        HListLayout() : Layout(LayoutType::H_LIST_LAYOUT)
+        {}
 
+		float calcPrefSizeX(Widget* parent) override;
 
-	class GridLayout : public Layout
-	{
-	public:
-		GridLayout();
+		float calcPrefSizeY(Widget* parent) override;
+
+		void update(Widget* parent) override;
 	};
 }

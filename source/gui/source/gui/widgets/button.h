@@ -30,12 +30,12 @@ namespace gui
 		gml::Vec4<float> idleColor;
 		gml::Vec4<float> hoverColor;
 		gml::Vec4<float> clickColor;
-		gml::Vec4<float> idleTexCoords;
-		gml::Vec4<float> hoverTexCoords;
-		gml::Vec4<float> clickTexCoords;
+		TextureAtlasView idleTexCoords;
+        TextureAtlasView hoverTexCoords;
+        TextureAtlasView clickTexCoords;
 
 	public:
-		PushButton(Widget * parent, MasterInterface master, const ButtonTemplate & layout);
+		PushButton(Widget * parent, Master* master, const ButtonTemplate & layout);
 		virtual ~PushButton() {}
 
 		virtual void onClick();
@@ -49,10 +49,6 @@ namespace gui
 		void setText(TextTemplate text) { label->setText(text); }
 		//void setTextColor(unsigned int color) { label->setTextColor(color); }
 
-		void setIdleTexture(WidgetTextureTemplate texture) { this->idleTexCoords = loadTexture(texture); /*setTexCoords(idleTexCoords); updateParams();*/ }
-		void setHoverTexture(WidgetTextureTemplate texture) { this->hoverTexCoords = loadTexture(texture); }
-		void setClickTexture(WidgetTextureTemplate texture) { this->clickTexCoords = loadTexture(texture); }
-
 		gml::Vec2f calcPrefSize();
 
 		void debug() { onHover(); }
@@ -64,7 +60,7 @@ namespace gui
 		bool state = false;
 
 	public:
-		CheckButton(Widget * parent, MasterInterface master, const ButtonTemplate & layout, bool activate = false);
+		CheckButton(Widget * parent, Master* master, const ButtonTemplate & layout, bool activate = false);
 
 		virtual void onClick();
 		virtual void onClickRelease();
@@ -85,14 +81,14 @@ namespace gui
 		T value;
 
 	public:
-		RadioButton(Widget * parent, MasterInterface master, const ButtonTemplate & layout, T value, bool isDefault = false)
+		RadioButton(Widget * parent, Master* master, const ButtonTemplate & layout, T value, bool isDefault = false)
 			: CheckButton(parent, master, layout, isDefault), value(value) {}
 
 		virtual void onClick()
 		{
 			if (!state) {
 				setColor(clickColor);
-				updateParams();
+                update_parameters();
 			}
 		}
 		virtual void onClickRelease()
@@ -107,7 +103,7 @@ namespace gui
 		{
 			state = false;
 			setColor(idleColor);
-			updateParams();
+            update_parameters();
 		}
 	};
 
@@ -120,7 +116,7 @@ namespace gui
 		std::map<T, RadioButton<T>*> buttons;
 
 	public:
-		RadioGroup(Widget * parent, MasterInterface master, const FrameTemplate & layout, const ButtonTemplate & buttonLayout, T defaultValue)
+		RadioGroup(Widget * parent, Master* master, const FrameTemplate & layout, const ButtonTemplate & buttonLayout, T defaultValue)
 			: Frame(parent, master, layout), state(defaultValue), buttonLayout(buttonLayout)
 		{
 			this->buttonLayout.geometry.offset = gml::Vec2<float>();

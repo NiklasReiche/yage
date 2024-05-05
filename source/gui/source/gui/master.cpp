@@ -3,65 +3,40 @@
 namespace gui
 {
 	Master::Master(const std::shared_ptr<platform::IWindow> &window, const std::shared_ptr<gl::IContext> &glContext)
-		: window(window), glContext(glContext),
-		textureManager(TextureManager(window, glContext->getTextureCreator())),
-		inputManager(InputManager(&root)),
-		renderer(GuiRenderer(glContext->getRenderer(), glContext->getShaderCreator(), gl::IRenderer::Viewport{ 0, 0, window->getWidth(), window->getHeight() }))
+		: m_window(window), m_gl_context(glContext),
+          m_texture_manager(TextureAtlasStore(window, glContext->getTextureCreator())),
+          m_input_manager(InputManager(&m_root)),
+          m_renderer(GuiRenderer(glContext->getRenderer(), glContext->getShaderCreator(), gl::IRenderer::Viewport{0, 0, window->getWidth(), window->getHeight() })),
+          m_root(this)
 	{
-		//root.resize(gml::Vec2<float>(glContext->getWidth(), glContext->getHeight()));
-		root.setSize(gml::Vec2<float>((float)window->getWidth(), (float)window->getHeight()));
-		renderer.setTexture(textureManager.getTexture(0));
+		m_root.setSize(gml::Vec2<float>((float)window->getWidth(), (float)window->getHeight()));
 		
-		window->attach(inputManager);
-	}
-
-	void Master::sortWidgets(std::vector<gl::IDrawable*> & vector_widget, std::vector<font::Text*> & vector_text, Widget & widget)
-	{
-		for (unsigned int i = 0; i < widget.getChildrenCount(); ++i)
-		{
-			Widget & child = widget.getChild(i);
-			if (child.is_Active()) {
-				vector_widget.push_back(child.drawable.get());
-				if (child.has_Text()) {
-					vector_text.push_back(child.getText());
-				}
-			}
-			sortWidgets(vector_widget, vector_text, child);
-		}
+		window->attach(m_input_manager);
 	}
 
 	void Master::update(double dt)
 	{
-		for (unsigned int i = 0; i < finishedAnimations.size(); ++i)
+		for (auto animation : m_finished_animations)
 		{
-			Animation* animation = finishedAnimations.at(i);
-			animations.erase(std::remove(animations.begin(), animations.end(), animation), animations.end());
+            m_animations.erase(std::remove(m_animations.begin(), m_animations.end(), animation), m_animations.end());
 		}
-		finishedAnimations.clear();
+		m_finished_animations.clear();
 
-		for (unsigned int i = 0; i < animations.size(); ++i) 
+		for (auto & animation : m_animations)
 		{
-			animations.at(i)->update(dt);
+			animation->update(dt);
 		}
 
-		std::vector<gl::IDrawable*> vector_widget;
-		std::vector<font::Text*> vector_text;
-
-		sortWidgets(vector_widget, vector_text, root);
-
-		renderer.widgets = std::move(vector_widget);
-		renderer.text = std::move(vector_text);
-
-		renderer.render();
+		m_renderer.render(m_root);
 	}
 
 	void Master::activateAnimation(Animation * animation)
 	{
-		animations.push_back(animation);
+		m_animations.push_back(animation);
 	}
 
 	void Master::deactivateAnimation(Animation * animation)
 	{
-		finishedAnimations.push_back(animation);
+		m_finished_animations.push_back(animation);
 	}
 }

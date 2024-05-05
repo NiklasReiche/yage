@@ -243,6 +243,13 @@ namespace font
         m_drawable->setSubData(m_data_offset_coords, vertices);
     }
 
+    void Text::update_offset(gml::Vec2f offset)
+    {
+        m_offset.x() = offset.x();
+        m_offset.y() = offset.y();
+        update_offset(m_offset);
+    }
+
     void Text::update_color(gl::Color_t color)
     {
         m_color = gl::toVec4(color);

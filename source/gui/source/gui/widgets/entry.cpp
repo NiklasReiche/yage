@@ -1,10 +1,11 @@
 #include "entry.h"
 #include "utils/strings.h"
 #include <core/platform/Window.h>
+#include "../master.h"
 
 namespace gui
 {
-	TextCursor::TextCursor(Widget* parent, MasterInterface master, WidgetTemplate widgetTemplate)
+	TextCursor::TextCursor(Widget* parent, Master* master, WidgetTemplate widgetTemplate)
 		: Widget(parent, master, widgetTemplate)
 	{
 		sizeHint.x() = SizeHint::FIXED;
@@ -38,12 +39,12 @@ namespace gui
 	void TextEntry::moveCursor()
 	{
 		gml::Vec2f cursorOffset;
-		cursorOffset.x() = label->getOffset().x() + label->getText()->getOffset(cursorPosition).x();
+		cursorOffset.x() = label->getOffset().x() + label->getText()->offset(cursorPosition).x();
 		cursorOffset.y() = cursor->getOffset().y();
 		cursor->move(cursorOffset);
 	}
 
-	TextEntry::TextEntry(Widget * parent, MasterInterface master, TextEntryTemplate entryTemplate, Master* m)
+	TextEntry::TextEntry(Widget * parent, Master* master, TextEntryTemplate entryTemplate, Master* m)
 		: Widget(parent, master, entryTemplate), 
 		padding(entryTemplate.padding),
 		callback(entryTemplate.command),
@@ -79,7 +80,7 @@ namespace gui
 		cursorAnimation = cursor->createAnimation<CursorAnimation>(m, 0.5);
 		cursor->hide();
 
-		layout = std::make_unique<AbsoluteLayout>();
+        m_layout = std::make_unique<AbsoluteLayout>();
 
 		if (prefSize == gml::Vec2f(0.0f)) {
 			prefSize = calcPrefSize();
@@ -90,7 +91,7 @@ namespace gui
 
 	void TextEntry::onFocus()
 	{
-		master.platform->enableCharInput();
+		master->window().enableCharInput();
 		cursor->show();
 		cursorAnimation->start();
 		if (inputText.length() == 0) {
@@ -100,7 +101,7 @@ namespace gui
 	}
 	void TextEntry::onFocusRelease()
 	{
-		master.platform->disableCharInput();
+		master->window().disableCharInput();
 		cursor->hide();
 		cursorAnimation->stop();
 		if (inputText.length() == 0) {
@@ -146,7 +147,7 @@ namespace gui
 			break;
 
 		case input::KeyEvent::Code::KEY_ENTER:
-			master.inputManger->unFocus();
+			master->input_manager().unFocus();
 			try {
 				callback();
 			} catch (std::bad_function_call){}

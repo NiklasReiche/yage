@@ -2,7 +2,7 @@
 
 namespace gui
 {
-	Frame::Frame(Widget * parent, MasterInterface master, FrameTemplate frameTemplate)
+	Frame::Frame(Widget * parent, Master* master, FrameTemplate frameTemplate)
 		: Widget(parent, master, frameTemplate)
 	{
 		isInteractable = false;
@@ -16,13 +16,13 @@ namespace gui
 		switch (frameTemplate.layoutType) 
 		{
 		case LayoutType::ABSOLUTE_LAYOUT:
-			layout = std::make_unique<AbsoluteLayout>();
+            m_layout = std::make_unique<AbsoluteLayout>();
 			break;
 		case LayoutType::V_LIST_LAYOUT:
-			layout = std::make_unique<VListLayout>();
+            m_layout = std::make_unique<VListLayout>();
 			break;
 		case LayoutType::H_LIST_LAYOUT:
-			layout = std::make_unique<HListLayout>();
+            m_layout = std::make_unique<HListLayout>();
 			break;
 		}
 	}
@@ -30,8 +30,8 @@ namespace gui
 	gml::Vec2f Frame::calcPrefSize()
 	{
 		gml::Vec2f mSize;
-		mSize.x() = layout->calcPrefSizeX(this) + gml::Vec2f((float)borderSize).x();
-		mSize.y() = layout->calcPrefSizeY(this) + gml::Vec2f((float)borderSize).y();
+		mSize.x() = m_layout->calcPrefSizeX(this) + gml::Vec2f((float)borderSize).x();
+		mSize.y() = m_layout->calcPrefSizeY(this) + gml::Vec2f((float)borderSize).y();
 		return mSize;
 	}
 }

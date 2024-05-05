@@ -105,10 +105,16 @@ namespace font
         gml::Vec3f offset(unsigned int i);
 
         /**
-         * Reconstructs the text geometry at an updated offset.
+         * Reconstructs the text geometry at an updated 3D offset.
          * @param offset New offset to use.
          */
         void update_offset(gml::Vec3f offset);
+
+        /**
+         * Reconstructs the text geometry at an updated 2D offset. The z-coordinate remains unchanged.
+         * @param offset New offset to use.
+         */
+        void update_offset(gml::Vec2f offset);
 
         /**
          * Reconstructs the text geometry with an updated color.

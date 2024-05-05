@@ -21,7 +21,6 @@ target_sources(yage_gui
         gui.h
         inputmanager.h
         inputmanager.cpp
-        interface.h
         layouts.h
         layouts.cpp
         master.h

@@ -1,8 +1,9 @@
 ﻿#include "label.h"
+#include "../master.h"
 
 namespace gui
 {
-    Label::Label(Widget* parent, MasterInterface master, LabelTemplate labelTemplate)
+    Label::Label(Widget* parent, Master* master, LabelTemplate labelTemplate)
             : Widget(parent, master, labelTemplate), params(labelTemplate), padding(labelTemplate.padding)
     {
         this->hasText = true;
@@ -16,12 +17,12 @@ namespace gui
         }
 
         gml::Vec2f textPosition = this->innerPosition + padding;
-        this->text = std::make_unique<font::Text>(master.glContext->getDrawableCreator(),
+        this->text = std::make_unique<font::Text>(master->gl_context().getDrawableCreator(),
                                                   labelTemplate.text.text, labelTemplate.text.font,
                                                   font::TextParameters{
                                                           .color = labelTemplate.text.color,
-                                                          .ptSize = (float) labelTemplate.text.size,
-                                                          .offset = gml::Vec3f(textPosition.x(), textPosition.y(), 0)
+                                                          .pt_size = (float) labelTemplate.text.size,
+                                                          .offset = gml::Vec3f(textPosition.x(), textPosition.y(), -1)
                                                   }
         );
 
@@ -36,14 +37,14 @@ namespace gui
     gml::Vec2f Label::calcPrefSize()
     {
         gml::Vec2f vec;
-        vec.x() = this->text->getSize().x() + (float) this->borderSize * 2 + padding.x() * 2;
-        vec.y() = this->text->getMaxDimensions().y() + (float) this->borderSize * 2 + padding.y() * 2;
+        vec.x() = this->text->dimensions().x() + (float) this->borderSize * 2 + padding.x() * 2;
+        vec.y() = this->text->max_font_dimensions().y() + (float) this->borderSize * 2 + padding.y() * 2;
         return vec;
     }
 
     void Label::setText(TextTemplate textTemplate)
     {
-        if (textTemplate.text.length() == 0)
+        if (textTemplate.text.empty())
         {
             textTemplate.text = U" ";
         }
@@ -51,19 +52,19 @@ namespace gui
         params.text = textTemplate;
 
         gml::Vec2f textPosition = innerPosition + padding;
-        this->text = std::make_unique<font::Text>(master.glContext->getDrawableCreator(),
+        this->text = std::make_unique<font::Text>(master->gl_context().getDrawableCreator(),
                                                   textTemplate.text, textTemplate.font,
                                                   font::TextParameters{
                                                           .color = textTemplate.color,
-                                                          .ptSize = (float) textTemplate.size,
-                                                          .offset = gml::Vec3f(textPosition.x(), textPosition.y(), 0)
+                                                          .pt_size = (float) textTemplate.size,
+                                                          .offset = gml::Vec3f(textPosition.x(), textPosition.y(), -1)
                                                   }
         );
 
         if (fitChildren)
         {
             prefSize = calcPrefSize();
-            parent->relayout();
+            parent->update_layout();
         }
     }
 
@@ -74,11 +75,11 @@ namespace gui
     }
 
 
-    void Label::updateGeometry()
+    void Label::update_geometry()
     {
-        Widget::updateGeometry();
+        Widget::update_geometry();
 
-        gml::Vec2f availableSize = innerSize - padding - text->getSize();
+        gml::Vec2f availableSize = innerSize - padding - text->dimensions();
         gml::Vec2f textPosition(0.0f);
 
         switch (alignX)
@@ -106,6 +107,6 @@ namespace gui
                 break;
         }
 
-        text->setOffset({textPosition.x(), textPosition.y(), 0}); // TODO
+        text->update_offset(gml::Vec2f{textPosition.x(), textPosition.y()});
     }
 }

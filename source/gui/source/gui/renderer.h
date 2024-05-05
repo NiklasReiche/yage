@@ -4,33 +4,27 @@
 #include "core.h"
 #include "font/shaders.h"
 #include "image/image.h"
+#include "root.h"
 
 namespace gui
 {
-	/*************************************************
-	** Basic Gui Renderer
-	*************************************************/
-
 	class GuiRenderer
 	{
 	public:
-		std::vector<gl::IDrawable*> widgets;
-		std::vector<font::Text*> text;
+		GuiRenderer() = delete;
 
-		GuiRenderer() = default;
 		GuiRenderer(const std::shared_ptr<gl::IRenderer> &glRenderer,
                     const std::shared_ptr<gl::IShaderCreator> &shaderCreator,
                     const gl::IRenderer::Viewport &viewport);
 
-		void render();
-
-        // TODO: this is probably not good
-		void setTexture(std::shared_ptr<gl::ITexture2D> texture);
+        void render(RootWidget& root);
 
 	private:
         std::shared_ptr<gl::IRenderer> glRenderer;
         std::unique_ptr<gl::IShader> guiShader;
         std::unique_ptr<gl::IShader> textShader;
-        std::shared_ptr<gl::ITexture2D> guiTexture; // TODO: don't have this as a field
+
+        void
+        collect_drawables(std::vector<Widget*>& vector_widget, std::vector<font::Text*>& vector_text, Widget& widget);
 	};
 }
