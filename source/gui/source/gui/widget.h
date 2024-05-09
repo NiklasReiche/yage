@@ -21,165 +21,163 @@ namespace gui
     class Widget
     {
     public:
-        std::unique_ptr<gl::IDrawable> drawable;
-
         Widget(Widget* parent, Master* master, const WidgetTemplate& widgetTemplate);
 
         virtual ~Widget() = default;
 
         template<typename Element, typename... Args>
-        Element* createWidget(Master* mInterface, Args... args)
+        Element* create_widget(Master* master, Args... args)
         {
-            children.push_back(std::make_unique<Element>(this, mInterface, std::forward<Args>(args)...));
+            m_children.push_back(std::make_unique<Element>(this, master, std::forward<Args>(args)...));
             update_layout();
-            return (Element*) children.back().get();
+            return (Element*) m_children.back().get();
         }
 
         template<typename Element, typename... Args>
-        Element* createAnimation(Master* _master, Args... args)
+        Element* create_animation(Master* master, Args... args)
         {
-            animations.push_back(std::make_unique<Element>(this, _master, std::forward<Args>(args)...));
-            return (Element*) animations.back().get();
+            m_animations.push_back(std::make_unique<Element>(this, master, std::forward<Args>(args)...));
+            return (Element*) m_animations.back().get();
         }
 
-        virtual font::Text* getText()
+        virtual font::Text* text()
         {
             return nullptr;
         }
 
         virtual gml::Vec2f calcPrefSize()
         {
-            return prefSize;
+            return m_hint_pref_size;
         }
 
 
         void hide()
         {
-            isActive = false;
+            m_is_active = false;
         }
 
         void show()
         {
-            isActive = true;
+            m_is_active = true;
         }
 
-        /* Getter */
-        bool is_Active()
+        [[nodiscard]]
+        bool is_Active() const
         {
-            return isActive;
+            return m_is_active;
         }
 
-        bool is_Interactable()
+        [[nodiscard]]
+        bool is_Interactable() const
         {
-            return isInteractable;
+            return m_is_interactable;
         }
 
-        bool has_Text()
+        [[nodiscard]]
+        bool has_Text() const
         {
-            return hasText;
+            return m_has_text;
         }
 
         Widget* getParent()
         {
-            return parent;
+            return m_parent;
         }
 
         Widget& getChild(int i)
         {
-            return *children[i].get();
+            return *m_children[i].get();
         }
-
+// TODO: use iterators
         unsigned int getChildrenCount()
         {
-            return children.size();
+            return m_children.size();
         }
 
 
         gml::Vec2<SizeHint> getSizeHint()
         {
-            return sizeHint;
+            return m_size_hint;
         }
 
         gml::Vec2<OffsetHint> getOffsetHint()
         {
-            return offsetHint;
+            return m_offset_hint;
         }
 
         gml::Vec2f getMinSize()
         {
-            return minSize;
+            return m_hint_min_size;
         }
 
         gml::Vec2f getMaxSize()
         {
-            return maxSize;
+            return m_hint_max_size;
         }
 
         gml::Vec2f getPreferredSize()
         {
-            return prefSize;
+            return m_hint_pref_size;
         }
 
         gml::Vec2f getCellMargin()
         {
-            return cellMargin;
+            return m_margin;
         }
 
         gml::Vec2f getLayoutMargin()
         {
-            return layoutMargin;
+            return m_padding;
         }
 
         gml::Vec2f getOffset()
         {
-            return offset;
+            return m_offset;
         }
 
         gml::Vec2f getPosition()
         {
-            return position;
+            return m_position;
         }
 
         gml::Vec2f getInnerPosition()
         {
-            return innerPosition;
+            return m_inner_position;
         }
 
         gml::Vec2f getSize()
         {
-            return size;
+            return m_size;
         }
 
         gml::Vec2f getInnerSize()
         {
-            return innerSize;
+            return m_inner_size;
         }
 
         gml::Vec4f getColor()
         {
-            return color;
+            return m_color;
         }
 
-
-        /* Setter */
-        void setColor(int _color)
+        void setColor(int color)
         {
-            this->color = gl::toVec4(_color);
+            this->m_color = gl::toVec4(color);
         }
 
-        void setColor(gml::Vec4<float> _color)
+        void setColor(gml::Vec4<float> color)
         {
-            this->color = _color;
+            this->m_color = color;
         }
 
-        void setSizeHint(gml::Vec2<SizeHint> _sizeHint)
+        void setSizeHint(gml::Vec2<SizeHint> sizeHint)
         {
-            this->sizeHint = _sizeHint;
+            this->m_size_hint = sizeHint;
         }
 
-        void setPreferredSize(gml::Vec2f _size)
+        void setPreferredSize(gml::Vec2f size)
         {
-            this->prefSize = _size;
+            this->m_hint_pref_size = size;
         }
 
         void setTextureAtlasView(TextureAtlasView texture_atlas_view)
@@ -189,128 +187,134 @@ namespace gui
 
 
         /* update semantics */
-        void update_parameters();
+        void update_vertices();
 
         virtual void update_geometry();
 
         virtual void update_layout();
 
-        virtual void setAnchor(Anchor _anchor);
 
-        virtual void setSize(gml::Vec2f _size);
+        virtual void set_anchor(Anchor _anchor);
+
+        virtual void set_size(gml::Vec2f _size);
 
         virtual void resize(gml::Vec2f _size);
 
-        virtual void setOffset(gml::Vec2f _offset);
+        virtual void set_offset(gml::Vec2f _offset);
 
         virtual void move(gml::Vec2f _cellMargin);
 
 
-        gml::Vec2f toAbs(gml::Vec2f value);
+        gml::Vec2f to_absolute(gml::Vec2f value);
 
-        float toAbsX(float value);
+        float to_absolute_x(float value);
 
-        float toAbsY(float value);
+        float to_absolute_y(float value);
 
-        float fromAspect();
+        float from_aspect();
 
         TextureAtlasView texture_atlas_view();
 
-        virtual void onHover()
+        gl::IDrawable& drawable();
+
+        virtual void on_hover()
         {}
 
-        virtual void onHoverRelease()
+        virtual void on_hover_release()
         {}
 
-        virtual void onClick()
+        virtual void on_click()
         {}
 
-        virtual void onClickRelease()
+        virtual void on_click_release()
         {}
 
-        virtual void onCancel()
+        virtual void on_cancel()
         {}
 
-        virtual void onResume()
+        virtual void on_resume()
         {}
 
-        virtual void onFocus()
+        virtual void on_focus()
         {}
 
-        virtual void onFocusRelease()
+        virtual void on_focus_release()
         {}
 
-        virtual void onCharInput(char character)
+        virtual void on_char_input(char character)
         {}
 
-        virtual void onKeyPress(input::KeyEvent::Code key)
+        virtual void on_key_press(input::KeyEvent::Code key)
         {}
 
     protected:
-        Master* master;
-        Widget* parent = nullptr;
-        std::vector<std::unique_ptr<Widget>> children;
+        Master* m_master;
+        Widget* m_parent = nullptr;
+        std::vector<std::unique_ptr<Widget>> m_children;
 
-        std::vector<std::unique_ptr<Animation>> animations;
+        std::vector<std::unique_ptr<Animation>> m_animations;
 
-        int level = 0; /* position of the widget in the widget tree hirachy */
-        bool isActive = true;
-        bool isInteractable = false;
-        bool keepFocus = false;
-        bool isHovered = false;
-        bool hasText = false;
-        bool fitChildren = false;
+        int m_level = 0; /* position of the widget in the widget tree hierarchy */
+        bool m_is_active = true;
+        bool m_is_interactable = false;
+        bool m_keep_focus = false;
+        bool m_is_hovered = false;
+        bool m_has_text = false;
+        bool m_fit_children = false;
 
+        /** Decides how children are ordered */
         std::unique_ptr<Layout> m_layout;
-        gml::Vec2<SizeHint> sizeHint = gml::Vec2<SizeHint>(SizeHint::EXPANDING);
-        gml::Vec2<OffsetHint> offsetHint = gml::Vec2<OffsetHint>(OffsetHint::FIXED);
+        gml::Vec2<SizeHint> m_size_hint = gml::Vec2<SizeHint>(SizeHint::EXPANDING);
+        gml::Vec2<OffsetHint> m_offset_hint = gml::Vec2<OffsetHint>(OffsetHint::FIXED);
 
-        Anchor anchor = Anchor::TOP_LEFT;
-        /* offset value used by layouts */
-        gml::Vec2f cellMargin;
-        /* padding for layouts */
-        gml::Vec2f layoutMargin;
-        /* prefered size for layouts */
-        gml::Vec2f prefSize;
-        /* minimal size for layouts */
-        gml::Vec2f minSize;
-        /* maximal size for layouts */
-        gml::Vec2f maxSize;
+        Anchor m_anchor = Anchor::TOP_LEFT;
+        /** margin for layouts */
+        gml::Vec2f m_margin;
+        /** padding for layouts */
+        gml::Vec2f m_padding;
+        /** preferred size for layouts */
+        gml::Vec2f m_hint_pref_size;
+        /** minimal size for layouts */
+        gml::Vec2f m_hint_min_size;
+        /** maximum size for layouts */
+        gml::Vec2f m_hint_max_size;
 
-        /* absolute offset from parent widget */
-        gml::Vec2f offset;
-        /* absolute position of the outer top left edge */
-        gml::Vec2f position;
-        /* absolute total size of the widget */
-        gml::Vec2f size;
-        /* absolute position of the inner top left edge - equal to position for borderless widgets */
-        gml::Vec2f innerPosition;
-        /* absolute size of the widget interior space - equal to size for borderless widgets */
-        gml::Vec2f innerSize;
+        /** absolute offset from parent widget */
+        gml::Vec2f m_offset;
+        /** absolute position of the outer top left edge */
+        gml::Vec2f m_position;
+        /** absolute total size of the widget */
+        gml::Vec2f m_size;
+        /** absolute position of the inner top left edge - equal to position for borderless widgets */
+        gml::Vec2f m_inner_position;
+        /** absolute size of the widget's interior space - equal to size for borderless widgets */
+        gml::Vec2f m_inner_size;
 
-        gml::Vec4<float> color;
-        int borderSize = 0;
-        gml::Vec4<float> borderColor;
-        int shadowOffset = 0;
-        float shadowHardness = 0.0f;
+        gml::Vec4<float> m_color;
+        int m_border_size = 0;
+        gml::Vec4<float> m_border_color;
+        int m_shadow_offset = 0;
+        float m_shadow_hardness = 0.0f;
 
         TextureAtlasView m_texture_atlas_view;
 
-        TextureAtlasView loadTexture(WidgetTextureTemplate tTemplate);
+        TextureAtlasView load_texture(WidgetTextureTemplate tTemplate);
 
     private:
+        std::unique_ptr<gl::IDrawable> m_drawable;
+
+        std::vector<float> construct_coords();
+
+        std::vector<float> construct_colors();
+
+        std::vector<float> construct_tex_coords(TextureAtlasView texture_atlas_view);
+
+        std::vector<float> construct_vertices(TextureAtlasView texture_atlas_view);
+
+        std::vector<unsigned int> construct_indices();
+
         friend class InputManager;
 
         friend class Animation;
-
-        std::vector<float> constructCoords();
-
-        std::vector<float> constructColors();
-
-        std::vector<float> constructTexCoords(TextureAtlasView texture_atlas_view);
-
-        std::vector<float> constructVertices(TextureAtlasView texture_atlas_view);
-
-        std::vector<unsigned int> construct_indices();
     };
 }

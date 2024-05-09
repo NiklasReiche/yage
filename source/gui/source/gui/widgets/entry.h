@@ -59,10 +59,10 @@ namespace gui
 	public:
 		TextEntry(Widget * parent, Master* master, TextEntryTemplate entryTemplate, Master* m);
 
-		void onFocus();
-		void onFocusRelease();
-		void onCharInput(char character);
-		void onKeyPress(input::KeyEvent::Code key);
+		void on_focus();
+		void on_focus_release();
+		void on_char_input(char character);
+		void on_key_press(input::KeyEvent::Code key);
 
 		std::string getString();
 

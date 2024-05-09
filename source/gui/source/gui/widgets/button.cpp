@@ -5,10 +5,10 @@ namespace gui
 	PushButton::PushButton(Widget * parent, Master* master, const ButtonTemplate & buttonTemplate)
 		: Widget(parent, master, buttonTemplate), command(buttonTemplate.command),
         idleTexCoords(m_texture_atlas_view),
-        hoverTexCoords(loadTexture(buttonTemplate.hoverTexture)),
-        clickTexCoords(loadTexture(buttonTemplate.clickTexture))
+        hoverTexCoords(load_texture(buttonTemplate.hoverTexture)),
+        clickTexCoords(load_texture(buttonTemplate.clickTexture))
 	{
-		this->isInteractable = true;
+		this->m_is_interactable = true;
 		this->idleColor = gl::toVec4(buttonTemplate.color);
 		this->hoverColor = gl::toVec4(buttonTemplate.hoverColor);
 		this->clickColor = gl::toVec4(buttonTemplate.clickColor);
@@ -17,34 +17,34 @@ namespace gui
             .text = buttonTemplate.text
         };
 		labelTemplate.geometry.offset = gml::Vec2f(0.0f);
-		labelTemplate.geometry.size = prefSize;
+		labelTemplate.geometry.size = m_hint_pref_size;
 		labelTemplate.color = 0x00000000u;
 		labelTemplate.shadow.offset = 0;
 		labelTemplate.border.size = 0;
 
-		label = this->createWidget<Label>(master, labelTemplate);
+		label = this->create_widget<Label>(master, labelTemplate);
 
 		this->m_layout = std::make_unique<VListLayout>();
 
-		if (prefSize == gml::Vec2f(0.0f)) {
-			fitChildren = true;
-			prefSize = calcPrefSize();
+		if (m_hint_pref_size == gml::Vec2f(0.0f)) {
+            m_fit_children = true;
+            m_hint_pref_size = calcPrefSize();
 			//sizeHint = gml::Vec2<SizeHint>(SizeHint::EXPANDING);
 		}
 	}
 
-	void PushButton::onClick()
+	void PushButton::on_click()
 	{
 		setColor(clickColor);
 		setTextureAtlasView(clickTexCoords);
-        update_parameters();
+        update_vertices();
 	}
 
-	void PushButton::onClickRelease()
+	void PushButton::on_click_release()
 	{
 		setColor(idleColor);
         setTextureAtlasView(idleTexCoords);
-        update_parameters();
+        update_vertices();
 
 		try {
 			command();
@@ -52,32 +52,32 @@ namespace gui
 		catch (std::bad_function_call) {}
 	}
 
-	void PushButton::onHover()
+	void PushButton::on_hover()
 	{
 		setColor(hoverColor);
         setTextureAtlasView(hoverTexCoords);
-        update_parameters();
+        update_vertices();
 	}
 
-	void PushButton::onHoverRelease()
+	void PushButton::on_hover_release()
 	{
 		setColor(idleColor);
         setTextureAtlasView(idleTexCoords);
-        update_parameters();
+        update_vertices();
 	}
 
-	void PushButton::onCancel() 
+	void PushButton::on_cancel()
 	{
 		setColor(idleColor);
         setTextureAtlasView(idleTexCoords);
-        update_parameters();
+        update_vertices();
 	}
 
-	void PushButton::onResume()
+	void PushButton::on_resume()
 	{
 		setColor(clickColor);
         setTextureAtlasView(clickTexCoords);
-        update_parameters();
+        update_vertices();
 	}
 
 	gml::Vec2f PushButton::calcPrefSize()
@@ -92,12 +92,12 @@ namespace gui
 		if (activate) {
 			setColor(clickColor);
             setTextureAtlasView(clickTexCoords);
-            update_parameters();
+            update_vertices();
 			state = true;
 		}
 	}
 
-	void CheckButton::onClick()
+	void CheckButton::on_click()
 	{
 		if (state) {
 			setColor(idleColor);
@@ -108,10 +108,10 @@ namespace gui
             setTextureAtlasView(clickTexCoords);
 		}
 
-        update_parameters();
+        update_vertices();
 	}
 
-	void CheckButton::onClickRelease()
+	void CheckButton::on_click_release()
 	{
 		if (state) {
 			state = false;
@@ -126,17 +126,17 @@ namespace gui
 		catch (std::bad_function_call) {}
 	}
 
-	void CheckButton::onHover()
+	void CheckButton::on_hover()
 	{
 		if (!state)
 		{
 			setColor(hoverColor);
             setTextureAtlasView(hoverTexCoords);
-            update_parameters();
+            update_vertices();
 		}
 	}
 
-	void CheckButton::onHoverRelease()
+	void CheckButton::on_hover_release()
 	{
 		if (!state) {
 			setColor(idleColor);
@@ -146,10 +146,10 @@ namespace gui
 			setColor(clickColor);
             setTextureAtlasView(clickTexCoords);
 		}
-        update_parameters();
+        update_vertices();
 	}
 
-	void CheckButton::onCancel()
+	void CheckButton::on_cancel()
 	{
 		if (state) {
 			setColor(clickColor);
@@ -160,7 +160,7 @@ namespace gui
             setTextureAtlasView(idleTexCoords);
 		}
 
-        update_parameters();
+        update_vertices();
 	}
 
 }

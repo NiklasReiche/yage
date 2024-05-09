@@ -41,7 +41,7 @@ namespace gui
 	{
 	private:
         LabelTemplate params;
-		std::unique_ptr<font::Text> text;
+		std::unique_ptr<font::Text> m_text;
 
 		gml::Vec2f padding = gml::Vec2f(2.0f);
 		TextAlignmentX alignX = TextAlignmentX::LEFT;
@@ -50,14 +50,14 @@ namespace gui
 	public:
 		Label(Widget * parent, Master* master, LabelTemplate labelTemplate);
 
-		font::Text* getText() { return text.get(); } // TODO
+		font::Text* text() override { return m_text.get(); } // TODO
 
 		void setText(TextTemplate text);
 
 		void setText(const std::u32string &string);
 
-		void update_geometry();
+		void update_geometry() override;
 
-		gml::Vec2f calcPrefSize();
+		gml::Vec2f calcPrefSize() override;
 	};
 }

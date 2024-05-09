@@ -271,14 +271,22 @@ public:
 		master->createWidget<gui::Label>(frame_3, animationElementTemplate);
 
 
-		animation_1 = frame_3->createAnimation<gui::MoveAnimation>(master, frame_3->getPosition(), frame_3->getPosition() + gml::Vec2<float>(200, 0), 2);
+		animation_1 = frame_3->create_animation<gui::MoveAnimation>(master, frame_3->getPosition(),
+                                                                    frame_3->getPosition() + gml::Vec2<float>(200, 0),
+                                                                    2);
 		animation_1->setOnAnimationStop(std::bind(&GuiTest::onAnimation1stop, this));
-		animation_2 = frame_3->createAnimation<gui::MoveAnimation>(master, frame_3->getPosition() + gml::Vec2<float>(200, 0), frame_3->getPosition(), 2);
+		animation_2 = frame_3->create_animation<gui::MoveAnimation>(master,
+                                                                    frame_3->getPosition() + gml::Vec2<float>(200, 0),
+                                                                    frame_3->getPosition(), 2);
 		animation_2->setOnAnimationStop(std::bind(&GuiTest::onAnimation2stop, this));
 
-		animation_3 = testLabel->createAnimation<gui::SizeAnimation>(master, testLabel->getSize(), testLabel->getSize() + gml::Vec2<float>(50, 25), 2);
+		animation_3 = testLabel->create_animation<gui::SizeAnimation>(master, testLabel->getSize(),
+                                                                      testLabel->getSize() + gml::Vec2<float>(50, 25),
+                                                                      2);
 		animation_3->setOnAnimationStop(std::bind(&GuiTest::onAnimation3stop, this));
-		animation_4 = testLabel->createAnimation<gui::SizeAnimation>(master, testLabel->getSize() + gml::Vec2<float>(50, 25), testLabel->getSize(), 2);
+		animation_4 = testLabel->create_animation<gui::SizeAnimation>(master,
+                                                                      testLabel->getSize() + gml::Vec2<float>(50, 25),
+                                                                      testLabel->getSize(), 2);
 		animation_4->setOnAnimationStop(std::bind(&GuiTest::onAnimation4stop, this));
 
 

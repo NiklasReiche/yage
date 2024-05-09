@@ -38,12 +38,12 @@ namespace gui
 		PushButton(Widget * parent, Master* master, const ButtonTemplate & layout);
 		virtual ~PushButton() {}
 
-		virtual void onClick();
-		virtual void onClickRelease();
-		virtual void onHover();
-		virtual void onHoverRelease();
-		virtual void onCancel();
-		virtual void onResume();
+		virtual void on_click();
+		virtual void on_click_release();
+		virtual void on_hover();
+		virtual void on_hover_release();
+		virtual void on_cancel();
+		virtual void on_resume();
 
 		void setCallback(std::function<void(void)> command) { this->command = command; }
 		void setText(TextTemplate text) { label->setText(text); }
@@ -51,7 +51,7 @@ namespace gui
 
 		gml::Vec2f calcPrefSize();
 
-		void debug() { onHover(); }
+		void debug() { on_hover(); }
 	};
 
 	class CheckButton : public PushButton
@@ -62,11 +62,11 @@ namespace gui
 	public:
 		CheckButton(Widget * parent, Master* master, const ButtonTemplate & layout, bool activate = false);
 
-		virtual void onClick();
-		virtual void onClickRelease();
-		virtual void onHover();
-		virtual void onHoverRelease();
-		virtual void onCancel();
+		virtual void on_click();
+		virtual void on_click_release();
+		virtual void on_hover();
+		virtual void on_hover_release();
+		virtual void on_cancel();
 
 		bool getState() { return state; }
 	};
@@ -84,18 +84,18 @@ namespace gui
 		RadioButton(Widget * parent, Master* master, const ButtonTemplate & layout, T value, bool isDefault = false)
 			: CheckButton(parent, master, layout, isDefault), value(value) {}
 
-		virtual void onClick()
+		virtual void on_click()
 		{
 			if (!state) {
 				setColor(clickColor);
-                update_parameters();
+                update_vertices();
 			}
 		}
-		virtual void onClickRelease()
+		virtual void on_click_release()
 		{
 			if (!state) {
 				state = true;
-				((RadioGroup<T>*)parent)->onRadioButtonClick(value);
+				((RadioGroup<T>*)m_parent)->onRadioButtonClick(value);
 			}
 		}
 
@@ -103,7 +103,7 @@ namespace gui
 		{
 			state = false;
 			setColor(idleColor);
-            update_parameters();
+            update_vertices();
 		}
 	};
 
@@ -126,7 +126,7 @@ namespace gui
 		{
 			buttonLayout.text.text = text;
 
-			buttons[value] = createWidget<RadioButton<T>>(master, buttonLayout, value, isDefault);
+			buttons[value] = create_widget<RadioButton<T>>(m_master, buttonLayout, value, isDefault);
 			if (isDefault) {
 				state = value;
 			}

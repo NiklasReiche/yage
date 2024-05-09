@@ -8,9 +8,9 @@ namespace gui
 	TextCursor::TextCursor(Widget* parent, Master* master, WidgetTemplate widgetTemplate)
 		: Widget(parent, master, widgetTemplate)
 	{
-		sizeHint.x() = SizeHint::FIXED;
-		sizeHint.y() = SizeHint::FIXED;
-		prefSize = widgetTemplate.geometry.size;
+        m_size_hint.x() = SizeHint::FIXED;
+        m_size_hint.y() = SizeHint::FIXED;
+        m_hint_pref_size = widgetTemplate.geometry.size;
 	}
 
 	CursorAnimation::CursorAnimation(Widget* widget, Master* master, double time)
@@ -39,7 +39,7 @@ namespace gui
 	void TextEntry::moveCursor()
 	{
 		gml::Vec2f cursorOffset;
-		cursorOffset.x() = label->getOffset().x() + label->getText()->offset(cursorPosition).x();
+		cursorOffset.x() = label->getOffset().x() + label->text()->offset(cursorPosition).x();
 		cursorOffset.y() = cursor->getOffset().y();
 		cursor->move(cursorOffset);
 	}
@@ -53,8 +53,8 @@ namespace gui
 		defaultTextTemplate(entryTemplate.defaultText),
 		inputTextTemplate(entryTemplate.inputText)
 	{
-		this->isInteractable = true;
-		this->keepFocus = true;
+		this->m_is_interactable = true;
+		this->m_keep_focus = true;
 
 		inputTextTemplate.size = defaultTextTemplate.size;
 		inputTextTemplate.font = defaultTextTemplate.font;
@@ -69,29 +69,29 @@ namespace gui
 		labelTemplate.border.size = 0;
 		labelTemplate.padding = gml::Vec2f(0.0f);
 
-		label = this->createWidget<Label>(master, labelTemplate);
+		label = this->create_widget<Label>(master, labelTemplate);
 
 		WidgetTemplate cursorTemplate;
 		cursorTemplate.geometry.offset = gml::Vec2f(padding.x(), padding.y());
 		cursorTemplate.geometry.size = gml::Vec2f(cursorWidth, label->getPreferredSize().y() - padding.y() * 2);
 		cursorTemplate.color = cursorColor;
 
-		cursor = this->createWidget<TextCursor>(master, cursorTemplate);
-		cursorAnimation = cursor->createAnimation<CursorAnimation>(m, 0.5);
+		cursor = this->create_widget<TextCursor>(master, cursorTemplate);
+		cursorAnimation = cursor->create_animation<CursorAnimation>(m, 0.5);
 		cursor->hide();
 
         m_layout = std::make_unique<AbsoluteLayout>();
 
-		if (prefSize == gml::Vec2f(0.0f)) {
-			prefSize = calcPrefSize();
-			sizeHint.x() = SizeHint::EXPANDING;
-			sizeHint.y() = SizeHint::FIXED;
+		if (m_hint_pref_size == gml::Vec2f(0.0f)) {
+            m_hint_pref_size = calcPrefSize();
+            m_size_hint.x() = SizeHint::EXPANDING;
+            m_size_hint.y() = SizeHint::FIXED;
 		}
 	}
 
-	void TextEntry::onFocus()
+	void TextEntry::on_focus()
 	{
-		master->window().enableCharInput();
+		m_master->window().enableCharInput();
 		cursor->show();
 		cursorAnimation->start();
 		if (inputText.length() == 0) {
@@ -99,9 +99,9 @@ namespace gui
 			label->setText(inputTextTemplate);
 		}
 	}
-	void TextEntry::onFocusRelease()
+	void TextEntry::on_focus_release()
 	{
-		master->window().disableCharInput();
+		m_master->window().disableCharInput();
 		cursor->hide();
 		cursorAnimation->stop();
 		if (inputText.length() == 0) {
@@ -109,7 +109,7 @@ namespace gui
 		}
 	}
 
-	void TextEntry::onCharInput(char character)
+	void TextEntry::on_char_input(char character)
 	{
 		inputText.insert(cursorPosition, std::string(1, character));
 		label->setText(utils::toUTF32(inputText));
@@ -119,7 +119,7 @@ namespace gui
 			moveCursor();
 		}
 	}
-	void TextEntry::onKeyPress(input::KeyEvent::Code key)
+	void TextEntry::on_key_press(input::KeyEvent::Code key)
 	{
 		switch (key)
 		{
@@ -147,7 +147,7 @@ namespace gui
 			break;
 
 		case input::KeyEvent::Code::KEY_ENTER:
-			master->input_manager().unFocus();
+			m_master->input_manager().unFocus();
 			try {
 				callback();
 			} catch (std::bad_function_call){}

@@ -20,7 +20,7 @@ namespace gui
 		else if (focusedWidget != nullptr &&
 			(action == input::KeyEvent::Action::PRESS || action == input::KeyEvent::Action::REPEAT))
 		{
-			focusedWidget->onKeyPress(key);
+            focusedWidget->on_key_press(key);
 		}
 	}
 
@@ -35,20 +35,20 @@ namespace gui
 			{
 				if (selectedWidget != nullptr)
 				{
-					selectedWidget->onHover();
+                    selectedWidget->on_hover();
 				}
 				if (lastSelectedWidget != nullptr)
 				{
-					lastSelectedWidget->onHoverRelease();
+                    lastSelectedWidget->on_hover_release();
 				}
 			}
 			else if (activeWidget == selectedWidget && activeWidget != nullptr)
 			{
-				selectedWidget->onResume();
+                selectedWidget->on_resume();
 			}
 			else if (activeWidget == lastSelectedWidget && activeWidget != nullptr)
 			{
-				lastSelectedWidget->onHoverRelease();
+                lastSelectedWidget->on_hover_release();
 			}
 		}
 	}
@@ -57,14 +57,14 @@ namespace gui
 	{
 		if (focusedWidget != nullptr)
 		{
-			focusedWidget->onFocusRelease();
+            focusedWidget->on_focus_release();
 			focusedWidget = nullptr;
 		}
 	}
 
 	Widget* InputManager::searchSelected(Widget* widget, const float xPos, const float yPos)
 	{
-		if (xPos > widget->position.x() && xPos < widget->position.x() + widget->size.x() && yPos > widget->position.y() && yPos < widget->position.y() + widget->size.y())
+		if (xPos > widget->m_position.x() && xPos < widget->m_position.x() + widget->m_size.x() && yPos > widget->m_position.y() && yPos < widget->m_position.y() + widget->m_size.y())
 		{
 			Widget* result = nullptr;
 			for (unsigned int i = 0; i < widget->getChildrenCount(); ++i)
@@ -93,19 +93,19 @@ namespace gui
 		if (selectedWidget != nullptr)
 		{
 			activeWidget = selectedWidget;
-			activeWidget->onClick();
+            activeWidget->on_click();
 
 			if (selectedWidget != focusedWidget)
 			{
 				if (focusedWidget != nullptr)
 				{
-					focusedWidget->onFocusRelease();
+                    focusedWidget->on_focus_release();
 					focusedWidget = nullptr;
 				}
-				if (selectedWidget->keepFocus)
+				if (selectedWidget->m_keep_focus)
 				{
 					focusedWidget = selectedWidget;
-					focusedWidget->onFocus();
+                    focusedWidget->on_focus();
 				}
 			}
 		}
@@ -115,7 +115,7 @@ namespace gui
 
 			if (focusedWidget != nullptr)
 			{
-				focusedWidget->onFocusRelease();
+                focusedWidget->on_focus_release();
 				focusedWidget = nullptr;
 			}
 		}
@@ -127,7 +127,7 @@ namespace gui
 		{
 			if (activeWidget != nullptr)
 			{
-				activeWidget->onCancel();
+                activeWidget->on_cancel();
 				activeWidget = nullptr;
 			}
 		}
@@ -135,7 +135,7 @@ namespace gui
 		{
 			if (activeWidget == selectedWidget)
 			{
-				activeWidget->onClickRelease();
+                activeWidget->on_click_release();
 				activeWidget = nullptr;
 			}
 		}
@@ -146,7 +146,7 @@ namespace gui
 	{
 		if (focusedWidget != nullptr)
 		{
-			focusedWidget->onCharInput(character);
+            focusedWidget->on_char_input(character);
 		}
 	}
 

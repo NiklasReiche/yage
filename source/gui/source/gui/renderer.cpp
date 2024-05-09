@@ -40,7 +40,7 @@ namespace gui
         glRenderer->useShader(*guiShader);
         for (auto widget : widgets) {
             glRenderer->bindTexture(widget->texture_atlas_view().get());
-            glRenderer->draw(*widget->drawable);
+            glRenderer->draw(widget->drawable());
         }
 
         glRenderer->useShader(*textShader);
@@ -61,7 +61,7 @@ namespace gui
             if (child.is_Active()) {
                 vector_widget.push_back(&child);
                 if (child.has_Text()) {
-                    vector_text.push_back(child.getText());
+                    vector_text.push_back(child.text());
                 }
             }
             collect_drawables(vector_widget, vector_text, child);

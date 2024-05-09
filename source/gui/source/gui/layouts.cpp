@@ -12,20 +12,21 @@ namespace gui
 			gml::Vec2f childCellMargin = child.getCellMargin();
 
 			if (child.getSizeHint().x() == SizeHint::INFINITE) {
-				childPrefSize.x() = child.toAbsX(childPrefSize.x());
+				childPrefSize.x() = child.to_absolute_x(childPrefSize.x());
 			}
 			if (child.getSizeHint().y() == SizeHint::INFINITE) {
-				childPrefSize.y() = child.toAbsY(childPrefSize.y());
-			}
-			if (child.getOffsetHint().x() == OffsetHint::INFINITE) {
-				childCellMargin.x() = child.toAbsX(childCellMargin.x());
-			}
-			if (child.getOffsetHint().y() == OffsetHint::INFINITE) {
-				childCellMargin.y() = child.toAbsY(childCellMargin.y());
+				childPrefSize.y() = child.to_absolute_y(childPrefSize.y());
 			}
 
-			child.setSize(childPrefSize);
-			child.setOffset(childCellMargin);
+			if (child.getOffsetHint().x() == OffsetHint::INFINITE) {
+				childCellMargin.x() = child.to_absolute_x(childCellMargin.x());
+			}
+			if (child.getOffsetHint().y() == OffsetHint::INFINITE) {
+				childCellMargin.y() = child.to_absolute_y(childCellMargin.y());
+			}
+
+            child.set_size(childPrefSize);
+            child.set_offset(childCellMargin);
 		}
 	}
 
@@ -53,21 +54,13 @@ namespace gui
 			switch (childSizeHint)
 			{
 			case SizeHint::FIXED:
+            case SizeHint::EXPANDING:
 				parentPrefSize = std::max(parentPrefSize, childPrefSize);
 				break;
 			case SizeHint::ASPECT:
-				parentPrefSize = std::max(parentPrefSize, childMinSize);
-				break;
-			case SizeHint::INFINITE:
-				parentPrefSize = std::max(parentPrefSize, childMinSize);
-				break;
-			case SizeHint::EXPANDING:
-				parentPrefSize = std::max(parentPrefSize, childPrefSize);
-				break;
+            case SizeHint::INFINITE:
 			case SizeHint::SHRINKING:
-				parentPrefSize = std::max(parentPrefSize, childMinSize);
-				break;
-			case SizeHint::RECOMMENDED:
+            case SizeHint::RECOMMENDED:
 				parentPrefSize = std::max(parentPrefSize, childMinSize);
 				break;
 			}
@@ -100,20 +93,12 @@ namespace gui
 			switch (childSizeHint)
 			{
 			case SizeHint::FIXED:
+            case SizeHint::EXPANDING:
 				parentPrefSize += childPrefSize;
 				break;
 			case SizeHint::ASPECT:
-				parentPrefSize += childMinSize;
-				break;
 			case SizeHint::INFINITE:
-				parentPrefSize += childMinSize;
-				break;
-			case SizeHint::EXPANDING:
-				parentPrefSize += childPrefSize;
-				break;
 			case SizeHint::SHRINKING:
-				parentPrefSize += childMinSize;
-				break;
 			case SizeHint::RECOMMENDED:
 				parentPrefSize += childMinSize;
 				break;
@@ -139,17 +124,17 @@ namespace gui
 
 			gml::Vec2f childCellMargin = child.getCellMargin();
 			if (child.getOffsetHint().x() == OffsetHint::INFINITE) {
-				childCellMargin.x() = child.toAbsX(childCellMargin.x());
+				childCellMargin.x() = child.to_absolute_x(childCellMargin.x());
 			}
 			if (child.getOffsetHint().y() == OffsetHint::INFINITE) {
-				childCellMargin.y() = child.toAbsY(childCellMargin.y());
+				childCellMargin.y() = child.to_absolute_y(childCellMargin.y());
 			}
 
 			if (child.getSizeHint().y() == SizeHint::INFINITE) {
-				totalSize.y() -= child.toAbsY(child.getPreferredSize().y()) + childCellMargin.y();
+				totalSize.y() -= child.to_absolute_y(child.getPreferredSize().y()) + childCellMargin.y();
 			}
 			else if (child.getSizeHint().y() == SizeHint::ASPECT) {
-				totalSize.y() -= child.fromAspect() + childCellMargin.y();
+				totalSize.y() -= child.from_aspect() + childCellMargin.y();
 			}
 			else {
 				totalSize.y() -= child.getPreferredSize().y() + childCellMargin.y();
@@ -173,7 +158,7 @@ namespace gui
 		for (unsigned int i = 0; i < widget->getChildrenCount(); ++i)
 		{
 			Widget & child = widget->getChild(i);
-			child.setAnchor(Anchor::TOP_LEFT);
+            child.set_anchor(Anchor::TOP_LEFT);
 			
 			gml::Vec2<SizeHint> childSizeHint = child.getSizeHint();
 			gml::Vec2f childPrefSize = child.getPreferredSize();
@@ -182,14 +167,14 @@ namespace gui
 			gml::Vec2f childSize(0.0f);
 
 			if (child.getOffsetHint().x() == OffsetHint::INFINITE) {
-				childCellMargin.x() = child.toAbsX(childCellMargin.x());
+				childCellMargin.x() = child.to_absolute_x(childCellMargin.x());
 			}
 			if (child.getOffsetHint().y() == OffsetHint::INFINITE) {
-				childCellMargin.y() = child.toAbsY(childCellMargin.y());
+				childCellMargin.y() = child.to_absolute_y(childCellMargin.y());
 			}
 
 			offset += childCellMargin;
-			child.setOffset(offset);
+            child.set_offset(offset);
 
 			switch (childSizeHint.x())
 			{
@@ -197,10 +182,10 @@ namespace gui
 				childSize.x() = childPrefSize.x();
 				break;
 			case SizeHint::INFINITE:
-				childSize.x() = child.toAbsX(childPrefSize.x());
+				childSize.x() = child.to_absolute_x(childPrefSize.x());
 				break;
 			case SizeHint::ASPECT:
-				childSize.x() = child.fromAspect();
+				childSize.x() = child.from_aspect();
 				break;
 			case SizeHint::EXPANDING:
 				childSize.x() = totalSize.x() - childCellMargin.x();
@@ -219,10 +204,10 @@ namespace gui
 				childSize.y() = childPrefSize.y();
 				break;
 			case SizeHint::INFINITE:
-				childSize.y() = child.toAbsY(childPrefSize.y());
+				childSize.y() = child.to_absolute_y(childPrefSize.y());
 				break;
 			case SizeHint::ASPECT:
-				childSize.y() = child.fromAspect();
+				childSize.y() = child.from_aspect();
 				break;
 			case SizeHint::EXPANDING:
 				childSize.y() = childPrefSize.y() + expandSize;
@@ -242,8 +227,8 @@ namespace gui
 				}
 				break;
 			}
-			
-			child.setSize(childSize);
+
+            child.set_size(childSize);
 			offset.x() = widget->getLayoutMargin().x();
 			offset.y() += childSize.y();
 		}	
@@ -359,17 +344,17 @@ namespace gui
 
 			gml::Vec2f childCellMargin = child.getCellMargin();
 			if (child.getOffsetHint().x() == OffsetHint::INFINITE) {
-				childCellMargin.x() = child.toAbsX(childCellMargin.x());
+				childCellMargin.x() = child.to_absolute_x(childCellMargin.x());
 			}
 			if (child.getOffsetHint().y() == OffsetHint::INFINITE) {
-				childCellMargin.y() = child.toAbsY(childCellMargin.y());
+				childCellMargin.y() = child.to_absolute_y(childCellMargin.y());
 			}
 
 			if (child.getSizeHint().x() == SizeHint::INFINITE) {
-				totalSize.x() -= child.toAbsX(child.getPreferredSize().x()) + childCellMargin.x();
+				totalSize.x() -= child.to_absolute_x(child.getPreferredSize().x()) + childCellMargin.x();
 			}
 			else if (child.getSizeHint().y() == SizeHint::ASPECT) {
-				totalSize.y() -= child.fromAspect() + childCellMargin.x();
+				totalSize.y() -= child.from_aspect() + childCellMargin.x();
 			}
 			else {
 				totalSize.x() -= child.getPreferredSize().x() + childCellMargin.x();
@@ -393,7 +378,7 @@ namespace gui
 		for (unsigned int i = 0; i < widget->getChildrenCount(); ++i)
 		{
 			Widget & child = widget->getChild(i);
-			child.setAnchor(Anchor::TOP_LEFT);
+            child.set_anchor(Anchor::TOP_LEFT);
 
 			gml::Vec2<SizeHint> childSizeHint = child.getSizeHint();
 			gml::Vec2f childPrefSize = child.getPreferredSize();
@@ -402,14 +387,14 @@ namespace gui
 			gml::Vec2f childSize(0.0f);
 
 			if (child.getOffsetHint().x() == OffsetHint::INFINITE) {
-				childCellMargin.x() = child.toAbsX(childCellMargin.x());
+				childCellMargin.x() = child.to_absolute_x(childCellMargin.x());
 			}
 			if (child.getOffsetHint().y() == OffsetHint::INFINITE) {
-				childCellMargin.y() = child.toAbsY(childCellMargin.y());
+				childCellMargin.y() = child.to_absolute_y(childCellMargin.y());
 			}
 
 			offset += childCellMargin;
-			child.setOffset(offset);
+            child.set_offset(offset);
 
 			switch (childSizeHint.y())
 			{
@@ -417,10 +402,10 @@ namespace gui
 				childSize.y() = childPrefSize.y();
 				break;
 			case SizeHint::INFINITE:
-				childSize.y() = child.toAbsY(childPrefSize.y());
+				childSize.y() = child.to_absolute_y(childPrefSize.y());
 				break;
 			case SizeHint::ASPECT:
-				childSize.y() = child.fromAspect();
+				childSize.y() = child.from_aspect();
 				break;
 			case SizeHint::EXPANDING:
 				childSize.y() = totalSize.y() - childCellMargin.y();
@@ -439,10 +424,10 @@ namespace gui
 				childSize.x() = childPrefSize.x();
 				break;
 			case SizeHint::INFINITE:
-				childSize.x() = child.toAbsX(childPrefSize.x());
+				childSize.x() = child.to_absolute_x(childPrefSize.x());
 				break;
 			case SizeHint::ASPECT:
-				childSize.x() = child.fromAspect();
+				childSize.x() = child.from_aspect();
 				break;
 			case SizeHint::EXPANDING:
 				childSize.x() = childPrefSize.x() + expandSize;
@@ -463,7 +448,7 @@ namespace gui
 				break;
 			}
 
-			child.setSize(childSize);
+            child.set_size(childSize);
 			offset.y() = widget->getLayoutMargin().y();
 			offset.x() += childSize.x();
 		}

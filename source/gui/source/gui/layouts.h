@@ -8,11 +8,17 @@ namespace gui
 
 	enum class SizeHint
 	{
+        /** This element should stay at a fixed size */
 		FIXED,
+        /** This element should expand with the parent container */
 		EXPANDING,
+        /** This element should shrink with the parent container */
 		SHRINKING,
+        /**  */
 		RECOMMENDED,
-		INFINITE,
+        /**  */
+		INFINITE, // TODO: this should probably be called RELATIVE, and also not be part of SizeHint
+        /**  */
 		ASPECT
 	};
 
@@ -21,6 +27,7 @@ namespace gui
 		FIXED,
 		INFINITE
 	};
+
 	enum class LayoutType
 	{
 		ABSOLUTE_LAYOUT,

@@ -9,7 +9,7 @@ namespace gui
           m_renderer(GuiRenderer(glContext->getRenderer(), glContext->getShaderCreator(), gl::IRenderer::Viewport{0, 0, window->getWidth(), window->getHeight() })),
           m_root(this)
 	{
-		m_root.setSize(gml::Vec2<float>((float)window->getWidth(), (float)window->getHeight()));
+        m_root.set_size(gml::Vec2<float>((float) window->getWidth(), (float) window->getHeight()));
 		
 		window->attach(m_input_manager);
 	}

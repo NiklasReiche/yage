@@ -30,9 +30,9 @@ namespace gui
         Element* createWidget(Widget* parent, Args... args)
         {
             if (parent == nullptr) {
-                return m_root.createWidget<Element>(this, args...);
+                return m_root.create_widget<Element>(this, args...);
             }
-            return parent->createWidget<Element>(this, args...);
+            return parent->create_widget<Element>(this, args...);
         }
 
         TextureAtlasStore& texture_atlas_store()
