@@ -8,9 +8,8 @@ namespace gui
 	TextCursor::TextCursor(Widget* parent, Master* master, WidgetTemplate widgetTemplate)
 		: Widget(parent, master, widgetTemplate)
 	{
-        m_size_hint.x() = SizeHint::FIXED;
-        m_size_hint.y() = SizeHint::FIXED;
-        m_hint_pref_size = widgetTemplate.geometry.size;
+        m_template.geometry.size_hint.x() = SizeHint::FIXED;
+        m_template.geometry.size_hint.y() = SizeHint::FIXED;
 	}
 
 	CursorAnimation::CursorAnimation(Widget* widget, Master* master, double time)
@@ -18,6 +17,7 @@ namespace gui
 	{
 
 	}
+
 	void CursorAnimation::update(double dt)
 	{
 		if (!isFinished) {
@@ -38,10 +38,14 @@ namespace gui
 
 	void TextEntry::moveCursor()
 	{
-		gml::Vec2f cursorOffset;
-		cursorOffset.x() = label->getOffset().x() + label->text()->offset(cursorPosition).x();
-		cursorOffset.y() = cursor->getOffset().y();
-		cursor->move(cursorOffset);
+		gml::Vec2f cursor_position;
+        cursor_position.x() = label->offset().x() + label->text()->offset(cursorPosition).x();
+        cursor_position.y() = cursor->offset().y();
+		cursor->set_anchor({
+            .offset = cursor_position,
+            .value_type = {ValueType::ABSOLUTE, ValueType::ABSOLUTE},
+            .position = AnchorPosition::TOP_LEFT
+        });
 	}
 
 	TextEntry::TextEntry(Widget * parent, Master* master, TextEntryTemplate entryTemplate, Master* m)
@@ -62,30 +66,27 @@ namespace gui
 		LabelTemplate labelTemplate{
             .text = entryTemplate.defaultText
         };
-		labelTemplate.geometry.offset = entryTemplate.padding;
-		labelTemplate.geometry.size = gml::Vec2f();
-		labelTemplate.color = 0x00000000u;
-		labelTemplate.shadow.offset = 0;
-		labelTemplate.border.size = 0;
+		labelTemplate.base.geometry.anchor.offset = entryTemplate.padding;
+		labelTemplate.base.geometry.preferred_size.value = gml::Vec2f();
+		labelTemplate.base.color = 0x00000000u;
+		labelTemplate.base.shadow.offset = 0;
+		labelTemplate.base.border.thickness = 0;
 		labelTemplate.padding = gml::Vec2f(0.0f);
 
 		label = this->create_widget<Label>(master, labelTemplate);
 
 		WidgetTemplate cursorTemplate;
-		cursorTemplate.geometry.offset = gml::Vec2f(padding.x(), padding.y());
-		cursorTemplate.geometry.size = gml::Vec2f(cursorWidth, label->getPreferredSize().y() - padding.y() * 2);
+		cursorTemplate.geometry.anchor.offset = gml::Vec2f(padding.x(), padding.y());
+		cursorTemplate.geometry.preferred_size.value = gml::Vec2f(cursorWidth, label->preferred_size().y() - padding.y() * 2);
 		cursorTemplate.color = cursorColor;
 
 		cursor = this->create_widget<TextCursor>(master, cursorTemplate);
 		cursorAnimation = cursor->create_animation<CursorAnimation>(m, 0.5);
 		cursor->hide();
 
-        m_layout = std::make_unique<AbsoluteLayout>();
-
-		if (m_hint_pref_size == gml::Vec2f(0.0f)) {
-            m_hint_pref_size = calcPrefSize();
-            m_size_hint.x() = SizeHint::EXPANDING;
-            m_size_hint.y() = SizeHint::FIXED;
+		if (m_template.geometry.preferred_size.value == gml::Vec2f(0.0f)) {
+            m_template.geometry.size_hint.x() = SizeHint::EXPANDING;
+            m_template.geometry.size_hint.y() = SizeHint::FIXED;
 		}
 	}
 
@@ -162,6 +163,6 @@ namespace gui
 
 	gml::Vec2f TextEntry::calcPrefSize()
 	{
-		return label->getPreferredSize() + padding * 2;
+		return label->preferred_size() + padding * 2;
 	}
 }

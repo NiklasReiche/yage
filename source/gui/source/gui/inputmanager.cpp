@@ -64,12 +64,12 @@ namespace gui
 
 	Widget* InputManager::searchSelected(Widget* widget, const float xPos, const float yPos)
 	{
-		if (xPos > widget->m_position.x() && xPos < widget->m_position.x() + widget->m_size.x() && yPos > widget->m_position.y() && yPos < widget->m_position.y() + widget->m_size.y())
+		if (xPos > widget->m_position_abs.x() && xPos < widget->m_position_abs.x() + widget->m_size_abs.x() && yPos > widget->m_position_abs.y() && yPos < widget->m_position_abs.y() + widget->m_size_abs.y())
 		{
 			Widget* result = nullptr;
-			for (unsigned int i = 0; i < widget->getChildrenCount(); ++i)
+			for (auto& child : widget->children())
 			{
-				result = searchSelected(&widget->getChild(i), xPos, yPos);
+				result = searchSelected(child.get(), xPos, yPos);
 				if (result != nullptr)
 				{
 					break;

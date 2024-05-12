@@ -15,14 +15,16 @@ target_sources(yage_gui
         widgets/frame.cpp
         widgets/label.h
         widgets/label.cpp
+        widgets/VListBox.h
+        widgets/VListBox.cpp
+        widgets/HListBox.h
+        widgets/HListBox.cpp
         animation.h
         animation.cpp
         core.h
         gui.h
         inputmanager.h
         inputmanager.cpp
-        layouts.h
-        layouts.cpp
         master.h
         master.cpp
         renderer.h

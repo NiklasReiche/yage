@@ -12,7 +12,6 @@
 #include "texturemanager.h"
 #include "animation.h"
 #include "widgettemplate.h"
-#include "layouts.h"
 
 namespace gui
 {
@@ -26,10 +25,16 @@ namespace gui
         virtual ~Widget() = default;
 
         template<typename Element, typename... Args>
-        Element* create_widget(Master* master, Args... args)
+        Element* create_widget(Master* master, Args... args) // TODO: this doesn't need the master, we can use m_master
         {
             m_children.push_back(std::make_unique<Element>(this, master, std::forward<Args>(args)...));
-            update_layout();
+
+            // TODO: correct? defer?
+            if (m_parent == nullptr)
+                update_layout();
+            else
+                m_parent->update_layout();
+
             return (Element*) m_children.back().get();
         }
 
@@ -44,12 +49,6 @@ namespace gui
         {
             return nullptr;
         }
-
-        virtual gml::Vec2f calcPrefSize()
-        {
-            return m_hint_pref_size;
-        }
-
 
         void hide()
         {
@@ -79,112 +78,95 @@ namespace gui
             return m_has_text;
         }
 
-        Widget* getParent()
+        Widget* parent()
         {
             return m_parent;
         }
 
-        Widget& getChild(int i)
+        const std::vector<std::unique_ptr<Widget>>& children()
         {
-            return *m_children[i].get();
-        }
-// TODO: use iterators
-        unsigned int getChildrenCount()
-        {
-            return m_children.size();
+            return m_children;
         }
 
-
-        gml::Vec2<SizeHint> getSizeHint()
+        virtual gml::Vec2f min_size()
         {
-            return m_size_hint;
+            gml::Vec2f size = m_template.geometry.min_size.value;
+            if (m_template.geometry.min_size.value_type.x() == ValueType::RELATIVE) {
+                size.x() = to_absolute_x(size.x());
+            }
+            if (m_template.geometry.min_size.value_type.y() == ValueType::RELATIVE) {
+                size.y() = to_absolute_y(size.y());
+            }
+            return size;
         }
 
-        gml::Vec2<OffsetHint> getOffsetHint()
+        virtual gml::Vec2f max_size()
         {
-            return m_offset_hint;
+            gml::Vec2f size = m_template.geometry.max_size.value;
+            if (m_template.geometry.max_size.value_type.x() == ValueType::RELATIVE) {
+                size.x() = to_absolute_x(size.x());
+            }
+            if (m_template.geometry.max_size.value_type.y() == ValueType::RELATIVE) {
+                size.y() = to_absolute_y(size.y());
+            }
+            return size;
         }
 
-        gml::Vec2f getMinSize()
+        virtual gml::Vec2f preferred_size()
         {
-            return m_hint_min_size;
+            gml::Vec2f size = m_template.geometry.preferred_size.value;
+
+            if (m_template.geometry.size_hint.x() == SizeHint::FIT_CHILDREN) {
+                float preferred_size = 0;
+                for (auto& child : m_children) {
+                    preferred_size = std::max(preferred_size, child->preferred_size().x());
+                }
+                size.x() = preferred_size;
+            }
+            else if (m_template.geometry.preferred_size.value_type.x() == ValueType::RELATIVE) {
+                size.x() = to_absolute_x(size.x());
+            }
+
+            if (m_template.geometry.size_hint.y() == SizeHint::FIT_CHILDREN) {
+                float preferred_size = 0;
+                for (auto& child: m_children) {
+                    preferred_size = std::max(preferred_size, child->preferred_size().y());
+                }
+                size.y() = preferred_size;
+            }
+            else if (m_template.geometry.preferred_size.value_type.y() == ValueType::RELATIVE) {
+                size.y() = to_absolute_y(size.y());
+            }
+
+            // TODO: should this incorporate shadow?
+            return size + gml::Vec2f(2 * m_template.border.thickness);
         }
 
-        gml::Vec2f getMaxSize()
-        {
-            return m_hint_max_size;
+        virtual gml::Vec2<SizeHint> size_hint() {
+            return m_template.geometry.size_hint;
         }
 
-        gml::Vec2f getPreferredSize()
+        virtual gml::Vec2f offset()
         {
-            return m_hint_pref_size;
+            gml::Vec2f offset = m_template.geometry.anchor.offset;
+            if (m_template.geometry.anchor.value_type.x() == ValueType::RELATIVE) {
+                offset.x() = to_absolute_x(offset.x());
+            }
+            if (m_template.geometry.anchor.value_type.y() == ValueType::RELATIVE) {
+                offset.y() = to_absolute_y(offset.y());
+            }
+            return offset;
         }
 
-        gml::Vec2f getCellMargin()
+        gml::Vec2f actual_size()
         {
-            return m_margin;
-        }
-
-        gml::Vec2f getLayoutMargin()
-        {
-            return m_padding;
-        }
-
-        gml::Vec2f getOffset()
-        {
-            return m_offset;
-        }
-
-        gml::Vec2f getPosition()
-        {
-            return m_position;
-        }
-
-        gml::Vec2f getInnerPosition()
-        {
-            return m_inner_position;
-        }
-
-        gml::Vec2f getSize()
-        {
-            return m_size;
-        }
-
-        gml::Vec2f getInnerSize()
-        {
-            return m_inner_size;
-        }
-
-        gml::Vec4f getColor()
-        {
-            return m_color;
-        }
-
-        void setColor(int color)
-        {
-            this->m_color = gl::toVec4(color);
-        }
-
-        void setColor(gml::Vec4<float> color)
-        {
-            this->m_color = color;
-        }
-
-        void setSizeHint(gml::Vec2<SizeHint> sizeHint)
-        {
-            this->m_size_hint = sizeHint;
-        }
-
-        void setPreferredSize(gml::Vec2f size)
-        {
-            this->m_hint_pref_size = size;
+            return m_size_abs;
         }
 
         void setTextureAtlasView(TextureAtlasView texture_atlas_view)
         {
             m_texture_atlas_view = texture_atlas_view;
         }
-
 
         /* update semantics */
         void update_vertices();
@@ -193,25 +175,15 @@ namespace gui
 
         virtual void update_layout();
 
+        virtual void set_anchor(Anchor anchor);
 
-        virtual void set_anchor(Anchor _anchor);
+        void set_actual_size(gml::Vec2f size);
 
-        virtual void set_size(gml::Vec2f _size);
+        void set_actual_anchor(Anchor anchor);
 
-        virtual void resize(gml::Vec2f _size);
+        virtual void resize(Size size);
 
-        virtual void set_offset(gml::Vec2f _offset);
-
-        virtual void move(gml::Vec2f _cellMargin);
-
-
-        gml::Vec2f to_absolute(gml::Vec2f value);
-
-        float to_absolute_x(float value);
-
-        float to_absolute_y(float value);
-
-        float from_aspect();
+        void set_absolute_offset(gml::Vec2f offset);
 
         TextureAtlasView texture_atlas_view();
 
@@ -260,45 +232,27 @@ namespace gui
         bool m_keep_focus = false;
         bool m_is_hovered = false;
         bool m_has_text = false;
-        bool m_fit_children = false;
 
-        /** Decides how children are ordered */
-        std::unique_ptr<Layout> m_layout;
-        gml::Vec2<SizeHint> m_size_hint = gml::Vec2<SizeHint>(SizeHint::EXPANDING);
-        gml::Vec2<OffsetHint> m_offset_hint = gml::Vec2<OffsetHint>(OffsetHint::FIXED);
-
-        Anchor m_anchor = Anchor::TOP_LEFT;
-        /** margin for layouts */
-        gml::Vec2f m_margin;
-        /** padding for layouts */
-        gml::Vec2f m_padding;
-        /** preferred size for layouts */
-        gml::Vec2f m_hint_pref_size;
-        /** minimal size for layouts */
-        gml::Vec2f m_hint_min_size;
-        /** maximum size for layouts */
-        gml::Vec2f m_hint_max_size;
-
-        /** absolute offset from parent widget */
-        gml::Vec2f m_offset;
-        /** absolute position of the outer top left edge */
-        gml::Vec2f m_position;
-        /** absolute total size of the widget */
-        gml::Vec2f m_size;
-        /** absolute position of the inner top left edge - equal to position for borderless widgets */
-        gml::Vec2f m_inner_position;
-        /** absolute size of the widget's interior space - equal to size for borderless widgets */
-        gml::Vec2f m_inner_size;
-
-        gml::Vec4<float> m_color;
-        int m_border_size = 0;
-        gml::Vec4<float> m_border_color;
-        int m_shadow_offset = 0;
-        float m_shadow_hardness = 0.0f;
+        WidgetTemplate m_template;
 
         TextureAtlasView m_texture_atlas_view;
 
+        /** absolute offset from parent widget */
+        gml::Vec2f m_offset_abs;
+        /** absolute position of the outer top left edge */
+        gml::Vec2f m_position_abs;
+        /** absolute total size of the widget */
+        gml::Vec2f m_size_abs;
+        /** absolute position of the inner top left edge - equal to position for borderless widgets */
+        gml::Vec2f m_inner_position_abs;
+        /** absolute size of the widget's interior space - equal to size for borderless widgets */
+        gml::Vec2f m_inner_size_abs;
+
         TextureAtlasView load_texture(WidgetTextureTemplate tTemplate);
+
+        float to_absolute_x(float value);
+
+        float to_absolute_y(float value);
 
     private:
         std::unique_ptr<gl::IDrawable> m_drawable;

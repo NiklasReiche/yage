@@ -9,16 +9,18 @@
 #include "../widget.h"
 #include "label.h"
 #include "frame.h"
+#include "HListBox.h"
 
 namespace gui
 {
-	struct ButtonTemplate : public WidgetTemplate
+	struct ButtonTemplate
 	{
+        WidgetTemplate base {};
 		TextTemplate text;
-		unsigned int clickColor = color;
-		unsigned int hoverColor = color;
-		WidgetTextureTemplate clickTexture = texture;
-		WidgetTextureTemplate hoverTexture = texture;
+		unsigned int clickColor = base.color;
+		unsigned int hoverColor = base.color;
+		WidgetTextureTemplate clickTexture = base.texture;
+		WidgetTextureTemplate hoverTexture = base.texture;
 		std::function<void()> command;
 	};
 
@@ -27,9 +29,9 @@ namespace gui
 	protected:
 		Label * label;
 		std::function<void()> command;
-		gml::Vec4<float> idleColor;
-		gml::Vec4<float> hoverColor;
-		gml::Vec4<float> clickColor;
+		gl::Color_t idleColor;
+        gl::Color_t hoverColor;
+        gl::Color_t clickColor;
 		TextureAtlasView idleTexCoords;
         TextureAtlasView hoverTexCoords;
         TextureAtlasView clickTexCoords;
@@ -87,7 +89,7 @@ namespace gui
 		virtual void on_click()
 		{
 			if (!state) {
-				setColor(clickColor);
+                m_template.color = clickColor;
                 update_vertices();
 			}
 		}
@@ -102,13 +104,14 @@ namespace gui
 		virtual void deactivate()
 		{
 			state = false;
-			setColor(idleColor);
+            m_template.color = idleColor;
             update_vertices();
 		}
 	};
 
+    // TODO: maybe this should not be a widget
 	template<typename T>
-	class RadioGroup : public Frame
+	class RadioGroup : public HListBox
 	{
 	private:
 		T state;
@@ -116,10 +119,12 @@ namespace gui
 		std::map<T, RadioButton<T>*> buttons;
 
 	public:
-		RadioGroup(Widget * parent, Master* master, const FrameTemplate & layout, const ButtonTemplate & buttonLayout, T defaultValue)
-			: Frame(parent, master, layout), state(defaultValue), buttonLayout(buttonLayout)
+		RadioGroup(Widget * parent, Master* master, const ButtonTemplate & buttonLayout, T defaultValue)
+			: HListBox(parent, master, WidgetTemplate()), // TODO
+            state(defaultValue),
+            buttonLayout(buttonLayout)
 		{
-			this->buttonLayout.geometry.offset = gml::Vec2<float>();
+			this->buttonLayout.base.geometry.anchor.offset = gml::Vec2<float>();
 		}
 
 		void addButton(std::u32string text, T value, bool isDefault = false)

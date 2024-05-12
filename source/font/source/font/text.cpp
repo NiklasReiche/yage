@@ -87,8 +87,8 @@ namespace font
             xPos += ch.glyph.advance * scale.x();
 
             // Update text geometry
-            m_dimensions.x() = std::max(m_dimensions.x(), xPos);
-            m_dimensions.y() = std::max(m_dimensions.y(), yPos + bottom);
+            m_dimensions.x() = std::max(m_dimensions.x(), xPos - m_offset.x());
+            m_dimensions.y() = std::max(m_dimensions.y(), yPos - m_offset.y() + bottom);
         }
 
         // Append to global vertices

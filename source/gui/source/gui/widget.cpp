@@ -8,22 +8,11 @@ namespace gui
 {
 	Widget::Widget(Widget * parent, Master* master, const WidgetTemplate & wTemplate)
 		: m_master(master), m_parent(parent),
-          m_size_hint(wTemplate.geometry.sizeHint),
-          m_offset_hint(wTemplate.geometry.offsetHint),
-          m_anchor(wTemplate.geometry.anchor),
-          m_margin(wTemplate.geometry.offset),
-          m_hint_pref_size(wTemplate.geometry.size),
-          m_color(gl::toVec4(wTemplate.color)),
-          m_border_size(wTemplate.border.size),
-          m_border_color(gl::toVec4(wTemplate.border.color)),
-          m_shadow_offset(wTemplate.shadow.offset),
-          m_shadow_hardness(wTemplate.shadow.hardness),
+          m_template(wTemplate),
           m_texture_atlas_view(load_texture(wTemplate.texture))
 	{
-		this->m_inner_position = m_position + gml::Vec2f((float)m_border_size);
-		this->m_inner_size = m_size - gml::Vec2f((float)m_border_size * 2);
-
-		this->m_layout = std::make_unique<Layout>();
+		this->m_inner_position_abs = m_position_abs + gml::Vec2f((float) m_template.border.thickness);
+		this->m_inner_size_abs = m_size_abs - gml::Vec2f((float) m_template.border.thickness * 2);
 
         std::vector<unsigned int> indices = construct_indices();
 		std::vector<float> vertices = construct_vertices(m_texture_atlas_view);
@@ -38,7 +27,7 @@ namespace gui
         int index = -1;
 
         std::vector<unsigned int> indices;
-        if (m_shadow_offset > 0) {
+        if (m_template.shadow.offset > 0) {
             std::array<unsigned int, 6> indices_shadow = {
                     static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
                     static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
@@ -47,7 +36,7 @@ namespace gui
             indices.insert(std::end(indices), std::begin(indices_shadow), std::end(indices_shadow));
         }
 
-        if (m_border_size > 0) {
+        if (m_template.border.thickness > 0) {
             std::array<unsigned int, 24> indices_border = {
                     static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
                     static_cast<unsigned int>(++index), static_cast<unsigned int>(++index),
@@ -78,15 +67,13 @@ namespace gui
 	{
         std::vector<float> vertices;
 
-		float left = m_position.x();
-		float top = m_position.y();
-		float right = m_position.x() + m_size.x();
-		float bottom = m_position.y() + m_size.y();
+		float left = m_position_abs.x();
+		float top = m_position_abs.y();
+		float right = m_position_abs.x() + m_size_abs.x();
+		float bottom = m_position_abs.y() + m_size_abs.y();
 
-		int so = m_shadow_offset;
-		int bs = m_border_size;
-
-        int index = -1;
+		int so = m_template.shadow.offset;
+		int bs = m_template.border.thickness;
 
 		if (so != 0)
 		{
@@ -163,11 +150,11 @@ namespace gui
 	{
         std::vector<float> vertices;
 
-		gml::Vec4<float> gl_color = m_color;
-		gml::Vec4<float> gl_bc = m_border_color;
-		float sh = m_shadow_hardness;
+		gml::Vec4<float> gl_color = gl::toVec4(m_template.color);
+		gml::Vec4<float> gl_bc = gl::toVec4(m_template.border.color);
+		float sh = m_template.shadow.hardness;
 
-		if (m_shadow_offset != 0)
+		if (m_template.shadow.offset != 0)
 		{
 			std::array<float, 24> color_shadow = {
 				0.0f, 0.0f, 0.0f, sh,
@@ -180,7 +167,7 @@ namespace gui
 			vertices.insert(std::end(vertices), std::begin(color_shadow), std::end(color_shadow));
 		}
 
-		if (m_border_size != 0)
+		if (m_template.border.thickness > 0)
 		{
 			std::array<float, 96> color_border = {
 				gl_bc.x(), gl_bc.y(), gl_bc.z(), gl_bc.w(),
@@ -237,7 +224,7 @@ namespace gui
         auto top = transparent.coordinates_start().y();
         auto bottom = transparent.coordinates_end().y();
 
-		if (m_shadow_offset != 0)
+		if (m_template.shadow.offset != 0)
 		{
 			std::array<float, 12> tex_shadow = {
                     left, top,
@@ -250,7 +237,7 @@ namespace gui
 			vertices.insert(std::end(vertices), std::begin(tex_shadow), std::end(tex_shadow));
 		}
 
-		if (m_border_size != 0) {
+		if (m_template.border.thickness > 0) {
 			std::array<float, 48> tex_border = {
                     left, top,
                     left, bottom,
@@ -336,51 +323,51 @@ namespace gui
 	
 	void Widget::update_layout()
 	{
-		if (m_fit_children) {
-            m_hint_pref_size = calcPrefSize();
-            m_parent->update_layout();
-		}
-		m_layout->update(this);
+        // the default behaviour is to layout children with their preferred size and offset
+        for (auto& child : m_children) {
+            child->set_actual_size(child->preferred_size());
+            child->set_absolute_offset(child->offset());
+        }
 	}
 
     void Widget::update_geometry()
     {
-        gml::Vec2f lastPosition = m_position;
+        gml::Vec2f lastPosition = m_position_abs;
 
         if (m_parent != nullptr) {
-            switch (m_anchor) {
-                case Anchor::TOP_LEFT:
-                    m_position = m_parent->getInnerPosition() + (m_offset);
+            switch (m_template.geometry.anchor.position) {
+                case AnchorPosition::TOP_LEFT:
+                    m_position_abs = m_parent->m_inner_position_abs + (m_offset_abs);
                     break;
 
-                case Anchor::BOTTOM_LEFT:
-                    m_position.x() = m_parent->getInnerPosition().x() + (m_offset).x();
-                    m_position.y() =
-                            (m_parent->getInnerPosition().y() + m_parent->getInnerSize().y()) - ((m_offset).y() + m_size.y());
+                case AnchorPosition::BOTTOM_LEFT:
+                    m_position_abs.x() = m_parent->m_inner_position_abs.x() + (m_offset_abs).x();
+                    m_position_abs.y() =
+                            (m_parent->m_inner_position_abs.y() + m_parent->m_inner_position_abs.y()) - ((m_offset_abs).y() + m_size_abs.y());
                     break;
 
-                case Anchor::TOP_RIGHT:
-                    m_position.x() =
-                            (m_parent->getInnerPosition().x() + m_parent->getInnerSize().x()) - ((m_offset).x() + m_size.x());
-                    m_position.y() = m_parent->getInnerPosition().y() + (m_offset).y();
+                case AnchorPosition::TOP_RIGHT:
+                    m_position_abs.x() =
+                            (m_parent->m_inner_position_abs.x() + m_parent->m_inner_position_abs.x()) - ((m_offset_abs).x() + m_size_abs.x());
+                    m_position_abs.y() = m_parent->m_inner_position_abs.y() + (m_offset_abs).y();
                     break;
 
-                case Anchor::BOTTOM_RIGHT:
-                    m_position.x() =
-                            (m_parent->getInnerPosition().x() + m_parent->getInnerSize().x()) - ((m_offset).x() + m_size.x());
-                    m_position.y() =
-                            (m_parent->getInnerPosition().y() + m_parent->getInnerSize().y()) - ((m_offset).y() + m_size.y());
+                case AnchorPosition::BOTTOM_RIGHT:
+                    m_position_abs.x() =
+                            (m_parent->m_inner_position_abs.x() + m_parent->m_inner_size_abs.x()) - ((m_offset_abs).x() + m_size_abs.x());
+                    m_position_abs.y() =
+                            (m_parent->m_inner_position_abs.y() + m_parent->m_inner_size_abs.y()) - ((m_offset_abs).y() + m_size_abs.y());
                     break;
 
-                case Anchor::CENTER:
-                    m_position = m_parent->getInnerPosition() + m_parent->getInnerSize() / 2.0f + (m_offset);
+                case AnchorPosition::CENTER:
+                    m_position_abs = m_parent->m_inner_position_abs + m_parent->m_inner_size_abs / 2.0f + (m_offset_abs);
                     break;
             }
 
-            m_inner_position = m_position + gml::Vec2f((float) m_border_size);
+            m_inner_position_abs = m_position_abs + gml::Vec2f((float) m_template.border.thickness);
         }
 
-        if (lastPosition != m_position) {
+        if (lastPosition != m_position_abs) {
             for (auto& child: m_children) {
                 child->update_geometry();
             }
@@ -389,81 +376,51 @@ namespace gui
         update_vertices();
     }
 
-	void Widget::set_size(gml::Vec2f _size)
+	void Widget::set_actual_size(gml::Vec2f size)
 	{
-		if (this->m_size != _size) {
-			this->m_size = _size;
-			this->m_inner_size = _size - gml::Vec2f((float)m_border_size) * 2.0f;
+		if (this->m_size_abs != size) {
+			this->m_size_abs = size;
+			this->m_inner_size_abs = size - gml::Vec2f((float)m_template.border.thickness) * 2.0f;
             update_geometry();
-			m_layout->update(this);
+			update_layout(); // TODO: maybe make this explicit
 		}
 	}
 
-	void Widget::resize(gml::Vec2f _size)
-	{
-		if (this->m_hint_pref_size != _size) {
-            m_hint_pref_size = _size;
-            m_parent->update_layout();
-			m_layout->update(this);
-		}
-	}
+    void Widget::set_actual_anchor(Anchor anchor)
+    {
+        m_template.geometry.anchor = anchor;
+        update_geometry();
+        update_layout(); // TODO: maybe make this explicit
+    }
 
-	void Widget::set_offset(gml::Vec2f _offset)
-	{
-		if (this->m_offset != _offset) {
-			this->m_offset = _offset;
+    void Widget::set_absolute_offset(gml::Vec2f offset)
+    {
+        if (this->m_offset_abs != offset) {
+            this->m_offset_abs = offset;
             update_geometry();
-		}
-	}
+        }
+    }
 
-	void Widget::move(gml::Vec2f _cellMargin)
+	void Widget::resize(Size size)
 	{
-		if (this->m_margin != _cellMargin) {
-			this->m_margin = _cellMargin;
-            m_parent->update_layout();
-			m_layout->update(this);
-		}
+        m_template.geometry.preferred_size = size;
+        m_parent->update_layout();
 	}
 
-	void Widget::set_anchor(Anchor _anchor)
-	{
-		if (this->m_anchor != _anchor) {
-			this->m_anchor = _anchor;
-            update_geometry();
-		}
-	}
+    void Widget::set_anchor(Anchor anchor)
+    {
+        m_template.geometry.anchor = anchor;
+        m_parent->update_layout();
+    }
 
-
-
-
-	gml::Vec2f Widget::to_absolute(gml::Vec2f value)
-	{
-		gml::Vec2f vec;
-		gml::Vec2f parentSize = m_parent->getSize();
-		vec.x() = value.x() * parentSize.x();
-		vec.y() = value.y() * parentSize.y();
-		return vec;
-	}
 	float Widget::to_absolute_x(float value)
 	{
-		return value * m_parent->getSize().x();
-	}
-	float Widget::to_absolute_y(float value)
-	{
-		return value * m_parent->getSize().y();
+		return value * m_parent->m_size_abs.x();
 	}
 
-	float Widget::from_aspect()
+	float Widget::to_absolute_y(float value)
 	{
-		if (m_size_hint.x() == SizeHint::INFINITE) {
-			return to_absolute_x(m_hint_pref_size.x()) * m_hint_pref_size.y();
-		}
-		else if (m_size_hint.y() == SizeHint::INFINITE) {
-			return m_hint_pref_size.x() * to_absolute_y(m_hint_pref_size.y());
-		}
-		else {
-			return m_hint_pref_size.x() * m_hint_pref_size.y();
-		}
+		return value * m_parent->m_size_abs.y();
 	}
 
     TextureAtlasView Widget::texture_atlas_view()

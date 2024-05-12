@@ -50,7 +50,7 @@ namespace gui
 			if (timeCurrent < timeEnd) {
 				timeCurrent += dt;
 				float time = (float)(timeCurrent / timeEnd);
-				widget->move(gml::lerp<gml::Vec2<float>>(beg, goal, time));
+				widget->set_anchor({.offset = gml::lerp<gml::Vec2<float>>(beg, goal, time)}); // TODO
 			}
 			else {
 				stop();
@@ -67,7 +67,8 @@ namespace gui
 			if (timeCurrent < timeEnd) {
 				timeCurrent += dt;
 				float time = (float)(timeCurrent / timeEnd);
-				widget->resize(gml::lerp<gml::Vec2<float>>(beg, goal, time));
+				widget->resize({
+                    .value = gml::lerp<gml::Vec2f>(beg, goal, time)}); // TODO
 			}
 			else {
 				stop();

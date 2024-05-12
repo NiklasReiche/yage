@@ -8,11 +8,6 @@ namespace gui
         .color = gl::Color::TRANSPARENT
     })
 	{
-        m_layout = std::make_unique<AbsoluteLayout>();
-	}
 
-	void RootWidget::update_layout()
-	{
-		m_layout->update(this);
 	}
 }

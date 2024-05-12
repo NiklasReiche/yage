@@ -24,17 +24,18 @@ namespace gui
 	struct TextTemplate
 	{
 		std::u32string text;
-        res::Resource<font::Font> font;
+        res::Resource<font::Font> font; // TODO: provide a default font somewhere
 		int size = 16;
 		gl::Color_t color = gl::Color::BLACK;
 		TextAlignmentX alignX = TextAlignmentX::LEFT;
 		TextAlignmentY alignY = TextAlignmentY::TOP;
 	};
 
-	struct LabelTemplate : public WidgetTemplate
+	struct LabelTemplate
 	{
+        WidgetTemplate base {};
 		TextTemplate text;
-		gml::Vec2f padding = gml::Vec2f(2.0f);
+		gml::Vec2f padding = gml::Vec2f(4.0f); // TODO: make this part of widget base class
 	};
 
 	class Label : public Widget
@@ -58,6 +59,6 @@ namespace gui
 
 		void update_geometry() override;
 
-		gml::Vec2f calcPrefSize() override;
+		gml::Vec2f preferred_size() override;
 	};
 }

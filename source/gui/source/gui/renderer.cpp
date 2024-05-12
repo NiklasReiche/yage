@@ -56,15 +56,14 @@ namespace gui
                                         std::vector<font::Text*>& vector_text,
                                         Widget& widget)
     {
-        for (unsigned int i = 0; i < widget.getChildrenCount(); ++i) {
-            Widget& child = widget.getChild(i);
-            if (child.is_Active()) {
-                vector_widget.push_back(&child);
-                if (child.has_Text()) {
-                    vector_text.push_back(child.text());
+        for (auto& child : widget.children()) {
+            if (child->is_Active()) {
+                vector_widget.push_back(child.get());
+                if (child->has_Text()) {
+                    vector_text.push_back(child->text());
                 }
             }
-            collect_drawables(vector_widget, vector_text, child);
+            collect_drawables(vector_widget, vector_text, *child);
         }
     }
 }

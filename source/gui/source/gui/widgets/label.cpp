@@ -4,19 +4,20 @@
 namespace gui
 {
     Label::Label(Widget* parent, Master* master, LabelTemplate labelTemplate)
-            : Widget(parent, master, labelTemplate), params(labelTemplate), padding(labelTemplate.padding)
+            : Widget(parent, master, labelTemplate.base), params(labelTemplate), padding(labelTemplate.padding)
     {
         this->m_has_text = true;
 
         alignX = labelTemplate.text.alignX;
         alignY = labelTemplate.text.alignY;
 
-        if (labelTemplate.text.text.length() == 0)
+        if (labelTemplate.text.text.empty())
         {
             labelTemplate.text.text = U" ";
         }
+        params = labelTemplate;
 
-        gml::Vec2f textPosition = this->m_inner_position + padding;
+        gml::Vec2f textPosition = this->m_inner_position_abs + padding;
         m_text = std::make_unique<font::Text>(master->gl_context().getDrawableCreator(),
                                                   labelTemplate.text.text, labelTemplate.text.font,
                                                   font::TextParameters{
@@ -26,20 +27,19 @@ namespace gui
                                                   }
         );
 
-        if (m_hint_pref_size == gml::Vec2f(0.0f))
+        // TODO
+        if (m_template.geometry.preferred_size.value == gml::Vec2f(0.0f))
         {
-            m_fit_children = true;
-            m_hint_pref_size = calcPrefSize();
-            m_size_hint = gml::Vec2<SizeHint>(SizeHint::EXPANDING);
+            m_template.geometry.size_hint = gml::Vec2<SizeHint>(SizeHint::FIT_CHILDREN);
         }
     }
 
-    gml::Vec2f Label::calcPrefSize()
+    gml::Vec2f Label::preferred_size()
     {
-        gml::Vec2f vec;
-        vec.x() = m_text->dimensions().x() + (float) this->m_border_size * 2 + padding.x() * 2;
-        vec.y() = m_text->max_font_dimensions().y() + (float) this->m_border_size * 2 + padding.y() * 2;
-        return vec;
+        return {
+            m_text->dimensions().x() + (float) m_template.border.thickness * 2 + padding.x() * 2,
+            m_text->max_font_dimensions().y() + (float) m_template.border.thickness * 2 + padding.y() * 2
+        };
     }
 
     void Label::setText(TextTemplate textTemplate)
@@ -51,7 +51,7 @@ namespace gui
 
         params.text = textTemplate;
 
-        gml::Vec2f textPosition = m_inner_position + padding;
+        gml::Vec2f textPosition = m_inner_position_abs + padding;
         m_text = std::make_unique<font::Text>(m_master->gl_context().getDrawableCreator(),
                                               textTemplate.text, textTemplate.font,
                                               font::TextParameters{
@@ -61,11 +61,7 @@ namespace gui
                                                   }
         );
 
-        if (m_fit_children)
-        {
-            m_hint_pref_size = calcPrefSize();
-            m_parent->update_layout();
-        }
+        m_parent->update_layout();
     }
 
     void Label::setText(const std::u32string &string)
@@ -79,31 +75,31 @@ namespace gui
     {
         Widget::update_geometry();
 
-        gml::Vec2f availableSize = m_inner_size - padding - m_text->dimensions();
+        gml::Vec2f availableSize = m_inner_size_abs - padding - m_text->dimensions();
         gml::Vec2f textPosition(0.0f);
 
         switch (alignX)
         {
             case TextAlignmentX::LEFT:
-                textPosition.x() = m_inner_position.x() + padding.x();
+                textPosition.x() = m_inner_position_abs.x() + padding.x();
                 break;
             case TextAlignmentX::RIGHT:
-                textPosition.x() = m_inner_position.x() + availableSize.x();
+                textPosition.x() = m_inner_position_abs.x() + availableSize.x();
                 break;
             case TextAlignmentX::CENTER:
-                textPosition.x() = m_inner_position.x() + availableSize.x() / 2;
+                textPosition.x() = m_inner_position_abs.x() + availableSize.x() / 2;
                 break;
         }
         switch (alignY)
         {
             case TextAlignmentY::TOP:
-                textPosition.y() = m_inner_position.y() + padding.y();
+                textPosition.y() = m_inner_position_abs.y() + padding.y();
                 break;
             case TextAlignmentY::BOTTOM:
-                textPosition.y() = m_inner_position.y() + availableSize.y();
+                textPosition.y() = m_inner_position_abs.y() + availableSize.y();
                 break;
             case TextAlignmentY::CENTER:
-                textPosition.y() = m_inner_position.y() + availableSize.y() / 2;
+                textPosition.y() = m_inner_position_abs.y() + availableSize.y() / 2;
                 break;
         }
 

@@ -8,19 +8,9 @@
 
 namespace gui
 {
-	struct FrameTemplate : public WidgetTemplate
-	{
-		LayoutType layoutType;
-		gml::Vec2f layoutMargin;
-	};
-
 	class Frame : public Widget
 	{
-	private:
-		
 	public:
-		Frame(Widget * parent, Master* master, FrameTemplate frameTemplate);
-
-		gml::Vec2f calcPrefSize();
+		Frame(Widget * parent, Master* master, WidgetTemplate frameTemplate);
 	};
 }

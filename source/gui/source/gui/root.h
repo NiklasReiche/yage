@@ -8,7 +8,5 @@ namespace gui
 	{
 	public:
 		explicit RootWidget(Master* master);
-
-		void update_layout() override;
 	};
 }
