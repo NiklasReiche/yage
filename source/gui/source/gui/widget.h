@@ -117,6 +117,7 @@ namespace gui
             gml::Vec2f size = m_template.geometry.preferred_size.value;
 
             if (m_template.geometry.size_hint.x() == SizeHint::FIT_CHILDREN) {
+                // default behaviour is that children are positioned on top of each other
                 float preferred_size = 0;
                 for (auto& child : m_children) {
                     preferred_size = std::max(preferred_size, child->preferred_size().x());
@@ -128,6 +129,7 @@ namespace gui
             }
 
             if (m_template.geometry.size_hint.y() == SizeHint::FIT_CHILDREN) {
+                // default behaviour is that children are positioned on top of each other
                 float preferred_size = 0;
                 for (auto& child: m_children) {
                     preferred_size = std::max(preferred_size, child->preferred_size().y());
@@ -167,6 +169,8 @@ namespace gui
         {
             m_texture_atlas_view = texture_atlas_view;
         }
+
+        virtual void set_template(WidgetTemplate widget_template);
 
         /* update semantics */
         void update_vertices();

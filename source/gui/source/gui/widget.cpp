@@ -432,4 +432,10 @@ namespace gui
     {
         return *m_drawable;
     }
+
+    void Widget::set_template(WidgetTemplate widget_template)
+    {
+        m_template = widget_template;
+        m_parent->update_layout();
+    }
 }

@@ -75,6 +75,7 @@ namespace gui
     {
         Widget::update_geometry();
 
+        // TODO: somethings wrong, maybe for negative available size
         gml::Vec2f availableSize = m_inner_size_abs - padding - m_text->dimensions();
         gml::Vec2f textPosition(0.0f);
 

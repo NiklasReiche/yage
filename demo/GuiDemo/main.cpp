@@ -26,7 +26,7 @@ public:
     gui::Label* label_check;
 
     gui::Widget* frame_radio;
-    gui::RadioGroup<int>* radioGroup;
+    gui::RadioGroup<int> radioGroup;
     gui::Label* label_radio;
 
     gui::Label* testLabel;
@@ -144,7 +144,6 @@ public:
                 .geometry = {.size_hint = {gui::SizeHint::FIT_CHILDREN, gui::SizeHint::FIT_CHILDREN}},
                 .color = gl::Color::TRANSPARENT,
         });
-
         auto element_template = gui::LabelTemplate{
                 .base = {
                         .border = {.thickness = 1}
@@ -166,6 +165,9 @@ public:
         });
 
         auto hListFrame = master->createWidget<gui::HListBox>(v_list_2, gui::WidgetTemplate{
+                .geometry = {
+                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                },
                 .color = gl::Color::TRANSPARENT,
         });
         master->createWidget<gui::Label>(hListFrame, element_template);
@@ -265,7 +267,8 @@ public:
                                 .offset = gml::Vec2<float>(10 + v_list_2->actual_size().x() + 50,
                                                            40 + v_list_1->actual_size().y() + 50),
                                 .position = gui::AnchorPosition::TOP_LEFT,
-                        }
+                        },
+                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
                 .border = {.thickness = 1},
                 .color = gl::Color::TRANSPARENT,
@@ -278,91 +281,171 @@ public:
                 }
         });
 
-        auto h_list_buttons = master->createWidget<gui::HListBox>(frame_4, gui::WidgetTemplate{
-            .border = {.thickness = 1},
-            .color = gl::Color::TRANSPARENT,
-        });
-        frame_clicks = master->createWidget<gui::VListBox>(h_list_buttons, gui::WidgetTemplate{
-            .color = gl::Color::TRANSPARENT
-        });
-        frame_check = master->createWidget<gui::VListBox>(h_list_buttons, gui::WidgetTemplate{
-                .color = gl::Color::TRANSPARENT
-        });
-        frame_radio = master->createWidget<gui::VListBox>(h_list_buttons, gui::WidgetTemplate{
-                .color = gl::Color::TRANSPARENT
+        auto h_list_buttons = master->createWidget<gui::VListBox>(frame_4, gui::WidgetTemplate{
+                .geometry = {
+                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                },
+                .border = {.thickness = 1},
+                .color = gl::Color::TRANSPARENT,
         });
 
-        label_clicks = master->createWidget<gui::Label>(frame_clicks, gui::LabelTemplate{
+        frame_clicks = master->createWidget<gui::HListBox>(h_list_buttons, gui::WidgetTemplate{
+                .geometry = {
+                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                },
+                .color = gl::Color::TRANSPARENT
+        });
+        master->createWidget<gui::Label>(frame_clicks, gui::LabelTemplate{
                 .text = {
-                        .text = U"clicks: 0",
+                        .text = U"Push button: ",
                         .font = font
                 }
         });
-
         button_clicks = master->createWidget<gui::PushButton>(frame_clicks, gui::ButtonTemplate{
                 .base = {
                         .border = {.thickness = 1},
+                        .color = gl::Color::LIGHT_BLUE,
+                },
+                .click = {
+                        .border = {.thickness = 2},
                         .color = gl::Color::BLUE,
                 },
-                .text = {
-                        .text = U"Push Button",
-                        .font = font,
-                        .alignX = gui::TextAlignmentX::CENTER,
-                        .alignY = gui::TextAlignmentY::CENTER,
+                .hover = {
+                        .border = {.thickness = 2},
+                        .color = gl::Color::LIGHT_BLUE,
                 },
-                .clickColor = gl::Color::BLUE,
-                .hoverColor = 0xDDDDDDFFu,
                 .command = std::bind(&GuiTest::on_button_1_click, this),
+        });
+        label_clicks = master->createWidget<gui::Label>(button_clicks, gui::LabelTemplate{
+                .base = {
+                        .color = gl::Color::TRANSPARENT,
+                },
+                .text = {
+                        .text = U"clicks: 0",
+                        .font = font,
+                },
         });
 
 
-        gui::LabelTemplate labelTemplateCheck{
+        frame_check = master->createWidget<gui::HListBox>(h_list_buttons, gui::WidgetTemplate{
+                .geometry = {
+                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                },
+                .color = gl::Color::TRANSPARENT
+        });
+        master->createWidget<gui::Label>(frame_check, gui::LabelTemplate{
                 .text = {
-                        .text = U"state: unselected",
+                        .text = U"Check button: ",
                         .font = font
                 }
-        };
-
-        label_check = master->createWidget<gui::Label>(frame_check, labelTemplateCheck);
-
+        });
         button_check = master->createWidget<gui::CheckButton>(frame_check, gui::ButtonTemplate{
                 .base = {
                         .border = {.thickness = 1},
-                        .color = gl::Color::BLUE,
+                        .color = gl::Color::LIGHT_BLUE,
                 },
-                .text = {
-                        .text = U"Check Button",
-                        .font = font,
-                        .alignX = gui::TextAlignmentX::CENTER,
-                        .alignY = gui::TextAlignmentY::CENTER,
+                .click = {
+                        .border = {.thickness = 1},
+                        .color = gl::Color::LIGHT_BLUE,
                 },
-                .clickColor = gl::Color::BLUE,
-                .hoverColor = 0xDDDDDDFFu,
+                .hover = {
+                        .border = {.thickness = 2},
+                        .color = gl::Color::LIGHT_BLUE,
+                },
                 .command = std::bind(&GuiTest::on_button_2_click, this),
         });
+        label_check = master->createWidget<gui::Label>(button_check, gui::LabelTemplate{
+                .base = {
+                        .color = gl::Color::TRANSPARENT,
+                },
+                .text = {
+                        .text = U"state: off",
+                        .font = font,
+                }
+        });
 
+        frame_radio = master->createWidget<gui::VListBox>(h_list_buttons, gui::WidgetTemplate{
+                .geometry = {
+                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                },
+                .color = gl::Color::TRANSPARENT
+        });
         label_radio = master->createWidget<gui::Label>(frame_radio, gui::LabelTemplate{
                 .text = {
                         .text = U"state: 1",
                         .font = font
                 }
         });
-
-        radioGroup = master->createWidget<gui::RadioGroup<int>>(frame_radio, gui::ButtonTemplate{
+        radioGroup = gui::RadioGroup<int>(0, [this](int value) {
+            this->on_radio_click(value);
+        });
+        auto radio_button_1 = radioGroup.addButton(master->createWidget<gui::RadioButton<int>>(frame_radio, gui::ButtonTemplate{
                 .base = {
                         .border = {.thickness = 1}
                 },
-                .text = {
-                        .text = U"",
-                        .font = font
+                .click = {
+                        .border = {.thickness = 1},
+                        .color = gl::Color::GREY,
                 },
-                .clickColor = gl::Color::GREY,
-                .hoverColor = 0xDDDDDDFF,
-                .command = std::bind(&GuiTest::on_radio_click, this)
-        }, 0);
-        radioGroup->addButton(U"Radio Button 1", 1, true);
-        radioGroup->addButton(U"Radio Button 2", 2);
-        radioGroup->addButton(U"Radio Button 3", 3);
+                .hover = {
+                        .border = {.thickness = 1},
+                        .color = 0xDDDDDDFF,
+                },
+        }, 1), true);
+        master->createWidget<gui::Label>(radio_button_1, gui::LabelTemplate{
+            .base = {
+                    .color = gl::Color::TRANSPARENT,
+            },
+            .text = {
+                    .text = U"Value 1",
+                    .font = font,
+            }
+        });
+        auto radio_button_2 = radioGroup.addButton(master->createWidget<gui::RadioButton<int>>(frame_radio, gui::ButtonTemplate{
+                .base = {
+                        .border = {.thickness = 1}
+                },
+                .click = {
+                        .border = {.thickness = 1},
+                        .color = gl::Color::GREY,
+                },
+                .hover = {
+                        .border = {.thickness = 1},
+                        .color = 0xDDDDDDFF,
+                },
+        }, 2));
+        master->createWidget<gui::Label>(radio_button_2, gui::LabelTemplate{
+                .base = {
+                        .color = gl::Color::TRANSPARENT,
+                },
+                .text = {
+                        .text = U"Value 2",
+                        .font = font,
+                }
+        });
+        auto radio_button_3 = radioGroup.addButton(
+                master->createWidget<gui::RadioButton<int>>(frame_radio, gui::ButtonTemplate{
+                        .base = {
+                                .border = {.thickness = 1}
+                        },
+                        .click = {
+                                .border = {.thickness = 1},
+                                .color = gl::Color::GREY,
+                        },
+                        .hover = {
+                                .border = {.thickness = 1},
+                                .color = 0xDDDDDDFF,
+                        },
+                }, 3));
+        master->createWidget<gui::Label>(radio_button_3, gui::LabelTemplate{
+                .base = {
+                        .color = gl::Color::TRANSPARENT,
+                },
+                .text = {
+                        .text = U"Value 3",
+                        .font = font,
+                }
+        });
 
         gui::TextEntryTemplate textEntryTemplate{
                 .defaultText = {
@@ -379,7 +462,6 @@ public:
         textEntryTemplate.defaultText.color = gl::Color::GREY;
 
         master->createWidget<gui::TextEntry>(frame_radio, textEntryTemplate, master);
-
     }
 
     ~GuiTest()
@@ -395,16 +477,16 @@ public:
 
     void on_button_2_click()
     {
-        if (button_check->getState()) {
-            label_check->setText(U"state: selected");
+        if (button_check->state()) {
+            label_check->setText(U"state: on");
         } else {
-            label_check->setText(U"state: unselected");
+            label_check->setText(U"state: off");
         }
     }
 
-    void on_radio_click()
+    void on_radio_click(int value)
     {
-        label_radio->setText(U"state: " + utils::toUTF32(radioGroup->getState()));
+        label_radio->setText(U"state: " + utils::toUTF32(value));
     }
 
     void onAnimation1stop()

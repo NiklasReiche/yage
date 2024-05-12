@@ -1,5 +1,6 @@
 #pragma once
 
+#include <utility>
 #include <vector>
 #include <array>
 #include <memory>
@@ -16,61 +17,45 @@ namespace gui
 	struct ButtonTemplate
 	{
         WidgetTemplate base {};
-		TextTemplate text;
-		unsigned int clickColor = base.color;
-		unsigned int hoverColor = base.color;
-		WidgetTextureTemplate clickTexture = base.texture;
-		WidgetTextureTemplate hoverTexture = base.texture;
-		std::function<void()> command;
+        WidgetTemplate click {};
+        WidgetTemplate hover {};
+		std::function<void()> command {};
 	};
 
 	class PushButton : public Widget
 	{
 	protected:
-		Label * label;
-		std::function<void()> command;
-		gl::Color_t idleColor;
-        gl::Color_t hoverColor;
-        gl::Color_t clickColor;
-		TextureAtlasView idleTexCoords;
-        TextureAtlasView hoverTexCoords;
-        TextureAtlasView clickTexCoords;
+        ButtonTemplate m_button_template;
 
 	public:
 		PushButton(Widget * parent, Master* master, const ButtonTemplate & layout);
-		virtual ~PushButton() {}
+		~PushButton() override = default;
 
-		virtual void on_click();
-		virtual void on_click_release();
-		virtual void on_hover();
-		virtual void on_hover_release();
-		virtual void on_cancel();
-		virtual void on_resume();
+        void on_click() override;
+        void on_click_release() override;
+		void on_hover() override;
+		void on_hover_release() override;
+		void on_cancel() override;
+		void on_resume() override;
 
-		void setCallback(std::function<void(void)> command) { this->command = command; }
-		void setText(TextTemplate text) { label->setText(text); }
-		//void setTextColor(unsigned int color) { label->setTextColor(color); }
-
-		gml::Vec2f calcPrefSize();
-
-		void debug() { on_hover(); }
+		void setCallback(std::function<void(void)> command) { m_button_template.command = std::move(command); }
 	};
 
 	class CheckButton : public PushButton
 	{
 	protected:
-		bool state = false;
+		bool m_state = false;
 
 	public:
 		CheckButton(Widget * parent, Master* master, const ButtonTemplate & layout, bool activate = false);
 
-		virtual void on_click();
-		virtual void on_click_release();
-		virtual void on_hover();
-		virtual void on_hover_release();
-		virtual void on_cancel();
+		void on_click() override;
+		void on_click_release() override;
+		void on_hover() override;
+		void on_hover_release() override;
+		void on_cancel() override;
 
-		bool getState() { return state; }
+		[[nodiscard]] bool state() const { return m_state; }
 	};
 
 
@@ -80,73 +65,84 @@ namespace gui
 	class RadioButton : public CheckButton
 	{
 	protected:
-		T value;
+		T m_value;
 
 	public:
 		RadioButton(Widget * parent, Master* master, const ButtonTemplate & layout, T value, bool isDefault = false)
-			: CheckButton(parent, master, layout, isDefault), value(value) {}
+			: CheckButton(parent, master, layout, isDefault), m_value(value) {}
 
-		virtual void on_click()
+		void on_click() override
 		{
-			if (!state) {
-                m_template.color = clickColor;
-                update_vertices();
+            CheckButton::on_click();
+			if (!m_state) {
+                set_template(m_button_template.click);
 			}
 		}
-		virtual void on_click_release()
+
+		void on_click_release() override
 		{
-			if (!state) {
-				state = true;
-				((RadioGroup<T>*)m_parent)->onRadioButtonClick(value);
+            CheckButton::on_click_release();
+			if (!m_state) {
+				m_state = true;
+                set_template(m_button_template.base);
 			}
 		}
 
 		virtual void deactivate()
 		{
-			state = false;
-            m_template.color = idleColor;
-            update_vertices();
+			m_state = false;
+            set_template(m_button_template.base);
 		}
+
+        T value() const {
+            return m_value;
+        }
 	};
 
-    // TODO: maybe this should not be a widget
 	template<typename T>
-	class RadioGroup : public HListBox
+	class RadioGroup
 	{
 	private:
 		T state;
-		ButtonTemplate buttonLayout;
-		std::map<T, RadioButton<T>*> buttons;
+		std::vector<RadioButton<T>*> buttons;
+        std::function<void(T)> m_on_change;
 
 	public:
-		RadioGroup(Widget * parent, Master* master, const ButtonTemplate & buttonLayout, T defaultValue)
-			: HListBox(parent, master, WidgetTemplate()), // TODO
-            state(defaultValue),
-            buttonLayout(buttonLayout)
+        RadioGroup() : state{}, m_on_change{}
+        {
+        }
+
+        explicit RadioGroup(T defaultValue) : state(defaultValue), m_on_change{}
+        {
+        }
+
+		RadioGroup(T defaultValue, std::function<void(T)> on_change) : state(defaultValue), m_on_change(on_change)
 		{
-			this->buttonLayout.base.geometry.anchor.offset = gml::Vec2<float>();
 		}
 
-		void addButton(std::u32string text, T value, bool isDefault = false)
+        RadioButton<T>* addButton(RadioButton<T>* button, bool isDefault = false)
 		{
-			buttonLayout.text.text = text;
-
-			buttons[value] = create_widget<RadioButton<T>>(m_master, buttonLayout, value, isDefault);
+			buttons.push_back(button);
+            auto index = buttons.size() - 1;
+            button->setCallback([this, button, index](){
+                this->onRadioButtonClick(index, button->value());
+            });
 			if (isDefault) {
-				state = value;
+				state = button->value();
 			}
+            return button;
 		}
 
-		void onRadioButtonClick(T value)
+		void onRadioButtonClick(std::size_t i, T value)
 		{
 			if (state != value) {
-				buttons.at(state)->deactivate();
+				buttons.at(i)->deactivate();
 				state = value;
 
 				try {
-					buttonLayout.command();
+					m_on_change(state);
 				}
-				catch (std::bad_function_call) {}
+				catch (std::bad_function_call&) {}
 			}
 		}
 

@@ -3,24 +3,9 @@
 namespace gui
 {
 	PushButton::PushButton(Widget * parent, Master* master, const ButtonTemplate & buttonTemplate)
-		: Widget(parent, master, buttonTemplate.base), command(buttonTemplate.command),
-        idleTexCoords(m_texture_atlas_view),
-        hoverTexCoords(load_texture(buttonTemplate.hoverTexture)),
-        clickTexCoords(load_texture(buttonTemplate.clickTexture))
+		: Widget(parent, master, buttonTemplate.base), m_button_template(buttonTemplate)
 	{
 		this->m_is_interactable = true;
-		this->idleColor = buttonTemplate.base.color;
-		this->hoverColor = buttonTemplate.hoverColor;
-		this->clickColor = buttonTemplate.clickColor;
-
-		LabelTemplate labelTemplate{
-            .text = buttonTemplate.text
-        };
-		labelTemplate.base.color = 0x00000000u;
-		labelTemplate.base.shadow.offset = 0;
-		labelTemplate.base.border.thickness = 0;
-
-		label = this->create_widget<Label>(master, labelTemplate);
 
         // TODO
 		if (m_template.geometry.preferred_size.value == gml::Vec2f(0.0f)) {
@@ -30,54 +15,37 @@ namespace gui
 
 	void PushButton::on_click()
 	{
-        m_template.color = clickColor;
-		setTextureAtlasView(clickTexCoords);
-        update_vertices();
+        set_template(m_button_template.click);
 	}
 
 	void PushButton::on_click_release()
 	{
-        m_template.color = idleColor;
-        setTextureAtlasView(idleTexCoords);
-        update_vertices();
+        set_template(m_button_template.base);
 
 		try {
-			command();
+            m_button_template.command();
 		}
-		catch (std::bad_function_call) {}
+		catch (std::bad_function_call&) {}
 	}
 
 	void PushButton::on_hover()
 	{
-        m_template.color = hoverColor;
-        setTextureAtlasView(hoverTexCoords);
-        update_vertices();
+        set_template(m_button_template.hover);
 	}
 
 	void PushButton::on_hover_release()
 	{
-        m_template.color = idleColor;
-        setTextureAtlasView(idleTexCoords);
-        update_vertices();
+        set_template(m_button_template.base);
 	}
 
 	void PushButton::on_cancel()
 	{
-        m_template.color = idleColor;
-        setTextureAtlasView(idleTexCoords);
-        update_vertices();
+        set_template(m_button_template.base);
 	}
 
 	void PushButton::on_resume()
 	{
-        m_template.color = clickColor;
-        setTextureAtlasView(clickTexCoords);
-        update_vertices();
-	}
-
-	gml::Vec2f PushButton::calcPrefSize()
-	{
-		return label->preferred_size();
+        set_template(m_button_template.click);
 	}
 
 
@@ -85,77 +53,57 @@ namespace gui
 		: PushButton(parent, master, layout)
 	{
 		if (activate) {
-            m_template.color = clickColor;
-            setTextureAtlasView(clickTexCoords);
-            update_vertices();
-			state = true;
+            PushButton::set_template(m_button_template.click);
+			m_state = true;
 		}
 	}
 
 	void CheckButton::on_click()
 	{
-		if (state) {
-            m_template.color = idleColor;
-            setTextureAtlasView(idleTexCoords);
+		if (m_state) {
+            set_template(m_button_template.base);
 		}
 		else {
-            m_template.color = clickColor;
-            setTextureAtlasView(clickTexCoords);
+            set_template(m_button_template.click);
 		}
-
-        update_vertices();
 	}
 
 	void CheckButton::on_click_release()
 	{
-		if (state) {
-			state = false;
-		}
-		else {
-			state = true;
-		}
+		m_state = !m_state;
 
 		try {
-			command();
+			m_button_template.command();
 		}
-		catch (std::bad_function_call) {}
+		catch (std::bad_function_call&) {}
 	}
 
 	void CheckButton::on_hover()
 	{
-		if (!state)
+		if (!m_state)
 		{
-            m_template.color = hoverColor;
-            setTextureAtlasView(hoverTexCoords);
-            update_vertices();
+            set_template(m_button_template.hover);
 		}
 	}
 
 	void CheckButton::on_hover_release()
 	{
-		if (!state) {
-            m_template.color = idleColor;
-            setTextureAtlasView(idleTexCoords);
+		if (!m_state) {
+            set_template(m_button_template.base);
 		}
 		else {
-            m_template.color = clickColor;
-            setTextureAtlasView(clickTexCoords);
+            set_template(m_button_template.click);
 		}
-        update_vertices();
 	}
 
 	void CheckButton::on_cancel()
 	{
-		if (state) {
-            m_template.color = clickColor;
-            setTextureAtlasView(clickTexCoords);
+		if (m_state) {
+            set_template(m_button_template.click);
 		}
 		else {
-            m_template.color = idleColor;
-            setTextureAtlasView(idleTexCoords);
+            set_template(m_button_template.base);
 		}
-
-        update_vertices();
 	}
 
 }

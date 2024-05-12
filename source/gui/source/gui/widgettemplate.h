@@ -56,7 +56,7 @@ namespace gui
         Anchor anchor {};
         /** preferred size for layouts */
         Size preferred_size {};
-        gml::Vec2<SizeHint> size_hint = {SizeHint::EXPANDING_SHRINKING, SizeHint::EXPANDING_SHRINKING};
+        gml::Vec2<SizeHint> size_hint = {SizeHint::FIT_CHILDREN, SizeHint::FIT_CHILDREN};
         /** minimal size for layouts */
         Size min_size {}; // TODO: does it make sense for this to be relative?
         /** maximum size for layouts */
