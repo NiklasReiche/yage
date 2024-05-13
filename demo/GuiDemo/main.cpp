@@ -46,7 +46,7 @@ public:
                         .size = 14,
                 },
         };
-        fpsCounter = master.createWidget<gui::Label>(nullptr, fpslabelTemplate);
+        fpsCounter = master.create_widget<gui::Label>(fpslabelTemplate);
 
         /*
         *
@@ -54,7 +54,7 @@ public:
         *
         */
 
-        auto v_list_1 = master.createWidget<gui::VListBox>(nullptr, gui::WidgetTemplate{
+        auto v_list_1 = master.create_widget<gui::VListBox>(gui::WidgetTemplate{
                 .geometry = {
                         .anchor = {
                                 .offset = gml::Vec2f(10, 40),
@@ -65,7 +65,7 @@ public:
                 .border = {.thickness = 1},
                 .color = gl::Color::TRANSPARENT
         });
-        master.createWidget<gui::Label>(v_list_1, gui::LabelTemplate{
+        v_list_1->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {.color = gl::Color::LIGHT_BLUE},
                 .text = {
                         .text = U"Widget design options",
@@ -74,19 +74,19 @@ public:
                 },
         });
 
-        auto* designFrame = master.createWidget<gui::HListBox>(v_list_1, gui::WidgetTemplate{
+        auto* designFrame = v_list_1->create_widget<gui::HListBox>(gui::WidgetTemplate{
                 .geometry = {
                         .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
                 .color = gl::Color::TRANSPARENT
         });
-        master.createWidget<gui::Label>(designFrame, gui::LabelTemplate{
+        designFrame->create_widget<gui::Label>(gui::LabelTemplate{
                 .text = {
                         .text = U"flat",
                         .font = font,
                 },
         });
-        master.createWidget<gui::Label>(designFrame, gui::LabelTemplate{
+        designFrame->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
                         .border = {.thickness = 1}
                 },
@@ -95,7 +95,7 @@ public:
                         .font = font,
                 },
         });
-        master.createWidget<gui::Label>(designFrame, gui::LabelTemplate{
+        designFrame->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
                         .shadow = {.offset = 3, .hardness = 0.4f}
                 },
@@ -112,7 +112,7 @@ public:
         *
         */
 
-        auto* v_list_2 = master.createWidget<gui::VListBox>(nullptr, gui::WidgetTemplate{
+        auto* v_list_2 = master.create_widget<gui::VListBox>(gui::WidgetTemplate{
                 .geometry = {
                         .anchor = {
                                 .offset = gml::Vec2f(10, 40 + v_list_1->actual_size().y() + 50),
@@ -123,7 +123,7 @@ public:
                 .border = {.thickness = 1},
                 .color = gl::Color::TRANSPARENT,
         });
-        master.createWidget<gui::Label>(v_list_2, gui::LabelTemplate{
+        v_list_2->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {.color = gl::Color::LIGHT_BLUE},
                 .text = {
                         .text = U"Widget layout options",
@@ -131,14 +131,14 @@ public:
                         .size = 20,
                 },
         });
-        master.createWidget<gui::Label>(v_list_2, gui::LabelTemplate{
+        v_list_2->create_widget<gui::Label>(gui::LabelTemplate{
                 .text = {
                         .text = U"Vertical list:",
                         .font = font,
                 },
         });
 
-        auto vListFrame = master.createWidget<gui::VListBox>(v_list_2, gui::WidgetTemplate{
+        auto vListFrame = v_list_2->create_widget<gui::VListBox>(gui::WidgetTemplate{
                 .geometry = {.size_hint = {gui::SizeHint::FIT_CHILDREN, gui::SizeHint::FIT_CHILDREN}},
                 .color = gl::Color::TRANSPARENT,
         });
@@ -151,34 +151,34 @@ public:
                         .font = font
                 }
         };
-        master.createWidget<gui::Label>(vListFrame, element_template);
-        master.createWidget<gui::Label>(vListFrame, element_template);
-        master.createWidget<gui::Label>(vListFrame, element_template);
+        vListFrame->create_widget<gui::Label>(element_template);
+        vListFrame->create_widget<gui::Label>(element_template);
+        vListFrame->create_widget<gui::Label>(element_template);
 
-        master.createWidget<gui::Label>(v_list_2, gui::LabelTemplate{
+        v_list_2->create_widget<gui::Label>(gui::LabelTemplate{
                 .text = {
                         .text = U"Horizontal list:",
                         .font = font,
                 }
         });
 
-        auto hListFrame = master.createWidget<gui::HListBox>(v_list_2, gui::WidgetTemplate{
+        auto hListFrame = v_list_2->create_widget<gui::HListBox>(gui::WidgetTemplate{
                 .geometry = {
                         .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
                 .color = gl::Color::TRANSPARENT,
         });
-        master.createWidget<gui::Label>(hListFrame, element_template);
-        master.createWidget<gui::Label>(hListFrame, element_template);
-        master.createWidget<gui::Label>(hListFrame, element_template);
+        hListFrame->create_widget<gui::Label>(element_template);
+        hListFrame->create_widget<gui::Label>(element_template);
+        hListFrame->create_widget<gui::Label>(element_template);
 
-        master.createWidget<gui::Label>(v_list_2, gui::LabelTemplate{
+        v_list_2->create_widget<gui::Label>(gui::LabelTemplate{
                 .text = {
                         .text = U"Grid:",
                         .font = font
                 }
         });
-        master.createWidget<gui::Label>(v_list_2, gui::LabelTemplate{
+        v_list_2->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {.border = {.thickness = 1}},
                 .text = {
                         .text = U"TODO",
@@ -192,7 +192,7 @@ public:
         * Animation Layout
         *
         */
-        auto h_list = master.createWidget<gui::HListBox>(nullptr, gui::WidgetTemplate{
+        auto h_list = master.create_widget<gui::HListBox>(gui::WidgetTemplate{
                 .geometry = {
                         .anchor = {
                                 .offset = gml::Vec2<float>(10 + v_list_1->actual_size().x() + 50, 40),
@@ -205,7 +205,7 @@ public:
                 .color = gl::Color::TRANSPARENT,
         });
 
-        testLabel = master.createWidget<gui::Label>(h_list, gui::LabelTemplate{
+        testLabel = h_list->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
                         .geometry = {
                                 .preferred_size = {
@@ -224,7 +224,7 @@ public:
                         .font = font
                 }
         });
-        master.createWidget<gui::Label>(h_list, gui::LabelTemplate{
+        h_list->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
                         .border = {
                                 .thickness = 1,
@@ -239,22 +239,20 @@ public:
         });
 
 
-        animation_1 = h_list->create_animation<gui::MoveAnimation>(&master, h_list->offset(),
+        animation_1 = h_list->create_animation<gui::MoveAnimation>(h_list->offset(),
                                                                    h_list->offset() + gml::Vec2<float>(200, 0),
                                                                    2);
         animation_1->setOnAnimationStop(std::bind(&GuiTest::onAnimation1stop, this));
-        animation_2 = h_list->create_animation<gui::MoveAnimation>(&master,
-                                                                   h_list->offset() + gml::Vec2<float>(200, 0),
+        animation_2 = h_list->create_animation<gui::MoveAnimation>(h_list->offset() + gml::Vec2<float>(200, 0),
                                                                    h_list->offset(), 2);
         animation_2->setOnAnimationStop(std::bind(&GuiTest::onAnimation2stop, this));
 
-        animation_3 = testLabel->create_animation<gui::SizeAnimation>(&master, testLabel->actual_size(),
+        animation_3 = testLabel->create_animation<gui::SizeAnimation>(testLabel->actual_size(),
                                                                       testLabel->actual_size() +
                                                                       gml::Vec2<float>(50, 25),
                                                                       2);
         animation_3->setOnAnimationStop(std::bind(&GuiTest::onAnimation3stop, this));
-        animation_4 = testLabel->create_animation<gui::SizeAnimation>(&master,
-                                                                      testLabel->actual_size() +
+        animation_4 = testLabel->create_animation<gui::SizeAnimation>(testLabel->actual_size() +
                                                                       gml::Vec2<float>(50, 25),
                                                                       testLabel->actual_size(), 2);
         animation_4->setOnAnimationStop(std::bind(&GuiTest::onAnimation4stop, this));
@@ -265,7 +263,7 @@ public:
         * Button Frame
         *
         */
-        auto frame_4 = master.createWidget<gui::VListBox>(nullptr, gui::WidgetTemplate{
+        auto frame_4 = master.create_widget<gui::VListBox>(gui::WidgetTemplate{
                 .geometry = {
                         .anchor = {
                                 .offset = gml::Vec2<float>(10 + v_list_2->actual_size().x() + 50,
@@ -277,7 +275,7 @@ public:
                 .border = {.thickness = 1},
                 .color = gl::Color::TRANSPARENT,
         });
-        master.createWidget<gui::Label>(frame_4, gui::LabelTemplate{
+        frame_4->create_widget<gui::Label>(gui::LabelTemplate{
                 .text = {
                         .text = U"Buttons:",
                         .font = font,
@@ -285,7 +283,7 @@ public:
                 }
         });
 
-        auto h_list_buttons = master.createWidget<gui::VListBox>(frame_4, gui::WidgetTemplate{
+        auto h_list_buttons = frame_4->create_widget<gui::VListBox>(gui::WidgetTemplate{
                 .geometry = {
                         .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
@@ -293,19 +291,19 @@ public:
                 .color = gl::Color::TRANSPARENT,
         });
 
-        frame_clicks = master.createWidget<gui::HListBox>(h_list_buttons, gui::WidgetTemplate{
+        frame_clicks = h_list_buttons->create_widget<gui::HListBox>(gui::WidgetTemplate{
                 .geometry = {
                         .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
                 .color = gl::Color::TRANSPARENT
         });
-        master.createWidget<gui::Label>(frame_clicks, gui::LabelTemplate{
+        frame_clicks->create_widget<gui::Label>(gui::LabelTemplate{
                 .text = {
                         .text = U"Push button: ",
                         .font = font
                 }
         });
-        button_clicks = master.createWidget<gui::PushButton>(frame_clicks, gui::ButtonTemplate{
+        button_clicks = frame_clicks->create_widget<gui::PushButton>(gui::ButtonTemplate{
                 .base = {
                         .border = {.thickness = 1},
                         .color = gl::Color::LIGHT_BLUE,
@@ -320,7 +318,7 @@ public:
                 },
                 .command = std::bind(&GuiTest::on_button_1_click, this),
         });
-        label_clicks = master.createWidget<gui::Label>(button_clicks, gui::LabelTemplate{
+        label_clicks = button_clicks->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
                         .color = gl::Color::TRANSPARENT,
                 },
@@ -331,19 +329,19 @@ public:
         });
 
 
-        frame_check = master.createWidget<gui::HListBox>(h_list_buttons, gui::WidgetTemplate{
+        frame_check = h_list_buttons->create_widget<gui::HListBox>(gui::WidgetTemplate{
                 .geometry = {
                         .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
                 .color = gl::Color::TRANSPARENT
         });
-        master.createWidget<gui::Label>(frame_check, gui::LabelTemplate{
+        frame_check->create_widget<gui::Label>(gui::LabelTemplate{
                 .text = {
                         .text = U"Check button: ",
                         .font = font
                 }
         });
-        button_check = master.createWidget<gui::CheckButton>(frame_check, gui::ButtonTemplate{
+        button_check = frame_check->create_widget<gui::CheckButton>(gui::ButtonTemplate{
                 .base = {
                         .border = {.thickness = 1},
                         .color = gl::Color::LIGHT_BLUE,
@@ -358,7 +356,7 @@ public:
                 },
                 .command = std::bind(&GuiTest::on_button_2_click, this),
         });
-        label_check = master.createWidget<gui::Label>(button_check, gui::LabelTemplate{
+        label_check = button_check->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
                         .color = gl::Color::TRANSPARENT,
                 },
@@ -368,13 +366,13 @@ public:
                 }
         });
 
-        frame_radio = master.createWidget<gui::VListBox>(h_list_buttons, gui::WidgetTemplate{
+        frame_radio = h_list_buttons->create_widget<gui::VListBox>(gui::WidgetTemplate{
                 .geometry = {
                         .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
                 .color = gl::Color::TRANSPARENT
         });
-        label_radio = master.createWidget<gui::Label>(frame_radio, gui::LabelTemplate{
+        label_radio = frame_radio->create_widget<gui::Label>(gui::LabelTemplate{
                 .text = {
                         .text = U"Value: 1",
                         .font = font
@@ -383,42 +381,44 @@ public:
         radioGroup = gui::RadioGroup<int>(0, [this](int value) {
             this->on_radio_click(value);
         });
-        auto radio_button_1 = radioGroup.addButton(master.createWidget<gui::RadioButton<int>>(frame_radio, gui::ButtonTemplate{
+        auto radio_button_1 = radioGroup.addButton(
+                frame_radio->create_widget<gui::RadioButton<int>>(gui::ButtonTemplate{
+                        .base = {
+                                .border = {.thickness = 1}
+                        },
+                        .click = {
+                                .border = {.thickness = 1},
+                                .color = gl::Color::GREY,
+                        },
+                        .hover = {
+                                .border = {.thickness = 1},
+                                .color = 0xDDDDDDFF,
+                        },
+                }, 1), true);
+        radio_button_1->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
-                        .border = {.thickness = 1}
+                        .color = gl::Color::TRANSPARENT,
                 },
-                .click = {
-                        .border = {.thickness = 1},
-                        .color = gl::Color::GREY,
-                },
-                .hover = {
-                        .border = {.thickness = 1},
-                        .color = 0xDDDDDDFF,
-                },
-        }, 1), true);
-        master.createWidget<gui::Label>(radio_button_1, gui::LabelTemplate{
-            .base = {
-                    .color = gl::Color::TRANSPARENT,
-            },
-            .text = {
-                    .text = U"Value 1",
-                    .font = font,
-            }
+                .text = {
+                        .text = U"Value 1",
+                        .font = font,
+                }
         });
-        auto radio_button_2 = radioGroup.addButton(master.createWidget<gui::RadioButton<int>>(frame_radio, gui::ButtonTemplate{
-                .base = {
-                        .border = {.thickness = 1}
-                },
-                .click = {
-                        .border = {.thickness = 1},
-                        .color = gl::Color::GREY,
-                },
-                .hover = {
-                        .border = {.thickness = 1},
-                        .color = 0xDDDDDDFF,
-                },
-        }, 2));
-        master.createWidget<gui::Label>(radio_button_2, gui::LabelTemplate{
+        auto radio_button_2 = radioGroup.addButton(
+                frame_radio->create_widget<gui::RadioButton<int>>(gui::ButtonTemplate{
+                        .base = {
+                                .border = {.thickness = 1}
+                        },
+                        .click = {
+                                .border = {.thickness = 1},
+                                .color = gl::Color::GREY,
+                        },
+                        .hover = {
+                                .border = {.thickness = 1},
+                                .color = 0xDDDDDDFF,
+                        },
+                }, 2));
+        radio_button_2->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
                         .color = gl::Color::TRANSPARENT,
                 },
@@ -428,7 +428,7 @@ public:
                 }
         });
         auto radio_button_3 = radioGroup.addButton(
-                master.createWidget<gui::RadioButton<int>>(frame_radio, gui::ButtonTemplate{
+                frame_radio->create_widget<gui::RadioButton<int>>(gui::ButtonTemplate{
                         .base = {
                                 .border = {.thickness = 1}
                         },
@@ -441,7 +441,7 @@ public:
                                 .color = 0xDDDDDDFF,
                         },
                 }, 3));
-        master.createWidget<gui::Label>(radio_button_3, gui::LabelTemplate{
+        radio_button_3->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
                         .color = gl::Color::TRANSPARENT,
                 },
@@ -465,7 +465,7 @@ public:
         textEntryTemplate.border.thickness = 1;
         textEntryTemplate.defaultText.color = gl::Color::GREY;
 
-        master.createWidget<gui::TextEntry>(frame_radio, textEntryTemplate, &master);
+        frame_radio->create_widget<gui::TextEntry>(textEntryTemplate, &master);
     }
 
     void on_button_1_click()

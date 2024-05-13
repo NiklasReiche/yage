@@ -1,7 +1,6 @@
 #include "widget.h"
 #include "master.h"
 #include "image/enum.h"
-#include <core/platform/Window.h>
 #include <image/img.h>
 
 namespace gui
@@ -437,5 +436,73 @@ namespace gui
     {
         m_template = widget_template;
         m_parent->update_layout();
+    }
+
+    gml::Vec2f Widget::offset()
+    {
+        gml::Vec2f offset = m_template.geometry.anchor.offset;
+        if (m_template.geometry.anchor.value_type.x() == ValueType::RELATIVE) {
+            offset.x() = to_absolute_x(offset.x());
+        }
+        if (m_template.geometry.anchor.value_type.y() == ValueType::RELATIVE) {
+            offset.y() = to_absolute_y(offset.y());
+        }
+        return offset;
+    }
+
+    gml::Vec2f Widget::preferred_size()
+    {
+        gml::Vec2f size = m_template.geometry.preferred_size.value;
+
+        if (m_template.geometry.size_hint.x() == SizeHint::FIT_CHILDREN) {
+            // default behaviour is that children are positioned on top of each other
+            float preferred_size = 0;
+            for (auto& child : m_children) {
+                preferred_size = std::max(preferred_size, child->preferred_size().x());
+            }
+            size.x() = preferred_size;
+        }
+        else if (m_template.geometry.preferred_size.value_type.x() == ValueType::RELATIVE) {
+            size.x() = to_absolute_x(size.x());
+        }
+
+        if (m_template.geometry.size_hint.y() == SizeHint::FIT_CHILDREN) {
+            // default behaviour is that children are positioned on top of each other
+            float preferred_size = 0;
+            for (auto& child: m_children) {
+                preferred_size = std::max(preferred_size, child->preferred_size().y());
+            }
+            size.y() = preferred_size;
+        }
+        else if (m_template.geometry.preferred_size.value_type.y() == ValueType::RELATIVE) {
+            size.y() = to_absolute_y(size.y());
+        }
+
+        // TODO: should this incorporate shadow?
+        return size + gml::Vec2f(2 * m_template.border.thickness);
+    }
+
+    gml::Vec2f Widget::min_size()
+    {
+        gml::Vec2f size = m_template.geometry.min_size.value;
+        if (m_template.geometry.min_size.value_type.x() == ValueType::RELATIVE) {
+            size.x() = to_absolute_x(size.x());
+        }
+        if (m_template.geometry.min_size.value_type.y() == ValueType::RELATIVE) {
+            size.y() = to_absolute_y(size.y());
+        }
+        return size;
+    }
+
+    gml::Vec2f Widget::max_size()
+    {
+        gml::Vec2f size = m_template.geometry.max_size.value;
+        if (m_template.geometry.max_size.value_type.x() == ValueType::RELATIVE) {
+            size.x() = to_absolute_x(size.x());
+        }
+        if (m_template.geometry.max_size.value_type.y() == ValueType::RELATIVE) {
+            size.y() = to_absolute_y(size.y());
+        }
+        return size;
     }
 }

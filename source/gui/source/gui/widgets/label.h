@@ -51,7 +51,7 @@ namespace gui
 	public:
 		Label(Widget * parent, Master* master, LabelTemplate labelTemplate);
 
-		font::Text* text() override { return m_text.get(); } // TODO
+		font::Text* text() override;
 
 		void setText(TextTemplate text);
 

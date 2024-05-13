@@ -20,28 +20,41 @@ namespace gui
     class Widget
     {
     public:
-        Widget(Widget* parent, Master* master, const WidgetTemplate& widgetTemplate);
-
         virtual ~Widget() = default;
 
-        template<typename Element, typename... Args>
-        Element* create_widget(Master* master, Args... args) // TODO: this doesn't need the master, we can use m_master
+        /**
+         * Creates a new widget and adds it as a child to this widget. This widget takes ownership of the child.
+         * @tparam Element The widget class to instantiate.
+         * @tparam Args Constructor parameter types for the new widget.
+         * @param args Constructor arguments for the new widget.
+         * @return Observer pointer to the new widget.
+         */
+        template<class Element, typename... Args>
+        Element* create_widget(Args... args)
         {
-            m_children.push_back(std::make_unique<Element>(this, master, std::forward<Args>(args)...));
+            m_children.push_back(std::make_unique<Element>(this, m_master, std::forward<Args>(args)...));
 
-            // TODO: correct? defer?
-            if (m_parent == nullptr)
+            if (m_parent == nullptr){
                 update_layout();
-            else
-                m_parent->update_layout();
+            }
+            else {
+                m_parent->update_layout(); // TODO: is this sufficient for updating the whole UI tree?
+            }
 
             return (Element*) m_children.back().get();
         }
 
-        template<typename Element, typename... Args>
-        Element* create_animation(Master* master, Args... args)
+        /**
+         * Creates a new animation for this widget. This widget takes ownership of the animation.
+         * @tparam Element The animation class to instantiate.
+         * @tparam Args Constructor parameter types for the animation.
+         * @param args Constructor arguments for the animation.
+         * @return Observer pointer to the animation.
+         */
+        template<class Element, typename... Args>
+        Element* create_animation(Args... args)
         {
-            m_animations.push_back(std::make_unique<Element>(this, master, std::forward<Args>(args)...));
+            m_animations.push_back(std::make_unique<Element>(this, m_master, std::forward<Args>(args)...));
             return (Element*) m_animations.back().get();
         }
 
@@ -50,32 +63,39 @@ namespace gui
             return nullptr;
         }
 
+        /**
+         * Deactivates this widget and all its children. It will not be rendered or listen to input unless it is
+         * activated again. However, this widget is still respected during the layout process.
+         */
         void hide()
         {
             m_is_active = false;
         }
 
+        /**
+         * Actives this widget, so that it gets rendered and listens to input.
+         */
         void show()
         {
             m_is_active = true;
         }
 
+        /**
+         * @return Whether this widget is hidden or visible.
+         */
         [[nodiscard]]
         bool is_Active() const
         {
             return m_is_active;
         }
 
+        /**
+         * @return Whether this widget listens to input.
+         */
         [[nodiscard]]
         bool is_Interactable() const
         {
             return m_is_interactable;
-        }
-
-        [[nodiscard]]
-        bool has_Text() const
-        {
-            return m_has_text;
         }
 
         Widget* parent()
@@ -88,77 +108,17 @@ namespace gui
             return m_children;
         }
 
-        virtual gml::Vec2f min_size()
-        {
-            gml::Vec2f size = m_template.geometry.min_size.value;
-            if (m_template.geometry.min_size.value_type.x() == ValueType::RELATIVE) {
-                size.x() = to_absolute_x(size.x());
-            }
-            if (m_template.geometry.min_size.value_type.y() == ValueType::RELATIVE) {
-                size.y() = to_absolute_y(size.y());
-            }
-            return size;
-        }
+        virtual gml::Vec2f min_size();
 
-        virtual gml::Vec2f max_size()
-        {
-            gml::Vec2f size = m_template.geometry.max_size.value;
-            if (m_template.geometry.max_size.value_type.x() == ValueType::RELATIVE) {
-                size.x() = to_absolute_x(size.x());
-            }
-            if (m_template.geometry.max_size.value_type.y() == ValueType::RELATIVE) {
-                size.y() = to_absolute_y(size.y());
-            }
-            return size;
-        }
+        virtual gml::Vec2f max_size();
 
-        virtual gml::Vec2f preferred_size()
-        {
-            gml::Vec2f size = m_template.geometry.preferred_size.value;
-
-            if (m_template.geometry.size_hint.x() == SizeHint::FIT_CHILDREN) {
-                // default behaviour is that children are positioned on top of each other
-                float preferred_size = 0;
-                for (auto& child : m_children) {
-                    preferred_size = std::max(preferred_size, child->preferred_size().x());
-                }
-                size.x() = preferred_size;
-            }
-            else if (m_template.geometry.preferred_size.value_type.x() == ValueType::RELATIVE) {
-                size.x() = to_absolute_x(size.x());
-            }
-
-            if (m_template.geometry.size_hint.y() == SizeHint::FIT_CHILDREN) {
-                // default behaviour is that children are positioned on top of each other
-                float preferred_size = 0;
-                for (auto& child: m_children) {
-                    preferred_size = std::max(preferred_size, child->preferred_size().y());
-                }
-                size.y() = preferred_size;
-            }
-            else if (m_template.geometry.preferred_size.value_type.y() == ValueType::RELATIVE) {
-                size.y() = to_absolute_y(size.y());
-            }
-
-            // TODO: should this incorporate shadow?
-            return size + gml::Vec2f(2 * m_template.border.thickness);
-        }
+        virtual gml::Vec2f preferred_size();
 
         virtual gml::Vec2<SizeHint> size_hint() {
             return m_template.geometry.size_hint;
         }
 
-        virtual gml::Vec2f offset()
-        {
-            gml::Vec2f offset = m_template.geometry.anchor.offset;
-            if (m_template.geometry.anchor.value_type.x() == ValueType::RELATIVE) {
-                offset.x() = to_absolute_x(offset.x());
-            }
-            if (m_template.geometry.anchor.value_type.y() == ValueType::RELATIVE) {
-                offset.y() = to_absolute_y(offset.y());
-            }
-            return offset;
-        }
+        virtual gml::Vec2f offset();
 
         gml::Vec2f actual_size()
         {
@@ -217,25 +177,21 @@ namespace gui
         virtual void on_focus_release()
         {}
 
-        virtual void on_char_input(char character)
+        virtual void on_char_input([[maybe_unused]] char character)
         {}
 
-        virtual void on_key_press(input::KeyEvent::Code key)
+        virtual void on_key_press([[maybe_unused]] input::KeyEvent::Code key)
         {}
 
     protected:
         Master* m_master;
         Widget* m_parent = nullptr;
         std::vector<std::unique_ptr<Widget>> m_children;
-
         std::vector<std::unique_ptr<Animation>> m_animations;
 
-        int m_level = 0; /* position of the widget in the widget tree hierarchy */
         bool m_is_active = true;
         bool m_is_interactable = false;
         bool m_keep_focus = false;
-        bool m_is_hovered = false;
-        bool m_has_text = false;
 
         WidgetTemplate m_template;
 
@@ -251,6 +207,8 @@ namespace gui
         gml::Vec2f m_inner_position_abs;
         /** absolute size of the widget's interior space - equal to size for borderless widgets */
         gml::Vec2f m_inner_size_abs;
+
+        Widget(Widget* parent, Master* master, const WidgetTemplate& widgetTemplate);
 
         TextureAtlasView load_texture(WidgetTextureTemplate tTemplate);
 

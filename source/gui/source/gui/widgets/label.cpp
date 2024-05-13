@@ -6,30 +6,26 @@ namespace gui
     Label::Label(Widget* parent, Master* master, LabelTemplate labelTemplate)
             : Widget(parent, master, labelTemplate.base), params(labelTemplate), padding(labelTemplate.padding)
     {
-        this->m_has_text = true;
-
         alignX = labelTemplate.text.alignX;
         alignY = labelTemplate.text.alignY;
 
-        if (labelTemplate.text.text.empty())
-        {
+        if (labelTemplate.text.text.empty()) {
             labelTemplate.text.text = U" ";
         }
         params = labelTemplate;
 
         gml::Vec2f textPosition = this->m_inner_position_abs + padding;
         m_text = std::make_unique<font::Text>(master->gl_context().getDrawableCreator(),
-                                                  labelTemplate.text.text, labelTemplate.text.font,
-                                                  font::TextParameters{
-                                                          .color = labelTemplate.text.color,
-                                                          .pt_size = (float) labelTemplate.text.size,
-                                                          .offset = gml::Vec3f(textPosition.x(), textPosition.y(), -1)
-                                                  }
+                                              labelTemplate.text.text, labelTemplate.text.font,
+                                              font::TextParameters{
+                                                      .color = labelTemplate.text.color,
+                                                      .pt_size = (float) labelTemplate.text.size,
+                                                      .offset = gml::Vec3f(textPosition.x(), textPosition.y(), -1)
+                                              }
         );
 
         // TODO
-        if (m_template.geometry.preferred_size.value == gml::Vec2f(0.0f))
-        {
+        if (m_template.geometry.preferred_size.value == gml::Vec2f(0.0f)) {
             m_template.geometry.size_hint = gml::Vec2<SizeHint>(SizeHint::FIT_CHILDREN);
         }
     }
@@ -38,7 +34,7 @@ namespace gui
     {
         // TODO
         gml::Vec2f size = m_template.geometry.preferred_size.value;
-        if (m_template.geometry.size_hint.x() == SizeHint::FIT_CHILDREN){
+        if (m_template.geometry.size_hint.x() == SizeHint::FIT_CHILDREN) {
             size.x() = m_text->dimensions().x() + (float) m_template.border.thickness * 2 + padding.x() * 2;
         }
         if (m_template.geometry.size_hint.y() == SizeHint::FIT_CHILDREN) {
@@ -50,8 +46,7 @@ namespace gui
 
     void Label::setText(TextTemplate textTemplate)
     {
-        if (textTemplate.text.empty())
-        {
+        if (textTemplate.text.empty()) {
             textTemplate.text = U" ";
         }
 
@@ -61,16 +56,16 @@ namespace gui
         m_text = std::make_unique<font::Text>(m_master->gl_context().getDrawableCreator(),
                                               textTemplate.text, textTemplate.font,
                                               font::TextParameters{
-                                                          .color = textTemplate.color,
-                                                          .pt_size = (float) textTemplate.size,
-                                                          .offset = gml::Vec3f(textPosition.x(), textPosition.y(), -1)
-                                                  }
+                                                      .color = textTemplate.color,
+                                                      .pt_size = (float) textTemplate.size,
+                                                      .offset = gml::Vec3f(textPosition.x(), textPosition.y(), -1)
+                                              }
         );
 
         m_parent->update_layout();
     }
 
-    void Label::setText(const std::u32string &string)
+    void Label::setText(const std::u32string& string)
     {
         params.text.text = string;
         setText(params.text);
@@ -85,8 +80,7 @@ namespace gui
         gml::Vec2f availableSize = m_inner_size_abs - padding - m_text->dimensions();
         gml::Vec2f textPosition(0.0f);
 
-        switch (alignX)
-        {
+        switch (alignX) {
             case TextAlignmentX::LEFT:
                 textPosition.x() = m_inner_position_abs.x() + padding.x();
                 break;
@@ -97,8 +91,7 @@ namespace gui
                 textPosition.x() = m_inner_position_abs.x() + availableSize.x() / 2;
                 break;
         }
-        switch (alignY)
-        {
+        switch (alignY) {
             case TextAlignmentY::TOP:
                 textPosition.y() = m_inner_position_abs.y() + padding.y();
                 break;
@@ -112,4 +105,7 @@ namespace gui
 
         m_text->update_offset(gml::Vec2f{textPosition.x(), textPosition.y()});
     }
+
+    font::Text* Label::text()
+    { return m_text.get(); }
 }

@@ -27,12 +27,9 @@ namespace gui
         void deactivateAnimation(Animation* animation);
 
         template<typename Element, typename... Args>
-        Element* createWidget(Widget* parent, Args... args)
+        Element* create_widget(Args... args)
         {
-            if (parent == nullptr) {
-                return m_root.create_widget<Element>(this, args...);
-            }
-            return parent->create_widget<Element>(this, args...);
+            return m_root.create_widget<Element>(args...);
         }
 
         TextureAtlasStore& texture_atlas_store()

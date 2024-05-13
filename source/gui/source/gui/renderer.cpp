@@ -57,11 +57,14 @@ namespace gui
                                         Widget& widget)
     {
         for (auto& child : widget.children()) {
-            if (child->is_Active()) {
-                vector_widget.push_back(child.get());
-                if (child->has_Text()) {
-                    vector_text.push_back(child->text());
-                }
+            if (!child->is_Active()) {
+                // stops processing this whole branch
+                continue;
+            }
+
+            vector_widget.push_back(child.get());
+            if (child->text() != nullptr) {
+                vector_text.push_back(child->text());
             }
             collect_drawables(vector_widget, vector_text, *child);
         }

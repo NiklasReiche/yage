@@ -73,15 +73,15 @@ namespace gui
 		labelTemplate.base.border.thickness = 0;
 		labelTemplate.padding = gml::Vec2f(0.0f);
 
-		label = this->create_widget<Label>(master, labelTemplate);
+		label = this->create_widget<Label>(labelTemplate);
 
 		WidgetTemplate cursorTemplate;
 		cursorTemplate.geometry.anchor.offset = gml::Vec2f(padding.x(), padding.y());
 		cursorTemplate.geometry.preferred_size.value = gml::Vec2f(cursorWidth, label->preferred_size().y() - padding.y() * 2);
 		cursorTemplate.color = cursorColor;
 
-		cursor = this->create_widget<TextCursor>(master, cursorTemplate);
-		cursorAnimation = cursor->create_animation<CursorAnimation>(m, 0.5);
+		cursor = this->create_widget<TextCursor>(cursorTemplate);
+		cursorAnimation = cursor->create_animation<CursorAnimation>(0.5);
 		cursor->hide();
 
 		if (m_template.geometry.preferred_size.value == gml::Vec2f(0.0f)) {
