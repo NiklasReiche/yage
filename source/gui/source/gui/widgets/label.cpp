@@ -36,10 +36,16 @@ namespace gui
 
     gml::Vec2f Label::preferred_size()
     {
-        return {
-            m_text->dimensions().x() + (float) m_template.border.thickness * 2 + padding.x() * 2,
-            m_text->max_font_dimensions().y() + (float) m_template.border.thickness * 2 + padding.y() * 2
-        };
+        // TODO
+        gml::Vec2f size = m_template.geometry.preferred_size.value;
+        if (m_template.geometry.size_hint.x() == SizeHint::FIT_CHILDREN){
+            size.x() = m_text->dimensions().x() + (float) m_template.border.thickness * 2 + padding.x() * 2;
+        }
+        if (m_template.geometry.size_hint.y() == SizeHint::FIT_CHILDREN) {
+            size.y() = m_text->max_font_dimensions().y() + (float) m_template.border.thickness * 2 + padding.y() * 2;
+        }
+
+        return size;
     }
 
     void Label::setText(TextTemplate textTemplate)

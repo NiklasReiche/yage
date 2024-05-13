@@ -85,8 +85,8 @@ namespace gui
 		cursor->hide();
 
 		if (m_template.geometry.preferred_size.value == gml::Vec2f(0.0f)) {
-            m_template.geometry.size_hint.x() = SizeHint::EXPANDING;
-            m_template.geometry.size_hint.y() = SizeHint::FIXED;
+            m_template.geometry.size_hint.x() = SizeHint::FIT_CHILDREN;
+            m_template.geometry.size_hint.y() = SizeHint::FIT_CHILDREN;
 		}
 	}
 

@@ -18,11 +18,16 @@ namespace gui
 	{
 		for (auto animation : m_finished_animations)
 		{
-            m_animations.erase(std::remove(m_animations.begin(), m_animations.end(), animation), m_animations.end());
+            auto it = std::find(m_animations.begin(), m_animations.end(), animation);
+            if (it != m_animations.end()){
+                m_animations.erase(it);
+            }
 		}
 		m_finished_animations.clear();
 
-		for (auto & animation : m_animations)
+        // copy animations, since an animation update may update the animation vector rough callbacks
+        std::vector<Animation*> worklist = m_animations;
+		for (auto & animation : worklist)
 		{
 			animation->update(dt);
 		}
