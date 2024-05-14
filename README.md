@@ -1,9 +1,8 @@
-# yage - Yet Another Game Engine
+# Yet Another Game Engine
 Small game engine / Work-in-progress
 
 ## Overview
-
-## Demos
+The goal of this project is to implement a 3D game engine from scratch (within reason, I'm happy to use libraries for stuff like window creation or reading PNG files). I don't expect to use this for developing any actual games but rather treat it as a learning experience for graphics programming and C++ in general.
 
 ## Subsystems
 The engine is built with a focus on modularity and thus includes various subsystems:
@@ -24,3 +23,16 @@ Bundles rigid body objects and simulates application of forces. The next steps i
 Uses signed distance fields to generate fonts in order to render unicode text at arbitrary sizes with a minimal memory footprint. Includes a generator for SDF fonts from true type fonts and a text renderer.
 ### GUI module
 Provides a framework for building simple hierarchical GUIs with some preliminary automatic layout options like widget stacking or anchoring.  
+
+## Demos
+### Physics-based rendering:
+TODO: add shreenshots
+
+### Physics simulation:
+TODO add shreenshots
+
+### Text renderer:
+![Screenshot 2024-05-14 204325](https://github.com/NiklasReiche/yage/assets/29310846/a20b7261-b89a-4054-af16-9773c0e997f7)
+
+### GUI showcase:
+TODO add shreenshots
