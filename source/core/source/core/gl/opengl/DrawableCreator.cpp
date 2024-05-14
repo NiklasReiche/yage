@@ -20,7 +20,7 @@ namespace opengl
 
         const unsigned int vertexSize = std::accumulate(vertexLayout.begin(), vertexLayout.end(), 0u);
         drawable->nVertices = vertexSize == 0 ? 0 : indices.size();
-        const auto nVerticesData = vertices.size() / vertexSize;
+        const auto nVerticesData = vertexSize == 0 ? 0 : vertices.size() / vertexSize;
 
 		const std::shared_ptr<gl::VertexBuffer> vertexBuffer = createVertexBuffer(vertices);
 		const std::shared_ptr<gl::ElementBuffer> elementBuffer = createElementBuffer(indices);

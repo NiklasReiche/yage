@@ -98,7 +98,7 @@ public:
 
 		auto point = glContext->getDrawableCreator()->createDrawable(std::vector<float>{ },
 		                                                             std::vector<unsigned int>{ },
-		                                                             {  },
+		                                                             { },
 		                                                             gl::VertexFormat::INTERLEAVED);
 
 		while (!window->shouldDestroy()) {
