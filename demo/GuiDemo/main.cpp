@@ -57,13 +57,12 @@ public:
         auto v_list_1 = master.create_widget<gui::VListBox>(gui::WidgetTemplate{
                 .geometry = {
                         .anchor = {
+                                .position = gui::AnchorPosition::TOP_LEFT,
                                 .offset = gml::Vec2f(10, 40),
-                                .position = gui::AnchorPosition::TOP_LEFT
                         },
                         .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
                 .border = {.thickness = 1},
-                .color = gl::Color::TRANSPARENT
         });
         v_list_1->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {.color = gl::Color::LIGHT_BLUE},
@@ -78,7 +77,6 @@ public:
                 .geometry = {
                         .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
-                .color = gl::Color::TRANSPARENT
         });
         designFrame->create_widget<gui::Label>(gui::LabelTemplate{
                 .text = {
@@ -97,7 +95,8 @@ public:
         });
         designFrame->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
-                        .shadow = {.offset = 3, .hardness = 0.4f}
+                        .shadow = {.offset = 3.0f, .hardness = 0.4f},
+                        .color = gl::Color::WHITE,
                 },
                 .text = {
                         .text = U"shadow",
@@ -115,13 +114,12 @@ public:
         auto* v_list_2 = master.create_widget<gui::VListBox>(gui::WidgetTemplate{
                 .geometry = {
                         .anchor = {
-                                .offset = gml::Vec2f(10, 40 + v_list_1->actual_size().y() + 50),
                                 .position = gui::AnchorPosition::TOP_LEFT,
+                                .offset = gml::Vec2f(10, 40 + v_list_1->actual_size().y() + 50),
                         },
                         .size_hint = {gui::SizeHint::FIT_CHILDREN, gui::SizeHint::FIT_CHILDREN},
                 },
                 .border = {.thickness = 1},
-                .color = gl::Color::TRANSPARENT,
         });
         v_list_2->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {.color = gl::Color::LIGHT_BLUE},
@@ -140,7 +138,6 @@ public:
 
         auto vListFrame = v_list_2->create_widget<gui::VListBox>(gui::WidgetTemplate{
                 .geometry = {.size_hint = {gui::SizeHint::FIT_CHILDREN, gui::SizeHint::FIT_CHILDREN}},
-                .color = gl::Color::TRANSPARENT,
         });
         auto element_template = gui::LabelTemplate{
                 .base = {
@@ -166,7 +163,6 @@ public:
                 .geometry = {
                         .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
-                .color = gl::Color::TRANSPARENT,
         });
         hListFrame->create_widget<gui::Label>(element_template);
         hListFrame->create_widget<gui::Label>(element_template);
@@ -195,8 +191,8 @@ public:
         auto h_list = master.create_widget<gui::HListBox>(gui::WidgetTemplate{
                 .geometry = {
                         .anchor = {
-                                .offset = gml::Vec2<float>(10 + v_list_1->actual_size().x() + 50, 40),
                                 .position = gui::AnchorPosition::TOP_LEFT,
+                                .offset = gml::Vec2<float>(10 + v_list_1->actual_size().x() + 50, 40),
                         },
                 },
                 .border = {
@@ -209,7 +205,7 @@ public:
                 .base = {
                         .geometry = {
                                 .preferred_size = {
-                                        .value = {50, 25},
+                                        .value = {80, 25},
                                 },
                                 .size_hint = {gui::SizeHint::FIXED, gui::SizeHint::FIXED},
                         },
@@ -220,7 +216,7 @@ public:
                         .color = gl::Color::LIGHT_BLUE,
                 },
                 .text = {
-                        .text = U"yay",
+                        .text = U"nested",
                         .font = font
                 }
         });
@@ -242,20 +238,20 @@ public:
         animation_1 = h_list->create_animation<gui::MoveAnimation>(h_list->offset(),
                                                                    h_list->offset() + gml::Vec2<float>(200, 0),
                                                                    2);
-        animation_1->setOnAnimationStop(std::bind(&GuiTest::onAnimation1stop, this));
+        animation_1->setOnAnimationStop([this] { onAnimation1stop(); });
         animation_2 = h_list->create_animation<gui::MoveAnimation>(h_list->offset() + gml::Vec2<float>(200, 0),
                                                                    h_list->offset(), 2);
-        animation_2->setOnAnimationStop(std::bind(&GuiTest::onAnimation2stop, this));
+        animation_2->setOnAnimationStop([this] { onAnimation2stop(); });
 
         animation_3 = testLabel->create_animation<gui::SizeAnimation>(testLabel->actual_size(),
                                                                       testLabel->actual_size() +
                                                                       gml::Vec2<float>(50, 25),
                                                                       2);
-        animation_3->setOnAnimationStop(std::bind(&GuiTest::onAnimation3stop, this));
+        animation_3->setOnAnimationStop([this] { onAnimation3stop(); });
         animation_4 = testLabel->create_animation<gui::SizeAnimation>(testLabel->actual_size() +
                                                                       gml::Vec2<float>(50, 25),
                                                                       testLabel->actual_size(), 2);
-        animation_4->setOnAnimationStop(std::bind(&GuiTest::onAnimation4stop, this));
+        animation_4->setOnAnimationStop([this] { onAnimation4stop(); });
 
 
         /*
@@ -266,14 +262,13 @@ public:
         auto frame_4 = master.create_widget<gui::VListBox>(gui::WidgetTemplate{
                 .geometry = {
                         .anchor = {
+                                .position = gui::AnchorPosition::TOP_LEFT,
                                 .offset = gml::Vec2<float>(10 + v_list_2->actual_size().x() + 50,
                                                            40 + v_list_1->actual_size().y() + 50),
-                                .position = gui::AnchorPosition::TOP_LEFT,
                         },
                         .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
                 .border = {.thickness = 1},
-                .color = gl::Color::TRANSPARENT,
         });
         frame_4->create_widget<gui::Label>(gui::LabelTemplate{
                 .text = {
@@ -287,15 +282,12 @@ public:
                 .geometry = {
                         .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
-                .border = {.thickness = 1},
-                .color = gl::Color::TRANSPARENT,
         });
 
         frame_clicks = h_list_buttons->create_widget<gui::HListBox>(gui::WidgetTemplate{
                 .geometry = {
                         .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
-                .color = gl::Color::TRANSPARENT
         });
         frame_clicks->create_widget<gui::Label>(gui::LabelTemplate{
                 .text = {
@@ -319,9 +311,6 @@ public:
                 .command = std::bind(&GuiTest::on_button_1_click, this),
         });
         label_clicks = button_clicks->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {
-                        .color = gl::Color::TRANSPARENT,
-                },
                 .text = {
                         .text = U"clicks: 0",
                         .font = font,

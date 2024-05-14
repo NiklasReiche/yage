@@ -38,7 +38,7 @@ namespace gui
             gml::Vec2f childMinSize = child->min_size();
             gml::Vec2f childSize(0.0f);
 
-            child->set_actual_anchor({.position = AnchorPosition::TOP_LEFT});
+            child->override_anchor({.position = AnchorPosition::TOP_LEFT});
             child->set_absolute_offset({x_offset, 0});
 
             switch (child->size_hint().y()) {
@@ -77,16 +77,17 @@ namespace gui
 
             x_offset += childSize.x();
 
-            child->set_actual_size(childSize); // triggers layout of child
+            child->set_actual_size(childSize);
+            child->update_layout();
         }
     }
 
-    gml::Vec2f HListBox::preferred_size()
+    gml::Vec2f HListBox::preferred_size() const
     {
         return gml::Vec2f(calc_pref_size_x(), calc_pref_size_y()) + gml::Vec2f(m_template.border.thickness * 2);
     }
 
-    float HListBox::calc_pref_size_x()
+    float HListBox::calc_pref_size_x() const
     {
         float preferred_size = 0.0f;
 
@@ -107,7 +108,7 @@ namespace gui
         return preferred_size;
     }
 
-    float HListBox::calc_pref_size_y()
+    float HListBox::calc_pref_size_y() const
     {
         float preferred_size = 0.0f;
 

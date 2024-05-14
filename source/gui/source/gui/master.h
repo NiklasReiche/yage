@@ -20,17 +20,17 @@ namespace gui
     public:
         Master(const std::shared_ptr<platform::IWindow>& window, const std::shared_ptr<gl::IContext>& glContext);
 
-        void update(double dt);
-
-        void activateAnimation(Animation* animation);
-
-        void deactivateAnimation(Animation* animation);
-
         template<typename Element, typename... Args>
         Element* create_widget(Args... args)
         {
             return m_root.create_widget<Element>(args...);
         }
+
+        void activateAnimation(Animation* animation);
+
+        void deactivateAnimation(Animation* animation);
+
+        void update(double dt);
 
         TextureAtlasStore& texture_atlas_store()
         {
@@ -50,6 +50,11 @@ namespace gui
         platform::IWindow& window()
         {
             return *m_window;
+        }
+
+        Widget& root()
+        {
+            return m_root;
         }
 
     private:

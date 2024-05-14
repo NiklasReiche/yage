@@ -30,7 +30,7 @@ namespace gui
         }
     }
 
-    gml::Vec2f Label::preferred_size()
+    gml::Vec2f Label::preferred_size() const
     {
         // TODO
         gml::Vec2f size = m_template.geometry.preferred_size.value;
@@ -106,6 +106,6 @@ namespace gui
         m_text->update_offset(gml::Vec2f{textPosition.x(), textPosition.y()});
     }
 
-    font::Text* Label::text()
+    font::Text* Label::text() const
     { return m_text.get(); }
 }

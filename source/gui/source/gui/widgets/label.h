@@ -51,7 +51,7 @@ namespace gui
 	public:
 		Label(Widget * parent, Master* master, LabelTemplate labelTemplate);
 
-		font::Text* text() override;
+		font::Text* text() const override;
 
 		void setText(TextTemplate text);
 
@@ -59,6 +59,6 @@ namespace gui
 
 		void update_geometry() override;
 
-		gml::Vec2f preferred_size() override;
+		gml::Vec2f preferred_size() const override;
 	};
 }

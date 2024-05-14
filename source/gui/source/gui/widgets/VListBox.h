@@ -4,7 +4,11 @@
 
 namespace gui
 {
-
+    /**
+     * Container widget that stacks its children vertically. Ignores anchors and offsets on children, but respects
+     * sizing constraints.
+     * TODO: merge with HListBox
+     */
     class VListBox : public Widget
     {
     public:
@@ -12,12 +16,15 @@ namespace gui
 
         void update_layout() override;
 
-        gml::Vec2f preferred_size() override;
+        [[nodiscard]]
+        gml::Vec2f preferred_size() const override;
 
     private:
-        float calc_pref_size_x();
+        [[nodiscard]]
+        float calc_pref_size_x() const;
 
-        float calc_pref_size_y();
+        [[nodiscard]]
+        float calc_pref_size_y() const;
     };
 
 }
