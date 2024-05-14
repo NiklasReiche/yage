@@ -201,13 +201,20 @@ namespace platform::desktop
 		}
 	}
 
-	void GlfwWindow::onCharEvent(GLFWwindow* window, const unsigned int)
+    void GlfwWindow::notifyListeners(const input::CharEvent& event)
+    {
+        for (auto listener: inputListeners) {
+            listener.get().onCharEvent(event);
+        }
+    }
+
+	void GlfwWindow::onCharEvent(GLFWwindow* window, const unsigned int codepoint)
 	{
 		auto handle = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
 		if (!handle->isCharInputEnabled) {
 			return;
 		}
-		throw NotImplementedException();
+        handle->notifyListeners(input::CharEvent(codepoint));
 	}
 	void GlfwWindow::onKeyEvent(GLFWwindow* window, const int key, const int, const int action, const int)
 	{

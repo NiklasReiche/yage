@@ -454,7 +454,7 @@ public:
         textEntryTemplate.border.thickness = 1;
         textEntryTemplate.defaultText.color = gl::Color::GREY;
 
-        frame_radio->create_widget<gui::TextEntry>(textEntryTemplate, &master);
+        frame_radio->create_widget<gui::TextEntry>(textEntryTemplate);
     }
 
     void on_button_1_click()

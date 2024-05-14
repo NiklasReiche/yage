@@ -210,20 +210,12 @@ namespace font
 
     gml::Vec3f Text::offset(unsigned int i)
     {
-        if (i > m_text.length()) {
-            throw std::invalid_argument("index out of bounds");
-        }
+        return char_offset(i, m_offset);
+    }
 
-        auto& font = m_font_resource.get();
-        const auto scale = font.scaling(m_font_size, m_dpi);
-
-        gml::Vec3f _offset = m_offset;
-        for (unsigned int j = 0; j < i; ++i) {
-            const Character& ch = font.characters.at(m_text[j]);
-            _offset.x() += ch.glyph.advance * scale.x();
-        }
-
-        return _offset;
+    gml::Vec3f Text::relative_offset(unsigned int i)
+    {
+        return char_offset(i, gml::Vec3f(0));
     }
 
     gml::Vec2<float> Text::dimensions() const
@@ -263,5 +255,23 @@ namespace font
         m_dpi = dpi;
         std::vector<float> vertices = construct_vertex_coords();
         m_drawable->setSubData(m_data_offset_coords, vertices);
+    }
+
+    gml::Vec3f Text::char_offset(unsigned int i, gml::Vec3f initial)
+    {
+        if (i > m_text.length()) {
+            throw std::invalid_argument("index out of bounds");
+        }
+
+        auto& font = m_font_resource.get();
+        const auto scale = font.scaling(m_font_size, m_dpi);
+
+        gml::Vec3f offset = initial;
+        for (unsigned int j = 0; j < i; ++j) {
+            const Character& ch = font.characters.at(m_text[j]); // TODO: handle unknown characters
+            offset.x() += ch.glyph.advance * scale.x();
+        }
+
+        return offset;
     }
 }

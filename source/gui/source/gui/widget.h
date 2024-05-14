@@ -176,7 +176,7 @@ namespace gui
 
         virtual void on_focus_release();
 
-        virtual void on_char_input(char character);
+        virtual void on_char_input(unsigned int character);
 
         virtual void on_key_press(input::KeyEvent::Code key);
 

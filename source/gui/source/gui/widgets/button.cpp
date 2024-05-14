@@ -22,10 +22,9 @@ namespace gui
 	{
         set_template(m_button_template.base);
 
-		try {
+        if (m_button_template.command) {
             m_button_template.command();
-		}
-		catch (std::bad_function_call&) {}
+        }
 	}
 
 	void PushButton::on_hover()
@@ -72,10 +71,9 @@ namespace gui
 	{
 		m_state = !m_state;
 
-		try {
-			m_button_template.command();
-		}
-		catch (std::bad_function_call&) {}
+        if (m_button_template.command){
+            m_button_template.command();
+        }
 	}
 
 	void CheckButton::on_hover()
@@ -105,5 +103,10 @@ namespace gui
             set_template(m_button_template.base);
 		}
 	}
+
+    bool CheckButton::state() const
+    {
+        return m_state;
+    }
 
 }

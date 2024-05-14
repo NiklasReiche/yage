@@ -11,6 +11,7 @@ namespace input
 			MOUSE_POS_EVENT,
 			MOUSE_BUTTON_EVENT,
 			MOUSE_WHEEL_EVENT,
+            CHAR_EVENT
 		};
 
 		explicit Event(Type type) noexcept;

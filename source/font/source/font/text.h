@@ -97,12 +97,21 @@ namespace font
         gml::Vec2f max_font_dimensions();
 
         /**
-         * Returns the model space offset of the i-th character glyph geometry.
+         * Returns the model space offset of the i-th character glyph geometry. Note that this includes any initial
+         * offset of the whole text.
          * @param i Index of the character in the text string
          * @return Model space coordinates of the glyph
          */
         [[nodiscard]]
         gml::Vec3f offset(unsigned int i);
+
+        /**
+         * Returns the model space offset of the i-th character glyph geometry from the start of the text.
+         * @param i Index of the character in the text string
+         * @return Model space coordinates of the glyph
+         */
+        [[nodiscard]]
+        gml::Vec3f relative_offset(unsigned int i);
 
         /**
          * Reconstructs the text geometry at an updated 3D offset.
@@ -160,5 +169,8 @@ namespace font
 
         [[nodiscard]]
         std::vector<float> construct_vertex_colors();
+
+        [[nodiscard]]
+        gml::Vec3f char_offset(unsigned int i, gml::Vec3f initial);
     };
 }

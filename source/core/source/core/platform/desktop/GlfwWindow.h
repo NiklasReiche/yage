@@ -11,6 +11,7 @@
 #include <core/platform/IFileReader.h>
 
 #include "File.h"
+#include "core/input/CharEvent.h"
 
 
 class GLFWwindow;
@@ -82,6 +83,7 @@ namespace platform::desktop
 		void notifyListeners(const input::KeyEvent& event);
 		void notifyListeners(const input::MousePosEvent& event);
 		void notifyListeners(const input::MouseWheelEvent& event);
+        void notifyListeners(const input::CharEvent& event);
 
 		static input::KeyEvent::Code convertToKeyCode(int key) noexcept;
 		static input::KeyEvent::Action convertToKeyAction(int action) noexcept;

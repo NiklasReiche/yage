@@ -1,11 +1,14 @@
 target_sources(yage_core
-	PRIVATE
-		Event.h
-		Event.cpp
-		InputListener.h
-		KeyEvent.h
-		KeyEvent.cpp
-		MousePosEvent.h
-		MousePosEvent.cpp
-		MouseWheelEvent.h
-		MouseWheelEvent.cpp)
+        PRIVATE
+        Event.h
+        Event.cpp
+        InputListener.h
+        KeyEvent.h
+        KeyEvent.cpp
+        MousePosEvent.h
+        MousePosEvent.cpp
+        MouseWheelEvent.h
+        MouseWheelEvent.cpp
+        CharEvent.h
+        CharEvent.cpp
+)

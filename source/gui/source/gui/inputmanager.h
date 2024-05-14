@@ -13,6 +13,8 @@ namespace gui
 		void onKeyEvent(const input::KeyEvent& event) override;
 		void onMousePosEvent(const input::MousePosEvent& event) override;
 
+        void onCharEvent(const input::CharEvent& event) override;
+
 		void unFocus();
 		
 	private:
@@ -27,7 +29,7 @@ namespace gui
 		void onMouseLeftPress();
 		void onMouseLeftRelease();
 
-		void onCharEvent(char character);
+
 #if 0
 		void onTouchEvent(float x, float y, input::TouchIndexCode, input::TouchAction);
 #endif

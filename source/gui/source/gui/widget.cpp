@@ -507,7 +507,7 @@ namespace gui
     {
     }
 
-    void Widget::on_char_input(char)
+    void Widget::on_char_input(unsigned int)
     {
     }
 

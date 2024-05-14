@@ -37,7 +37,7 @@ namespace gui
     void TextEntry::moveCursor()
     {
         gml::Vec2f cursor_position;
-        cursor_position.x() = label->offset().x() + label->text()->offset(cursorPosition).x();
+        cursor_position.x() = label->offset().x() + label->text()->relative_offset(cursorPosition).x();
         cursor_position.y() = cursor->offset().y();
         cursor->set_anchor({
                                    .position = AnchorPosition::TOP_LEFT,
@@ -46,7 +46,7 @@ namespace gui
                            });
     }
 
-    TextEntry::TextEntry(Widget* parent, Master* master, TextEntryTemplate entryTemplate, Master* m)
+    TextEntry::TextEntry(Widget* parent, Master* master, TextEntryTemplate entryTemplate)
             : Widget(parent, master, entryTemplate),
               padding(entryTemplate.padding),
               callback(entryTemplate.command),
@@ -55,31 +55,26 @@ namespace gui
               defaultTextTemplate(entryTemplate.defaultText),
               inputTextTemplate(entryTemplate.inputText)
     {
-        this->m_is_interactable = true;
-        this->m_keep_focus = true;
+        m_is_interactable = true;
+        m_keep_focus = true;
 
         inputTextTemplate.size = defaultTextTemplate.size;
         inputTextTemplate.font = defaultTextTemplate.font;
 
         LabelTemplate labelTemplate{
-                .text = entryTemplate.defaultText
+            .text = entryTemplate.defaultText
         };
-        labelTemplate.base.geometry.anchor.offset = entryTemplate.padding;
-        labelTemplate.base.geometry.preferred_size.value = gml::Vec2f();
-        labelTemplate.base.color = 0x00000000u;
-        labelTemplate.base.shadow.offset = 0;
-        labelTemplate.base.border.thickness = 0;
+        labelTemplate.base.color = gl::Color::LIGHT_BLUE;
         labelTemplate.padding = gml::Vec2f(0.0f);
-
-        label = this->create_widget<Label>(labelTemplate);
+        label = create_widget<Label>(labelTemplate);
 
         WidgetTemplate cursorTemplate;
-        cursorTemplate.geometry.anchor.offset = gml::Vec2f(padding.x(), padding.y());
+        //cursorTemplate.geometry.anchor.offset = gml::Vec2f(padding.x(), padding.y());
         cursorTemplate.geometry.preferred_size.value = gml::Vec2f(cursorWidth,
                                                                   label->preferred_size().y() - padding.y() * 2);
         cursorTemplate.color = cursorColor;
 
-        cursor = this->create_widget<TextCursor>(cursorTemplate);
+        cursor = create_widget<TextCursor>(cursorTemplate);
         cursorAnimation = cursor->create_animation<CursorAnimation>(0.5);
         cursor->hide();
 
@@ -94,7 +89,7 @@ namespace gui
         m_master->window().enableCharInput();
         cursor->show();
         cursorAnimation->start();
-        if (inputText.length() == 0) {
+        if (inputText.empty()) {
             inputTextTemplate.text = U"";
             label->setText(inputTextTemplate);
         }
@@ -105,15 +100,15 @@ namespace gui
         m_master->window().disableCharInput();
         cursor->hide();
         cursorAnimation->stop();
-        if (inputText.length() == 0) {
+        if (inputText.empty()) {
             label->setText(defaultTextTemplate);
         }
     }
 
-    void TextEntry::on_char_input(char character)
+    void TextEntry::on_char_input(unsigned int character)
     {
-        inputText.insert(cursorPosition, std::string(1, character));
-        label->setText(utils::toUTF32(inputText));
+        inputText.insert(inputText.begin() + cursorPosition, static_cast<char32_t>(character));
+        label->setText(inputText);
 
         if (cursorPosition < (int) inputText.length()) {
             cursorPosition++;
@@ -128,7 +123,7 @@ namespace gui
                 if (cursorPosition > 0) {
                     cursorPosition--;
                     this->inputText.erase(cursorPosition, 1);
-                    label->setText(utils::toUTF32(inputText));
+                    label->setText(inputText);
                     moveCursor();
                 }
                 break;
@@ -149,21 +144,17 @@ namespace gui
 
             case input::KeyEvent::Code::KEY_ENTER:
                 m_master->input_manager().unFocus();
-                try {
+                if (callback)
                     callback();
-                } catch (std::bad_function_call) {
-                }
+                break;
+
+            default:
                 break;
         }
     }
 
-    std::string TextEntry::getString()
+    std::u32string TextEntry::value() const
     {
         return inputText;
-    }
-
-    gml::Vec2f TextEntry::calcPrefSize()
-    {
-        return label->preferred_size() + padding * 2;
     }
 }

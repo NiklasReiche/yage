@@ -142,13 +142,13 @@ namespace gui
 		blockHover = false;
 	}
 
-	void InputManager::onCharEvent(char character)
-	{
-		if (focusedWidget != nullptr)
-		{
-            focusedWidget->on_char_input(character);
-		}
-	}
+    void InputManager::onCharEvent(const input::CharEvent& event)
+    {
+        InputListener::onCharEvent(event);
+        if (focusedWidget != nullptr) {
+            focusedWidget->on_char_input(event.codepoint());
+        }
+    }
 
 #if 0
 	void InputManager::onTouchEvent(float x, float y, input::TouchIndexCode index, input::TouchAction action)

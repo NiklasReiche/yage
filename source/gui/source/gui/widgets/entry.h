@@ -22,7 +22,7 @@ namespace gui
 	{
 	public:
 		CursorAnimation(Widget* widget, Master* master, double time);
-		void update(double dt);
+		void update(double dt) override;
 	};
 
 
@@ -31,15 +31,15 @@ namespace gui
 		gml::Vec2f padding = gml::Vec2f(2.0f);
 		TextTemplate defaultText;
 		TextTemplate inputText;
-		unsigned int cursorColor = gl::Color::BLACK;
-		int cursorWidth = 1;
-		std::function<void()> command;
+		gl::Color_t cursorColor = gl::Color::BLACK;
+		float cursorWidth = 1;
+		std::function<void()> command{};
 	};
 
 	class TextEntry : public Widget
 	{
 	private:
-		Label * label;
+		Label* label;
 		TextCursor* cursor;
 		CursorAnimation* cursorAnimation;
 
@@ -47,25 +47,23 @@ namespace gui
 		std::function<void()> callback;
 
 		unsigned int cursorColor = gl::Color::BLACK;
-		int cursorWidth = 1;
+		float cursorWidth = 1.0f;
 		int cursorPosition = 0;
 
 		TextTemplate defaultTextTemplate;
 		TextTemplate inputTextTemplate;
-		std::string inputText = "";
+		std::u32string inputText;
 
 		void moveCursor();
 
 	public:
-		TextEntry(Widget * parent, Master* master, TextEntryTemplate entryTemplate, Master* m);
+		TextEntry(Widget * parent, Master* master, TextEntryTemplate entryTemplate);
 
-		void on_focus();
-		void on_focus_release();
-		void on_char_input(char character);
-		void on_key_press(input::KeyEvent::Code key);
+		void on_focus() override;
+		void on_focus_release() override;
+		void on_char_input(unsigned int character) override;
+		void on_key_press(input::KeyEvent::Code key) override;
 
-		std::string getString();
-
-		gml::Vec2f calcPrefSize();
-	};
+		[[nodiscard]] std::u32string value() const;
+    };
 }
