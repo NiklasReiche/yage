@@ -8,7 +8,7 @@ namespace opengl
 	class Cubemap : public Texture, public gl::ICubemap, public std::enable_shared_from_this<Cubemap>
 	{
 	public:
-		~Cubemap() override = default;
+		~Cubemap() override;
 
 		int getWidth() const override;
 

@@ -22,6 +22,8 @@ namespace opengl
 		GLenum source, GLenum type, GLuint id, GLenum severity, 
 		GLsizei length, const GLchar* message, const void* userParam);
 
+    // TODO: add unbind() methods to unbind destroyed objects if they were bound previously (currently we reset the
+    //  bind targets for every destroyed object, even if it's not necessary)
 	class Context : public gl::IContext, public std::enable_shared_from_this<Context>
 	{
 	public:

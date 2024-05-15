@@ -10,7 +10,7 @@ namespace opengl
 		: public Texture, public gl::ITexture2D, public std::enable_shared_from_this<Texture2D>
 	{
 	public:
-		~Texture2D() override = default;
+		~Texture2D() override;
 
 		Texture2D(const Texture2D& other) = delete;
 

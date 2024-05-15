@@ -6,6 +6,7 @@ namespace opengl
 	VertexBuffer::~VertexBuffer()
 	{
 		glDeleteBuffers(1, &vbo);
+        lockContextPtr()->bindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	VertexBuffer::VertexBuffer(VertexBuffer&& other) noexcept

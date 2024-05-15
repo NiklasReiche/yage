@@ -1,10 +1,12 @@
 #include "ElementBuffer.h"
+#include "Context.h"
 
 namespace opengl
 {
 	ElementBuffer::~ElementBuffer()
 	{
 		glDeleteBuffers(1, &ebo);
+        lockContextPtr()->bindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	ElementBuffer::ElementBuffer(ElementBuffer&& other) noexcept
