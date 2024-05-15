@@ -109,7 +109,7 @@ namespace opengl
 		glGenVertexArrays(1, &vertexArray->vao);
 
 		context->bindVertexArray(vertexArray->vao);
-		// force binding so that vao registers it
+		// force binding so that vao registers it TODO
 		glBindBuffer(GL_ARRAY_BUFFER, vertexArray->vertexBuffer->vbo);
 		context->bindBuffer(GL_ARRAY_BUFFER, vertexArray->vertexBuffer->vbo);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexArray->elementBuffer->ebo);
@@ -179,6 +179,9 @@ namespace opengl
 	{
 		auto context = lockContextPtr();
 		auto elementBuffer = std::unique_ptr<ElementBuffer>(new ElementBuffer(context));
+
+        // we must unbind any VAO to not accidentally bind the new EBO to an unrelated VAO
+        context->bindVertexArray(0);
 
 		glGenBuffers(1, &elementBuffer->ebo);
 
