@@ -26,9 +26,10 @@ namespace gui
 	};
 
 
-	struct TextEntryTemplate : public WidgetTemplate 
+	struct TextEntryTemplate
 	{
-		gml::Vec2f padding = gml::Vec2f(2.0f);
+        WidgetTemplate base;
+        gml::Vec2f padding = gml::Vec2f(2.0f);
 		TextTemplate defaultText;
 		TextTemplate inputText;
 		gl::Color_t cursorColor = gl::Color::BLACK;
@@ -64,6 +65,7 @@ namespace gui
 		void on_char_input(unsigned int character) override;
 		void on_key_press(input::KeyEvent::Code key) override;
 
-		[[nodiscard]] std::u32string value() const;
+        [[nodiscard]]
+        std::u32string value() const;
     };
 }

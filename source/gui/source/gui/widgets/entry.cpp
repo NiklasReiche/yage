@@ -47,7 +47,7 @@ namespace gui
     }
 
     TextEntry::TextEntry(Widget* parent, Master* master, TextEntryTemplate entryTemplate)
-            : Widget(parent, master, entryTemplate),
+            : Widget(parent, master, entryTemplate.base),
               padding(entryTemplate.padding),
               callback(entryTemplate.command),
               cursorColor(entryTemplate.cursorColor),
@@ -64,7 +64,6 @@ namespace gui
         LabelTemplate labelTemplate{
             .text = entryTemplate.defaultText
         };
-        labelTemplate.base.color = gl::Color::LIGHT_BLUE;
         labelTemplate.padding = gml::Vec2f(0.0f);
         label = create_widget<Label>(labelTemplate);
 
@@ -122,7 +121,7 @@ namespace gui
             case input::KeyEvent::Code::KEY_BACKSPACE:
                 if (cursorPosition > 0) {
                     cursorPosition--;
-                    this->inputText.erase(cursorPosition, 1);
+                    inputText.erase(cursorPosition, 1);
                     label->setText(inputText);
                     moveCursor();
                 }

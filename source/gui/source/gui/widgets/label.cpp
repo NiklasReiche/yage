@@ -14,7 +14,7 @@ namespace gui
         }
         params = labelTemplate;
 
-        gml::Vec2f textPosition = this->m_inner_position_abs + padding;
+        gml::Vec2f textPosition = m_inner_position_abs + padding;
         m_text = std::make_unique<font::Text>(master->gl_context().getDrawableCreator(),
                                               labelTemplate.text.text, labelTemplate.text.font,
                                               font::TextParameters{

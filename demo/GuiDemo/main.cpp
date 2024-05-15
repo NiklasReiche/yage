@@ -39,6 +39,7 @@ public:
             res::Resource<font::Font> font)
             : platform(platform), gl(gl), master(gui::Master(platform, gl))
     {
+
         gui::LabelTemplate fpslabelTemplate{
                 .text = gui::TextTemplate{
                         .text = U" ",
@@ -271,10 +272,11 @@ public:
                 .border = {.thickness = 1},
         });
         frame_4->create_widget<gui::Label>(gui::LabelTemplate{
+                .base = {.color = gl::Color::LIGHT_BLUE},
                 .text = {
                         .text = U"Buttons:",
                         .font = font,
-                        .size = 20
+                        .size = 20,
                 }
         });
 
@@ -363,7 +365,7 @@ public:
         });
         label_radio = frame_radio->create_widget<gui::Label>(gui::LabelTemplate{
                 .text = {
-                        .text = U"Value: 1",
+                        .text = U"Radio Buttons: selected value: 1",
                         .font = font
                 }
         });
@@ -440,21 +442,39 @@ public:
                 }
         });
 
-        gui::TextEntryTemplate textEntryTemplate{
+        auto entryFrame = master.create_widget<gui::VListBox>(gui::WidgetTemplate{
+                .geometry = {.anchor = {.offset = gml::Vec2<float>(
+                        10 + v_list_2->actual_size().x() + 50 + frame_4->actual_size().x() + 50,
+                        40 + v_list_1->actual_size().y() + 50),}},
+                .border = {.thickness = 1}
+        });
+        entryFrame->create_widget<gui::Label>(gui::LabelTemplate{
+                .base = {
+                        .color = gl::Color::LIGHT_BLUE,
+                },
+                .text = {
+                        .text = U"Text input",
+                        .font = font,
+                },
+        });
+        entryFrame->create_widget<gui::TextEntry>(gui::TextEntryTemplate{
+                .base = {
+                        .geometry = {
+                                .preferred_size = {.value = {100.0f, 20.0f}},
+                                .size_hint = {gui::SizeHint::FIXED, gui::SizeHint::FIXED},
+                        },
+                        .border = {.thickness = 1},
+                },
                 .defaultText = {
-                        .text = U"entry",
-                        .font = font
+                        .text = U"input text...",
+                        .font = font,
+                        .color = gl::Color::GREY,
                 },
                 .inputText = {
                         .text = U"",
-                        .font = font
+                        .font = font,
                 },
-                .command = nullptr
-        };
-        textEntryTemplate.border.thickness = 1;
-        textEntryTemplate.defaultText.color = gl::Color::GREY;
-
-        frame_radio->create_widget<gui::TextEntry>(textEntryTemplate);
+        });
     }
 
     void on_button_1_click()
@@ -474,7 +494,7 @@ public:
 
     void on_radio_click(int value)
     {
-        label_radio->setText(U"state: " + utils::toUTF32(value));
+        label_radio->setText(U"Radio Buttons: selected value: " + utils::toUTF32(value));
     }
 
     void onAnimation1stop()
@@ -524,16 +544,22 @@ int main()
     window->show();
     window->getTimeStep();
     double timer = 0.0;
+    double dt = 1.0 / 60.0;
+    double frame_time;
     while (!window->shouldDestroy()) {
-        double dt = window->getTimeStep();
-        timer += dt;
+        frame_time = window->getTimeStep();
+        timer += frame_time;
 
-        if (timer > 0.2) {
-            displayFPS(guiTest, dt);
+        if (timer > 1) {
+            displayFPS(guiTest, 0.1);
             timer = 0.0;
         }
 
-        guiTest.master.update(dt);
+        while (frame_time > 0) {
+            double delta_time = std::min(frame_time, dt);
+            guiTest.master.update(delta_time);
+            frame_time -= delta_time;
+        }
 
         window->swapBuffers();
         window->pollEvents();
