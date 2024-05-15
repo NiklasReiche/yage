@@ -49,7 +49,7 @@ namespace opengl
 
 	private:
 		gml::Vec4f clearColor = gml::Vec4f(0, 0, 0, 1);
-        
+
         std::unique_ptr<gl::IDrawable> unitDrawable;
         std::unique_ptr<gl::IShader> unitShader;
 

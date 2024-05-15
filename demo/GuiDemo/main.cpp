@@ -49,11 +49,9 @@ public:
         };
         fpsCounter = master.create_widget<gui::Label>(fpslabelTemplate);
 
-        /*
-        *
-        * Design Frame -------------------------------------------------------------------------------------------------
-        *
-        */
+        // #############################################################################################################
+        // Designs
+        // #############################################################################################################
 
         auto v_list_1 = master.create_widget<gui::VListBox>(gui::WidgetTemplate{
                 .geometry = {
@@ -106,11 +104,9 @@ public:
         });
 
 
-        /*
-        *
-        * Layout Frame -------------------------------------------------------------------------------------------------
-        *
-        */
+        // #############################################################################################################
+        // Layouts
+        // #############################################################################################################
 
         auto* v_list_2 = master.create_widget<gui::VListBox>(gui::WidgetTemplate{
                 .geometry = {
@@ -184,11 +180,10 @@ public:
         });
 
 
-        /*
-        *
-        * Animation Layout
-        *
-        */
+        // #############################################################################################################
+        // Animations
+        // #############################################################################################################
+
         auto h_list = master.create_widget<gui::HListBox>(gui::WidgetTemplate{
                 .geometry = {
                         .anchor = {
@@ -255,11 +250,10 @@ public:
         animation_4->setOnAnimationStop([this] { onAnimation4stop(); });
 
 
-        /*
-        *
-        * Button Frame
-        *
-        */
+        // #############################################################################################################
+        // Buttons
+        // #############################################################################################################
+
         auto frame_4 = master.create_widget<gui::VListBox>(gui::WidgetTemplate{
                 .geometry = {
                         .anchor = {
@@ -310,7 +304,7 @@ public:
                         .border = {.thickness = 2},
                         .color = gl::Color::LIGHT_BLUE,
                 },
-                .command = std::bind(&GuiTest::on_button_1_click, this),
+                .command = [this] { on_button_1_click(); },
         });
         label_clicks = button_clicks->create_widget<gui::Label>(gui::LabelTemplate{
                 .text = {
@@ -345,7 +339,7 @@ public:
                         .border = {.thickness = 2},
                         .color = gl::Color::LIGHT_BLUE,
                 },
-                .command = std::bind(&GuiTest::on_button_2_click, this),
+                .command = [this] { on_button_2_click(); },
         });
         label_check = button_check->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
@@ -442,6 +436,10 @@ public:
                 }
         });
 
+        // #############################################################################################################
+        // Entries
+        // #############################################################################################################
+
         auto entryFrame = master.create_widget<gui::VListBox>(gui::WidgetTemplate{
                 .geometry = {.anchor = {.offset = gml::Vec2<float>(
                         10 + v_list_2->actual_size().x() + 50 + frame_4->actual_size().x() + 50,
@@ -483,7 +481,7 @@ public:
         label_clicks->setText(U"clicks: " + utils::toUTF32(clicks));
     }
 
-    void on_button_2_click()
+    void on_button_2_click() const
     {
         if (button_check->state()) {
             label_check->setText(U"state: on");
@@ -492,27 +490,27 @@ public:
         }
     }
 
-    void on_radio_click(int value)
+    void on_radio_click(int value) const
     {
         label_radio->setText(U"Radio Buttons: selected value: " + utils::toUTF32(value));
     }
 
-    void onAnimation1stop()
+    void onAnimation1stop() const
     {
         animation_2->start();
     }
 
-    void onAnimation2stop()
+    void onAnimation2stop() const
     {
         animation_1->start();
     }
 
-    void onAnimation3stop()
+    void onAnimation3stop() const
     {
         animation_4->start();
     }
 
-    void onAnimation4stop()
+    void onAnimation4stop() const
     {
         animation_3->start();
     }
