@@ -49,10 +49,9 @@ namespace opengl
 
 	private:
 		gml::Vec4f clearColor = gml::Vec4f(0, 0, 0, 1);
-
-        // TODO: these can't be static, since their destructors require the context to be alive
-		static std::unique_ptr<gl::IDrawable> unitDrawable;
-		static std::unique_ptr<gl::IShader> unitShader;
+        
+        std::unique_ptr<gl::IDrawable> unitDrawable;
+        std::unique_ptr<gl::IShader> unitShader;
 
 		explicit Renderer(std::weak_ptr<Context> contextPtr);
 
