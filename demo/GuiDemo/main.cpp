@@ -291,7 +291,7 @@ public:
                         .font = font
                 }
         });
-        button_clicks = frame_clicks->create_widget<gui::PushButton>(gui::ButtonTemplate{
+        button_clicks = frame_clicks->create_widget<gui::PushButton>(gui::PushButtonTemplate{
                 .base = {
                         .border = {.thickness = 1},
                         .color = gl::Color::LIGHT_BLUE,
@@ -326,20 +326,16 @@ public:
                         .font = font
                 }
         });
-        button_check = frame_check->create_widget<gui::CheckButton>(gui::ButtonTemplate{
+        button_check = frame_check->create_widget<gui::CheckButton>(gui::CheckButtonTemplate{
                 .base = {
                         .border = {.thickness = 1},
-                        .color = gl::Color::LIGHT_BLUE,
+                        .color = gl::Color::LIGHT_GREY,
                 },
-                .click = {
+                .selected = {
                         .border = {.thickness = 1},
                         .color = gl::Color::LIGHT_BLUE,
                 },
-                .hover = {
-                        .border = {.thickness = 2},
-                        .color = gl::Color::LIGHT_BLUE,
-                },
-                .command = [this] { on_button_2_click(); },
+                .command = [this](bool state) -> void { this->on_button_2_click(state); },
         });
         label_check = button_check->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
@@ -357,29 +353,38 @@ public:
                 },
                 .color = gl::Color::TRANSPARENT
         });
-        label_radio = frame_radio->create_widget<gui::Label>(gui::LabelTemplate{
+        frame_radio->create_widget<gui::Label>(gui::LabelTemplate{
                 .text = {
-                        .text = U"Radio Buttons: selected value: 1",
+                        .text = U"Radio Buttons:",
                         .font = font
                 }
+        });
+        auto frame_radio_2 = frame_radio->create_widget<gui::HListBox>(gui::WidgetTemplate{
+                .geometry = {
+                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                },
+                .color = gl::Color::TRANSPARENT
+        });
+        auto radio_group_box = frame_radio_2->create_widget<gui::VListBox>(gui::WidgetTemplate{
+                .geometry = {
+                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                },
+                .color = gl::Color::TRANSPARENT
         });
         radioGroup = gui::RadioGroup<int>(0, [this](int value) {
             this->on_radio_click(value);
         });
         auto radio_button_1 = radioGroup.addButton(
-                frame_radio->create_widget<gui::RadioButton<int>>(gui::ButtonTemplate{
+                radio_group_box->create_widget<gui::CheckButton>(gui::CheckButtonTemplate{
                         .base = {
-                                .border = {.thickness = 1}
-                        },
-                        .click = {
                                 .border = {.thickness = 1},
-                                .color = gl::Color::GREY,
+                                .color = gl::Color::LIGHT_GREY,
                         },
-                        .hover = {
+                        .selected = {
                                 .border = {.thickness = 1},
-                                .color = 0xDDDDDDFF,
+                                .color = gl::Color::LIGHT_BLUE,
                         },
-                }, 1), true);
+                }), 1, true);
         radio_button_1->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
                         .color = gl::Color::TRANSPARENT,
@@ -390,19 +395,16 @@ public:
                 }
         });
         auto radio_button_2 = radioGroup.addButton(
-                frame_radio->create_widget<gui::RadioButton<int>>(gui::ButtonTemplate{
+                radio_group_box->create_widget<gui::CheckButton>(gui::CheckButtonTemplate{
                         .base = {
-                                .border = {.thickness = 1}
-                        },
-                        .click = {
                                 .border = {.thickness = 1},
-                                .color = gl::Color::GREY,
+                                .color = gl::Color::LIGHT_GREY,
                         },
-                        .hover = {
+                        .selected = {
                                 .border = {.thickness = 1},
-                                .color = 0xDDDDDDFF,
+                                .color = gl::Color::LIGHT_BLUE,
                         },
-                }, 2));
+                }), 2);
         radio_button_2->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
                         .color = gl::Color::TRANSPARENT,
@@ -413,19 +415,16 @@ public:
                 }
         });
         auto radio_button_3 = radioGroup.addButton(
-                frame_radio->create_widget<gui::RadioButton<int>>(gui::ButtonTemplate{
+                radio_group_box->create_widget<gui::CheckButton>(gui::CheckButtonTemplate{
                         .base = {
-                                .border = {.thickness = 1}
-                        },
-                        .click = {
                                 .border = {.thickness = 1},
-                                .color = gl::Color::GREY,
+                                .color = gl::Color::LIGHT_GREY,
                         },
-                        .hover = {
+                        .selected = {
                                 .border = {.thickness = 1},
-                                .color = 0xDDDDDDFF,
+                                .color = gl::Color::LIGHT_BLUE,
                         },
-                }, 3));
+                }), 3);
         radio_button_3->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
                         .color = gl::Color::TRANSPARENT,
@@ -433,6 +432,12 @@ public:
                 .text = {
                         .text = U"Value 3",
                         .font = font,
+                }
+        });
+        label_radio = frame_radio_2->create_widget<gui::Label>(gui::LabelTemplate{
+                .text = {
+                        .text = U"selected: 1",
+                        .font = font
                 }
         });
 
@@ -463,12 +468,12 @@ public:
                         },
                         .border = {.thickness = 1},
                 },
-                .defaultText = {
+                .placeholder_text = {
                         .text = U"input text...",
                         .font = font,
                         .color = gl::Color::GREY,
                 },
-                .inputText = {
+                .input_text = {
                         .text = U"",
                         .font = font,
                 },
@@ -478,21 +483,21 @@ public:
     void on_button_1_click()
     {
         clicks++;
-        label_clicks->setText(U"clicks: " + utils::toUTF32(clicks));
+        label_clicks->set_text(U"clicks: " + utils::toUTF32(clicks));
     }
 
-    void on_button_2_click() const
+    void on_button_2_click(bool state) const
     {
-        if (button_check->state()) {
-            label_check->setText(U"state: on");
+        if (state) {
+            label_check->set_text(U"state: on");
         } else {
-            label_check->setText(U"state: off");
+            label_check->set_text(U"state: off");
         }
     }
 
     void on_radio_click(int value) const
     {
-        label_radio->setText(U"Radio Buttons: selected value: " + utils::toUTF32(value));
+        label_radio->set_text(U"selected: " + utils::toUTF32(value));
     }
 
     void onAnimation1stop() const
@@ -519,7 +524,7 @@ public:
 void displayFPS(GuiTest& gui, double dt)
 {
     double frameRate = 1.0 / dt;
-    gui.fpsCounter->setText(utils::toUTF32((int) frameRate));
+    gui.fpsCounter->set_text(utils::toUTF32((int) frameRate));
 }
 
 int main()
@@ -558,6 +563,8 @@ int main()
             guiTest.master.update(delta_time);
             frame_time -= delta_time;
         }
+
+        guiTest.master.render();
 
         window->swapBuffers();
         window->pollEvents();

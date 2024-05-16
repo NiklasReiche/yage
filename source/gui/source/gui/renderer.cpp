@@ -8,51 +8,51 @@ namespace gui
 	** Basic Gui Renderer
 	*************************************************/
 
-	GuiRenderer::GuiRenderer(const std::shared_ptr<gl::IRenderer> &glRenderer,
-                             const std::shared_ptr<gl::IShaderCreator> &shaderCreator, const gl::IRenderer::Viewport &viewport)
-		: glRenderer(glRenderer)
+	GuiRenderer::GuiRenderer(const std::shared_ptr<gl::IRenderer> &base_renderer,
+                             const std::shared_ptr<gl::IShaderCreator> &shader_creator, const gl::IRenderer::Viewport &viewport)
+		: base_renderer(base_renderer)
 	{
-		glRenderer->setViewport(viewport);
+		base_renderer->setViewport(viewport);
 
-		guiShader = shaderCreator->createShader(shaders::WidgetShader::vert, shaders::WidgetShader::frag);
-		textShader = shaderCreator->createShader(font::shaders::TextShader::vert, font::shaders::TextShader::frag);
+        widget_shader = shader_creator->createShader(shaders::WidgetShader::vert, shaders::WidgetShader::frag);
+        text_shader = shader_creator->createShader(font::shaders::TextShader::vert, font::shaders::TextShader::frag);
 
 		gml::Mat4d projection = gml::matrix::orthographic<float>(0.0, (float)viewport.width, (float)viewport.height, 0.0, 0.1, 100.0);
-		guiShader->setUniform("projection", projection);
-		guiShader->setUniform("texture", 0);
-		textShader->setUniform("projection", projection);
+		widget_shader->setUniform("projection", projection);
+		widget_shader->setUniform("texture", 0);
+		text_shader->setUniform("projection", projection);
 
 		//clearColor = gml::Vec4<float>(1, 1, 1, 1);
 	}
     
     void GuiRenderer::render(RootWidget& root)
     {
-        std::vector<Widget*> widgets;
-        std::vector<font::Text*> texts;
+        std::vector<std::reference_wrapper<Widget>> widgets;
+        std::vector<std::reference_wrapper<font::Text>> texts;
         collect_drawables(widgets, texts, root);
 
-        glRenderer->setClearColor(gl::Color::WHITE);
-        glRenderer->clear();
-        glRenderer->enableBlending();
+        base_renderer->setClearColor(gl::Color::WHITE);
+        base_renderer->clear();
+        base_renderer->enableBlending();
 
-        glRenderer->useShader(*guiShader);
+        base_renderer->useShader(*widget_shader);
         for (auto widget : widgets) {
-            glRenderer->bindTexture(widget->texture_atlas_view().get());
-            glRenderer->draw(widget->drawable());
+            base_renderer->bindTexture(widget.get().texture_atlas_view().get());
+            base_renderer->draw(widget.get().drawable());
         }
 
-        glRenderer->useShader(*textShader);
+        base_renderer->useShader(*text_shader);
         for (auto text : texts) {
-            glRenderer->bindTexture(text->texture(), 0);
-            glRenderer->draw(text->drawable());
+            base_renderer->bindTexture(text.get().texture(), 0);
+            base_renderer->draw(text.get().drawable());
         }
 
-        glRenderer->disableBlending();
+        base_renderer->disableBlending();
     }
 
-    void GuiRenderer::collect_drawables(std::vector<Widget*>& vector_widget,
-                                        std::vector<font::Text*>& vector_text,
-                                        Widget& widget)
+    void GuiRenderer::collect_drawables(std::vector<std::reference_wrapper<Widget>>& vector_widget,
+                                        std::vector<std::reference_wrapper<font::Text>>& vector_text,
+                                        const Widget& widget)
     {
         for (auto& child : widget.children()) {
             if (!child->is_Active()) {
@@ -60,9 +60,9 @@ namespace gui
                 continue;
             }
 
-            vector_widget.push_back(child.get());
+            vector_widget.emplace_back(*child);
             if (child->text() != nullptr) {
-                vector_text.push_back(child->text());
+                vector_text.emplace_back(*child->text());
             }
             collect_drawables(vector_widget, vector_text, *child);
         }

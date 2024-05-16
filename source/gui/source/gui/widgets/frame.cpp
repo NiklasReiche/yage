@@ -2,8 +2,8 @@
 
 namespace gui
 {
-	Frame::Frame(Widget * parent, Master* master, WidgetTemplate frameTemplate)
-		: Widget(parent, master, frameTemplate)
+	Frame::Frame(Widget * parent, Master* master, const WidgetTemplate& widget_template)
+		: Widget(parent, master, widget_template)
 	{
         m_is_interactable = false;
 	}

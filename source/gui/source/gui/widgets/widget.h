@@ -42,7 +42,7 @@ namespace gui
     struct Size
     {
         gml::Vec2f value = gml::Vec2f(0);
-        gml::Vec2 <ValueType> value_type = {ValueType::ABSOLUTE, ValueType::ABSOLUTE};
+        gml::Vec2<ValueType> value_type = {ValueType::ABSOLUTE, ValueType::ABSOLUTE};
     };
 
     enum class AnchorPosition
@@ -69,7 +69,7 @@ namespace gui
         /**
          * Encodes whether the provided offset values are absolute or relative.
          */
-        gml::Vec2 <ValueType> value_type = {ValueType::ABSOLUTE, ValueType::ABSOLUTE};
+        gml::Vec2<ValueType> value_type = {ValueType::ABSOLUTE, ValueType::ABSOLUTE};
 
         bool operator==(const Anchor& rhs) const
         {
@@ -90,7 +90,7 @@ namespace gui
         Anchor anchor{};
         /** preferred size for layouts */
         Size preferred_size{};
-        gml::Vec2 <SizeHint> size_hint = {SizeHint::FIT_CHILDREN, SizeHint::FIT_CHILDREN};
+        gml::Vec2<SizeHint> size_hint = {SizeHint::FIT_CHILDREN, SizeHint::FIT_CHILDREN};
         /** minimal size for layouts */
         Size min_size{}; // TODO: does it make sense for this to be relative?
         /** maximum size for layouts */
@@ -140,6 +140,7 @@ namespace gui
          * @tparam Args Constructor parameter types for the new widget.
          * @param args Constructor arguments for the new widget.
          * @return Observer pointer to the new widget.
+         * TODO: potentially make this virtual so that non-container subclasses can restrict adding children
          */
         template<class Element, typename... Args>
         Element* create_widget(Args... args)
@@ -267,7 +268,8 @@ namespace gui
         [[nodiscard]]
         virtual font::Text* text() const;
 
-        TextureAtlasView texture_atlas_view();
+        [[nodiscard]]
+        TextureAtlasView texture_atlas_view() const;
 
         virtual void on_hover();
 
@@ -314,9 +316,9 @@ namespace gui
         /** absolute size of the widget's interior space - equal to size for borderless widgets */
         gml::Vec2f m_inner_size_abs;
 
-        Widget(Widget* parent, Master* master, const WidgetTemplate& widgetTemplate);
+        Widget(Widget* parent, Master* master, const WidgetTemplate& widget_template);
 
-        TextureAtlasView load_texture(const WidgetTextureTemplate& tTemplate);
+        TextureAtlasView load_texture(const WidgetTextureTemplate& texture_template);
 
         [[nodiscard]]
         float to_absolute_x(float value) const;

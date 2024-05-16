@@ -49,7 +49,7 @@ namespace font
      * Represent geometry for a string of UTF-32 encoded text that can be rendered.
      * The geometry is constructed in 3D model space. Dynamic transformations should be done in the shader.
      */
-     // TODO: Can we do inserting/appending without just destroying and recreating the whole vertex data?
+     // TODO: Can we do inserting/appending without just destroying and recreating the whole vertex data? Maybe allocate GPU memory like a vector
     class Text
     {
     public:
@@ -98,20 +98,23 @@ namespace font
 
         /**
          * Returns the model space offset of the i-th character glyph geometry. Note that this includes any initial
-         * offset of the whole text.
+         * offset of the whole text. If the index is out of bounds, returns the offset where the next character would
+         * appear.
          * @param i Index of the character in the text string
          * @return Model space coordinates of the glyph
          */
         [[nodiscard]]
-        gml::Vec3f offset(unsigned int i);
+        gml::Vec3f offset(std::size_t i);
 
         /**
-         * Returns the model space offset of the i-th character glyph geometry from the start of the text.
+         * Returns the model space offset of the i-th character glyph geometry from the start of the text. The first
+         * character therefore has an offset of zero. If the index is out of bounds, returns the offset where the next
+         * character would appear.
          * @param i Index of the character in the text string
          * @return Model space coordinates of the glyph
          */
         [[nodiscard]]
-        gml::Vec3f relative_offset(unsigned int i);
+        gml::Vec3f relative_offset(std::size_t i);
 
         /**
          * Reconstructs the text geometry at an updated 3D offset.
@@ -171,6 +174,6 @@ namespace font
         std::vector<float> construct_vertex_colors();
 
         [[nodiscard]]
-        gml::Vec3f char_offset(unsigned int i, gml::Vec3f initial);
+        gml::Vec3f char_offset(std::size_t i, gml::Vec3f initial);
     };
 }

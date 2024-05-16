@@ -3,26 +3,22 @@
 
 namespace gui
 {
-    Label::Label(Widget* parent, Master* master, LabelTemplate labelTemplate)
-            : Widget(parent, master, labelTemplate.base), params(labelTemplate), padding(labelTemplate.padding)
+    Label::Label(Widget* parent, Master* master, const LabelTemplate& label_template)
+            : Widget(parent, master, label_template.base), m_label_template(label_template)
     {
-        alignX = labelTemplate.text.alignX;
-        alignY = labelTemplate.text.alignY;
+        m_label_template = label_template;
 
-        if (labelTemplate.text.text.empty()) {
-            labelTemplate.text.text = U" ";
+        if (!label_template.text.text.empty()) {
+            gml::Vec2f textPosition = m_inner_position_abs + label_template.padding;
+            m_text = std::make_unique<font::Text>(master->gl_context().getDrawableCreator(),
+                                                  label_template.text.text, label_template.text.font,
+                                                  font::TextParameters{
+                                                          .color = label_template.text.color,
+                                                          .pt_size = (float) label_template.text.size,
+                                                          .offset = gml::Vec3f(textPosition.x(), textPosition.y(), -1)
+                                                  }
+            );
         }
-        params = labelTemplate;
-
-        gml::Vec2f textPosition = m_inner_position_abs + padding;
-        m_text = std::make_unique<font::Text>(master->gl_context().getDrawableCreator(),
-                                              labelTemplate.text.text, labelTemplate.text.font,
-                                              font::TextParameters{
-                                                      .color = labelTemplate.text.color,
-                                                      .pt_size = (float) labelTemplate.text.size,
-                                                      .offset = gml::Vec3f(textPosition.x(), textPosition.y(), -1)
-                                              }
-        );
 
         // TODO
         if (m_template.geometry.preferred_size.value == gml::Vec2f(0.0f)) {
@@ -34,55 +30,59 @@ namespace gui
     {
         // TODO
         gml::Vec2f size = m_template.geometry.preferred_size.value;
-        if (m_template.geometry.size_hint.x() == SizeHint::FIT_CHILDREN) {
-            size.x() = m_text->dimensions().x() + (float) m_template.border.thickness * 2 + padding.x() * 2;
+        if (m_template.geometry.size_hint.x() == SizeHint::FIT_CHILDREN && m_text != nullptr) {
+            size.x() = m_text->dimensions().x() + (float) m_template.border.thickness * 2 +
+                       m_label_template.padding.x() * 2;
         }
-        if (m_template.geometry.size_hint.y() == SizeHint::FIT_CHILDREN) {
-            size.y() = m_text->max_font_dimensions().y() + (float) m_template.border.thickness * 2 + padding.y() * 2;
+        if (m_template.geometry.size_hint.y() == SizeHint::FIT_CHILDREN && m_text != nullptr) {
+            size.y() = m_text->max_font_dimensions().y() + (float) m_template.border.thickness * 2 +
+                       m_label_template.padding.y() * 2;
         }
 
         return size;
     }
 
-    void Label::setText(TextTemplate textTemplate)
+    void Label::set_text(const TextTemplate& text)
     {
-        if (textTemplate.text.empty()) {
-            textTemplate.text = U" ";
+        m_label_template.text = text;
+
+        if (m_label_template.text.text.empty()) {
+            m_text = nullptr;
+        } else {
+            gml::Vec2f textPosition = m_inner_position_abs + m_label_template.padding;
+            m_text = std::make_unique<font::Text>(m_master->gl_context().getDrawableCreator(),
+                                                  text.text, text.font,
+                                                  font::TextParameters{
+                                                          .color = text.color,
+                                                          .pt_size = (float) text.size,
+                                                          .offset = gml::Vec3f(textPosition.x(), textPosition.y(), -1)
+                                                  }
+            );
         }
-
-        params.text = textTemplate;
-
-        gml::Vec2f textPosition = m_inner_position_abs + padding;
-        m_text = std::make_unique<font::Text>(m_master->gl_context().getDrawableCreator(),
-                                              textTemplate.text, textTemplate.font,
-                                              font::TextParameters{
-                                                      .color = textTemplate.color,
-                                                      .pt_size = (float) textTemplate.size,
-                                                      .offset = gml::Vec3f(textPosition.x(), textPosition.y(), -1)
-                                              }
-        );
 
         m_parent->update_layout();
     }
 
-    void Label::setText(const std::u32string& string)
+    void Label::set_text(const std::u32string& string)
     {
-        params.text.text = string;
-        setText(params.text);
+        m_label_template.text.text = string;
+        set_text(m_label_template.text);
     }
 
 
     void Label::update_geometry()
     {
         Widget::update_geometry();
+        if (m_text == nullptr) {
+            return;
+        }
 
         // TODO: somethings wrong, maybe for negative available size
-        gml::Vec2f availableSize = m_inner_size_abs - padding - m_text->dimensions();
+        gml::Vec2f availableSize = m_inner_size_abs - m_label_template.padding - m_text->dimensions();
         gml::Vec2f textPosition(0.0f);
-
-        switch (alignX) {
+        switch (m_label_template.text.align_x) {
             case TextAlignmentX::LEFT:
-                textPosition.x() = m_inner_position_abs.x() + padding.x();
+                textPosition.x() = m_inner_position_abs.x() + m_label_template.padding.x();
                 break;
             case TextAlignmentX::RIGHT:
                 textPosition.x() = m_inner_position_abs.x() + availableSize.x();
@@ -91,9 +91,9 @@ namespace gui
                 textPosition.x() = m_inner_position_abs.x() + availableSize.x() / 2;
                 break;
         }
-        switch (alignY) {
+        switch (m_label_template.text.align_y) {
             case TextAlignmentY::TOP:
-                textPosition.y() = m_inner_position_abs.y() + padding.y();
+                textPosition.y() = m_inner_position_abs.y() + m_label_template.padding.y();
                 break;
             case TextAlignmentY::BOTTOM:
                 textPosition.y() = m_inner_position_abs.y() + availableSize.y();
@@ -107,5 +107,7 @@ namespace gui
     }
 
     font::Text* Label::text() const
-    { return m_text.get(); }
+    {
+        return m_text.get();
+    }
 }

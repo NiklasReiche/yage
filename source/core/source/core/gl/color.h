@@ -30,6 +30,7 @@ namespace gl
 			MAGENTA = 0xFF00FFFFu,
 			SILVER = 0xC0C0C0FFu,
 			GREY = 0x808080FFu,
+            LIGHT_GREY = 0xD0D0D0FFu,
 			ORANGE = 0xFFA500FFu,
 			BROWN = 0xA52A2AFFu,
 			MAROON = 0x800000FFu,

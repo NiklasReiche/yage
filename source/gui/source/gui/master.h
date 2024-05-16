@@ -14,22 +14,47 @@
 
 namespace gui
 {
+    /**
+     * Provides an interface for the individual components of the gui system.
+     */
     class Master
     {
     public:
         Master(const std::shared_ptr<platform::IWindow>& window, const std::shared_ptr<gl::IContext>& glContext);
 
+        /**
+         * Creates a widget as a child of the UI tree's root.
+         * @tparam Element The widget class to instantiate.
+         * @tparam Args Constructor parameter types for the new widget.
+         * @param args Constructor arguments for the new widget.
+         * @return Observer pointer to the new widget.
+         */
         template<typename Element, typename... Args>
         Element* create_widget(Args... args)
         {
             return m_root.create_widget<Element>(args...);
         }
 
-        void activateAnimation(Animation* animation);
+        /**
+         * Sets an animation as active. The animation will start being updated in the next update pass.
+         */
+        void activate_animation(Animation* animation);
 
-        void deactivateAnimation(Animation* animation);
+        /**
+         * Sets an animation as inactive. The animation will stop being updated in the next update pass.
+         */
+        void deactivate_animation(Animation* animation);
 
+        /**
+         * Performs an update pass for all active animations, using a given time step.
+         * @param dt The delta time value with which to update animations.
+         */
         void update(double dt);
+
+        /**
+         * Performs a rendering pass for the gui elements.
+         */
+        void render();
 
         TextureAtlasStore& texture_atlas_store()
         {

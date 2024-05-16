@@ -208,12 +208,12 @@ namespace font
         return dimensions;
     }
 
-    gml::Vec3f Text::offset(unsigned int i)
+    gml::Vec3f Text::offset(std::size_t i)
     {
         return char_offset(i, m_offset);
     }
 
-    gml::Vec3f Text::relative_offset(unsigned int i)
+    gml::Vec3f Text::relative_offset(std::size_t i)
     {
         return char_offset(i, gml::Vec3f(0));
     }
@@ -257,17 +257,14 @@ namespace font
         m_drawable->setSubData(m_data_offset_coords, vertices);
     }
 
-    gml::Vec3f Text::char_offset(unsigned int i, gml::Vec3f initial)
+    gml::Vec3f Text::char_offset(std::size_t i, gml::Vec3f initial)
     {
-        if (i > m_text.length()) {
-            throw std::invalid_argument("index out of bounds");
-        }
-
         auto& font = m_font_resource.get();
         const auto scale = font.scaling(m_font_size, m_dpi);
 
         gml::Vec3f offset = initial;
-        for (unsigned int j = 0; j < i; ++j) {
+        auto max_char_index = std::min(i, m_text.length());
+        for (std::size_t j = 0; j < max_char_index; ++j) {
             const Character& ch = font.characters.at(m_text[j]); // TODO: handle unknown characters
             offset.x() += ch.glyph.advance * scale.x();
         }

@@ -6,58 +6,59 @@
 
 namespace gui
 {
-	enum class TextAlignmentY
-	{
-		TOP,
-		BOTTOM,
-		CENTER
-	};
+    enum class TextAlignmentY
+    {
+        TOP,
+        BOTTOM,
+        CENTER
+    };
 
-	enum class TextAlignmentX
-	{
-		LEFT, 
-		RIGHT, 
-		CENTER
-	};
+    enum class TextAlignmentX
+    {
+        LEFT,
+        RIGHT,
+        CENTER
+    };
 
-	struct TextTemplate
-	{
-		std::u32string text;
+    struct TextTemplate
+    {
+        std::u32string text;
         res::Resource<font::Font> font; // TODO: provide a default font somewhere
-		int size = 16;
-		gl::Color_t color = gl::Color::BLACK;
-		TextAlignmentX alignX = TextAlignmentX::LEFT;
-		TextAlignmentY alignY = TextAlignmentY::TOP;
-	};
+        int size = 16;
+        gl::Color_t color = gl::Color::BLACK;
+        TextAlignmentX align_x = TextAlignmentX::LEFT;
+        TextAlignmentY align_y = TextAlignmentY::TOP;
+    };
 
-	struct LabelTemplate
-	{
-        WidgetTemplate base {};
-		TextTemplate text;
-		gml::Vec2f padding = gml::Vec2f(4.0f); // TODO: make this part of widget base class
-	};
+    struct LabelTemplate
+    {
+        WidgetTemplate base{};
+        TextTemplate text;
+        gml::Vec2f padding = gml::Vec2f(4.0f); // TODO: make this part of widget base class
+    };
 
-	class Label : public Widget
-	{
-	private:
-        LabelTemplate params;
-		std::unique_ptr<font::Text> m_text;
+    /**
+     * A widget that displays text.
+     */
+    class Label : public Widget
+    {
+    public:
+        Label(Widget* parent, Master* master, const LabelTemplate& label_template);
 
-		gml::Vec2f padding = gml::Vec2f(2.0f);
-		TextAlignmentX alignX = TextAlignmentX::LEFT;
-		TextAlignmentY alignY = TextAlignmentY::TOP;
+        void update_geometry() override;
 
-	public:
-		Label(Widget * parent, Master* master, LabelTemplate labelTemplate);
+        [[nodiscard]]
+        gml::Vec2f preferred_size() const override;
 
-		font::Text* text() const override;
+        [[nodiscard]]
+        font::Text* text() const override;
 
-		void setText(TextTemplate text);
+        void set_text(const TextTemplate& text);
 
-		void setText(const std::u32string &string);
+        void set_text(const std::u32string& string);
 
-		void update_geometry() override;
-
-		gml::Vec2f preferred_size() const override;
-	};
+    private:
+        LabelTemplate m_label_template;
+        std::unique_ptr<font::Text> m_text;
+    };
 }

@@ -8,10 +8,9 @@
 
 namespace gui
 {
-    Widget::Widget(Widget* parent, Master* master, const WidgetTemplate& wTemplate)
-            : m_master(master), m_parent(parent),
-              m_template(wTemplate),
-              m_texture_atlas_view(load_texture(wTemplate.texture))
+    Widget::Widget(Widget* parent, Master* master, const WidgetTemplate& widget_template)
+            : m_master(master), m_parent(parent), m_template(widget_template),
+              m_texture_atlas_view(load_texture(widget_template.texture))
     {
         m_inner_position_abs = m_position_abs + gml::Vec2f(m_template.border.thickness);
         m_inner_size_abs = m_size_abs - gml::Vec2f(m_template.border.thickness * 2.0f);
@@ -19,7 +18,7 @@ namespace gui
         std::vector<unsigned int> indices = construct_indices();
         std::vector<float> vertices = construct_vertices(m_texture_atlas_view);
         m_drawable = master->gl_context().getDrawableCreator()
-                ->createDrawable(vertices, indices, {2, 4, 2}, gl::VertexFormat::BATCHED);
+                           ->createDrawable(vertices, indices, {2, 4, 2}, gl::VertexFormat::BATCHED);
 
         Widget::update_geometry();
     }
@@ -241,11 +240,11 @@ namespace gui
         return vertices;
     }
 
-    TextureAtlasView Widget::load_texture(const WidgetTextureTemplate& tTemplate)
+    TextureAtlasView Widget::load_texture(const WidgetTextureTemplate& texture_template)
     {
-        if (!tTemplate.filename.empty()) {
+        if (!texture_template.filename.empty()) {
             auto reader = m_master->window().getFileReader();
-            auto file = reader->openBinaryFile(tTemplate.filename, platform::IFile::AccessMode::READ);
+            auto file = reader->openBinaryFile(texture_template.filename, platform::IFile::AccessMode::READ);
             img::Image image = img::readFromFile(*file, img::FORCE_CHANNELS::RGBA);
             return m_master->texture_atlas_store().add(image);
         } else {
@@ -273,7 +272,7 @@ namespace gui
 
     void Widget::update_geometry()
     {
-        gml::Vec2f lastPosition = m_position_abs;
+        gml::Vec2f last_position = m_position_abs;
 
         if (m_parent != nullptr) {
             switch (m_template.geometry.anchor.position) {
@@ -312,7 +311,7 @@ namespace gui
             m_inner_position_abs = m_position_abs + gml::Vec2f((float) m_template.border.thickness);
         }
 
-        if (lastPosition != m_position_abs) {
+        if (last_position != m_position_abs) {
             for (auto& child: m_children) {
                 child->update_geometry();
             }
@@ -362,6 +361,7 @@ namespace gui
     {
         m_template = std::move(widget_template);
         update_root_layout();
+        update_geometry();
     }
 
     float Widget::to_absolute_x(float value) const
@@ -374,7 +374,7 @@ namespace gui
         return value * m_parent->m_size_abs.y();
     }
 
-    TextureAtlasView Widget::texture_atlas_view()
+    TextureAtlasView Widget::texture_atlas_view() const
     {
         return m_texture_atlas_view;
     }

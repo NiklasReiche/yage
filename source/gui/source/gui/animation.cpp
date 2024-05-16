@@ -15,14 +15,14 @@ namespace gui
 	void Animation::start()
 	{
 		if (isFinished) {
-			master->activateAnimation(this);
+            master->activate_animation(this);
 			isFinished = false;
 		}
 	}
 	void Animation::stop()
 	{
 		if (!isFinished) {
-			master->deactivateAnimation(this);
+            master->deactivate_animation(this);
 			isFinished = true;
 			reset();
 			if (onAnimationStop) {

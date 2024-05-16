@@ -11,16 +11,28 @@ namespace gui
 {
     class TextureAtlasStore;
 
+    /**
+     * Encodes texture coordinates and a texture target for an atlas within an atlas store.
+     */
     class TextureAtlasView
     {
     public:
-        TextureAtlasView(TextureAtlasStore* m_store, unsigned int m_index, const gml::Vec2f& m_coordinates_start,
-                         const gml::Vec2f& m_coordinates_end);
+        TextureAtlasView(TextureAtlasStore* store, unsigned int index, const gml::Vec2f& coordinates_start,
+                         const gml::Vec2f& coordinates_end);
 
+        /**
+         * @return Texture that this view references.
+         */
         gl::ITexture2D& get();
 
+        /**
+         * @return Texture coordinates of the upper left corner.
+         */
         gml::Vec2f coordinates_start();
 
+        /**
+         * @return Texture coordinates of the bottom right corner.
+         */
         gml::Vec2f coordinates_end();
 
     private:
@@ -33,8 +45,14 @@ namespace gui
     struct TextureAtlas
     {
         std::unique_ptr<gl::ITexture2D> texture;
-        gml::Vec2f cursor;
-        int y_nextOffset = 0;
+        /**
+         * Encodes the position at which the next image should be inserted.
+         */
+        gml::Vec2i cursor;
+        /**
+         * Keeps track of the height of the current line of images in the atlas.
+         */
+        int y_next_offset = 0;
     };
 
     /**
@@ -45,13 +63,6 @@ namespace gui
      */
     class TextureAtlasStore
     {
-    private:
-        std::shared_ptr<platform::IWindow> platform;
-        std::shared_ptr<gl::ITextureCreator> textureCreator;
-
-        std::map<unsigned int, TextureAtlas> textures;
-        const int TEXTURE_SIZE = 2048;
-
     public:
         TextureAtlasStore(const std::shared_ptr<platform::IWindow>& platform,
                           const std::shared_ptr<gl::ITextureCreator>& textureCreator);
@@ -60,8 +71,22 @@ namespace gui
 
         TextureAtlasView add(gl::ITexture2D& image);
 
+        /**
+         * @return A view into a fully transparent texture to use for non-textured elements.
+         */
         TextureAtlasView transparent();
 
+        /**
+         * @return The texture atlas at the given index.
+         */
         gl::ITexture2D& at(unsigned int i);
+
+    private:
+        const int TEXTURE_SIZE = 2048;
+
+        std::shared_ptr<platform::IWindow> platform;
+        std::shared_ptr<gl::ITextureCreator> textureCreator;
+
+        std::map<unsigned int, TextureAtlas> textures;
     };
 }
