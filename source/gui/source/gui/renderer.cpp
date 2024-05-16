@@ -13,10 +13,8 @@ namespace gui
 		: glRenderer(glRenderer)
 	{
 		glRenderer->setViewport(viewport);
-		
-		gui::ShaderTemplate guiShaderTemplate;
 
-		guiShader = shaderCreator->createShader(guiShaderTemplate.guiShader_vert, guiShaderTemplate.guiShader_frag);
+		guiShader = shaderCreator->createShader(shaders::WidgetShader::vert, shaders::WidgetShader::frag);
 		textShader = shaderCreator->createShader(font::shaders::TextShader::vert, font::shaders::TextShader::frag);
 
 		gml::Mat4d projection = gml::matrix::orthographic<float>(0.0, (float)viewport.width, (float)viewport.height, 0.0, 0.1, 100.0);

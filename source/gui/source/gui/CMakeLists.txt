@@ -1,9 +1,10 @@
 # TODO: find a way to do this at build time
-#set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/textShader.vert)
-#file(READ shaders/textShader.vert TEXT_VERT)
-#set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/textShader.frag)
-#file(READ shaders/textShader.frag TEXT_FRAG)
-#configure_file(shaders.in.cpp shaders.cpp @ONLY)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/widgetShader.vert)
+file(READ shaders/widgetShader.vert WIDGET_VERT)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/widgetShader.frag)
+file(READ shaders/widgetShader.frag WIDGET_FRAG)
+configure_file(shaders.in.cpp shaders.cpp @ONLY)
+configure_file(shaders.h shaders.h) #also copy the header to resolve relative include in cpp file
 
 target_sources(yage_gui
         PRIVATE
@@ -32,9 +33,11 @@ target_sources(yage_gui
         master.cpp
         renderer.h
         renderer.cpp
-        shaders.h
         texturemanager.h
         texturemanager.cpp
+
+        shaders.h
+        ${CMAKE_CURRENT_BINARY_DIR}/shaders.cpp
 
         gui.h
 )

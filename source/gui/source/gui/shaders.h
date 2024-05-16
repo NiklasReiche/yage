@@ -2,15 +2,11 @@
 
 #include <string>
 
-namespace gui
+namespace gui::shaders
 {
-	struct ShaderTemplate 
+	struct WidgetShader
 	{
-		const std::string guiShader_vert =
-#include "shaders/guiShader_GL3.vert"
-			;
-		const std::string guiShader_frag =
-#include "shaders/guiShader_GL3.frag"
-			;
+		static const std::string vert;
+        static const std::string frag;
 	};
 }

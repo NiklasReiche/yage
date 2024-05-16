@@ -1,5 +1,3 @@
-R"(
-
 #version 330 core
 
 in vec4 Color;
@@ -13,5 +11,3 @@ void main(){
 	vec4 texColor = texture2D(texture, TexCoords);
 	color = mix(texColor, Color, Color.a);
 }
-
-)"
