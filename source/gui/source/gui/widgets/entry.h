@@ -5,9 +5,8 @@
 #include <memory>
 #include <functional>
 
-#include "../core.h"
 #include "../inputmanager.h"
-#include "../widget.h"
+#include "widget.h"
 #include "label.h"
 
 namespace gui

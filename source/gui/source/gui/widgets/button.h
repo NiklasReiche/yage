@@ -6,8 +6,7 @@
 #include <memory>
 #include <functional>
 
-#include "../core.h"
-#include "../widget.h"
+#include "widget.h"
 #include "label.h"
 #include "frame.h"
 #include "HListBox.h"

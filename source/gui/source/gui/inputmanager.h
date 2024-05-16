@@ -1,7 +1,8 @@
 #pragma once
 
 #include <core/input/InputListener.h>
-#include "widget.h"
+
+#include "widgets/widget.h"
 
 namespace gui
 {

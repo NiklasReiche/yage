@@ -5,12 +5,11 @@
 
 #include <core/platform/Window.h>
 
-#include "core.h"
 #include "renderer.h"
 #include "inputmanager.h"
 #include "texturemanager.h"
-#include "widget.h"
-#include "root.h"
+#include "widgets/widget.h"
+#include "widgets/root.h"
 #include "animation.h"
 
 namespace gui

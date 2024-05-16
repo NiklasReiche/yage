@@ -1,10 +1,11 @@
 #pragma once
 
 #include <vector>
-#include "core.h"
-#include "font/shaders.h"
-#include "image/image.h"
-#include "root.h"
+
+#include <font/shaders.h>
+#include <image/image.h>
+
+#include "widgets/root.h"
 
 namespace gui
 {

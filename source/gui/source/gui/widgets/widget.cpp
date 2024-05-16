@@ -1,6 +1,7 @@
 #include "widget.h"
-#include "master.h"
-#include "image/enum.h"
+#include "../master.h"
+
+#include <image/enum.h>
 #include <image/img.h>
 
 #include <utility>

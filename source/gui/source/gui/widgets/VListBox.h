@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gui/widget.h"
+#include "widget.h"
 
 namespace gui
 {

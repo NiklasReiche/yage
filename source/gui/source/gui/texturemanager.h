@@ -2,9 +2,10 @@
 
 #include <map>
 #include <vector>
-#include "core.h"
-#include "gml/gml.h"
-#include "image/image.h"
+
+#include <core/platform/Window.h>
+#include <gml/gml.h>
+#include <image/image.h>
 
 namespace gui
 {

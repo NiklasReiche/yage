@@ -1,5 +1,5 @@
 #include "animation.h"
-#include "widget.h"
+#include "widgets/widget.h"
 #include "master.h"
 
 namespace gui

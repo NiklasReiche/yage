@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "core.h"
+#include <gml/vector.h>
 #include <gml/interpolation.h>
 
 namespace gui

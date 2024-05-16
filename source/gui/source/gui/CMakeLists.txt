@@ -7,6 +7,10 @@
 
 target_sources(yage_gui
         PRIVATE
+        widgets/widget.h
+        widgets/widget.cpp
+        widgets/root.h
+        widgets/root.cpp
         widgets/button.h
         widgets/button.cpp
         widgets/entry.h
@@ -19,22 +23,18 @@ target_sources(yage_gui
         widgets/VListBox.cpp
         widgets/HListBox.h
         widgets/HListBox.cpp
+
         animation.h
         animation.cpp
-        core.h
-        gui.h
         inputmanager.h
         inputmanager.cpp
         master.h
         master.cpp
         renderer.h
         renderer.cpp
-        root.h
-        root.cpp
         shaders.h
         texturemanager.h
         texturemanager.cpp
-        widget.h
-        widget.cpp
-        widgettemplate.h
+
+        gui.h
 )
