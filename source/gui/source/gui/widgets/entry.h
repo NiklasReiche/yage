@@ -28,7 +28,6 @@ namespace gui
 	struct TextEntryTemplate
 	{
         WidgetTemplate base;
-        gml::Vec2f padding = gml::Vec2f(2.0f);
 		TextTemplate placeholder_text;
 		TextTemplate input_text;
 		gl::Color_t cursor_color = gl::Color::BLACK;

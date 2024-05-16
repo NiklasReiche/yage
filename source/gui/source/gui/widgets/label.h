@@ -34,7 +34,6 @@ namespace gui
     {
         WidgetTemplate base{};
         TextTemplate text;
-        gml::Vec2f padding = gml::Vec2f(4.0f); // TODO: make this part of widget base class
     };
 
     /**

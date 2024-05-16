@@ -13,7 +13,9 @@ namespace gui
               m_texture_atlas_view(load_texture(widget_template.texture))
     {
         m_inner_position_abs = m_position_abs + gml::Vec2f(m_template.border.thickness);
-        m_inner_size_abs = m_size_abs - gml::Vec2f(m_template.border.thickness * 2.0f);
+        m_inner_size_abs = m_size_abs - gml::Vec2f(m_template.border.thickness * 2.0f) -
+                           gml::Vec2f(m_template.padding(0), m_template.padding(1)) -
+                           gml::Vec2f(m_template.padding(2), m_template.padding(3));
 
         std::vector<unsigned int> indices = construct_indices();
         std::vector<float> vertices = construct_vertices(m_texture_atlas_view);
@@ -289,7 +291,7 @@ namespace gui
 
                 case AnchorPosition::TOP_RIGHT:
                     m_position_abs.x() =
-                            (m_parent->m_inner_position_abs.x() + m_parent->m_inner_position_abs.x()) -
+                            m_parent->m_inner_position_abs.x() + m_parent->m_inner_position_abs.x() -
                             (m_offset_abs.x() + m_size_abs.x());
                     m_position_abs.y() = m_parent->m_inner_position_abs.y() + m_offset_abs.y();
                     break;
@@ -308,7 +310,8 @@ namespace gui
                     break;
             }
 
-            m_inner_position_abs = m_position_abs + gml::Vec2f((float) m_template.border.thickness);
+            m_inner_position_abs = m_position_abs + gml::Vec2f((float) m_template.border.thickness) +
+                                   gml::Vec2f(m_template.padding(0), m_template.padding(1));
         }
 
         if (last_position != m_position_abs) {
@@ -324,7 +327,9 @@ namespace gui
     {
         if (m_size_abs != size) {
             m_size_abs = size;
-            m_inner_size_abs = size - gml::Vec2f(m_template.border.thickness * 2.0f);
+            m_inner_size_abs = size - gml::Vec2f(m_template.border.thickness * 2.0f) -
+                               gml::Vec2f(m_template.padding(0), m_template.padding(1)) -
+                               gml::Vec2f(m_template.padding(2), m_template.padding(3));
             update_geometry();
         }
     }
@@ -424,7 +429,9 @@ namespace gui
         }
 
         // TODO: should this incorporate shadow?
-        return size + gml::Vec2f(2 * m_template.border.thickness);
+        return size + gml::Vec2f(2 * m_template.border.thickness) +
+               gml::Vec2f(m_template.padding(0), m_template.padding(1)) +
+               gml::Vec2f(m_template.padding(2), m_template.padding(3));
     }
 
     gml::Vec2f Widget::min_size() const

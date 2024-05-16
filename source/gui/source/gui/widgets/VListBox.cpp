@@ -8,14 +8,16 @@ namespace gui
         float totalShrinkingSize = 0.0f;
         int nExpanding = 0;
 
-        for (auto& child : m_children) {
+        for (auto& child: m_children) {
             remaining_size.y() -= child->preferred_size().y();
 
-            if (child->size_hint().y() == SizeHint::SHRINKING || child->size_hint().y() == SizeHint::EXPANDING_SHRINKING) {
+            if (child->size_hint().y() == SizeHint::SHRINKING ||
+                child->size_hint().y() == SizeHint::EXPANDING_SHRINKING) {
                 totalShrinkingSize += child->preferred_size().y() - child->min_size().y();
             }
 
-            if (child->size_hint().y() == SizeHint::EXPANDING || child->size_hint().y() == SizeHint::EXPANDING_SHRINKING) {
+            if (child->size_hint().y() == SizeHint::EXPANDING ||
+                child->size_hint().y() == SizeHint::EXPANDING_SHRINKING) {
                 ++nExpanding;
             }
         }
@@ -80,14 +82,17 @@ namespace gui
 
     gml::Vec2f VListBox::preferred_size() const
     {
-        return gml::Vec2f(calc_pref_size_x(), calc_pref_size_y()) + gml::Vec2f(m_template.border.thickness * 2);
+        return gml::Vec2f(calc_pref_size_x(), calc_pref_size_y()) +
+               gml::Vec2f(m_template.border.thickness * 2) +
+               gml::Vec2f(m_template.padding(0), m_template.padding(1)) +
+               gml::Vec2f(m_template.padding(2), m_template.padding(3));
     }
 
     float VListBox::calc_pref_size_x() const
     {
         float preferred_size = 0.0f;
 
-        for (auto& child : m_children) {
+        for (auto& child: m_children) {
             switch (child->size_hint().x()) {
                 case SizeHint::FIXED:
                 case SizeHint::EXPANDING:
@@ -127,5 +132,6 @@ namespace gui
 
     VListBox::VListBox(Widget* parent, Master* master, const WidgetTemplate& widget_template) : Widget(parent, master,
                                                                                                        widget_template)
-    {}
+    {
+    }
 }

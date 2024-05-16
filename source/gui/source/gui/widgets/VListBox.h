@@ -8,6 +8,7 @@ namespace gui
      * Container widget that stacks its children vertically. Ignores anchors and offsets on children, but respects
      * sizing constraints.
      * TODO: merge with HListBox
+     * TODO: add spacing option
      */
     class VListBox : public Widget
     {

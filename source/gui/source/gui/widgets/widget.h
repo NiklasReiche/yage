@@ -122,6 +122,8 @@ namespace gui
         WidgetShadowTemplate shadow{};
         unsigned int color = gl::Color::TRANSPARENT;
         WidgetTextureTemplate texture{};
+        gml::Vec4f padding = gml::Vec4f(0);
+        //TODO: margin
     };
 
     class Master;

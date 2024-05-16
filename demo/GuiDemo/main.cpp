@@ -64,7 +64,8 @@ public:
                 .border = {.thickness = 1},
         });
         v_list_1->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {.color = gl::Color::LIGHT_BLUE},
+                .base = {.color = gl::Color::LIGHT_BLUE,
+                        .padding = {5, 5, 5, 5}},
                 .text = {
                         .text = U"Widget design options",
                         .font = font,
@@ -76,8 +77,10 @@ public:
                 .geometry = {
                         .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
+                .padding = {5, 5, 5, 5},
         });
         designFrame->create_widget<gui::Label>(gui::LabelTemplate{
+                .base = {.padding = {2, 2, 2, 2}},
                 .text = {
                         .text = U"flat",
                         .font = font,
@@ -85,7 +88,8 @@ public:
         });
         designFrame->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
-                        .border = {.thickness = 1}
+                        .border = {.thickness = 1},
+                        .padding = {2, 2, 2, 2}
                 },
                 .text = {
                         .text = U"border",
@@ -96,6 +100,7 @@ public:
                 .base = {
                         .shadow = {.offset = 3.0f, .hardness = 0.4f},
                         .color = gl::Color::WHITE,
+                        .padding = {2, 2, 2, 2}
                 },
                 .text = {
                         .text = U"shadow",
@@ -119,7 +124,7 @@ public:
                 .border = {.thickness = 1},
         });
         v_list_2->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {.color = gl::Color::LIGHT_BLUE},
+                .base = {.color = gl::Color::LIGHT_BLUE, .padding = {2, 2, 2, 2}},
                 .text = {
                         .text = U"Widget layout options",
                         .font = font,
@@ -127,6 +132,7 @@ public:
                 },
         });
         v_list_2->create_widget<gui::Label>(gui::LabelTemplate{
+                .base = {.padding = {2, 2, 2, 2}},
                 .text = {
                         .text = U"Vertical list:",
                         .font = font,
@@ -138,7 +144,8 @@ public:
         });
         auto element_template = gui::LabelTemplate{
                 .base = {
-                        .border = {.thickness = 1}
+                        .border = {.thickness = 1},
+                        .padding = {2, 2, 2, 2}
                 },
                 .text = {
                         .text = U"element",
@@ -150,6 +157,7 @@ public:
         vListFrame->create_widget<gui::Label>(element_template);
 
         v_list_2->create_widget<gui::Label>(gui::LabelTemplate{
+                .base = {.padding = {2, 2, 2, 2}},
                 .text = {
                         .text = U"Horizontal list:",
                         .font = font,
@@ -166,13 +174,14 @@ public:
         hListFrame->create_widget<gui::Label>(element_template);
 
         v_list_2->create_widget<gui::Label>(gui::LabelTemplate{
+                .base = {.padding = {2, 2, 2, 2}},
                 .text = {
                         .text = U"Grid:",
                         .font = font
                 }
         });
         v_list_2->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {.border = {.thickness = 1}},
+                .base = {.border = {.thickness = 1}, .padding = {2, 2, 2, 2}},
                 .text = {
                         .text = U"TODO",
                         .font = font
@@ -210,6 +219,7 @@ public:
                                 .color = gl::Color::BROWN,
                         },
                         .color = gl::Color::LIGHT_BLUE,
+                        .padding = {2, 2, 2, 2},
                 },
                 .text = {
                         .text = U"nested",
@@ -223,6 +233,7 @@ public:
                                 .color = gl::Color::GREEN,
                         },
                         .color = gl::Color::ORANGE,
+                        .padding = {2, 2, 2, 2},
                 },
                 .text = {
                         .text = U"animations",
@@ -266,7 +277,7 @@ public:
                 .border = {.thickness = 1},
         });
         frame_4->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {.color = gl::Color::LIGHT_BLUE},
+                .base = {.color = gl::Color::LIGHT_BLUE, .padding = {2, 2, 2, 2}},
                 .text = {
                         .text = U"Buttons:",
                         .font = font,
@@ -286,6 +297,7 @@ public:
                 },
         });
         frame_clicks->create_widget<gui::Label>(gui::LabelTemplate{
+                .base = {.padding = {2, 2, 2, 2}},
                 .text = {
                         .text = U"Push button: ",
                         .font = font
@@ -307,6 +319,7 @@ public:
                 .command = [this] { on_button_1_click(); },
         });
         label_clicks = button_clicks->create_widget<gui::Label>(gui::LabelTemplate{
+                .base = {.padding = {2, 2, 2, 2}},
                 .text = {
                         .text = U"clicks: 0",
                         .font = font,
@@ -321,6 +334,7 @@ public:
                 .color = gl::Color::TRANSPARENT
         });
         frame_check->create_widget<gui::Label>(gui::LabelTemplate{
+                .base = {.padding = {2, 2, 2, 2}},
                 .text = {
                         .text = U"Check button: ",
                         .font = font
@@ -340,6 +354,7 @@ public:
         label_check = button_check->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
                         .color = gl::Color::TRANSPARENT,
+                        .padding = {2, 2, 2, 2},
                 },
                 .text = {
                         .text = U"state: off",
@@ -354,6 +369,9 @@ public:
                 .color = gl::Color::TRANSPARENT
         });
         frame_radio->create_widget<gui::Label>(gui::LabelTemplate{
+                .base = {
+                        .padding = {2, 2, 2, 2},
+                },
                 .text = {
                         .text = U"Radio Buttons:",
                         .font = font
@@ -388,6 +406,7 @@ public:
         radio_button_1->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
                         .color = gl::Color::TRANSPARENT,
+                        .padding = {2, 2, 2, 2},
                 },
                 .text = {
                         .text = U"Value 1",
@@ -408,6 +427,7 @@ public:
         radio_button_2->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
                         .color = gl::Color::TRANSPARENT,
+                        .padding = {2, 2, 2, 2},
                 },
                 .text = {
                         .text = U"Value 2",
@@ -428,6 +448,7 @@ public:
         radio_button_3->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
                         .color = gl::Color::TRANSPARENT,
+                        .padding = {2, 2, 2, 2},
                 },
                 .text = {
                         .text = U"Value 3",
@@ -435,6 +456,9 @@ public:
                 }
         });
         label_radio = frame_radio_2->create_widget<gui::Label>(gui::LabelTemplate{
+                .base = {
+                        .padding = {2, 2, 2, 2},
+                },
                 .text = {
                         .text = U"selected: 1",
                         .font = font
@@ -454,6 +478,7 @@ public:
         entryFrame->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
                         .color = gl::Color::LIGHT_BLUE,
+                        .padding = {2, 2, 2, 2},
                 },
                 .text = {
                         .text = U"Text input",
@@ -467,6 +492,7 @@ public:
                                 .size_hint = {gui::SizeHint::FIXED, gui::SizeHint::FIXED},
                         },
                         .border = {.thickness = 1},
+                        .padding = {2, 2, 2, 2},
                 },
                 .placeholder_text = {
                         .text = U"input text...",
@@ -554,7 +580,7 @@ int main()
         timer += frame_time;
 
         if (timer > 1) {
-            displayFPS(guiTest, 0.1);
+            displayFPS(guiTest, frame_time);
             timer = 0.0;
         }
 

@@ -40,20 +40,21 @@ namespace gui
         m_is_interactable = true;
         m_keep_focus = true;
 
-        LabelTemplate labelTemplate{
+        label = create_widget<Label>(LabelTemplate{
+                .base  {
+                        .padding = gml::Vec4f(0.0f),
+                },
                 .text = entry_template.placeholder_text
-        };
-        labelTemplate.padding = gml::Vec2f(0.0f);
-        label = create_widget<Label>(labelTemplate);
+        });
 
-        WidgetTemplate cursorTemplate;
-        //cursorTemplate.geometry.anchor.offset = gml::Vec2f(padding.x(), padding.y());
-        cursorTemplate.geometry.preferred_size.value = gml::Vec2f(CURSOR_WIDTH,
-                                                                  label->preferred_size().y() -
-                                                                  m_entry_template.padding.y() * 2);
-        cursorTemplate.color = m_entry_template.cursor_color;
-
-        cursor = create_widget<TextCursor>(cursorTemplate);
+        cursor = create_widget<TextCursor>(WidgetTemplate{
+                .geometry = {
+                        .preferred_size = {
+                                .value = gml::Vec2f(CURSOR_WIDTH, label->preferred_size().y())
+                        },
+                },
+                .color = m_entry_template.cursor_color,
+        });
         cursor_animation = cursor->create_animation<CursorAnimation>(0.5);
         cursor->hide();
 

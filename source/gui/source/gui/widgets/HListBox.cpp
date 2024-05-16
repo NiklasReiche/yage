@@ -8,17 +8,19 @@ namespace gui
         float potentialShrinkSize = 0.0f;
         int nExpanding = 0;
 
-        for (auto& child : m_children) {
+        for (auto& child: m_children) {
             // try to fit children with preferred size
             remaining_size -= child->preferred_size().x();
 
             // count how much we can potentially shrink
-            if (child->size_hint().x() == SizeHint::SHRINKING || child->size_hint().x() == SizeHint::EXPANDING_SHRINKING) {
+            if (child->size_hint().x() == SizeHint::SHRINKING ||
+                child->size_hint().x() == SizeHint::EXPANDING_SHRINKING) {
                 potentialShrinkSize += child->preferred_size().x() - child->min_size().x();
             }
 
             // track how many children want to expand
-            if (child->size_hint().x() == SizeHint::EXPANDING || child->size_hint().x() == SizeHint::EXPANDING_SHRINKING) {
+            if (child->size_hint().x() == SizeHint::EXPANDING ||
+                child->size_hint().x() == SizeHint::EXPANDING_SHRINKING) {
                 ++nExpanding;
             }
         }
@@ -84,7 +86,10 @@ namespace gui
 
     gml::Vec2f HListBox::preferred_size() const
     {
-        return gml::Vec2f(calc_pref_size_x(), calc_pref_size_y()) + gml::Vec2f(m_template.border.thickness * 2);
+        return gml::Vec2f(calc_pref_size_x(), calc_pref_size_y()) +
+               gml::Vec2f(m_template.border.thickness * 2) +
+               gml::Vec2f(m_template.padding(0), m_template.padding(1)) +
+               gml::Vec2f(m_template.padding(2), m_template.padding(3));
     }
 
     float HListBox::calc_pref_size_x() const
@@ -131,5 +136,6 @@ namespace gui
 
     HListBox::HListBox(Widget* parent, Master* master, const WidgetTemplate& widget_template) : Widget(parent, master,
                                                                                                        widget_template)
-    {}
+    {
+    }
 }

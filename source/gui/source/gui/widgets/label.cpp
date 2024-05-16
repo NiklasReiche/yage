@@ -9,7 +9,7 @@ namespace gui
         m_label_template = label_template;
 
         if (!label_template.text.text.empty()) {
-            gml::Vec2f textPosition = m_inner_position_abs + label_template.padding;
+            gml::Vec2f textPosition = m_inner_position_abs;
             m_text = std::make_unique<font::Text>(master->gl_context().getDrawableCreator(),
                                                   label_template.text.text, label_template.text.font,
                                                   font::TextParameters{
@@ -28,18 +28,18 @@ namespace gui
 
     gml::Vec2f Label::preferred_size() const
     {
-        // TODO
+        // TODO: merge with base class implementation and add only new stuff here
         gml::Vec2f size = m_template.geometry.preferred_size.value;
         if (m_template.geometry.size_hint.x() == SizeHint::FIT_CHILDREN && m_text != nullptr) {
-            size.x() = m_text->dimensions().x() + (float) m_template.border.thickness * 2 +
-                       m_label_template.padding.x() * 2;
+            size.x() = m_text->dimensions().x();
         }
         if (m_template.geometry.size_hint.y() == SizeHint::FIT_CHILDREN && m_text != nullptr) {
-            size.y() = m_text->max_font_dimensions().y() + (float) m_template.border.thickness * 2 +
-                       m_label_template.padding.y() * 2;
+            size.y() = m_text->max_font_dimensions().y();
         }
 
-        return size;
+        return size + gml::Vec2f(m_template.border.thickness * 2) +
+                      gml::Vec2f(m_template.padding(0), m_template.padding(1)) +
+                      gml::Vec2f(m_template.padding(2), m_template.padding(3));
     }
 
     void Label::set_text(const TextTemplate& text)
@@ -49,7 +49,7 @@ namespace gui
         if (m_label_template.text.text.empty()) {
             m_text = nullptr;
         } else {
-            gml::Vec2f textPosition = m_inner_position_abs + m_label_template.padding;
+            gml::Vec2f textPosition = m_inner_position_abs;
             m_text = std::make_unique<font::Text>(m_master->gl_context().getDrawableCreator(),
                                                   text.text, text.font,
                                                   font::TextParameters{
@@ -78,11 +78,11 @@ namespace gui
         }
 
         // TODO: somethings wrong, maybe for negative available size
-        gml::Vec2f availableSize = m_inner_size_abs - m_label_template.padding - m_text->dimensions();
+        gml::Vec2f availableSize = m_inner_size_abs - m_text->dimensions();
         gml::Vec2f textPosition(0.0f);
         switch (m_label_template.text.align_x) {
             case TextAlignmentX::LEFT:
-                textPosition.x() = m_inner_position_abs.x() + m_label_template.padding.x();
+                textPosition.x() = m_inner_position_abs.x();
                 break;
             case TextAlignmentX::RIGHT:
                 textPosition.x() = m_inner_position_abs.x() + availableSize.x();
@@ -93,7 +93,7 @@ namespace gui
         }
         switch (m_label_template.text.align_y) {
             case TextAlignmentY::TOP:
-                textPosition.y() = m_inner_position_abs.y() + m_label_template.padding.y();
+                textPosition.y() = m_inner_position_abs.y();
                 break;
             case TextAlignmentY::BOTTOM:
                 textPosition.y() = m_inner_position_abs.y() + availableSize.y();
