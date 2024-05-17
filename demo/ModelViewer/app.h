@@ -10,6 +10,7 @@
 #include <gl3d/sceneRenderer.h>
 #include <gl3d/resources/obj.h>
 #include <gl3d/resources/gltf.h>
+#include <gl3d/shaders.h>
 
 #include "MovementListener.h"
 #include "ProjectionView.h"
@@ -49,13 +50,8 @@ public:
 			openTextFile("assets/shaders/pointShader.geom", platform::IFile::AccessMode::READ)->readAll();
 		csShader = glContext->getShaderCreator()->createShader(csVertexShader, csFragmentShader, csGeometryShader);
 
-		std::string pbrVertexShader =
-#include "gl3d/shaders/pbrShader.vert"
-	;
-		std::string pbrFragmentShader =
-#include "gl3d/shaders/pbrShader.frag"
-	;
-		pbrShader = glContext->getShaderCreator()->createShader(pbrVertexShader, pbrFragmentShader);
+		pbrShader = glContext->getShaderCreator()->createShader(gl3d::shaders::PbrShader::vert,
+                                                                gl3d::shaders::PbrShader::frag);
 
 		auto ubo = glContext->getShaderCreator()->createUniformBlock("ProjectionView");
 		pbrShader->linkUniformBlock(*ubo);
@@ -92,6 +88,8 @@ public:
 		                                                             std::vector<unsigned int>{ },
 		                                                             {  },
 		                                                             gl::VertexFormat::INTERLEAVED);
+
+        baseRenderer->setClearColor(gl::Color::WHITE);
 
 		while (!window->shouldDestroy()) {
 			baseRenderer->clear();
@@ -142,7 +140,7 @@ private:
 	std::shared_ptr<gl3d::SceneObject> loadModel(const std::string& filename)
 	{
 		auto tuple = gl3d::resources::readGltf(platform::desktop::FileReader(),
-		                                       filename, *glContext->getDrawableCreator());
+		                                       filename, *glContext->getDrawableCreator(), *glContext->getTextureCreator());
 		auto mesh = std::make_shared<gl3d::Mesh>(std::move(std::get<0>(tuple)));
 		auto material = std::make_shared<gl3d::Material>(std::get<1>(tuple));
 		material->setShader(pbrShader);

@@ -10,7 +10,7 @@ namespace gl3d::resources
 {
 	std::tuple<std::unique_ptr<gl::IDrawable>, gl3d::Material> readGltf(
 		const platform::IFileReader& fileReader, const std::string& filename,
-		gl::IDrawableCreator& drawableCreator);
+		gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator);
 
 #if 0
 	template<typename T>

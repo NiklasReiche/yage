@@ -23,7 +23,7 @@ namespace opengl
 
 	private:
 		std::unique_ptr<VertexArray> vertexArray;
-		GLint nVertices = 0;
+		GLint nIndices = 0;
 		GLenum indicesDataType = GL_UNSIGNED_INT;
 
 		Drawable(Drawable&& other) noexcept;

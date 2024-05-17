@@ -63,6 +63,10 @@ namespace gl3d
 			//}
 
 			drawable.material->updateShader();
+            int i = 0;
+            for (auto texture : drawable.material->textures()){
+                this->renderer->bindTexture(texture, i++);
+            }
 			this->renderer->draw(*(drawable.mesh->drawable));
 		}
 	}

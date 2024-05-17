@@ -22,7 +22,7 @@ namespace opengl
 			const std::span<const unsigned char>& vertices,
 			const std::span<const unsigned char>& indices,
 			const std::vector<unsigned int>& vertexLayout,
-			unsigned int nVertices,
+			unsigned int nIndices,
 			gl::VertexFormat format = gl::VertexFormat::INTERLEAVED) override;
 
 		std::unique_ptr<gl::ElementBuffer> createElementBuffer(const std::span<const unsigned int>& indices) override;
@@ -37,7 +37,7 @@ namespace opengl
 			const std::shared_ptr<gl::VertexBuffer>& vertexBuffer,
 			const std::shared_ptr<gl::ElementBuffer>& elementBuffer,
 			const std::vector<unsigned int>& vertexLayout,
-            unsigned int nVertices,
+            unsigned int nIndices,
 			gl::VertexFormat format) override;
 
 	private:

@@ -158,16 +158,16 @@ namespace opengl
 
 	void Context::bindTexture(const GLenum target, const GLuint texture, const int unit)
 	{
-		if (glState.activeTextureUnit != unit) {
-			glActiveTexture(GL_TEXTURE0 + unit);
-			glState.activeTextureUnit = unit;
-		}
-
 		auto textures = glState.textures[unit];
 
 		const auto it = textures.find(target);
 		if (it != textures.end() && it->second == texture)
 			return;
+
+        if (glState.activeTextureUnit != unit) {
+            glActiveTexture(GL_TEXTURE0 + unit);
+            glState.activeTextureUnit = unit;
+        }
 
 		glBindTexture(target, texture);
 		glState.textures[unit][target] = texture;

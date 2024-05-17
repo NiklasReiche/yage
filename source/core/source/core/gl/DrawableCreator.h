@@ -46,7 +46,7 @@ namespace gl
          * @param vertices
          * @param indices
          * @param vertexLayout
-         * @param nVertices
+         * @param nIndices
          * @param format
          * @return
          */
@@ -55,7 +55,7 @@ namespace gl
 			const std::span<const unsigned char>& vertices,
 			const std::span<const unsigned char>& indices,
 			const std::vector<unsigned int>& vertexLayout,
-			unsigned int nVertices,
+			unsigned int nIndices,
 			VertexFormat format) = 0;
 
 		[[nodiscard]]

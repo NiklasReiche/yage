@@ -70,9 +70,12 @@ namespace gl3d
 		[[nodiscard]]
 		std::shared_ptr<gl::IShader> getShader() const;
 
+        [[nodiscard]]
+        std::vector<std::reference_wrapper<gl::ITexture2D>> textures() const;
+
 	private:
 		std::shared_ptr<gl::IShader> shader;
-		std::map<std::string, std::shared_ptr<gl::ITexture2D>> textures;
+		std::map<std::string, std::shared_ptr<gl::ITexture2D>> m_textures;
 		std::map<std::string, gml::Vec3f> vec3Values;
 		std::map<std::string, float> fValues;
 		std::map<std::string, int> iValues;

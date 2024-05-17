@@ -126,11 +126,11 @@ namespace opengl
 		auto& ptr = static_cast<const Drawable&>(drawable);
 		lockContextPtr()->bindVertexArray(ptr.vertexArray->vao);
 		// TODO
-		if (ptr.nVertices == 0) {
+		if (ptr.nIndices == 0) {
 			glDrawArrays(GL_POINTS, 0, 1);
 		} else {
 			glDrawElements(static_cast<GLenum>(ptr.vertexArray->primitive),
-			               ptr.nVertices,
+			               ptr.nIndices,
 			               ptr.indicesDataType,
 			               nullptr);
 		}

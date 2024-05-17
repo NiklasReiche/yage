@@ -19,7 +19,7 @@ namespace opengl
 		auto drawable = std::make_unique<Drawable>();
 
         const unsigned int vertexSize = std::accumulate(vertexLayout.begin(), vertexLayout.end(), 0u);
-        drawable->nVertices = vertexSize == 0 ? 0 : indices.size();
+        drawable->nIndices = vertexSize == 0 ? 0 : indices.size();
         const auto nVerticesData = vertexSize == 0 ? 0 : vertices.size() / vertexSize;
 
 		const std::shared_ptr<gl::VertexBuffer> vertexBuffer = createVertexBuffer(vertices);
@@ -34,7 +34,7 @@ namespace opengl
 		const std::span<const unsigned char>& vertices,
 		const std::span<const unsigned char>& indices,
 		const std::vector<unsigned int>& vertexLayout,
-		unsigned int nVertices,
+		unsigned int nIndices,
 		gl::VertexFormat format)
 	{
 		auto context = lockContextPtr();
@@ -42,10 +42,14 @@ namespace opengl
 
 		const std::shared_ptr<gl::VertexBuffer> vertexBuffer = createVertexBuffer(vertices);
 		const std::shared_ptr<gl::ElementBuffer> elementBuffer = createElementBuffer(indices);
+
+        const unsigned int vertexBytes = std::accumulate(vertexLayout.begin(), vertexLayout.end(), 0u);
+        const int nVertices = vertices.size() / vertexBytes;
+
 		drawable->vertexArray = createVertexArrayInternal(vertexBuffer, elementBuffer, vertexLayout, nVertices, format);
 
-		drawable->nVertices = nVertices;
-		switch (indices.size() / nVertices) {
+		drawable->nIndices = nIndices;
+		switch (indices.size() / nIndices) {
 			case 1: drawable->indicesDataType = GL_UNSIGNED_BYTE;
 				break;
 			case 2: drawable->indicesDataType = GL_UNSIGNED_SHORT;
@@ -87,10 +91,10 @@ namespace opengl
 		const std::shared_ptr<gl::VertexBuffer>& vertexBuffer,
 		const std::shared_ptr<gl::ElementBuffer>& elementBuffer,
 		const std::vector<unsigned int>& vertexLayout,
-        unsigned int nVertices,
+        unsigned int nIndices,
 		gl::VertexFormat format)
 	{
-		return createVertexArrayInternal(vertexBuffer, elementBuffer, vertexLayout, nVertices, format);
+		return createVertexArrayInternal(vertexBuffer, elementBuffer, vertexLayout, nIndices, format);
 	}
 
 	std::unique_ptr<VertexArray>
@@ -139,7 +143,7 @@ namespace opengl
                         i, vertexLayout[i],
                         GL_FLOAT, GL_FALSE,
                         vertexLayout[i] * sizeof(GLfloat),
-                        reinterpret_cast<GLvoid*>(attributeOffset * sizeof(GLfloat)));
+                        reinterpret_cast<GLvoid*>(attributeOffset));
                     attributeOffset += vertexLayout[i] * nVertices;
                 }
                 break;

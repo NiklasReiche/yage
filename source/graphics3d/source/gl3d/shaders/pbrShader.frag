@@ -1,9 +1,10 @@
-R"(
-
 #version 330 core
 
-in vec3 FragPosition;
-in vec3 FragNormal;
+in VS_OUT {
+    vec3 FragPos;
+    vec2 TexCoords;
+    mat3 TBN;
+} fs_in;
 
 out vec4 FragColor;
 
@@ -14,6 +15,10 @@ struct Material {
     float metallic;
     float roughness;
     float ao;
+    sampler2D albedoMap;
+    sampler2D normalMap;
+    sampler2D metallicRoughnessMap;
+    sampler2D aoMap;
 };
 uniform Material material;
 
@@ -32,23 +37,31 @@ float GeometrySchlickGGX(float NdotV, float roughness);
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
 
 void main() {
-    vec3 N = normalize(FragNormal);
-    vec3 V = normalize(camPos - FragPosition);
+    vec3 N = texture(material.normalMap, fs_in.TexCoords).rgb;
+    N = N * 2.0 - 1.0; // map from [0,1] to [-1,1]
+    N = normalize(fs_in.TBN * N); // TODO: use inverse of TBN to calculate lights/camera in T-space within vertex shader
 
-    vec3 F0 = mix(vec3(0.04), material.albedo, material.metallic);
+    vec3 V = normalize(camPos - fs_in.FragPos);
+
+    vec3 albedo = texture(material.albedoMap, fs_in.TexCoords).rgb;
+    float metallic = texture(material.metallicRoughnessMap, fs_in.TexCoords).b;
+    float roughness = texture(material.metallicRoughnessMap, fs_in.TexCoords).g;
+    float ao = texture(material.albedoMap, fs_in.TexCoords).r;
+
+    vec3 F0 = mix(vec3(0.04), albedo, metallic);
 
     vec3 Lo = vec3(0.0);
     for (int i = 0; i < n_pointLights; ++i) {
-        vec3 L = normalize(pointLights[i].position - FragPosition);
+        vec3 L = normalize(pointLights[i].position - fs_in.FragPos);
         vec3 H = normalize(V + L);
 
-        float distance = length(pointLights[i].position - FragPosition);
+        float distance = length(pointLights[i].position - fs_in.FragPos);
         float attenuation = 1.0 / (distance * distance);
         vec3 radiance = pointLights[i].color * attenuation;
 
         // cook-torrance brdf
-        float NDF = DistributionGGX(N, H, material.roughness);
-        float G = GeometrySmith(N, V, L, material.roughness);
+        float NDF = DistributionGGX(N, H, roughness);
+        float G = GeometrySmith(N, V, L, roughness);
         vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
         vec3 numerator = NDF * G * F;
@@ -57,13 +70,13 @@ void main() {
 
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
-        kD *= 1.0 - material.metallic;
+        kD *= 1.0 - metallic;
 
         float NdotL = max(dot(N, L), 0.0);
-        Lo += (kD * material.albedo / PI + specular) * radiance * NdotL;
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
     }
 
-    vec3 ambient = vec3(0.03) * material.albedo * material.ao;
+    vec3 ambient = vec3(0.03) * albedo * ao;
     vec3 color = Lo;//ambient + Lo;
 
     color = color / (color + vec3(1.0));
@@ -111,5 +124,3 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 
     return ggx1 * ggx2;
 }
-
-)"

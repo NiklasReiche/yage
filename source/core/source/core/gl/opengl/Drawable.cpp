@@ -13,9 +13,9 @@ namespace opengl
 		if (this != &other)
 		{
 			vertexArray = std::move(other.vertexArray);
-			nVertices = other.nVertices;
+            nIndices = other.nIndices;
 
-			other.nVertices = 0;
+			other.nIndices = 0;
 		}
 		return *this;
 	}
