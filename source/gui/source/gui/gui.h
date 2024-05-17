@@ -9,7 +9,6 @@
 #include "widgets/label.h"
 #include "widgets/frame.h"
 #include "widgets/entry.h"
-#include "widgets/VListBox.h"
-#include "widgets/HListBox.h"
+#include "widgets/ListBox.h"
 
 #include "animation.h"

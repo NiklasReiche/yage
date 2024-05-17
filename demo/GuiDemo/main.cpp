@@ -53,15 +53,18 @@ public:
         // Designs
         // #############################################################################################################
 
-        auto v_list_1 = master.create_widget<gui::VListBox>(gui::WidgetTemplate{
-                .geometry = {
-                        .anchor = {
-                                .position = gui::AnchorPosition::TOP_LEFT,
-                                .offset = gml::Vec2f(10, 40),
+        auto v_list_1 = master.create_widget<gui::ListBox>(gui::ListBoxTemplate{
+                .base = {
+                        .geometry = {
+                                .anchor = {
+                                        .position = gui::AnchorPosition::TOP_LEFT,
+                                        .offset = gml::Vec2f(10, 40),
+                                },
+                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                         },
-                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                        .border = {.thickness = 1},
                 },
-                .border = {.thickness = 1},
+                .orientation = gui::ListBoxTemplate::VERTICAL,
         });
         v_list_1->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {.color = gl::Color::LIGHT_BLUE,
@@ -73,11 +76,15 @@ public:
                 },
         });
 
-        auto* designFrame = v_list_1->create_widget<gui::HListBox>(gui::WidgetTemplate{
-                .geometry = {
-                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+        auto* designFrame = v_list_1->create_widget<gui::ListBox>(gui::ListBoxTemplate{
+                .base = {
+                        .geometry = {
+                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                        },
+                        .padding = {5, 5, 5, 5},
                 },
-                .padding = {5, 5, 5, 5},
+                .orientation = gui::ListBoxTemplate::HORIZONTAL,
+                .spacing = 10.0f,
         });
         designFrame->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {.padding = {2, 2, 2, 2}},
@@ -113,15 +120,18 @@ public:
         // Layouts
         // #############################################################################################################
 
-        auto* v_list_2 = master.create_widget<gui::VListBox>(gui::WidgetTemplate{
-                .geometry = {
-                        .anchor = {
-                                .position = gui::AnchorPosition::TOP_LEFT,
-                                .offset = gml::Vec2f(10, 40 + v_list_1->actual_size().y() + 50),
+        auto* v_list_2 = master.create_widget<gui::ListBox>(gui::ListBoxTemplate{
+                .base = {
+                        .geometry = {
+                                .anchor = {
+                                        .position = gui::AnchorPosition::TOP_LEFT,
+                                        .offset = gml::Vec2f(10, 40 + v_list_1->actual_size().y() + 50),
+                                },
+                                .size_hint = {gui::SizeHint::FIT_CHILDREN, gui::SizeHint::FIT_CHILDREN},
                         },
-                        .size_hint = {gui::SizeHint::FIT_CHILDREN, gui::SizeHint::FIT_CHILDREN},
+                        .border = {.thickness = 1},
                 },
-                .border = {.thickness = 1},
+                .orientation = gui::ListBoxTemplate::VERTICAL,
         });
         v_list_2->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {.color = gl::Color::LIGHT_BLUE, .padding = {2, 2, 2, 2}},
@@ -139,8 +149,13 @@ public:
                 },
         });
 
-        auto vListFrame = v_list_2->create_widget<gui::VListBox>(gui::WidgetTemplate{
-                .geometry = {.size_hint = {gui::SizeHint::FIT_CHILDREN, gui::SizeHint::FIT_CHILDREN}},
+        auto vListFrame = v_list_2->create_widget<gui::ListBox>(gui::ListBoxTemplate{
+                .base = {
+                        .geometry = {.size_hint = {gui::SizeHint::FIT_CHILDREN, gui::SizeHint::FIT_CHILDREN}},
+                        .padding = {6, 2, 6, 2},
+                },
+                .orientation = gui::ListBoxTemplate::VERTICAL,
+                .spacing = 2,
         });
         auto element_template = gui::LabelTemplate{
                 .base = {
@@ -164,10 +179,15 @@ public:
                 }
         });
 
-        auto hListFrame = v_list_2->create_widget<gui::HListBox>(gui::WidgetTemplate{
-                .geometry = {
-                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+        auto hListFrame = v_list_2->create_widget<gui::ListBox>(gui::ListBoxTemplate{
+                .base = {
+                        .geometry = {
+                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                        },
+                        .padding = {6, 2, 6, 2},
                 },
+                .orientation = gui::ListBoxTemplate::HORIZONTAL,
+                .spacing = 2.0f,
         });
         hListFrame->create_widget<gui::Label>(element_template);
         hListFrame->create_widget<gui::Label>(element_template);
@@ -193,17 +213,20 @@ public:
         // Animations
         // #############################################################################################################
 
-        auto h_list = master.create_widget<gui::HListBox>(gui::WidgetTemplate{
-                .geometry = {
-                        .anchor = {
-                                .position = gui::AnchorPosition::TOP_LEFT,
-                                .offset = gml::Vec2<float>(10 + v_list_1->actual_size().x() + 50, 40),
+        auto h_list = master.create_widget<gui::ListBox>(gui::ListBoxTemplate{
+                .base = {
+                        .geometry = {
+                                .anchor = {
+                                        .position = gui::AnchorPosition::TOP_LEFT,
+                                        .offset = gml::Vec2<float>(10 + v_list_1->actual_size().x() + 50, 40),
+                                },
                         },
+                        .border = {
+                                .thickness = 1,
+                        },
+                        .color = gl::Color::TRANSPARENT,
                 },
-                .border = {
-                        .thickness = 1,
-                },
-                .color = gl::Color::TRANSPARENT,
+                .orientation = gui::ListBoxTemplate::HORIZONTAL,
         });
 
         testLabel = h_list->create_widget<gui::Label>(gui::LabelTemplate{
@@ -265,16 +288,19 @@ public:
         // Buttons
         // #############################################################################################################
 
-        auto frame_4 = master.create_widget<gui::VListBox>(gui::WidgetTemplate{
-                .geometry = {
-                        .anchor = {
-                                .position = gui::AnchorPosition::TOP_LEFT,
-                                .offset = gml::Vec2<float>(10 + v_list_2->actual_size().x() + 50,
-                                                           40 + v_list_1->actual_size().y() + 50),
+        auto frame_4 = master.create_widget<gui::ListBox>(gui::ListBoxTemplate{
+                .base = {
+                        .geometry = {
+                                .anchor = {
+                                        .position = gui::AnchorPosition::TOP_LEFT,
+                                        .offset = gml::Vec2<float>(10 + v_list_2->actual_size().x() + 50,
+                                                                   40 + v_list_1->actual_size().y() + 50),
+                                },
+                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                         },
-                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                        .border = {.thickness = 1},
                 },
-                .border = {.thickness = 1},
+                .orientation = gui::ListBoxTemplate::VERTICAL,
         });
         frame_4->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {.color = gl::Color::LIGHT_BLUE, .padding = {2, 2, 2, 2}},
@@ -285,16 +311,22 @@ public:
                 }
         });
 
-        auto h_list_buttons = frame_4->create_widget<gui::VListBox>(gui::WidgetTemplate{
-                .geometry = {
-                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+        auto h_list_buttons = frame_4->create_widget<gui::ListBox>(gui::ListBoxTemplate{
+                .base = {
+                        .geometry = {
+                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                        },
                 },
+                .orientation = gui::ListBoxTemplate::VERTICAL,
         });
 
-        frame_clicks = h_list_buttons->create_widget<gui::HListBox>(gui::WidgetTemplate{
-                .geometry = {
-                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+        frame_clicks = h_list_buttons->create_widget<gui::ListBox>(gui::ListBoxTemplate{
+                .base = {
+                        .geometry = {
+                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                        },
                 },
+                .orientation = gui::ListBoxTemplate::HORIZONTAL,
         });
         frame_clicks->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {.padding = {2, 2, 2, 2}},
@@ -327,11 +359,14 @@ public:
         });
 
 
-        frame_check = h_list_buttons->create_widget<gui::HListBox>(gui::WidgetTemplate{
-                .geometry = {
-                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+        frame_check = h_list_buttons->create_widget<gui::ListBox>(gui::ListBoxTemplate{
+                .base = {
+                        .geometry = {
+                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                        },
+                        .color = gl::Color::TRANSPARENT
                 },
-                .color = gl::Color::TRANSPARENT
+                .orientation = gui::ListBoxTemplate::HORIZONTAL,
         });
         frame_check->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {.padding = {2, 2, 2, 2}},
@@ -362,11 +397,14 @@ public:
                 }
         });
 
-        frame_radio = h_list_buttons->create_widget<gui::VListBox>(gui::WidgetTemplate{
-                .geometry = {
-                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+        frame_radio = h_list_buttons->create_widget<gui::ListBox>(gui::ListBoxTemplate{
+                .base = {
+                        .geometry = {
+                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                        },
+                        .color = gl::Color::TRANSPARENT
                 },
-                .color = gl::Color::TRANSPARENT
+                .orientation = gui::ListBoxTemplate::VERTICAL
         });
         frame_radio->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
@@ -377,17 +415,23 @@ public:
                         .font = font
                 }
         });
-        auto frame_radio_2 = frame_radio->create_widget<gui::HListBox>(gui::WidgetTemplate{
-                .geometry = {
-                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+        auto frame_radio_2 = frame_radio->create_widget<gui::ListBox>(gui::ListBoxTemplate{
+                .base = {
+                        .geometry = {
+                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                        },
+                        .color = gl::Color::TRANSPARENT
                 },
-                .color = gl::Color::TRANSPARENT
+                .orientation = gui::ListBoxTemplate::HORIZONTAL,
         });
-        auto radio_group_box = frame_radio_2->create_widget<gui::VListBox>(gui::WidgetTemplate{
-                .geometry = {
-                        .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+        auto radio_group_box = frame_radio_2->create_widget<gui::ListBox>(gui::ListBoxTemplate{
+                .base = {
+                        .geometry = {
+                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                        },
+                        .color = gl::Color::TRANSPARENT
                 },
-                .color = gl::Color::TRANSPARENT
+                .orientation = gui::ListBoxTemplate::VERTICAL,
         });
         radioGroup = gui::RadioGroup<int>(0, [this](int value) {
             this->on_radio_click(value);
@@ -469,11 +513,14 @@ public:
         // Entries
         // #############################################################################################################
 
-        auto entryFrame = master.create_widget<gui::VListBox>(gui::WidgetTemplate{
-                .geometry = {.anchor = {.offset = gml::Vec2<float>(
-                        10 + v_list_2->actual_size().x() + 50 + frame_4->actual_size().x() + 50,
-                        40 + v_list_1->actual_size().y() + 50),}},
-                .border = {.thickness = 1}
+        auto entryFrame = master.create_widget<gui::ListBox>(gui::ListBoxTemplate{
+                .base = {
+                        .geometry = {.anchor = {.offset = gml::Vec2<float>(
+                                10 + v_list_2->actual_size().x() + 50 + frame_4->actual_size().x() + 50,
+                                40 + v_list_1->actual_size().y() + 50),}},
+                        .border = {.thickness = 1}
+                },
+                .orientation = gui::ListBoxTemplate::VERTICAL,
         });
         entryFrame->create_widget<gui::Label>(gui::LabelTemplate{
                 .base = {
