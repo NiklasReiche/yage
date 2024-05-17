@@ -31,8 +31,11 @@ TODO: add shreenshots
 ### Physics simulation:
 TODO add shreenshots
 
-### Text renderer:
-![Screenshot 2024-05-14 204325](https://github.com/NiklasReiche/yage/assets/29310846/a20b7261-b89a-4054-af16-9773c0e997f7)
-
 ### GUI showcase:
-TODO add shreenshots
+>![gui_demo_WolSdPGhhf](https://github.com/NiklasReiche/yage/assets/29310846/2a8c30e1-f8b3-4e37-9a8d-a6393054becd)
+
+### Text renderer:
+>![text_renderer_ZNWA41Qhvw](https://github.com/NiklasReiche/yage/assets/29310846/ea7f4650-f3eb-466a-896e-8f0691aa0f96)
+
+
+
