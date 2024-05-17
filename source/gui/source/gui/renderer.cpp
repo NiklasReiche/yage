@@ -21,6 +21,7 @@ namespace gui
 		widget_shader->setUniform("projection", projection);
 		widget_shader->setUniform("texture", 0);
 		text_shader->setUniform("projection", projection);
+        text_shader->setUniform("scale", 16.0f / 16.0f); // TODO: based on text size
 
 		//clearColor = gml::Vec4<float>(1, 1, 1, 1);
 	}

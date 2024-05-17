@@ -114,6 +114,19 @@ public:
                         .font = font,
                 },
         });
+        designFrame->create_widget<gui::Label>(gui::LabelTemplate{
+                .base = {
+                        .texture = {
+                                .filename = "assets/texture.png"
+                        },
+                        .padding = {10, 4, 10, 4}
+                },
+                .text = {
+                        .text = U"texture",
+                        .font = font,
+                        .color = gl::Color::WHITE,
+                },
+        });
 
 
         // #############################################################################################################
@@ -316,8 +329,10 @@ public:
                         .geometry = {
                                 .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                         },
+                        .padding = {5, 5, 5, 5},
                 },
                 .orientation = gui::ListBoxTemplate::VERTICAL,
+                .spacing = 20,
         });
 
         frame_clicks = h_list_buttons->create_widget<gui::ListBox>(gui::ListBoxTemplate{
@@ -602,7 +617,7 @@ void displayFPS(GuiTest& gui, double dt)
 
 int main()
 {
-    std::shared_ptr<platform::desktop::GlfwWindow> window = std::make_shared<platform::desktop::GlfwWindow>(1400, 900,
+    std::shared_ptr<platform::desktop::GlfwWindow> window = std::make_shared<platform::desktop::GlfwWindow>(800, 400,
                                                                                                             "GUI Demo");
     std::shared_ptr<gl::IContext> context = gl::createContext(window);
 
