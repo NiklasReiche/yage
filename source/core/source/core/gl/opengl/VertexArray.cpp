@@ -1,10 +1,12 @@
 #include "VertexArray.h"
+#include "Context.h"
 
 namespace opengl
 {
 	VertexArray::~VertexArray()
 	{
 		glDeleteVertexArrays(1, &vao);
+        lockContextPtr()->bindVertexArray(0);
 	}
 
 	VertexArray::VertexArray(VertexArray&& other) noexcept
@@ -30,4 +32,9 @@ namespace opengl
 		}
 		return *this;
 	}
+
+    void VertexArray::setSubData(unsigned int offset, const std::vector<float>& vertices)
+    {
+        vertexBuffer->setSubData(offset, vertices);
+    }
 }

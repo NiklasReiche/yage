@@ -9,6 +9,9 @@ namespace platform::desktop
 	class FileReader : public IFileReader
 	{
 	public:
+        FileReader() = default;
+        virtual ~FileReader() = default;
+
 		[[nodiscard]]
 		std::unique_ptr<IBinaryFile> openBinaryFile(const std::string& filename, IFile::AccessMode mode) const override;
 

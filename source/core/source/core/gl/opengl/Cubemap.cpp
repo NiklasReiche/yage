@@ -3,6 +3,11 @@
 
 namespace opengl
 {
+    Cubemap::~Cubemap()
+    {
+        lockContextPtr()->bindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    }
+
 	Cubemap::Cubemap(Cubemap&&other) noexcept
 		: Texture(std::move(other))
 	{

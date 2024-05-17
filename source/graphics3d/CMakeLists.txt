@@ -3,7 +3,7 @@ message(STATUS "> Configuring yage_gl3d")
 add_library(yage_gl3d SHARED)
 
 target_compile_options(yage_gl3d
-	PRIVATE -fdiagnostics-color=always -Wall -Wextra -Werror)
+	PRIVATE -fdiagnostics-color=always -Wall -Wextra)
 
 target_link_libraries(yage_gl3d
 	PUBLIC yage_core yage_utils yage_image nlohmann_json::nlohmann_json tinygltf)

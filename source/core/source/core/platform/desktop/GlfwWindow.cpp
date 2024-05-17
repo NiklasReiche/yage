@@ -8,6 +8,7 @@
 #include <utils/NotImplementedException.h>
 
 #include "GlfwException.h"
+#include "FileReader.h"
 
 namespace platform::desktop
 {
@@ -200,13 +201,20 @@ namespace platform::desktop
 		}
 	}
 
-	void GlfwWindow::onCharEvent(GLFWwindow* window, const unsigned int)
+    void GlfwWindow::notifyListeners(const input::CharEvent& event)
+    {
+        for (auto listener: inputListeners) {
+            listener.get().onCharEvent(event);
+        }
+    }
+
+	void GlfwWindow::onCharEvent(GLFWwindow* window, const unsigned int codepoint)
 	{
 		auto handle = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
 		if (!handle->isCharInputEnabled) {
 			return;
 		}
-		throw NotImplementedException();
+        handle->notifyListeners(input::CharEvent(codepoint));
 	}
 	void GlfwWindow::onKeyEvent(GLFWwindow* window, const int key, const int, const int action, const int)
 	{
@@ -419,4 +427,9 @@ namespace platform::desktop
 			default: return input::KeyEvent::Code::KEY_UNKNOWN;
 		}
 	}
+
+    std::unique_ptr<platform::IFileReader> GlfwWindow::getFileReader()
+    {
+        return std::make_unique<FileReader>(FileReader());
+    }
 }

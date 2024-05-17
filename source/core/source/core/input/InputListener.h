@@ -3,6 +3,7 @@
 #include "KeyEvent.h"
 #include "MousePosEvent.h"
 #include "MouseWheelEvent.h"
+#include "CharEvent.h"
 
 namespace input
 {
@@ -19,5 +20,9 @@ namespace input
 		virtual void onKeyEvent(const KeyEvent&) {}
 		virtual void onMousePosEvent(const MousePosEvent&) {}
 		virtual void onMouseWheelEvent(const MouseWheelEvent&) {}
+
+        virtual void onCharEvent(const CharEvent&)
+        {
+        }
 	};
 }

@@ -8,8 +8,10 @@
 #include <core/input/KeyEvent.h>
 #include <core/input/MousePosEvent.h>
 #include <core/platform/Window.h>
+#include <core/platform/IFileReader.h>
 
 #include "File.h"
+#include "core/input/CharEvent.h"
 
 
 class GLFWwindow;
@@ -27,6 +29,9 @@ namespace platform::desktop
 		void swapBuffers() override;
 		void show() override;
 		void hide() override;
+
+        [[nodiscard]]
+        std::unique_ptr<IFileReader> getFileReader() override;
 
 		[[nodiscard]] int getWidth() const override;
 		[[nodiscard]] int getHeight() const override;
@@ -78,6 +83,7 @@ namespace platform::desktop
 		void notifyListeners(const input::KeyEvent& event);
 		void notifyListeners(const input::MousePosEvent& event);
 		void notifyListeners(const input::MouseWheelEvent& event);
+        void notifyListeners(const input::CharEvent& event);
 
 		static input::KeyEvent::Code convertToKeyCode(int key) noexcept;
 		static input::KeyEvent::Action convertToKeyAction(int action) noexcept;

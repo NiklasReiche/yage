@@ -8,6 +8,7 @@ namespace opengl
 	Shader::~Shader()
 	{
 		glDeleteProgram(program);
+        lockContextPtr()->bindShader(0);
 	}
 
 	Shader::Shader(Shader&& other) noexcept

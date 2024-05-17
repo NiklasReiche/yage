@@ -18,6 +18,7 @@ namespace gml
 	using Vec2 = Vector<T, 2>;
 
 	using Vec2i = Vec2<int>;
+    using Vec2ui = Vec2<unsigned int>;
 	using Vec2f = Vec2<float>;
 	using Vec2d = Vec2<double>;
 
@@ -25,6 +26,7 @@ namespace gml
 	using Vec3 = Vector<T, 3>;
 
 	using Vec3i = Vec3<int>;
+    using Vec3ui = Vec3<unsigned int>;
 	using Vec3f = Vec3<float>;
 	using Vec3d = Vec3<double>;
 
@@ -32,6 +34,7 @@ namespace gml
 	using Vec4 = Vector<T, 4>;
 
 	using Vec4i = Vec4<int>;
+    using Vec4ui = Vec4<unsigned int>;
 	using Vec4f = Vec4<float>;
 	using Vec4d = Vec4<double>;
 

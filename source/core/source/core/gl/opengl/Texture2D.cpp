@@ -6,6 +6,11 @@
 
 namespace opengl
 {
+    Texture2D::~Texture2D()
+    {
+        lockContextPtr()->bindTexture(GL_TEXTURE_2D, 0);
+    }
+
 	Texture2D::Texture2D(Texture2D&&other) noexcept
 		: Texture(std::move(other))
 	{

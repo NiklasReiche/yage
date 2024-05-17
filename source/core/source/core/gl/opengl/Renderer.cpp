@@ -12,9 +12,6 @@
 
 namespace opengl
 {
-	std::unique_ptr<gl::IDrawable> Renderer::unitDrawable;
-	std::unique_ptr<gl::IShader> Renderer::unitShader;
-
 	void Renderer::enableDepthTest()
 	{
 		lockContextPtr()->enableDepthTest(GL_LESS, GL_TRUE);

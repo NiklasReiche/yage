@@ -3,7 +3,7 @@ message(STATUS "> Configuring yage_core")
 add_library(yage_core SHARED)
 
 target_compile_options(yage_core
-	PRIVATE -fdiagnostics-color=always -Wall -Wextra -Werror)
+	PRIVATE -fdiagnostics-color=always -Wall -Wextra)
 
 target_link_libraries(yage_core
 	PUBLIC yage_gml yage_utils glfw glad tfd)

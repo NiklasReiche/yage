@@ -6,9 +6,11 @@
 
 namespace gl
 {
+    typedef uint32_t Color_t;
+
 	namespace Color
 	{
-		enum Color : uint32_t
+		enum Color : Color_t
 		{
 			TRANSPARENT = 0x00000000u,
 			BLACK = 0x000000FFu,
@@ -28,6 +30,7 @@ namespace gl
 			MAGENTA = 0xFF00FFFFu,
 			SILVER = 0xC0C0C0FFu,
 			GREY = 0x808080FFu,
+            LIGHT_GREY = 0xD0D0D0FFu,
 			ORANGE = 0xFFA500FFu,
 			BROWN = 0xA52A2AFFu,
 			MAROON = 0x800000FFu,
@@ -35,28 +38,31 @@ namespace gl
 		};
 	}
 
-	inline void setRed(uint32_t & color, uint32_t red)
+	inline void setRed(Color_t & color, uint32_t red)
 	{
 		unsigned int g = (color >> 16) & 0xff;
 		unsigned int b = (color >> 8) & 0xff;
 		unsigned int a = (color) & 0xff;
 		color = (a) | (b << 8) | (g << 16) | (red << 24);
 	}
-	inline void setGreen(uint32_t & color, uint32_t green)
+
+	inline void setGreen(Color_t & color, uint32_t green)
 	{
 		unsigned int r = (color >> 24) & 0xff;
 		unsigned int b = (color >> 8) & 0xff;
 		unsigned int a = (color) & 0xff;
 		color = (a) | (b << 8) | (green << 16) | (r << 24);
 	}
-	inline void setBlue(uint32_t & color, uint32_t blue)
+
+	inline void setBlue(Color_t & color, uint32_t blue)
 	{
 		unsigned int r = (color >> 24) & 0xff;
 		unsigned int g = (color >> 16) & 0xff;
 		unsigned int a = (color) & 0xff;
 		color = (a) | (blue << 8) | (g << 16) | (r << 24);
 	}
-	inline void setAlpha(uint32_t & color, uint32_t alpha)
+
+	inline void setAlpha(Color_t & color, uint32_t alpha)
 	{
 		unsigned int r = (color >> 24) & 0xff;
 		unsigned int g = (color >> 16) & 0xff;
@@ -64,12 +70,22 @@ namespace gl
 		color = (alpha) | (b << 8) | (g << 16) | (r << 24);
 	}
 
-	inline gml::Vec3f toVec3(uint32_t color)
+	inline gml::Vec3f toVec3(Color_t color)
 	{
-		return gml::Vec3f(((color >> 24) & 0xff) / 255.0f, ((color >> 16) & 0xff) / 255.0f, ((color >> 8) & 0xff) / 255.0f);
+		return {
+            static_cast<float>((color >> 24) & 0xff) / 255.0f,
+            static_cast<float>((color >> 16) & 0xff) / 255.0f,
+            static_cast<float>((color >> 8) & 0xff) / 255.0f
+        };
 	}
-	inline gml::Vec4f toVec4(uint32_t color)
+
+	inline gml::Vec4f toVec4(Color_t color)
 	{
-		return gml::Vec4f(((color >> 24) & 0xff) / 255.0f, ((color >> 16) & 0xff) / 255.0f, ((color >> 8) & 0xff) / 255.0f, ((color) & 0xff) / 255.0f);
+		return {
+            static_cast<float>((color >> 24) & 0xff) / 255.0f,
+            static_cast<float>((color >> 16) & 0xff) / 255.0f,
+            static_cast<float>((color >> 8) & 0xff) / 255.0f,
+            static_cast<float>((color) & 0xff) / 255.0f
+        };
 	}
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <map>
+#include <unordered_map>
 
 #include <gml/gml.h>
 #include <core/gl/Texture2D.h>
@@ -23,13 +23,13 @@ namespace font
         /**
          * Size of the glyph's bounding box in pixel coordinates.
          */
-		gml::Vec2<float> size;
+		gml::Vec2f size;
 
         /**
          * x: Vertical distance from the cursor position to the left edge of the glyph's bounding box in pixel coordinates.
          * y: Horizontal distance from the baseline to the top edge of the glyph's bounding box in pixel coordinates.
          */
-        gml::Vec2<float> bearing;
+        gml::Vec2f bearing;
 
         /**
          * Distance that the cursor should increment after drawing this glyph in pixel coordinates.
@@ -51,10 +51,9 @@ namespace font
 	struct FontMetrics
 	{
         /**
-         * Pt size at which the font was loaded. Use this for calculating scaling factors when rendering text at
-         * different pt sizes.
+         * Font units per EM square.
          */
-		int ptSize = 0; // TODO: maybe instead store unitsPerEM and offer a method to calculate scale for a given pt size and dpi
+        int unitsPerEM = 0;
 
         /**
          * Vertical space between two baselines. Use this to calculate newlines.
@@ -88,11 +87,26 @@ namespace font
         /**
          * Metrics for the individual characters.
          */
-        std::map<Codepoint, Character> characters;
+        std::unordered_map<Codepoint, Character> characters;
 
         /**
          * Texture atlas containing the glyph sdf bitmaps.
          */
         std::unique_ptr<gl::ITexture2D> textureAtlas;
+
+        /**
+         * Returns the scaling factor to derive pixel coordinates for glyph metrics for a given font size and dpi
+         * resolution.
+         * @param ptSize Font size at which to draw text.
+         * @param dpi DPI resolution of the target canvas.
+         * @return Scaling factor to convert glyph metrics into pixel coordinates.
+         */
+        [[nodiscard]]
+        gml::Vec2f scaling(float ptSize, gml::Vec2i dpi) const
+        {
+            // 1 pt = 1/72 inch
+            const gml::Vec2f pixelsPerEM = static_cast<gml::Vec2f>(dpi) * ptSize / 72.f;
+            return pixelsPerEM / static_cast<float>(metrics.unitsPerEM);
+        }
 	};
 }

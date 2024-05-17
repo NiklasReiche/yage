@@ -6,6 +6,7 @@ namespace opengl
 	UniformBuffer::~UniformBuffer()
 	{
 		glDeleteBuffers(1, &ubo);
+        lockContextPtr()->bindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
 	UniformBuffer::UniformBuffer(UniformBuffer&& other) noexcept

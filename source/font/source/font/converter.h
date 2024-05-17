@@ -37,9 +37,9 @@ namespace font
          */
         void initialize();
 
-        FT_Face loadFace(const std::string &filepath);
+        FT_Face load_face(const std::string &filepath);
 
-        FT_GlyphSlot loadGlyph(const FT_Face &face, Codepoint c, FT_GLYPH_LOAD_FLAG load_flag);
+        FT_GlyphSlot load_glyph(const FT_Face &face, Codepoint c, FT_GLYPH_LOAD_FLAG load_flag);
 
     private:
         /**
@@ -72,16 +72,19 @@ namespace font
                      const std::vector<Codepoint> &charCodes, int loadResolution = 512,
                      int spread = 4, int padding = 2, int sdfResolution = 64);
 
-        static std::vector<Codepoint> codepointSetAscii();
+        /**
+         * @return A set of codepoints for the printable ascii characters.
+         */
+        static std::vector<Codepoint> codepoint_set_ascii();
 
     private:
         std::shared_ptr<gl::IContext> glContext;
 
-        static GlyphMetrics getGlyphMetricsAndUpdateMax(FT_Loader &ft, const FT_Face &face, Codepoint c, GlyphMetrics &maxGlyph);
+        static GlyphMetrics load_glyph_metrics_and_update_max(FT_Loader &ft, const FT_Face &face, Codepoint c, GlyphMetrics &maxGlyph);
 
-        static img::Image getBitmap(FT_Loader &ft, FT_Face const &face, Codepoint c);
+        static img::Image load_bitmap(FT_Loader &ft, FT_Face const &face, Codepoint c);
 
-        static img::Image generateSdf(const img::Image &bitmap, int spread);
+        static img::Image generate_sdf(const img::Image &bitmap, int spread);
 
         /**
          * Reads a color value from an non-padded input image using coordinates from a padded image space.
@@ -91,20 +94,20 @@ namespace font
          * @param padding padding in texture coordinate fractions around the input bitmap
          * @return value taken from the input image or zero if the coordinates fall within the padded space
          */
-        static unsigned char getPaddedValue(const img::Image &bitmap, int y, int x, int padding);
+        static unsigned char padded_value(const img::Image &bitmap, int y, int x, int padding);
 
         static TexMetrics
-        getRelativeTextureMetrics(const img::Image &characterBitmap, gml::Vec2i offset, gml::Vec2i atlasSize);
+        relative_texture_metrics(const img::Image &characterBitmap, gml::Vec2i offset, gml::Vec2i atlasSize);
 
         img::Image downscale(const img::Image &image, gml::Vec2i targetResolution);
 
-        static void writeFontFile(const std::string &filename, int unitsPerEM,
-                                  const std::vector<Codepoint> &charCodes,
-                                  const img::Image &atlas,
-                                  GlyphMetrics maxGlyph, const std::map<Codepoint, Character> &characters,
-                                  gml::Vec2f spreadInTexCoords, const FT_Face &face);
+        static void write_font_file(const std::string &filename, int unitsPerEM,
+                                    const std::vector<Codepoint> &charCodes,
+                                    const img::Image &atlas,
+                                    GlyphMetrics maxGlyph, const std::map<Codepoint, Character> &characters,
+                                    gml::Vec2f spreadInTexCoords, const FT_Face &face);
 
-        static unsigned char rightGetBit(unsigned char c, unsigned int n);
+        static unsigned char right_get_bit(unsigned char c, unsigned int n);
 
         /**
          * Unpacks a tightly packed bitmap image to a byte-map.
@@ -115,6 +118,6 @@ namespace font
          * @param pitch
          */
         static std::vector<unsigned char>
-        unpackBitmap(unsigned char *data, unsigned int rows, unsigned int width, unsigned int pitch);
+        unpack_bitmap(unsigned char *data, unsigned int rows, unsigned int width, unsigned int pitch);
     };
 }

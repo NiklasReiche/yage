@@ -33,7 +33,7 @@ int main(int argc, char *argv[], char *[])
                 0x00f6, // ö
                 0x00fc  // ü
         };
-        auto codepoints = font::FontConverter::codepointSetAscii();
+        auto codepoints = font::FontConverter::codepoint_set_ascii();
         codepoints.insert(std::end(codepoints), std::begin(additionalCharacters), std::end(additionalCharacters));
         std::cout << "Starting font conversion." << std::endl;
         auto converter = font::FontConverter(context);
@@ -42,31 +42,30 @@ int main(int argc, char *argv[], char *[])
         std::cout << "Finished font conversion." << std::endl;
     }
 
-    std::shared_ptr<font::Font> font;
-    {
-        auto loader = font::FontLoader(context->getTextureCreator());
-        auto fontFile = fileReader.openBinaryFile(fontPath + ".font", platform::IFile::AccessMode::READ);
-        font = loader.loadFont(*fontFile);
-    }
+    res::Store<font::Font> fontStore;
+    font::FontFileLoader fontLoader(context->getTextureCreator(), window->getFileReader());
+    res::Resource<font::Font> font = fontStore.loadResource(fontLoader, fontPath + ".font");
 
     auto textShader = context->getShaderCreator()->createShader(font::shaders::TextShader::vert,
                                                                 font::shaders::TextShader::frag);
 
     std::u32string string = U"ÜÄÖ The quick brown fox jumps over the lazy dog.";
     auto text100 = font::Text(context->getDrawableCreator(), string, font,
-                           gl::Color::BLACK, 100);
+                              {.color = gl::Color::BLACK, .pt_size = 100});
     auto text50 = font::Text(context->getDrawableCreator(), string, font,
-                           gl::Color::BLACK, 50);
+                             {.color = gl::Color::BLACK, .pt_size = 50});
     auto text24 = font::Text(context->getDrawableCreator(), string, font,
-                            gl::Color::BLACK, 24);
+                             {.color = gl::Color::BLACK, .pt_size = 24});
     auto text16 = font::Text(context->getDrawableCreator(), string, font,
-                            gl::Color::BLACK, 16);
+                             {.color = gl::Color::BLACK, .pt_size = 16});
     auto text12 = font::Text(context->getDrawableCreator(), string, font,
-                             gl::Color::BLACK, 12);
+                             {.color = gl::Color::BLACK, .pt_size = 12});
     auto text11 = font::Text(context->getDrawableCreator(), string, font,
-                             gl::Color::BLACK, 11);
+                             {.color = gl::Color::BLACK, .pt_size = 11});
     auto text9 = font::Text(context->getDrawableCreator(), string, font,
-                             gl::Color::BLACK, 9);
+                            {.color = gl::Color::BLACK, .pt_size = 9});
+
+    text100.update_color(gl::Color::BLUE);
 
     auto renderer = context->getRenderer();
 	window->show();
@@ -84,42 +83,42 @@ int main(int argc, char *argv[], char *[])
 
         renderer->useShader(*textShader);
         textShader->setUniform("spread", 1.0f);
-        renderer->bindTexture(*font->textureAtlas);
+        renderer->bindTexture(*font.get().textureAtlas);
 
         float yPos = 0;
         textShader->setUniform("projection", projection);
         textShader->setUniform("scale", 100.0f / 16.0f);
-        renderer->draw(text100.getDrawable());
+        renderer->draw(text100.drawable());
         yPos += 150;
 
         textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
         textShader->setUniform("scale", 50.0f / 16.0f);
-        renderer->draw(text50.getDrawable());
+        renderer->draw(text50.drawable());
         yPos += 90;
 
         textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
         textShader->setUniform("scale", 24.0f / 16.0f);
-        renderer->draw(text24.getDrawable());
+        renderer->draw(text24.drawable());
         yPos += 50;
 
         textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
         textShader->setUniform("scale", 16.0f / 16.0f);
-        renderer->draw(text16.getDrawable());
+        renderer->draw(text16.drawable());
         yPos += 40;
 
         textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
         textShader->setUniform("scale", 12.0f / 16.0f);
-        renderer->draw(text12.getDrawable());
+        renderer->draw(text12.drawable());
         yPos += 30;
 
         textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
         textShader->setUniform("scale", 11.0f / 16.0f);
-        renderer->draw(text11.getDrawable());
+        renderer->draw(text11.drawable());
         yPos += 30;
 
         textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
         textShader->setUniform("scale", 9.0f / 16.0f);
-        renderer->draw(text9.getDrawable());
+        renderer->draw(text9.drawable());
         yPos += 30;
 
         textShader->setUniform("projection",
@@ -130,7 +129,7 @@ int main(int argc, char *argv[], char *[])
                                );
         step++;
         textShader->setUniform("scale", 16.0f / 16.0f);
-        renderer->draw(text16.getDrawable());
+        renderer->draw(text16.drawable());
 
 		window->swapBuffers();
 		window->pollEvents();

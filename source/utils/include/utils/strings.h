@@ -3,6 +3,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <locale>
+#include <codecvt>
 
 namespace utils
 {
@@ -13,6 +15,12 @@ namespace utils
 		stream << param;
 		return stream.str();
 	}
+
+    template<typename T>
+    std::u32string toUTF32(T param)
+    {
+        return std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>().from_bytes(toString(param));
+    }
 
 	inline std::vector<std::string> strip(std::string string, const std::string& delimiter)
 	{
