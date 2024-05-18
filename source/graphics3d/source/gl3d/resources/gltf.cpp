@@ -10,6 +10,8 @@
 
 namespace gl3d::resources
 {
+    typedef unsigned char byte;
+
     gl::TextureWrapper convert_wrapper(int wrap)
     {
         switch (wrap) {
@@ -44,22 +46,18 @@ namespace gl3d::resources
         }
     }
 
-    // TODO use spans
-    // TODO sparse accessors
-    std::vector<unsigned char> readBuffer(tinygltf::Model& model, int i, std::size_t offset, std::size_t size)
+    std::span<byte> readBuffer(tinygltf::Model& model, int i, std::size_t offset, std::size_t size)
     {
-        std::vector<unsigned char> buffer(model.buffers[i].data.begin() + offset,
-                                          model.buffers[i].data.begin() + offset + size);
-        return buffer;
+        return {model.buffers[i].data.begin() + offset, model.buffers[i].data.begin() + offset + size};
     }
 
-    std::vector<unsigned char> readBufferView(tinygltf::Model& model, int i, std::size_t offset, std::size_t byte_length)
+    std::span<byte> readBufferView(tinygltf::Model& model, int i, std::size_t offset, std::size_t byte_length)
     {
         auto& bufferView = model.bufferViews[i];
         return readBuffer(model, bufferView.buffer, bufferView.byteOffset + offset, byte_length);
     }
 
-    std::vector<unsigned char> readAccessor(tinygltf::Model& model, tinygltf::Accessor& accessor)
+    std::span<byte> readAccessor(tinygltf::Model& model, tinygltf::Accessor& accessor)
     {
         auto type_byte_length = tinygltf::GetNumComponentsInType(accessor.type) *
                                 tinygltf::GetComponentSizeInBytes(accessor.componentType);
@@ -118,7 +116,7 @@ namespace gl3d::resources
         auto tangents = readAccessor(model, tangent_accessor);
         auto tex_coords = readAccessor(model, tex_coord_accessor);
 
-        std::vector<unsigned char> vertices;
+        std::vector<byte> vertices;
         vertices.insert(vertices.end(), positions.begin(), positions.end());
         vertices.insert(vertices.end(), normals.begin(), normals.end());
         vertices.insert(vertices.end(), tangents.begin(), tangents.end());
@@ -213,5 +211,7 @@ namespace gl3d::resources
 
         // TODO: we currently only support single models
         return read_mesh(model, model.meshes[0], drawableCreator, textureCreator);
+
+        // TODO: do we need to handle sparse accessors explicitly?
     }
 }
