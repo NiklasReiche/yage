@@ -45,7 +45,7 @@ namespace opengl
 	void Shader::setUniform(const std::string& name, const int value)
 	{
 		if (!hasUniform(name))
-			return;
+            throw std::invalid_argument("unknown uniform '" + name + "'");
 		
 		lockContextPtr()->bindShader(program);
 		glUniform1i(uniformLocations.at(name), value);
@@ -53,8 +53,8 @@ namespace opengl
 	
 	void Shader::setUniform(const std::string& name, const bool value)
 	{
-		if (!hasUniform(name)) 
-			return;
+		if (!hasUniform(name))
+            throw std::invalid_argument("unknown uniform '" + name + "'");
 		
 		lockContextPtr()->bindShader(program);
 		glUniform1i(uniformLocations.at(name), static_cast<int>(value));
@@ -62,8 +62,8 @@ namespace opengl
 	
 	void Shader::setUniform(const std::string& name, const float value)
 	{
-		if (!hasUniform(name)) 
-			return;
+		if (!hasUniform(name))
+            throw std::invalid_argument("unknown uniform '" + name + "'");
 		
 		lockContextPtr()->bindShader(program);
 		glUniform1f(uniformLocations.at(name), value);
@@ -72,7 +72,7 @@ namespace opengl
 	void Shader::setUniform(const std::string& name, const gml::Vec3f value)
 	{
 		if (!hasUniform(name))
-			return;
+            throw std::invalid_argument("unknown uniform '" + name + "'");
 		
 		lockContextPtr()->bindShader(program);
 		glUniform3f(uniformLocations.at(name), value.x(), value.y(), value.z());
@@ -81,7 +81,7 @@ namespace opengl
 	void Shader::setUniform(const std::string& name, const gml::Mat4f value)
 	{
 		if (!hasUniform(name)) 
-			return;
+			throw std::invalid_argument("unknown uniform '" + name + "'");
 		
 		lockContextPtr()->bindShader(program);
 		glUniformMatrix4fv(uniformLocations.at(name), 1, GL_TRUE, value.data());

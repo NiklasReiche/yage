@@ -67,14 +67,10 @@ namespace gl
     enum class TextureFilter
     {
         NEAREST,
-        LINEAR
-    };
-
-    enum class MipmapOption
-    {
-        NEAREST_NEAREST,
-        LINEAR_NEAREST,
-        NEAREST_LINEAR,
-        LINEAR_LINEAR
+        LINEAR,
+        NEAREST_MIPMAP_NEAREST,
+        LINEAR_MIPMAP_NEAREST,
+        NEAREST_MIPMAP_LINEAR,
+        LINEAR_MIPMAP_LINEAR
     };
 }

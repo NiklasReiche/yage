@@ -6,7 +6,7 @@ namespace gl3d
 {
 	void Material::addTexture(const std::string& name, std::shared_ptr<gl::ITexture2D> tex)
 	{
-        m_textures[name] = std::move(tex);
+        m_textures.emplace_back(name, tex);
 	}
 
 	void Material::addVec3(const std::string& name, const gml::Vec3f& value)
@@ -41,9 +41,9 @@ namespace gl3d
 
         // textures must be added in the same order as they are defined in the shader
         int i = 0;
-		for (std::pair<std::string, std::shared_ptr<gl::ITexture2D>> uniform : m_textures)
+		for (const auto& [name, t] : m_textures)
 		{
-			shader->setUniform("material." + uniform.first, i++);
+			shader->setUniform("material." + name, i++);
 		}
 	}
 
@@ -61,8 +61,8 @@ namespace gl3d
     {
         // TODO
         std::vector<std::reference_wrapper<gl::ITexture2D>> out;
-        for (std::pair<std::string, std::shared_ptr<gl::ITexture2D>> uniform: m_textures) {
-            out.emplace_back(*uniform.second);
+        for (const auto& [name, tex] : m_textures) {
+            out.emplace_back(*tex);
         }
         return out;
     }

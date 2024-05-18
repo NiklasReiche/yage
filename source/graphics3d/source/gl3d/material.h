@@ -75,7 +75,7 @@ namespace gl3d
 
 	private:
 		std::shared_ptr<gl::IShader> shader;
-		std::map<std::string, std::shared_ptr<gl::ITexture2D>> m_textures;
+		std::vector<std::pair<std::string, std::shared_ptr<gl::ITexture2D>>> m_textures;
 		std::map<std::string, gml::Vec3f> vec3Values;
 		std::map<std::string, float> fValues;
 		std::map<std::string, int> iValues;

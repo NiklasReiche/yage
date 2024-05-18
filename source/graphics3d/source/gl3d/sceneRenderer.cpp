@@ -52,15 +52,18 @@ namespace gl3d
 			std::shared_ptr<gl::IShader> shader = drawable.material->getShader();
 			shader->setUniform("model", drawable.transform);
 
+#if 0
 			shader->setUniform("n_dirLights", (int)uniformValues.dirLights.size());
 			for (int i = 0; i < (int)uniformValues.dirLights.size(); ++i) {
 				setDirLightShader(*shader, i, uniformValues.dirLights.at(i));
 			}
-
-			//shader->setUniform("n_pointLights", (int)uniformValues.pointLights.size());
-			//for (int i = 0; i < (int)uniformValues.pointLights.size(); ++i) {
-			//	setPointLightShader(*shader, i, uniformValues.pointLights.at(i));
-			//}
+#endif
+#if 0
+			shader->setUniform("n_pointLights", (int)uniformValues.pointLights.size());
+			for (int i = 0; i < (int)uniformValues.pointLights.size(); ++i) {
+				setPBRPointLightShader(*shader, i, uniformValues.pointLights.at(i));
+			}
+#endif
 
 			drawable.material->updateShader();
             int i = 0;
@@ -113,9 +116,9 @@ namespace gl3d
 	void SceneRenderer::setPBRPointLightShader(
 		gl::IShader& shader,
 		unsigned pos,
-		const std::shared_ptr<pbr::PointLight>& light) const
+		const pbr::PointLight& light) const
 	{
-		shader.setUniform("pointLights[" + utils::toString(pos) + "].position", light->position);
-		shader.setUniform("pointLights[" + utils::toString(pos) + "].color", light->color);
+		shader.setUniform("pointLights[" + utils::toString(pos) + "].position", light.position);
+		shader.setUniform("pointLights[" + utils::toString(pos) + "].color", light.color);
 	}
 }

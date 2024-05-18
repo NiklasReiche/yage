@@ -164,11 +164,6 @@ namespace opengl
         Texture::configTextureFilter(minOption, magOption);
     }
 
-    void Texture2D::configTextureFilter(gl::MipmapOption minOption, gl::TextureFilter magOption)
-    {
-        Texture::configTextureFilter(minOption, magOption);
-    }
-
 	int Texture2D::getWidth() const
 	{
 		return width;
@@ -188,4 +183,9 @@ namespace opengl
 	{
 		return convertToTextureFormat(format);
 	}
+
+    bool Texture2D::requires_mipmaps()
+    {
+        return Texture::requires_mipmaps();
+    }
 }

@@ -171,7 +171,7 @@ namespace gl
 
         virtual void configTextureFilter(TextureFilter minOption, TextureFilter magOption) = 0;
 
-        virtual void configTextureFilter(MipmapOption minOption, TextureFilter magOption) = 0;
+        virtual bool requires_mipmaps() = 0;
 
 		[[nodiscard]]
 		virtual int getWidth() const = 0;

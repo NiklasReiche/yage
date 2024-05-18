@@ -16,6 +16,7 @@ namespace gl
 		BATCHED
 	};
 
+    // TODO: fix the whole nVertices / nIndices ambiguity
 	class IDrawableCreator
 	{
 	public:

@@ -11,7 +11,7 @@
 struct Mouse
 {
 	gml::Vec2f pos;
-	float sensitivity = 0.5f;
+	float sensitivity = 0.2f;
 	bool isHidden = false;
 	bool first = true;
 };
@@ -79,28 +79,28 @@ public:
 	void applyUpdate()
 	{
 		if (keyStates[input::KeyEvent::Code::KEY_W]) {
-			camera->moveForward(0.1);
+			camera->moveForward(speed);
 		}
 		if (keyStates[input::KeyEvent::Code::KEY_A]) {
-			camera->moveLeft(0.1);
+			camera->moveLeft(speed);
 		}
 		if (keyStates[input::KeyEvent::Code::KEY_S]) {
-			camera->moveBackward(0.1);
+			camera->moveBackward(speed);
 		}
 		if (keyStates[input::KeyEvent::Code::KEY_D]) {
-			camera->moveRight(0.1);
+			camera->moveRight(speed);
 		}
 		if (keyStates[input::KeyEvent::Code::KEY_LEFT]) {
-			lights[mode]->position += gml::Vec3f(-0.1f, 0.0f, 0.0f);
+			lights[mode]->position += gml::Vec3f(-speed, 0.0f, 0.0f);
 		}
 		if (keyStates[input::KeyEvent::Code::KEY_RIGHT]) {
-			lights[mode]->position += gml::Vec3f(0.1f, 0.0f, 0.0f);
+			lights[mode]->position += gml::Vec3f(speed, 0.0f, 0.0f);
 		}
 		if (keyStates[input::KeyEvent::Code::KEY_UP]) {
-			lights[mode]->position += gml::Vec3f(0.0f, 0.0f, -0.1f);
+			lights[mode]->position += gml::Vec3f(0.0f, 0.0f, -speed);
 		}
 		if (keyStates[input::KeyEvent::Code::KEY_DOWN]) {
-			lights[mode]->position += gml::Vec3f(0.0f, 0.0f, 0.1f);
+			lights[mode]->position += gml::Vec3f(0.0f, 0.0f, speed);
 		}
 	}
 
@@ -111,4 +111,5 @@ private:
 	std::shared_ptr<gl3d::Camera> camera;
 	std::vector<std::shared_ptr<gl3d::pbr::PointLight>> lights;
 	int mode = 0;
+    float speed = 0.01f;
 };

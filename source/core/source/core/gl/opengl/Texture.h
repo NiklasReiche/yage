@@ -18,7 +18,8 @@ namespace opengl
 
         void configTextureFilter(gl::TextureFilter minOption, gl::TextureFilter magOption);
 
-        void configTextureFilter(gl::MipmapOption minOption, gl::TextureFilter magOption);
+        [[nodiscard]]
+        bool requires_mipmaps() const;
 
 	protected:
 		const GLenum pxType = GL_UNSIGNED_BYTE;
@@ -26,6 +27,10 @@ namespace opengl
 		TextureType target = TextureType::UNDEFINED;
 		InternalFormat format = InternalFormat::UNDEFINED;
 		int nChannels = 0;
+        TextureWrapper m_wrap_s;
+        TextureWrapper m_wrap_t;
+        TextureFilter m_filter_min;
+        TextureFilter m_filter_mag;
 
 		using OpenGlObject::OpenGlObject;
 

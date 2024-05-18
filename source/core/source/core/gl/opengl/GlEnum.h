@@ -54,15 +54,11 @@ namespace opengl
 	enum class TextureFilter
 	{
 		NEAREST = GL_NEAREST,
-		LINEAR = GL_LINEAR
-	};
-
-	enum class MipmapOption
-	{
-		NEAREST_NEAREST = GL_NEAREST_MIPMAP_NEAREST,
-		LINEAR_NEAREST = GL_LINEAR_MIPMAP_NEAREST,
-		NEAREST_LINEAR = GL_NEAREST_MIPMAP_LINEAR,
-		LINEAR_LINEAR = GL_LINEAR_MIPMAP_LINEAR
+		LINEAR = GL_LINEAR,
+        NEAREST_MIPMAP_NEAREST = GL_NEAREST_MIPMAP_NEAREST,
+        LINEAR_MIPMAP_NEAREST = GL_LINEAR_MIPMAP_NEAREST,
+        NEAREST_MIPMAP_LINEAR = GL_NEAREST_MIPMAP_LINEAR,
+        LINEAR_MIPMAP_LINEAR = GL_LINEAR_MIPMAP_LINEAR
 	};
 
 	enum class DrawMode
@@ -152,25 +148,16 @@ namespace opengl
                 return TextureFilter::NEAREST;
             case gl::TextureFilter::LINEAR:
                 return TextureFilter::LINEAR;
+            case gl::TextureFilter::LINEAR_MIPMAP_LINEAR:
+                return TextureFilter::LINEAR_MIPMAP_LINEAR;
+            case gl::TextureFilter::LINEAR_MIPMAP_NEAREST:
+                return TextureFilter::LINEAR_MIPMAP_NEAREST;
+            case gl::TextureFilter::NEAREST_MIPMAP_NEAREST:
+                return TextureFilter::NEAREST_MIPMAP_NEAREST;
+            case gl::TextureFilter::NEAREST_MIPMAP_LINEAR:
+                return TextureFilter::NEAREST_MIPMAP_LINEAR;
             default:
                 throw std::invalid_argument("unknown filter format");
-        }
-    }
-
-    inline MipmapOption convertMipMapOption(const gl::MipmapOption format)
-    {
-        switch (format)
-        {
-            case gl::MipmapOption::NEAREST_NEAREST:
-                return MipmapOption::NEAREST_NEAREST;
-            case gl::MipmapOption::NEAREST_LINEAR:
-                return MipmapOption::NEAREST_LINEAR;
-            case gl::MipmapOption::LINEAR_NEAREST:
-                return MipmapOption::LINEAR_NEAREST;
-            case gl::MipmapOption::LINEAR_LINEAR:
-                return MipmapOption::LINEAR_LINEAR;
-            default:
-                throw std::invalid_argument("unknown mipmap option");
         }
     }
 

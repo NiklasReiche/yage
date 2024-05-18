@@ -32,15 +32,6 @@ public:
 		baseRenderer->setViewport(0, 0, 1500, 900);
 		renderer = gl3d::SceneRenderer(baseRenderer);
 
-
-		std::string vertexShader =
-#include "gl3d/shaders/singleColorShader.vert"
-	;
-		std::string fragmentShader =
-#include "gl3d/shaders/singleColorShader.frag"
-	;
-		shader = glContext->getShaderCreator()->createShader(vertexShader, fragmentShader);
-
 		auto fileReader = platform::desktop::FileReader();
 		std::string csVertexShader = fileReader.
 			openTextFile("assets/shaders/pointShader.vert", platform::IFile::AccessMode::READ)->readAll();
@@ -66,13 +57,15 @@ public:
 		scene->addChild(model);
 
 		lights.push_back(std::make_shared<gl3d::pbr::PointLight>(gl3d::pbr::PointLight{
-			gml::Vec3f(100, 100, 100),
+			gml::Vec3f(50, 50, 50),
 			gml::Vec3f(0, 1, 5)
 		}));
+#if 0
 		lights.push_back(std::make_shared<gl3d::pbr::PointLight>(gl3d::pbr::PointLight{
 			gml::Vec3f(100, 100, 100),
 			gml::Vec3f(0, 1, 5)
 		}));
+#endif
 
 		inputListener = MovementListener(window, camera, lights);
 		window->attach(inputListener);
@@ -100,7 +93,6 @@ public:
 			projViewUniform.syncView();
 
 			baseRenderer->useShader(*csShader);
-			csShader->setUniform("viewPos", camera->getPosition());
 			baseRenderer->draw(*point);
 
 			baseRenderer->useShader(*pbrShader);
@@ -125,7 +117,6 @@ private:
 
 	ProjectionView projViewUniform;
 
-	std::shared_ptr<gl::IShader> shader;
 	std::shared_ptr<gl::IShader> csShader;
 	std::shared_ptr<gl::IShader> pbrShader;
 	std::shared_ptr<gl3d::Camera> camera;

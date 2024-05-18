@@ -43,10 +43,10 @@ void main() {
 
     vec3 V = normalize(camPos - fs_in.FragPos);
 
-    vec3 albedo = texture(material.albedoMap, fs_in.TexCoords).rgb;
-    float metallic = texture(material.metallicRoughnessMap, fs_in.TexCoords).b;
-    float roughness = texture(material.metallicRoughnessMap, fs_in.TexCoords).g;
-    float ao = texture(material.albedoMap, fs_in.TexCoords).r;
+    vec3 albedo = texture(material.albedoMap, fs_in.TexCoords).rgb * material.albedo;
+    float metallic = texture(material.metallicRoughnessMap, fs_in.TexCoords).b * material.metallic;
+    float roughness = texture(material.metallicRoughnessMap, fs_in.TexCoords).g * material.roughness;
+    float ao = texture(material.aoMap, fs_in.TexCoords).r * material.ao;
 
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
 
@@ -65,8 +65,8 @@ void main() {
         vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
         vec3 numerator = NDF * G * F;
-        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
-        vec3 specular = numerator / max(denominator, 0.001);
+        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
+        vec3 specular = numerator / denominator;
 
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
@@ -77,17 +77,19 @@ void main() {
     }
 
     vec3 ambient = vec3(0.03) * albedo * ao;
-    vec3 color = Lo;//ambient + Lo;
+    vec3 color = ambient + Lo;
 
-    color = color / (color + vec3(1.0));
-    color = pow(color, vec3(1.0/2.2));
+    // tone mapping (Reinhard operator)
+    //color = color / (color + vec3(1.0));
+    // gamma correction
+    //color = pow(color, vec3(1.0/2.2));
 
     FragColor = vec4(color, 1.0);
 }
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
-    return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -97,11 +99,11 @@ float DistributionGGX(vec3 N, vec3 H, float roughness)
     float NdotH  = max(dot(N, H), 0.0);
     float NdotH2 = NdotH*NdotH;
 
-    float num   = a2;
+    float nom   = a2;
     float denom = (NdotH2 * (a2 - 1.0) + 1.0);
     denom = PI * denom * denom;
 
-    return num / max(denom, 0.0000001);
+    return nom / denom;
 }
 
 float GeometrySchlickGGX(float NdotV, float roughness)
@@ -109,10 +111,10 @@ float GeometrySchlickGGX(float NdotV, float roughness)
     float r = (roughness + 1.0);
     float k = (r*r) / 8.0;
 
-    float num   = NdotV;
+    float nom   = NdotV;
     float denom = NdotV * (1.0 - k) + k;
 
-    return num / denom;
+    return nom / denom;
 }
 
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)

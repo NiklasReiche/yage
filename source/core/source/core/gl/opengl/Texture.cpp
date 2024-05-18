@@ -40,8 +40,11 @@ namespace opengl
 	{
 		lockContextPtr()->bindTexture(static_cast<GLenum>(target), texture);
 
-		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_WRAP_S, static_cast<GLenum>(convertWrapper(xOption)));
-		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_WRAP_T, static_cast<GLenum>(convertWrapper(yOption)));
+        m_wrap_s = convertWrapper(xOption);
+        m_wrap_t = convertWrapper(yOption);
+
+		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_WRAP_S, static_cast<GLint>(m_wrap_s));
+		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_WRAP_T, static_cast<GLint>(m_wrap_t));
 	}
 
 	// ReSharper disable once CppMemberFunctionMayBeConst
@@ -49,17 +52,33 @@ namespace opengl
 	{
 		lockContextPtr()->bindTexture(static_cast<GLenum>(target), texture);
 
-		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MIN_FILTER, static_cast<GLenum>(convertFilter(minOption)));
-		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MAG_FILTER, static_cast<GLenum>(convertFilter(magOption)));
+        m_filter_min = convertFilter(minOption);
+        m_filter_mag = convertFilter(magOption);
+
+		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MIN_FILTER, static_cast<GLint>(m_filter_min));
+		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MAG_FILTER, static_cast<GLint>(m_filter_mag));
 	}
 
-	// ReSharper disable once CppMemberFunctionMayBeConst
-	void Texture::configTextureFilter(gl::MipmapOption minOption, gl::TextureFilter magOption)
-	{
-		lockContextPtr()->bindTexture(static_cast<GLenum>(target), texture);
-
-		glGenerateMipmap(static_cast<GLenum>(target));
-		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MIN_FILTER, static_cast<GLenum>(convertMipMapOption(minOption)));
-		glTexParameteri(static_cast<GLenum>(target), GL_TEXTURE_MAG_FILTER, static_cast<GLenum>(convertFilter(magOption)));
-	}
+    bool Texture::requires_mipmaps() const
+    {
+        switch (m_filter_min) {
+            case TextureFilter::NEAREST_MIPMAP_NEAREST:
+            case TextureFilter::NEAREST_MIPMAP_LINEAR:
+            case TextureFilter::LINEAR_MIPMAP_NEAREST:
+            case TextureFilter::LINEAR_MIPMAP_LINEAR:
+                return true;
+            default:
+                break;
+        }
+        switch (m_filter_mag) {
+            case TextureFilter::NEAREST_MIPMAP_NEAREST:
+            case TextureFilter::NEAREST_MIPMAP_LINEAR:
+            case TextureFilter::LINEAR_MIPMAP_NEAREST:
+            case TextureFilter::LINEAR_MIPMAP_LINEAR:
+                return true;
+            default:
+                break;
+        }
+        return false;
+    }
 }

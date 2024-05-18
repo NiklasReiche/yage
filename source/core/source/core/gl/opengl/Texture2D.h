@@ -41,7 +41,7 @@ namespace opengl
 
         void configTextureFilter(gl::TextureFilter minOption, gl::TextureFilter magOption) override;
 
-        void configTextureFilter(gl::MipmapOption minOption, gl::TextureFilter magOption) override;
+        bool requires_mipmaps() override;
 
 		int getWidth() const override;
 
