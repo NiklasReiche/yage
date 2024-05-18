@@ -2,6 +2,12 @@
 
 namespace gl3d
 {
+    struct Geometry
+    {
+        std::shared_ptr<Mesh> mesh;
+        gml::Mat4d transform;
+    };
+
 	SceneRenderer::SceneRenderer(std::shared_ptr<gl::IRenderer> renderer)
 		: renderer(std::move(renderer))
 	{
@@ -10,17 +16,14 @@ namespace gl3d
 
 	void SceneRenderer::renderGraph(const std::shared_ptr<SceneNode>& root)
 	{
-		std::vector<Geom> drawablesLoop;
+		std::vector<Geometry> drawablesLoop;
 		uniformValues.dirLights.clear();
 		uniformValues.pointLights.clear();
 
 		auto collectGeometry = [this, &drawablesLoop](SceneObject* node, gml::Mat4d transform)
 		{
-			if (node->hasMaterial() && node->hasMesh()) {
-				drawablesLoop.push_back({
-					                        node->getMesh(),
-					                        node->getMaterial(),
-					                        transform });
+			if (node->hasMesh()) {
+				drawablesLoop.emplace_back(node->getMesh(), transform);
 			}
 			if (node->hasLight()) {
 				std::shared_ptr<Light> light = node->getLight();
@@ -48,29 +51,30 @@ namespace gl3d
 
 		root->updateChildren(collectGeometry);
 
-		for (Geom drawable : drawablesLoop) {
-			std::shared_ptr<gl::IShader> shader = drawable.material->getShader();
-			shader->setUniform("model", drawable.transform);
-
+		for (auto& geometry : drawablesLoop) {
+            for (auto& sub_mesh : geometry.mesh->sub_meshes()) {
 #if 0
-			shader->setUniform("n_dirLights", (int)uniformValues.dirLights.size());
-			for (int i = 0; i < (int)uniformValues.dirLights.size(); ++i) {
-				setDirLightShader(*shader, i, uniformValues.dirLights.at(i));
-			}
-#endif
-#if 0
-			shader->setUniform("n_pointLights", (int)uniformValues.pointLights.size());
-			for (int i = 0; i < (int)uniformValues.pointLights.size(); ++i) {
-				setPBRPointLightShader(*shader, i, uniformValues.pointLights.at(i));
-			}
-#endif
-
-			drawable.material->updateShader();
-            int i = 0;
-            for (auto texture : drawable.material->textures()){
-                this->renderer->bindTexture(texture, i++);
+                shader->setUniform("n_dirLights", (int)uniformValues.dirLights.size());
+            for (int i = 0; i < (int)uniformValues.dirLights.size(); ++i) {
+                setDirLightShader(*shader, i, uniformValues.dirLights.at(i));
             }
-			this->renderer->draw(*(drawable.mesh->drawable));
+#endif
+#if 0
+                shader->setUniform("n_pointLights", (int)uniformValues.pointLights.size());
+            for (int i = 0; i < (int)uniformValues.pointLights.size(); ++i) {
+                setPBRPointLightShader(*shader, i, uniformValues.pointLights.at(i));
+            }
+#endif
+
+                sub_mesh->material().getShader()->setUniform("model", geometry.transform);
+                sub_mesh->material().updateShader();
+                int i = 0;
+                for (auto texture: sub_mesh->material().textures()) {
+                    this->renderer->bindTexture(texture, i++);
+                }
+
+                this->renderer->draw(sub_mesh->drawable());
+            }
 		}
 	}
 

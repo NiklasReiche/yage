@@ -17,13 +17,6 @@
 
 namespace gl3d
 {
-	struct Geom
-	{
-		std::shared_ptr<Mesh> mesh;
-		std::shared_ptr<Material> material;
-		gml::Mat4d transform;
-	};
-
 	struct ShaderUniformValues
 	{
 		gml::Vec3d viewPos;

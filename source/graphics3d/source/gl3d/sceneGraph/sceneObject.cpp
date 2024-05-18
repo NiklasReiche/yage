@@ -12,63 +12,48 @@ namespace gl3d
 	{
 	}
 
-	void SceneObject::bindMaterial(const std::shared_ptr<Material>& material)
-	{
-		this->material = material;
-	}
-
 	void SceneObject::bindMesh(const std::shared_ptr<Mesh>& mesh)
 	{
-		this->mesh = mesh;
+		this->m_mesh = mesh;
 	}
 
 	void SceneObject::bindLight(const std::shared_ptr<Light>& light)
 	{
-		this->light = light;
+		this->m_light = light;
 	}
 
 	void SceneObject::bindCamera(const std::shared_ptr<Camera>& camera)
 	{
-		this->camera = camera;
-	}
-
-	bool SceneObject::hasMaterial() const
-	{
-		return material != nullptr;
+		this->m_camera = camera;
 	}
 
 	bool SceneObject::hasMesh() const
 	{
-		return mesh != nullptr;
+		return m_mesh != nullptr;
 	}
 
 	bool SceneObject::hasLight() const
 	{
-		return light != nullptr;
+		return m_light != nullptr;
 	}
 
 	bool SceneObject::hasCamera() const
 	{
-		return camera != nullptr;
-	}
-
-	std::shared_ptr<Material> SceneObject::getMaterial() const
-	{
-		return material;
+		return m_camera != nullptr;
 	}
 
 	std::shared_ptr<Mesh> SceneObject::getMesh() const
 	{
-		return mesh;
+		return m_mesh;
 	}
 
 	std::shared_ptr<Light> SceneObject::getLight() const
 	{
-		return light;
+		return m_light;
 	}
 
 	std::shared_ptr<Camera> SceneObject::getCamera() const
 	{
-		return camera;
+		return m_camera;
 	}
 }

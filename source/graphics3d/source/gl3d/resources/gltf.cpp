@@ -46,22 +46,21 @@ namespace gl3d::resources
 
     // TODO use spans
     // TODO sparse accessors
-    std::vector<unsigned char> readBuffer(tinygltf::Model& model, int i, int offset, int size)
+    std::vector<unsigned char> readBuffer(tinygltf::Model& model, int i, std::size_t offset, std::size_t size)
     {
         std::vector<unsigned char> buffer(model.buffers[i].data.begin() + offset,
                                           model.buffers[i].data.begin() + offset + size);
         return buffer;
     }
 
-    std::vector<unsigned char> readBufferView(tinygltf::Model& model, int i, int offset, int byte_length)
+    std::vector<unsigned char> readBufferView(tinygltf::Model& model, int i, std::size_t offset, std::size_t byte_length)
     {
         auto& bufferView = model.bufferViews[i];
         return readBuffer(model, bufferView.buffer, bufferView.byteOffset + offset, byte_length);
     }
 
-    std::vector<unsigned char> readAccessor(tinygltf::Model& model, int i)
+    std::vector<unsigned char> readAccessor(tinygltf::Model& model, tinygltf::Accessor& accessor)
     {
-        auto& accessor = model.accessors[i];
         auto type_byte_length = tinygltf::GetNumComponentsInType(accessor.type) *
                                 tinygltf::GetComponentSizeInBytes(accessor.componentType);
         return readBufferView(model, accessor.bufferView, accessor.byteOffset, accessor.count * type_byte_length);
@@ -105,7 +104,78 @@ namespace gl3d::resources
         return t;
     }
 
-    std::tuple<std::unique_ptr<gl::IDrawable>, gl3d::Material> readGltf(
+    std::unique_ptr<SubMesh> read_sub_mesh(tinygltf::Model& model, tinygltf::Primitive& primitive,
+                                           gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator)
+    {
+        // TODO: fallback when attributes are not present
+        auto position_accessor = model.accessors[primitive.attributes["POSITION"]];
+        auto normal_accessor = model.accessors[primitive.attributes["NORMAL"]];
+        auto tangent_accessor = model.accessors[primitive.attributes["TANGENT"]];
+        auto tex_coord_accessor = model.accessors[primitive.attributes["TEXCOORD_0"]]; // TODO
+
+        auto positions = readAccessor(model, position_accessor);
+        auto normals = readAccessor(model, normal_accessor);
+        auto tangents = readAccessor(model, tangent_accessor);
+        auto tex_coords = readAccessor(model, tex_coord_accessor);
+
+        std::vector<unsigned char> vertices;
+        vertices.insert(vertices.end(), positions.begin(), positions.end());
+        vertices.insert(vertices.end(), normals.begin(), normals.end());
+        vertices.insert(vertices.end(), tangents.begin(), tangents.end());
+        vertices.insert(vertices.end(), tex_coords.begin(), tex_coords.end());
+
+        auto indices_accessor = model.accessors[primitive.indices];
+        auto indices = readAccessor(model, indices_accessor);
+
+        const std::vector<unsigned int>& vertexLayout{
+                static_cast<unsigned int>(tinygltf::GetNumComponentsInType(position_accessor.type)),
+                static_cast<unsigned int>(tinygltf::GetNumComponentsInType(normal_accessor.type)),
+                static_cast<unsigned int>(tinygltf::GetNumComponentsInType(tangent_accessor.type)),
+                static_cast<unsigned int>(tinygltf::GetNumComponentsInType(tex_coord_accessor.type))
+        };
+        std::shared_ptr<gl::IDrawable> drawable = drawableCreator.createDrawable(vertices, indices, vertexLayout,
+                                                       indices.size() / tinygltf::GetComponentSizeInBytes(
+                                                               indices_accessor.componentType),
+                                                       gl::VertexFormat::BATCHED);
+
+        auto& material = model.materials[primitive.material];
+
+        // TODO: use a 1x1 dummy texture or disable tex_coords in shader, if there's no textures
+        auto base_texture = read_texture(textureCreator, model,
+                                         model.textures[material.pbrMetallicRoughness.baseColorTexture.index]);
+        auto normal_texture = read_texture(textureCreator, model, model.textures[material.normalTexture.index]);
+        auto occlusion_texture = read_texture(textureCreator, model, model.textures[material.occlusionTexture.index]);
+        auto metallic_roughness_texture = read_texture(textureCreator, model,
+                                                       model.textures[material.pbrMetallicRoughness
+                                                                              .metallicRoughnessTexture.index]);
+
+        auto gl3d_material = std::make_shared<Material>();
+        gl3d_material->addVec3("albedo", gml::Vec3f(static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[0]),
+                                                    static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[1]),
+                                                    static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[2])));
+        gl3d_material->addFloat("metallic", static_cast<float>(material.pbrMetallicRoughness.metallicFactor));
+        gl3d_material->addFloat("roughness", static_cast<float>(material.pbrMetallicRoughness.roughnessFactor));
+        gl3d_material->addFloat("ao", 1);
+
+        gl3d_material->addTexture("albedoMap", base_texture);
+        gl3d_material->addTexture("normalMap", normal_texture);
+        gl3d_material->addTexture("metallicRoughnessMap", metallic_roughness_texture);
+        gl3d_material->addTexture("aoMap", occlusion_texture);
+
+        return std::make_unique<SubMesh>(drawable, gl3d_material);
+    }
+
+    std::unique_ptr<Mesh> read_mesh(tinygltf::Model& model, tinygltf::Mesh& mesh,
+                                    gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator)
+    {
+        auto gl3d_mesh = std::make_unique<Mesh>();
+        for (auto& primitive : mesh.primitives) {
+            gl3d_mesh->add_sub_mesh(read_sub_mesh(model, primitive, drawableCreator, textureCreator));
+        }
+        return gl3d_mesh;
+    }
+
+    std::unique_ptr<Mesh> readGltf(
             const platform::IFileReader& fileReader, const std::string& filename,
             gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator)
     {
@@ -115,202 +185,33 @@ namespace gl3d::resources
         std::string basedir = utils::join(tmp, "/");
         basedir.pop_back();
 
-        std::string data;
-        if (filetype == "gltf") {
-            data = fileReader.openTextFile(filename, platform::IFile::AccessMode::READ)->readAll();
-        } else if (filetype == "glb") {
-            throw NotImplementedException();
-        } else {
-            throw std::invalid_argument("invalid filetype for gltf");
-        }
-
-
         tinygltf::TinyGLTF loader;
         loader.SetPreserveImageChannels(true);
 
         tinygltf::Model model;
         std::string err;
         std::string warn;
-        bool ret = loader.LoadASCIIFromString(&model, &err, &warn, data.data(), data.length(), basedir);
-
-        // TODO
-        if (!warn.empty()) {
-            printf("Warn: %s\n", warn.c_str());
+        bool ret;
+        if (filetype == "gltf") {
+            std::string data = fileReader.openTextFile(filename, platform::IFile::AccessMode::READ)->readAll();
+            ret = loader.LoadASCIIFromString(&model, &err, &warn, data.data(), data.length(), basedir);
+        } else if (filetype == "glb") {
+            // TODO
+            //fileReader.openBinaryFile(filename, platform::IFile::AccessMode::READ);
+            //loader.LoadBinaryFromMemory();
+            throw NotImplementedException();
+        } else {
+            throw std::invalid_argument("invalid filetype for gltf");
         }
-        if (!err.empty()) {
-            printf("Err: %s\n", err.c_str());
+
+        if (!warn.empty()) {
+            printf("Warn: %s\n", warn.c_str()); // TODO
         }
         if (!ret) {
-            printf("Failed to parse glTF\n");
+            throw std::logic_error("TinyGLTF parsing error: " + err);
         }
 
-        auto& mesh = model.meshes[0];
-
-        auto positions = readAccessor(model, mesh.primitives[0].attributes["POSITION"]);
-        auto normals = readAccessor(model, mesh.primitives[0].attributes["NORMAL"]);
-        auto tangents = readAccessor(model, mesh.primitives[0].attributes["TANGENT"]);
-        auto tex_coords = readAccessor(model, mesh.primitives[0].attributes["TEXCOORD_0"]);
-
-        std::vector<unsigned char> vertices;
-        vertices.insert(vertices.end(), positions.begin(), positions.end());
-        vertices.insert(vertices.end(), normals.begin(), normals.end());
-        vertices.insert(vertices.end(), tangents.begin(), tangents.end());
-        vertices.insert(vertices.end(), tex_coords.begin(), tex_coords.end());
-
-        auto indices = readAccessor(model, mesh.primitives[0].indices);
-
-        auto position_accessor = model.accessors[mesh.primitives[0].attributes["POSITION"]];
-        auto normal_accessor = model.accessors[mesh.primitives[0].attributes["NORMAL"]];
-        auto tangent_accessor = model.accessors[mesh.primitives[0].attributes["TANGENT"]];
-        auto tex_coord_accessor = model.accessors[mesh.primitives[0].attributes["TEXCOORD_0"]];
-        auto indices_accessor = model.accessors[mesh.primitives[0].indices];
-
-        const std::vector<unsigned int>& vertexLayout{
-                static_cast<unsigned int>(tinygltf::GetNumComponentsInType(position_accessor.type)),
-                static_cast<unsigned int>(tinygltf::GetNumComponentsInType(normal_accessor.type)),
-                static_cast<unsigned int>(tinygltf::GetNumComponentsInType(tangent_accessor.type)),
-                static_cast<unsigned int>(tinygltf::GetNumComponentsInType(tex_coord_accessor.type))
-        };
-        const unsigned int vertexSize = std::accumulate(vertexLayout.begin(), vertexLayout.end(), 0u);
-        auto drawable = drawableCreator.createDrawable(vertices, indices, vertexLayout,
-                                                       indices.size() / tinygltf::GetComponentSizeInBytes(
-                                                               indices_accessor.componentType),
-                                                       gl::VertexFormat::BATCHED);
-
-        auto& material = model.materials[mesh.primitives[0].material];
-
-        auto base_texture = read_texture(textureCreator, model,
-                                         model.textures[material.pbrMetallicRoughness.baseColorTexture.index]);
-        auto normal_texture = read_texture(textureCreator, model, model.textures[material.normalTexture.index]);
-        auto occlusion_texture = read_texture(textureCreator, model, model.textures[material.occlusionTexture.index]);
-        auto metallic_roughness_texture = read_texture(textureCreator, model,
-                                                       model.textures[material.pbrMetallicRoughness
-                                                                              .metallicRoughnessTexture.index]);
-
-
-        auto pbrMaterial = gl3d::Material();
-        pbrMaterial.addVec3("albedo", gml::Vec3f(static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[0]),
-                                                 static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[1]),
-                                                 static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[2])));
-        pbrMaterial.addFloat("metallic", static_cast<float>(material.pbrMetallicRoughness.metallicFactor));
-        pbrMaterial.addFloat("roughness", static_cast<float>(material.pbrMetallicRoughness.roughnessFactor));
-        pbrMaterial.addFloat("ao", 1); // TODO
-
-        pbrMaterial.addTexture("albedoMap", base_texture);
-        pbrMaterial.addTexture("normalMap", normal_texture);
-        pbrMaterial.addTexture("metallicRoughnessMap", metallic_roughness_texture);
-        pbrMaterial.addTexture("aoMap", occlusion_texture);
-
-        return {std::move(drawable), pbrMaterial};
+        // TODO: we currently only support single models
+        return read_mesh(model, model.meshes[0], drawableCreator, textureCreator);
     }
-
-#if 0
-    std::tuple<std::unique_ptr<gl::IDrawable>, gl3d::Material> readGltf(
-        const platform::IFileReader& fileReader, const std::string& filename,
-        gl::IDrawableCreator&)
-    {
-        auto file = fileReader.openTextFile(filename, platform::IFile::AccessMode::READ);
-        auto data = json::parse(file->readAll());
-
-        std::vector<std::unique_ptr<platform::IBinaryFile>> buffers;
-        for (auto bufferDef : data["buffers"]) {
-            if (!utils::startsWith(bufferDef["uri"], "data:application/octet-stream")) {
-                auto tmp = utils::strip(filename, "/");
-                tmp.pop_back();
-                std::string path = utils::join(tmp);
-                buffers.push_back(fileReader.openBinaryFile(path + "/" + bufferDef["uri"].get<std::string>(),
-                                                            platform::IFile::AccessMode::READ));
-            }
-        }
-
-        auto& meshPrimitive = data["meshes"][0]["primitives"][0];
-//		int normalsAccessor = meshPrimitive["attributes"]["POSITION"].get<int>();
-//		int indicesAccessor = meshPrimitive["indices"].get<int>();
-
-        int positionsAccessor = meshPrimitive["attributes"]["POSITION"].get<int>();
-        int positionsView = data["accessors"][positionsAccessor]["bufferView"];
-        auto& bufferView = data["bufferViews"][positionsView];
-        std::vector<gml::Vec3f> positions(bufferView["byteLength"].get<int>() / 12);
-        buffers[bufferView["buffer"].get<int>()]->seek(bufferView["byteOffset"].get<int>(),
-                                                       platform::IFile::SeekOffset::BEG);
-        buffers[bufferView["buffer"].get<int>()]->read(&positions[0], bufferView["byteLength"].get<int>());
-
-        return std::tuple<std::unique_ptr<gl::IDrawable>, gl3d::Material>(nullptr, gl3d::Material());
-    }
-
-
-
-
-
-    std::vector<float> readBufferViewFloat(
-        nlohmann::json data, int i, int offset, int nElements,
-        std::vector<std::unique_ptr<platform::IBinaryFile>> buffers)
-    {
-        std::vector<float> elements(nElements);
-
-        int bufferIndex = data["bufferView"][i]["buffer"].get<int>();
-        int byteOffset = offset + data["bufferView"][i]["byteOffset"].get<int>();
-
-        buffers[bufferIndex]->seek(byteOffset, platform::IFile::SeekOffset::BEG);
-        buffers[bufferIndex]->read(elements.data(), nElements * size(COMPONENT_TYPE::FLOAT));
-
-        return elements;
-    }
-
-    void readMeshes(nlohmann::json data, std::vector<std::unique_ptr<platform::IBinaryFile>> buffers)
-    {
-        for (auto mesh : data["meshes"]) {
-            auto primitive = mesh["primitives"][0];
-            int positionsAccessor = primitive["attributes"]["POSITION"].get<int>();
-            auto positions = readBufferViewFloat(data,
-                                                 data["accessor"][positionsAccessor]["bufferView"],
-                                                 data["accessor"][positionsAccessor]["byteOffset"],
-                                                 size(data["accessor"][positionsAccessor]["type"].get<std::string>()) * size,
-                                                 buffers);
-
-            int normalsAccessor = primitive["attributes"]["NORMAL"].get<int>();
-            auto normals = readBufferViewFloat(data,
-                                               data["accessor"][normalsAccessor]["bufferView"],
-                                               data["accessor"][normalsAccessor]["byteOffset"],
-                                               size(data["accessor"][normalsAccessor]["type"].get<std::string>()) * 4,
-                                               buffers);
-
-            int indicesAccessor = primitive["indices"].get<int>();
-            int componentType = data["accessor"][normalsAccessor]["componentType"].get<int>();
-
-            std::vector<unsigned int> indices;
-            switch (componentType)
-            {
-                case BYTE:
-                case UNSIGNED_BYTE:
-                case SHORT:
-                case UNSIGNED_SHORT:
-                    auto rawIndices =
-                        readBufferViewInteger<std::uin>(data,
-                                                                  data["accessor"][normalsAccessor]["bufferView"],
-                                                                  data["accessor"][normalsAccessor]["byteOffset"],
-                                                                  size(
-                                                                      data["accessor"][normalsAccessor]["type"].get<std::string>()));
-                case UNSIGNED_INT:
-            }
-
-
-
-
-        }
-    }
-
-    std::vector<std::unique_ptr<platform::IBinaryFile>>
-    readBuffers(nlohmann::json data, const std::string& basePath, const platform::IFileReader& fileReader)
-    {
-        std::vector<std::unique_ptr<platform::IBinaryFile>> buffers;
-        for (auto buffer : data["buffers"]) {
-            if (!utils::startsWith(buffer["uri"], "data:application/octet-stream")) {
-                buffers.push_back(fileReader.openBinaryFile(basePath + "/" + buffer["uri"].get<std::string>(),
-                                                            platform::IFile::AccessMode::READ));
-            }
-        }
-        return buffers;
-    }
-#endif
 }

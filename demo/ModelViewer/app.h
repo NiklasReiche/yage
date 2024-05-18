@@ -130,16 +130,15 @@ private:
 
 	std::shared_ptr<gl3d::SceneObject> loadModel(const std::string& filename)
 	{
-		auto tuple = gl3d::resources::readGltf(platform::desktop::FileReader(),
+		std::shared_ptr<gl3d::Mesh> mesh = gl3d::resources::readGltf(platform::desktop::FileReader(),
 		                                       filename, *glContext->getDrawableCreator(), *glContext->getTextureCreator());
-		auto mesh = std::make_shared<gl3d::Mesh>(std::move(std::get<0>(tuple)));
-		auto material = std::make_shared<gl3d::Material>(std::get<1>(tuple));
-		material->setShader(pbrShader);
+        auto mesh_node = std::make_shared<gl3d::SceneObject>(&""[std::rand()]);
+        mesh_node->bindMesh(mesh);
 
-		auto object = std::make_shared<gl3d::SceneObject>(&""[std::rand()]);
-		object->bindMaterial(material);
-		object->bindMesh(mesh);
+        for (auto& sub_mesh : mesh->sub_meshes()) {
+            sub_mesh->material().setShader(pbrShader);
+        }
 
-		return object;
+		return mesh_node;
 	}
 };
