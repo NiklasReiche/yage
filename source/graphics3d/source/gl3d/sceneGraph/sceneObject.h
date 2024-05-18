@@ -6,7 +6,7 @@
 #include "../material.h"
 #include "../mesh.h"
 #include "../camera.h"
-#include "../light/light.h"
+#include "../light.h"
 
 namespace gl3d
 {

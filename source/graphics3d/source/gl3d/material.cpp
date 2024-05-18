@@ -4,66 +4,64 @@
 
 namespace gl3d
 {
-	void Material::addTexture(const std::string& name, std::shared_ptr<gl::ITexture2D> tex)
+	void Material::add_uniform(const std::string& name, std::shared_ptr<gl::ITexture2D> tex)
 	{
-        m_textures.emplace_back(name, tex);
+        m_textures[name] = std::move(tex);
 	}
 
-	void Material::addVec3(const std::string& name, const gml::Vec3f& value)
+	void Material::add_uniform(const std::string& name, gml::Vec3f value)
 	{
-		vec3Values[name] = value;
+        m_vec3Values[name] = value;
 	}
 
-	void Material::addFloat(const std::string& name, float value)
+	void Material::add_uniform(const std::string& name, float value)
 	{
-		fValues[name] = value;
+        m_fValues[name] = value;
 	}
 
-	void Material::addInteger(const std::string& name, int value)
+	void Material::add_uniform(const std::string& name, int value)
 	{
-		iValues[name] = value;
+        m_iValues[name] = value;
 	}
 
-	void Material::updateShader()
+	void Material::update_shader_uniforms()
 	{
-		for (const auto& uniform : vec3Values)
+		for (const auto& uniform : m_vec3Values)
 		{
-			shader->setUniform("material." + uniform.first, uniform.second);
+			m_shader->setUniform("material." + uniform.first, uniform.second);
 		}
-		for (const auto& uniform : fValues)
+		for (const auto& uniform : m_fValues)
 		{
-			shader->setUniform("material." + uniform.first, uniform.second);
+			m_shader->setUniform("material." + uniform.first, uniform.second);
 		}
-		for (const auto& uniform : iValues)
+		for (const auto& uniform : m_iValues)
 		{
-			shader->setUniform("material." + uniform.first, uniform.second);
+			m_shader->setUniform("material." + uniform.first, uniform.second);
 		}
 
-        // textures must be added in the same order as they are defined in the shader
         int i = 0;
-		for (const auto& [name, t] : m_textures)
+		for (const auto& [name, _] : m_textures)
 		{
-			shader->setUniform("material." + name, i++);
+            // it's important to use the same order as when binding textures to get the correct texture units
+			m_shader->setUniform("material." + name, i++);
 		}
 	}
 
-	void Material::setShader(std::shared_ptr<gl::IShader> _shader)
+	void Material::set_shader(std::shared_ptr<gl::IShader> shader)
 	{
-		this->shader = std::move(_shader);
+		this->m_shader = std::move(shader);
 	}
 
-	std::shared_ptr<gl::IShader> Material::getShader() const
+	std::shared_ptr<gl::IShader> Material::shader() const
 	{
-		return shader;
+		return m_shader;
 	}
 
-    std::vector<std::reference_wrapper<gl::ITexture2D>> Material::textures() const
+    void Material::bind_textures(gl::IRenderer& renderer)
     {
-        // TODO
-        std::vector<std::reference_wrapper<gl::ITexture2D>> out;
-        for (const auto& [name, tex] : m_textures) {
-            out.emplace_back(*tex);
+        int i = 0;
+        for (const auto& [_, texture]: m_textures) {
+            renderer.bindTexture(*texture, i++);
         }
-        return out;
     }
 }

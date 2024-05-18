@@ -28,19 +28,19 @@ namespace
 			} else if (type == "Ka") {
 				float x, y, z;
 				line >> x >> y >> z;
-				material.addVec3("ambient", gml::Vec3f(x, y, z));
+                material.add_uniform("ambient", gml::Vec3f(x, y, z));
 			} else if (type == "Kd") {
 				float x, y, z;
 				line >> x >> y >> z;
-				material.addVec3("diffuse", gml::Vec3f(x, y, z));
+                material.add_uniform("diffuse", gml::Vec3f(x, y, z));
 			} else if (type == "Ks") {
 				float x, y, z;
 				line >> x >> y >> z;
-				material.addVec3("specular", gml::Vec3f(x, y, z));
+                material.add_uniform("specular", gml::Vec3f(x, y, z));
 			} else if (type == "Ns") {
 				float s;
 				line >> s;
-				material.addFloat("shininess", s);
+                material.add_uniform("shininess", s);
 			}
 		}
 

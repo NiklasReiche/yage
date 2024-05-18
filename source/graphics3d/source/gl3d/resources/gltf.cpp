@@ -148,17 +148,19 @@ namespace gl3d::resources
                                                                               .metallicRoughnessTexture.index]);
 
         auto gl3d_material = std::make_shared<Material>();
-        gl3d_material->addVec3("albedo", gml::Vec3f(static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[0]),
-                                                    static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[1]),
-                                                    static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[2])));
-        gl3d_material->addFloat("metallic", static_cast<float>(material.pbrMetallicRoughness.metallicFactor));
-        gl3d_material->addFloat("roughness", static_cast<float>(material.pbrMetallicRoughness.roughnessFactor));
-        gl3d_material->addFloat("ao", 1);
+        gl3d_material
+                ->add_uniform("albedo", gml::Vec3f(static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[0]),
+                                                   static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[1]),
+                                                   static_cast<float>(material.pbrMetallicRoughness
+                                                                              .baseColorFactor[2])));
+        gl3d_material->add_uniform("metallic", static_cast<float>(material.pbrMetallicRoughness.metallicFactor));
+        gl3d_material->add_uniform("roughness", static_cast<float>(material.pbrMetallicRoughness.roughnessFactor));
+        gl3d_material->add_uniform("ao", 1.0f);
 
-        gl3d_material->addTexture("albedoMap", base_texture);
-        gl3d_material->addTexture("normalMap", normal_texture);
-        gl3d_material->addTexture("metallicRoughnessMap", metallic_roughness_texture);
-        gl3d_material->addTexture("aoMap", occlusion_texture);
+        gl3d_material->add_uniform("albedoMap", base_texture);
+        gl3d_material->add_uniform("normalMap", normal_texture);
+        gl3d_material->add_uniform("metallicRoughnessMap", metallic_roughness_texture);
+        gl3d_material->add_uniform("aoMap", occlusion_texture);
 
         return std::make_unique<SubMesh>(drawable, gl3d_material);
     }

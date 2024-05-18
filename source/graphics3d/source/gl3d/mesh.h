@@ -8,6 +8,11 @@
 
 namespace gl3d
 {
+    // TODO: these could be modelled as simple structs
+
+    /**
+     * Represents a geometric primitive with an associated material.
+     */
     class SubMesh
     {
     public:
@@ -26,6 +31,9 @@ namespace gl3d
         std::shared_ptr<Material> m_material;
     };
 
+    /**
+     * Represents a geometric model as a collection of sub meshes.
+     */
 	class Mesh
 	{
 	public:

@@ -11,14 +11,8 @@ target_sources(yage_gl3d
         camera.h
         camera.cpp
 
-        light/light.h
-        light/light.cpp
-        light/pointLight.h
-        light/pointLight.cpp
-        light/dirLight.h
-        light/dirLight.cpp
-
-        light/pbr/PointLight.h
+        light.h
+        light.cpp
 
         material.h
         material.cpp
@@ -39,6 +33,8 @@ target_sources(yage_gl3d
         resources/obj.cpp
         resources/gltf.h
         resources/gltf.cpp
+
+        shaderSnippets.h
 
         shaders.h
         ${CMAKE_CURRENT_BINARY_DIR}/shaders.cpp

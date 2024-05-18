@@ -166,7 +166,7 @@ private:
 		                                       filename, *glContext->getDrawableCreator());
 		auto mesh = std::make_shared<gl3d::Mesh>(std::move(std::get<0>(tuple)));
 		auto material = std::make_shared<gl3d::Material>(std::get<1>(tuple));
-		material->setShader(pbrShader);
+        material->set_shader(pbrShader);
 
 		auto object = std::make_shared<gl3d::SceneObject>(&""[std::rand()]);
 		object->bindMaterial(material);
@@ -207,7 +207,7 @@ private:
 		                                       "models/cube.gltf", *glContext->getDrawableCreator());
 		auto mesh = std::make_shared<gl3d::Mesh>(std::move(std::get<0>(tuple)));
 		auto material = std::make_shared<gl3d::Material>(std::get<1>(tuple));
-		material->setShader(pbrShader);
+        material->set_shader(pbrShader);
 		light2->bindMesh(mesh);
 		light2->bindMaterial(material);
 		light2->setTransform(gml::matrix::translate<double>(gml::Vec3d(0, 1, 5)) *

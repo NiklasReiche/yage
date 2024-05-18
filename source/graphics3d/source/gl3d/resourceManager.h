@@ -3,8 +3,7 @@
 #include "resourceCache.h"
 #include "material.h"
 #include "mesh.h"
-#include "light/dirLight.h"
-#include "light/pointLight.h"
+#include "light.h"
 
 namespace gl3d
 {
@@ -31,10 +30,6 @@ namespace gl3d
 		unsigned int add(PointLight light)
 		{
 			return lightCache.add(std::make_shared<PointLight>(light));
-		}
-		unsigned int add(SpotLight light)
-		{
-			return lightCache.add(std::make_shared<SpotLight>(light));
 		}
 
 		std::shared_ptr<Material> getMaterial(unsigned int id)

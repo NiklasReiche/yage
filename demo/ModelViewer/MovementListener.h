@@ -22,9 +22,8 @@ public:
 	MovementListener() = default;
 
 	MovementListener(std::shared_ptr<platform::IWindow> window,
-				  std::shared_ptr<gl3d::Camera> camera,
-				  std::vector<std::shared_ptr<gl3d::pbr::PointLight>> lights)
-		: window(std::move(window)), camera(std::move(camera)), lights(std::move(lights))
+				  std::shared_ptr<gl3d::Camera> camera)
+		: window(std::move(window)), camera(std::move(camera))
 	{
 		keyStates[input::KeyEvent::Code::KEY_W] = false;
 		keyStates[input::KeyEvent::Code::KEY_A] = false;
@@ -70,9 +69,6 @@ public:
 				std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->hideCursor();
 				mouse.isHidden = true;
 			}
-		} else if (code == input::KeyEvent::Code::KEY_Y && action == input::KeyEvent::Action::PRESS) {
-			mode = (mode + 1) % lights.size();
-			std::cout << "Switched to mode " << mode << std::endl;
 		}
 	}
 
@@ -90,18 +86,6 @@ public:
 		if (keyStates[input::KeyEvent::Code::KEY_D]) {
 			camera->moveRight(speed);
 		}
-		if (keyStates[input::KeyEvent::Code::KEY_LEFT]) {
-			lights[mode]->position += gml::Vec3f(-speed, 0.0f, 0.0f);
-		}
-		if (keyStates[input::KeyEvent::Code::KEY_RIGHT]) {
-			lights[mode]->position += gml::Vec3f(speed, 0.0f, 0.0f);
-		}
-		if (keyStates[input::KeyEvent::Code::KEY_UP]) {
-			lights[mode]->position += gml::Vec3f(0.0f, 0.0f, -speed);
-		}
-		if (keyStates[input::KeyEvent::Code::KEY_DOWN]) {
-			lights[mode]->position += gml::Vec3f(0.0f, 0.0f, speed);
-		}
 	}
 
 private:
@@ -109,7 +93,5 @@ private:
 	std::map<input::KeyEvent::Code, bool> keyStates;
 	std::shared_ptr<platform::IWindow> window;
 	std::shared_ptr<gl3d::Camera> camera;
-	std::vector<std::shared_ptr<gl3d::pbr::PointLight>> lights;
-	int mode = 0;
     float speed = 0.01f;
 };

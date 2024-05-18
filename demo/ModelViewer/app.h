@@ -30,7 +30,7 @@ public:
 		baseRenderer = glContext->getRenderer();
 		baseRenderer->enableDepthTest();
 		baseRenderer->setViewport(0, 0, 1500, 900);
-		renderer = gl3d::SceneRenderer(baseRenderer);
+		renderer = std::make_unique<gl3d::SceneRenderer>(baseRenderer);
 
 		auto fileReader = platform::desktop::FileReader();
 		std::string csVertexShader = fileReader.
@@ -56,18 +56,17 @@ public:
 		model = loadModel(filename);
 		scene->addChild(model);
 
-		lights.push_back(std::make_shared<gl3d::pbr::PointLight>(gl3d::pbr::PointLight{
-			gml::Vec3f(50, 50, 50),
-			gml::Vec3f(0, 1, 5)
-		}));
-#if 0
-		lights.push_back(std::make_shared<gl3d::pbr::PointLight>(gl3d::pbr::PointLight{
-			gml::Vec3f(100, 100, 100),
-			gml::Vec3f(0, 1, 5)
-		}));
-#endif
+        auto light = std::make_shared<gl3d::PointLight>();
+        light->position = gml::Vec3f(0, 1, 5);
+        light->color = gml::Vec3f(50, 50, 50);
+		lights.push_back(light);
 
-		inputListener = MovementListener(window, camera, lights);
+        auto light_node = std::make_shared<gl3d::SceneObject>();
+        light_node->setTransform(gml::matrix::translate(2, 2, 3));
+        light_node->bindLight(light);
+        scene->addChild(light_node);
+
+		inputListener = MovementListener(window, camera);
 		window->attach(inputListener);
 	}
 
@@ -97,13 +96,9 @@ public:
 
 			baseRenderer->useShader(*pbrShader);
 			pbrShader->setUniform("camPos", camera->getPosition());
-			pbrShader->setUniform("n_pointLights", (int)lights.size());
-			for (int i = 0; i < (int)lights.size(); ++i) {
-				pbrShader->setUniform("pointLights[" + utils::toString(i) + "].position", lights[i]->position);
-				pbrShader->setUniform("pointLights[" + utils::toString(i) + "].color", lights[i]->color);
-			}
+            pbrShader->setUniform(gl3d::ShaderSnippets::POINT_LIGHTS_AMOUNT_NAME, (int) lights.size()); // TODO
 
-			renderer.renderGraph(scene);
+			renderer->renderGraph(scene);
 
 			window->swapBuffers();
 			window->pollEvents();
@@ -121,11 +116,11 @@ private:
 	std::shared_ptr<gl::IShader> pbrShader;
 	std::shared_ptr<gl3d::Camera> camera;
 	std::shared_ptr<gl::IRenderer> baseRenderer;
-	gl3d::SceneRenderer renderer;
+	std::unique_ptr<gl3d::SceneRenderer> renderer;
 
 	std::shared_ptr<gl3d::SceneGroup> scene;
 	std::shared_ptr<gl3d::SceneObject> model;
-	std::vector<std::shared_ptr<gl3d::pbr::PointLight>> lights;
+	std::vector<std::shared_ptr<gl3d::PointLight>> lights;
 
 
 	std::shared_ptr<gl3d::SceneObject> loadModel(const std::string& filename)
@@ -136,7 +131,7 @@ private:
         mesh_node->bindMesh(mesh);
 
         for (auto& sub_mesh : mesh->sub_meshes()) {
-            sub_mesh->material().setShader(pbrShader);
+            sub_mesh->material().set_shader(pbrShader);
         }
 
 		return mesh_node;
