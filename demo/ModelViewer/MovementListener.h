@@ -19,6 +19,8 @@ struct Mouse
 class MovementListener : public input::InputListener
 {
 public:
+    std::shared_ptr<gl3d::SceneNode> world;
+
 	MovementListener() = default;
 
 	MovementListener(std::shared_ptr<platform::IWindow> window,
@@ -71,6 +73,15 @@ public:
 			}
 		}
 	}
+
+    void onMouseWheelEvent(const input::MouseWheelEvent& event) override
+    {
+        auto offset = event.getYOffset();
+        if (offset < 0) {
+            offset = -1 / offset;
+        }
+        world->setTransform(world->getTransform() * gml::matrix::scale<double>(offset, offset, offset));
+    }
 
 	void applyUpdate()
 	{

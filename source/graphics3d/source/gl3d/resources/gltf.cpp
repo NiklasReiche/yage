@@ -1,4 +1,7 @@
 #include "gltf.h"
+#include "gl3d/sceneGraph/sceneNode.h"
+#include "gl3d/sceneGraph/sceneObject.h"
+#include "gl3d/sceneGraph/sceneGroup.h"
 #include <vector>
 #include <utils/strings.h>
 #include <gml/vector.h>
@@ -47,12 +50,13 @@ namespace gl3d::resources
     std::span<const std::byte> readBuffer(tinygltf::Model& model, int i, std::size_t offset, std::size_t size)
     {
         return std::as_bytes(std::span<unsigned char>{
-            model.buffers[i].data.begin() + offset,
-            model.buffers[i].data.begin() + offset + size
+                model.buffers[i].data.begin() + offset,
+                model.buffers[i].data.begin() + offset + size
         });
     }
 
-    std::span<const std::byte> readBufferView(tinygltf::Model& model, int i, std::size_t offset, std::size_t byte_length)
+    std::span<const std::byte>
+    readBufferView(tinygltf::Model& model, int i, std::size_t offset, std::size_t byte_length)
     {
         auto& bufferView = model.bufferViews[i];
         return readBuffer(model, bufferView.buffer, bufferView.byteOffset + offset, byte_length);
@@ -103,8 +107,46 @@ namespace gl3d::resources
         return t;
     }
 
+    std::shared_ptr<gl3d::Material>
+    read_material(tinygltf::Model& model, tinygltf::Material& material,
+                  const std::vector<std::shared_ptr<gl::ITexture2D>>& textures,
+                  std::shared_ptr<gl::IShader>& shader)
+    {
+        // TODO: use a 1x1 dummy texture or disable tex_coords in shader, if there's no textures
+
+        auto gl3d_material = std::make_shared<Material>();
+        gl3d_material->add_uniform("albedo", gml::Vec3f(
+                static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[0]),
+                static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[1]),
+                static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[2])));
+        gl3d_material->add_uniform("metallic", static_cast<float>(material.pbrMetallicRoughness.metallicFactor));
+        gl3d_material->add_uniform("roughness", static_cast<float>(material.pbrMetallicRoughness.roughnessFactor));
+        gl3d_material->add_uniform("ao", 1.0f);
+
+        if (material.pbrMetallicRoughness.baseColorTexture.index > -1) {
+            gl3d_material->add_uniform("albedoMap",
+                                       textures.at(material.pbrMetallicRoughness.baseColorTexture.index));
+        }
+        if (material.pbrMetallicRoughness.metallicRoughnessTexture.index > -1) {
+            gl3d_material->add_uniform("aoMap",
+                                       textures.at(material.pbrMetallicRoughness.metallicRoughnessTexture.index));
+        }
+        if (material.normalTexture.index > -1) {
+            gl3d_material->add_uniform("normalMap",
+                                       textures.at(material.normalTexture.index));
+        }
+        if (material.occlusionTexture.index > -1) {
+            gl3d_material->add_uniform("metallicRoughnessMap",
+                                       textures.at(material.occlusionTexture.index));
+        }
+        gl3d_material->set_shader(shader);
+
+        return gl3d_material;
+    }
+
     std::unique_ptr<SubMesh> read_sub_mesh(tinygltf::Model& model, tinygltf::Primitive& primitive,
-                                           gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator)
+                                           gl::IDrawableCreator& drawableCreator,
+                                           const std::vector<std::shared_ptr<gl3d::Material>>& materials)
     {
         // TODO: fallback when attributes are not present
         auto position_accessor = model.accessors[primitive.attributes["POSITION"]];
@@ -137,48 +179,36 @@ namespace gl3d::resources
                 indices.size() / tinygltf::GetComponentSizeInBytes(indices_accessor.componentType),
                 gl::VertexFormat::BATCHED);
 
-        auto& material = model.materials[primitive.material];
-
-        // TODO: use a 1x1 dummy texture or disable tex_coords in shader, if there's no textures
-        auto base_texture = read_texture(textureCreator, model,
-                                         model.textures[material.pbrMetallicRoughness.baseColorTexture.index]);
-        auto normal_texture = read_texture(textureCreator, model, model.textures[material.normalTexture.index]);
-        auto occlusion_texture = read_texture(textureCreator, model, model.textures[material.occlusionTexture.index]);
-        auto metallic_roughness_texture = read_texture(textureCreator, model,
-                                                       model.textures[material.pbrMetallicRoughness
-                                                                              .metallicRoughnessTexture.index]);
-
-        auto gl3d_material = std::make_shared<Material>();
-        gl3d_material
-                ->add_uniform("albedo", gml::Vec3f(static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[0]),
-                                                   static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[1]),
-                                                   static_cast<float>(material.pbrMetallicRoughness
-                                                                              .baseColorFactor[2])));
-        gl3d_material->add_uniform("metallic", static_cast<float>(material.pbrMetallicRoughness.metallicFactor));
-        gl3d_material->add_uniform("roughness", static_cast<float>(material.pbrMetallicRoughness.roughnessFactor));
-        gl3d_material->add_uniform("ao", 1.0f);
-
-        gl3d_material->add_uniform("albedoMap", base_texture);
-        gl3d_material->add_uniform("normalMap", normal_texture);
-        gl3d_material->add_uniform("metallicRoughnessMap", metallic_roughness_texture);
-        gl3d_material->add_uniform("aoMap", occlusion_texture);
-
+        auto& gl3d_material = materials[primitive.material];
         return std::make_unique<SubMesh>(drawable, gl3d_material);
     }
 
     std::unique_ptr<Mesh> read_mesh(tinygltf::Model& model, tinygltf::Mesh& mesh,
-                                    gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator)
+                                    gl::IDrawableCreator& drawableCreator,
+                                    const std::vector<std::shared_ptr<gl3d::Material>>& materials)
     {
         auto gl3d_mesh = std::make_unique<Mesh>();
-        for (auto& primitive : mesh.primitives) {
-            gl3d_mesh->add_sub_mesh(read_sub_mesh(model, primitive, drawableCreator, textureCreator));
+        for (auto& primitive: mesh.primitives) {
+            gl3d_mesh->add_sub_mesh(read_sub_mesh(model, primitive, drawableCreator, materials));
         }
         return gl3d_mesh;
     }
 
-    std::unique_ptr<Mesh> readGltf(
+    void construct_node(tinygltf::Model& model, tinygltf::Node& node,
+                        const std::shared_ptr<gl3d::SceneGroup>& root,
+                        const std::vector<std::shared_ptr<gl3d::SceneGroup>>& scene_nodes)
+    {
+        for (auto& child_index: node.children) {
+            auto& child = scene_nodes.at(child_index);
+            root->addChild(child);
+            construct_node(model, model.nodes[child_index], child, scene_nodes);
+        }
+    }
+
+    std::shared_ptr<SceneGroup> readGltf(
             const platform::IFileReader& fileReader, const std::string& filename,
-            gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator)
+            gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator,
+            std::shared_ptr<gl::IShader>& shader)
     {
         auto tmp = utils::strip(filename, "/");
         std::string filetype = utils::strip(tmp.back(), ".").back();
@@ -212,8 +242,61 @@ namespace gl3d::resources
             throw std::logic_error("TinyGLTF parsing error: " + err);
         }
 
-        // TODO: we currently only support single models
-        return read_mesh(model, model.meshes[0], drawableCreator, textureCreator);
+        std::vector<std::shared_ptr<gl::ITexture2D>> textures;
+        for (auto& texture: model.textures) {
+            textures.push_back(read_texture(textureCreator, model, texture));
+        }
+
+        std::vector<std::shared_ptr<gl3d::Material>> materials;
+        for (auto& material: model.materials) {
+            materials.push_back(read_material(model, material, textures, shader));
+        }
+
+        std::vector<std::shared_ptr<gl3d::Mesh>> meshes;
+        for (auto& mesh: model.meshes) {
+            meshes.push_back(read_mesh(model, mesh, drawableCreator, materials));
+        }
+
+        std::vector<std::shared_ptr<gl3d::SceneGroup>> scene_nodes;
+        // TODO: camera
+        for (auto& node: model.nodes) {
+            gml::Mat4d transform = gml::matrix::Id4d;
+            if (node.matrix.size() == 16) {
+                transform = gml::Mat4d(std::span<double, 16>{node.matrix.begin(), node.matrix.end()});
+            }
+
+            if (node.children.empty()) {
+                auto object = std::make_shared<gl3d::SceneObject>(node.name, transform);
+                if (node.mesh > -1) {
+                    object->bindMesh(meshes.at(node.mesh));
+                }
+
+                auto group = std::make_shared<gl3d::SceneGroup>(node.name + "_group");
+                group->addChild(object);
+                scene_nodes.push_back(group);
+            } else {
+                auto group = std::make_shared<gl3d::SceneGroup>(node.name, transform);
+                scene_nodes.push_back(group);
+
+                if (node.mesh > -1) {
+                    auto object = std::make_shared<gl3d::SceneObject>(node.name + "_object");
+                    object->bindMesh(meshes.at(node.mesh));
+                    group->addChild(object);
+                }
+            }
+        }
+
+        std::vector<std::shared_ptr<gl3d::SceneGroup>> scenes;
+        for (auto& scene: model.scenes) {
+            auto world_root = std::make_shared<gl3d::SceneGroup>("root");
+            for (auto root_index : scene.nodes) {
+                construct_node(model, model.nodes[root_index], world_root, scene_nodes);
+            }
+            scenes.push_back(world_root);
+        }
+
+        // TODO: support multiple scenes
+        return scenes.at(model.defaultScene);
 
         // TODO: do we need to handle sparse accessors explicitly?
     }

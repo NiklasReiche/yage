@@ -54,10 +54,9 @@ public:
         projViewUniform.syncView();
         pbrShader->setUniform("camPos", gml::Vec3d(5, 5, 5));
 
-        scene = std::make_shared<gl3d::SceneGroup>("world");
-        model = loadModel(filename);
-        scene->addChild(model);
+        scene = loadScene(filename);
 
+#if 0
         auto light = std::make_shared<gl3d::PointLight>();
         light->color = gml::Vec3f(50, 50, 50);
 
@@ -65,6 +64,7 @@ public:
         light_node->setTransform(gml::matrix::translate(2, 2, 3));
         light_node->bindLight(light);
         scene->addChild(light_node);
+#endif
 
         auto light_2 = std::make_shared<gl3d::DirectionalLight>();
         light_2->color = gml::Vec3f(2, 2, 2);
@@ -75,6 +75,7 @@ public:
         scene->addChild(light_node_2);
 
         inputListener = MovementListener(window, camera);
+        inputListener.world = scene;
         window->attach(inputListener);
     }
 
@@ -122,20 +123,11 @@ private:
     std::unique_ptr<gl3d::SceneRenderer> renderer;
 
     std::shared_ptr<gl3d::SceneGroup> scene;
-    std::shared_ptr<gl3d::SceneObject> model;
 
-    std::shared_ptr<gl3d::SceneObject> loadModel(const std::string& filename)
+    std::shared_ptr<gl3d::SceneGroup> loadScene(const std::string& filename)
     {
-        std::shared_ptr<gl3d::Mesh> mesh = gl3d::resources::readGltf(platform::desktop::FileReader(),
+        return gl3d::resources::readGltf(platform::desktop::FileReader(),
                                                                      filename, *glContext->getDrawableCreator(),
-                                                                     *glContext->getTextureCreator());
-        auto mesh_node = std::make_shared<gl3d::SceneObject>(&""[std::rand()]);
-        mesh_node->bindMesh(mesh);
-
-        for (auto& sub_mesh: mesh->sub_meshes()) {
-            sub_mesh->material().set_shader(pbrShader);
-        }
-
-        return mesh_node;
+                                                                     *glContext->getTextureCreator(), pbrShader);
     }
 };
