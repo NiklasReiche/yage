@@ -21,6 +21,8 @@ target_sources(yage_core
 if(WIN32 OR UNIX)
 	add_subdirectory(opengl)
 	target_compile_definitions(yage_core PRIVATE "OPENGL")
+
+	add_subdirectory(vulkan)
 elseif(ANDROID)
 	add_subdirectory(opengles2)
 endif()

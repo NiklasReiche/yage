@@ -1,6 +1,7 @@
 #include "GlfwWindow.h"
 
 #include <glad/gl.h>
+#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <tfd/tinyfiledialogs.h>
 
@@ -12,7 +13,7 @@
 
 namespace yage::platform::desktop
 {
-	GlfwWindow::GlfwWindow(int width, int height, const std::string& title)
+	GlfwWindow::GlfwWindow(int width, int height, const std::string& title, GlApi gl_api)
 	{
 		if (width < 1 || height < 1) {
 			throw std::invalid_argument("Window dimensions must be positive");
@@ -24,16 +25,24 @@ namespace yage::platform::desktop
 			throw GlfwException(-1, "Failed to initialize GLFW");
 		}
 
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        switch (gl_api) {
+            case GlApi::API_OPENGL:
+                glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+                glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+                glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifdef DEBUG
+                glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+#endif
+                glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // TODO
+                break;
+            case GlApi::API_VULKAN:
+                glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+                glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // TODO
+                break;
+        }
 
-		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-#ifndef NDEBUG
-		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
-#endif
 
 		glfwWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 
@@ -58,6 +67,7 @@ namespace yage::platform::desktop
 	
 	GlfwWindow::~GlfwWindow()
 	{
+        glfwDestroyWindow(glfwWindow);
 		glfwTerminate();
 	}
 
@@ -120,9 +130,9 @@ namespace yage::platform::desktop
 	}
 
 	void GlfwWindow::disableVSync()
-    {
-        glfwSwapInterval(0);
-    }
+	{
+		glfwSwapInterval(0);
+	}
 
     void GlfwWindow::toggleCursor()
 	{

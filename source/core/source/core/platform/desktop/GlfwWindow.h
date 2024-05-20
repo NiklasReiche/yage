@@ -21,7 +21,12 @@ namespace yage::platform::desktop
 	class GlfwWindow final : public IWindow, public std::enable_shared_from_this<GlfwWindow>
 	{
 	public:
-		GlfwWindow(int width, int height, const std::string& title = "");
+        enum class GlApi {
+            API_OPENGL,
+            API_VULKAN
+        };
+
+		GlfwWindow(int width, int height, const std::string& title, GlApi gl_api);
 		~GlfwWindow() override;
 
 		void makeCurrent() override;

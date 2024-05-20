@@ -8,8 +8,8 @@ using namespace yage;
 
 int main()
 {
-    std::shared_ptr<platform::IWindow> window = std::make_shared<platform::desktop::GlfwWindow>(500, 500,
-                                                                                                "Simple Window");
+    std::shared_ptr<platform::IWindow> window =
+            std::make_shared<platform::desktop::GlfwWindow>(500, 500, "Simple Window", platform::desktop::GlfwWindow::GlApi::API_OPENGL);
     std::shared_ptr<gl::IContext> context = gl::createContext(window);
 
     const std::array<float, 15> vertices = {
