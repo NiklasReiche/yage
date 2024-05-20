@@ -184,11 +184,11 @@ private:
 	{
 		scene = std::make_shared<gl3d::SceneGroup>("world");
 
-		auto lightRes = std::make_shared<gl3d::DirLight>(
-			gl3d::DirLight({ gml::Vec3f(0.2f),
-			                 gml::Vec3f(0.5f),
-			                 gml::Vec3f(1.0f) },
-			               gml::Vec3f(-1, -1, -1)));
+		auto lightRes = std::make_shared<gl3d::DirectionalLight>(
+			gl3d::DirectionalLight({gml::Vec3f(0.2f),
+                                    gml::Vec3f(0.5f),
+                                    gml::Vec3f(1.0f) },
+                                   gml::Vec3f(-1, -1, -1)));
 		light1 = std::make_shared<gl3d::SceneObject>("light");
 		light1->bindLight(lightRes);
 		light1->setTransform(

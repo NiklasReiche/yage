@@ -18,7 +18,9 @@ namespace gl3d
 	{
 		gml::Vec3d viewPos;
 		gml::Mat4d view;
-		std::vector<std::shared_ptr<Light>> lights;
+        std::vector<std::shared_ptr<Light>> dir_lights;
+		std::vector<std::shared_ptr<Light>> point_lights;
+        std::shared_ptr<Camera> camera;
 	};
 
 	class SceneRenderer

@@ -854,6 +854,28 @@ namespace gml::matrix
 		return mat1 * translate<T>(-pos.x(), -pos.y(), -pos.z());
 	}
 
+    /**
+	 * @brief Constructs a lookAt view matrix.
+	 *
+	 * @param pos the camera position
+	 * @param target the view target position
+	 * @return the view matrix
+	 */
+    template<typename T>
+    Mat4<T> lookAt(const Vec3<T>& pos, const Vec3<T>& target)
+    {
+        Vec3<T> direction = normalize(pos - target);
+        Vec3<T> right = normalize(cross(vector::worldUp<T>(), direction));
+        Vec3<T> up = normalize(cross(direction, right));
+        Mat4<T> mat1 = {
+                {right.x(),     right.y(),     right.z(),     0},
+                {up.x(),        up.y(),        up.z(),        0},
+                {direction.x(), direction.y(), direction.z(), 0},
+                {0,             0,             0,             1}
+        };
+        return mat1 * translate<T>(-pos.x(), -pos.y(), -pos.z());
+    }
+
 	/**
 	 * @brief Constructs a rotation matrix from a quaternion
 	 * representation.

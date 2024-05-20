@@ -22,6 +22,12 @@ struct Material {
 };
 uniform Material material;
 
+struct DirLight {
+    vec3 direction;
+    vec3 color;
+};
+uniform DirLight dirLights[10];
+uniform int n_dirLights;
 struct PointLight {
     vec3 position;
     vec3 color;
@@ -31,6 +37,7 @@ uniform int n_pointLights;
 
 const float PI = 3.14159265359;
 
+vec3 calcLo(vec3 F0, vec3 N, vec3 V, vec3 L, vec3 radiance, float roughness, float metallic, vec3 albedo);
 vec3 fresnelSchlick(float cosTheta, vec3 F0);
 float DistributionGGX(vec3 N, vec3 H, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
@@ -51,29 +58,20 @@ void main() {
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
 
     vec3 Lo = vec3(0.0);
+
     for (int i = 0; i < n_pointLights; ++i) {
         vec3 L = normalize(pointLights[i].position - fs_in.FragPos);
-        vec3 H = normalize(V + L);
 
         float distance = length(pointLights[i].position - fs_in.FragPos);
         float attenuation = 1.0 / (distance * distance);
         vec3 radiance = pointLights[i].color * attenuation;
 
-        // cook-torrance brdf
-        float NDF = DistributionGGX(N, H, roughness);
-        float G = GeometrySmith(N, V, L, roughness);
-        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+        Lo += calcLo(F0, N, V, L, radiance, roughness, metallic, albedo);
+    }
 
-        vec3 numerator = NDF * G * F;
-        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
-        vec3 specular = numerator / denominator;
-
-        vec3 kS = F;
-        vec3 kD = vec3(1.0) - kS;
-        kD *= 1.0 - metallic;
-
-        float NdotL = max(dot(N, L), 0.0);
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+    for (int i = 0; i < n_dirLights; ++i) {
+        vec3 L = normalize(-dirLights[i].direction);
+        Lo += calcLo(F0, N, V, L, dirLights[i].color, roughness, metallic, albedo);
     }
 
     vec3 ambient = vec3(0.03) * albedo * ao;
@@ -85,6 +83,29 @@ void main() {
     //color = pow(color, vec3(1.0/2.2));
 
     FragColor = vec4(color, 1.0);
+}
+
+vec3 calcLo(vec3 F0, vec3 N, vec3 V, vec3 L, vec3 radiance, float roughness, float metallic, vec3 albedo)
+{
+    vec3 H = normalize(V + L);
+
+    // cook-torrance brdf
+    float NDF = DistributionGGX(N, H, roughness);
+    float G = GeometrySmith(N, V, L, roughness);
+    vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+    vec3 numerator = NDF * G * F;
+    float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
+    vec3 specular = numerator / denominator;
+
+    vec3 kS = F;
+    vec3 kD = vec3(1.0) - kS;
+    kD *= 1.0 - metallic;
+
+    float NdotL = max(dot(N, L), 0.0);
+    vec3 Lo = (kD * albedo / PI + specular) * radiance * NdotL;
+
+    return Lo;
 }
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0)

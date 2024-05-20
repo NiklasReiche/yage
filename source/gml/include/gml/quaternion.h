@@ -347,7 +347,7 @@ namespace gml::quaternion
 		const gml::Vec3<T> a = gml::normalize(axis);
 		const double s = std::sin(angle / 2);
 
-		return Quaternion<T>(std::cos(angle / 2), a.x * s, a.y * s, a.z * s);
+		return Quaternion<T>(std::cos(angle / 2), a.x() * s, a.y() * s, a.z() * s);
 	}
 
 	/**

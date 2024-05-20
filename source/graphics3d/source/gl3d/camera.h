@@ -22,14 +22,14 @@ namespace gl3d
 		void rotateYaw(double degree);
 		void rotatePitch(double degree);
 		void rotateRoll(double degree);
-		void lookAt(gml::Vec3d target, double degree = 0.0f);
+		void lookAt(gml::Vec3d position, gml::Vec3d target);
 
 		[[nodiscard]] gml::Mat4d getViewMatrix() const;
 		[[nodiscard]] gml::Vec3d getPosition() const;
 		[[nodiscard]] gml::Quatd getRotation() const;
 
 	private:
-		gml::Vec3d position;
-		gml::Quatd rotation;
+		gml::Vec3d m_position;
+		gml::Quatd m_rotation;
 	};
 }

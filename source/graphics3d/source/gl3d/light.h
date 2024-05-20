@@ -8,6 +8,12 @@
 
 namespace gl3d
 {
+    enum class LightType
+    {
+        DIRECTIONAL_LIGHT,
+        POINT_LIGHT
+    };
+
     class Light
     {
     public:
@@ -15,30 +21,29 @@ namespace gl3d
 
         virtual ~Light() = default;
 
-        virtual void update_from_transform(gml::Mat4f transform) = 0;
+        virtual void update_from_transform(gml::Mat4d transform) = 0;
 
         virtual void update_uniforms(gl::IShader& shader, std::size_t i) = 0;
+
+        LightType type();
+
+    protected:
+        explicit Light(LightType type);
+
+    private:
+        LightType m_type;
     };
 
-    class DirLight : public Light
+    class DirectionalLight : public Light
     {
     public:
         gml::Vec3f direction;
 
-        void update_uniforms(gl::IShader& shader, std::size_t i) override
-        {
-            shader.setUniform(ShaderSnippets::DIR_LIGHTS_NAME + "[" + utils::toString(i) + "]." +
-                              ShaderSnippets::DIR_LIGHT_DIRECTION_NAME,
-                              direction);
-            shader.setUniform(ShaderSnippets::DIR_LIGHTS_NAME + "[" + utils::toString(i) + "]." +
-                              ShaderSnippets::LIGHT_COLOR_NAME,
-                              color);
-        }
+        DirectionalLight();
 
-        void update_from_transform(gml::Mat4f transform) override
-        {
-            // TODO
-        }
+        void update_uniforms(gl::IShader& shader, std::size_t i) override;
+
+        void update_from_transform(gml::Mat4d transform) override;
     };
 
     class PointLight : public Light
@@ -46,19 +51,10 @@ namespace gl3d
     public:
         gml::Vec3f position;
 
-        void update_uniforms(gl::IShader& shader, std::size_t i) override
-        {
-            shader.setUniform(ShaderSnippets::POINT_LIGHTS_NAME + "[" + utils::toString(i) + "]." +
-                              ShaderSnippets::POINT_LIGHT_POSITION_NAME,
-                              position);
-            shader.setUniform(ShaderSnippets::POINT_LIGHTS_NAME + "[" + utils::toString(i) + "]." +
-                              ShaderSnippets::LIGHT_COLOR_NAME,
-                              color);
-        }
+        PointLight();
 
-        void update_from_transform(gml::Mat4f transform) override
-        {
-            position = transform.getTranslation();
-        }
+        void update_uniforms(gl::IShader& shader, std::size_t i) override;
+
+        void update_from_transform(gml::Mat4d transform) override;
     };
 }

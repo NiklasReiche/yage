@@ -23,9 +23,9 @@ namespace gl3d
 		{
 			return meshCache.add(mesh);
 		}
-		unsigned int add(DirLight light)
+		unsigned int add(DirectionalLight light)
 		{
-			return lightCache.add(std::make_shared<DirLight>(light));
+			return lightCache.add(std::make_shared<DirectionalLight>(light));
 		}
 		unsigned int add(PointLight light)
 		{
