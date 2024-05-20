@@ -36,48 +36,48 @@ namespace gl
 		 */
 		[[nodiscard]]
 		virtual std::unique_ptr<IDrawable> createDrawable(
-			const std::span<const float> & vertices,
-			const std::span<const unsigned int>& indices,
-			const std::vector<unsigned int>& vertexLayout,
-			VertexFormat format) = 0;
+                const std::span<const float> & vertices,
+                const std::span<const unsigned int>& indices,
+                const std::span<const unsigned int>& vertexLayout,
+                gl::VertexFormat format) = 0;
 
         /**
          * Creates a drawable from a continuous data source. Vertices and indices are interpreted as byte streams,
          * where the the actual data type of the indices is computed by providing the total amount of vertices.
-         * @param vertices
-         * @param indices
-         * @param vertexLayout
-         * @param nIndices
-         * @param format
-         * @return
+         * @param vertices byte data representing vertex data of type float
+         * @param indices byte data representing indices of an unsigned integer type
+         * @param vertex_layout layout of a vertex, i.e. a number for each component, representing the size of the component
+         * @param n_indices the amount of indices in the given index buffer
+         * @param format Whether the vertex data is interleaved or batched
+         * @return a drawable
          */
 		[[nodiscard]]
 		virtual std::unique_ptr<IDrawable> createDrawable(
-			const std::span<const unsigned char>& vertices,
-			const std::span<const unsigned char>& indices,
-			const std::vector<unsigned int>& vertexLayout,
-			unsigned int nIndices,
-			VertexFormat format) = 0;
+                const std::span<const std::byte>& vertices,
+                const std::span<const std::byte>& indices,
+                const std::span<const unsigned int>& vertex_layout,
+                unsigned int n_indices,
+                VertexFormat format) = 0;
 
 		[[nodiscard]]
 		virtual std::unique_ptr<ElementBuffer> createElementBuffer(const std::span<const unsigned int>& indices) = 0;
 
 		[[nodiscard]]
-		virtual std::unique_ptr<ElementBuffer> createElementBuffer(const std::span<const unsigned char>& indices) = 0;
+		virtual std::unique_ptr<ElementBuffer> createElementBuffer(const std::span<const std::byte>& indices) = 0;
 
 		[[nodiscard]]
 		virtual std::unique_ptr<VertexBuffer> createVertexBuffer(const std::span<const float>& vertices) = 0;
 
 		[[nodiscard]]
-		virtual std::unique_ptr<VertexBuffer> createVertexBuffer(const std::span<const unsigned char>& vertices) = 0;
+		virtual std::unique_ptr<VertexBuffer> createVertexBuffer(const std::span<const std::byte>& vertices) = 0;
 
 		[[nodiscard]]
 		virtual std::unique_ptr<VertexArray> createVertexArray(
-			const std::shared_ptr<VertexBuffer>& vertexBuffer,
-			const std::shared_ptr<ElementBuffer>& elementBuffer,
-			const std::vector<unsigned int>& vertexLayout,
-            unsigned int nVertices,
-			gl::VertexFormat format = gl::VertexFormat::INTERLEAVED) = 0;
+                const std::shared_ptr<gl::VertexBuffer>& vertex_buffer,
+                const std::shared_ptr<gl::ElementBuffer>& element_buffer,
+                const std::span<const unsigned int>& vertex_layout,
+                unsigned int n_vertices,
+                gl::VertexFormat format) = 0;
 
 	protected:
 		IDrawableCreator() = default;

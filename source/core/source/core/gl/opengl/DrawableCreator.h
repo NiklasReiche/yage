@@ -9,51 +9,47 @@
 
 namespace opengl
 {
-	class DrawableCreator final : public BaseObject, public gl::IDrawableCreator
-	{
-	public:
-		std::unique_ptr<gl::IDrawable> createDrawable(
-			const std::span<const float>& vertices,
-			const std::span<const unsigned int>& indices,
-			const std::vector<unsigned int>& vertexLayout,
-			gl::VertexFormat format = gl::VertexFormat::INTERLEAVED) override;
+    class DrawableCreator final : public BaseObject, public gl::IDrawableCreator
+    {
+    public:
+        std::unique_ptr<gl::IDrawable> createDrawable(
+                const std::span<const float>& vertices,
+                const std::span<const unsigned int>& indices,
+                const std::span<const unsigned int>& vertex_layout,
+                gl::VertexFormat format) override;
 
-		std::unique_ptr<gl::IDrawable> createDrawable(
-			const std::span<const unsigned char>& vertices,
-			const std::span<const unsigned char>& indices,
-			const std::vector<unsigned int>& vertexLayout,
-			unsigned int nIndices,
-			gl::VertexFormat format = gl::VertexFormat::INTERLEAVED) override;
+        std::unique_ptr<gl::IDrawable> createDrawable(
+                const std::span<const std::byte>& vertices,
+                const std::span<const std::byte>& indices,
+                const std::span<const unsigned int>& vertex_layout,
+                unsigned int n_indices,
+                gl::VertexFormat format) override;
 
-		std::unique_ptr<gl::ElementBuffer> createElementBuffer(const std::span<const unsigned int>& indices) override;
+        std::unique_ptr<gl::ElementBuffer> createElementBuffer(const std::span<const unsigned int>& indices) override;
 
-		std::unique_ptr<gl::ElementBuffer> createElementBuffer(const std::span<const unsigned char>& indices) override;
+        std::unique_ptr<gl::ElementBuffer> createElementBuffer(const std::span<const std::byte>& indices) override;
 
-		std::unique_ptr<gl::VertexBuffer> createVertexBuffer(const std::span<const float>& vertices) override;
+        std::unique_ptr<gl::VertexBuffer> createVertexBuffer(const std::span<const float>& vertices) override;
 
-		std::unique_ptr<gl::VertexBuffer> createVertexBuffer(const std::span<const unsigned char>& vertices) override;
+        std::unique_ptr<gl::VertexBuffer> createVertexBuffer(const std::span<const std::byte>& vertices) override;
 
-		std::unique_ptr<gl::VertexArray> createVertexArray(
-			const std::shared_ptr<gl::VertexBuffer>& vertexBuffer,
-			const std::shared_ptr<gl::ElementBuffer>& elementBuffer,
-			const std::vector<unsigned int>& vertexLayout,
-            unsigned int nIndices,
-			gl::VertexFormat format) override;
+        std::unique_ptr<gl::VertexArray> createVertexArray(
+                const std::shared_ptr<gl::VertexBuffer>& vertex_buffer,
+                const std::shared_ptr<gl::ElementBuffer>& element_buffer,
+                const std::span<const unsigned int>& vertex_layout,
+                unsigned int n_vertices,
+                gl::VertexFormat format) override;
 
-	private:
-		using BaseObject::BaseObject;
+    private:
+        using BaseObject::BaseObject;
 
-		std::unique_ptr<VertexArray> createVertexArrayInternal(
-			const std::shared_ptr<gl::VertexBuffer>& vertexBuffer,
-			const std::shared_ptr<gl::ElementBuffer>& elementBuffer,
-			const std::vector<unsigned int>& vertexLayout,
-            unsigned int nVertices,
-			gl::VertexFormat format);
+        std::unique_ptr<VertexArray> createVertexArrayInternal(
+                const std::shared_ptr<gl::VertexBuffer>& vertex_buffer,
+                const std::shared_ptr<gl::ElementBuffer>& element_buffer,
+                const std::span<const unsigned int>& vertex_layout,
+                unsigned int n_vertices,
+                gl::VertexFormat format);
 
-		std::unique_ptr<gl::ElementBuffer> createElementBuffer(const unsigned char* indices, std::size_t size);
-
-		std::unique_ptr<gl::VertexBuffer> createVertexBuffer(const unsigned char* vertices, std::size_t size);
-
-		friend class Context;
-	};
-}// namespace gl3
+        friend class Context;
+    };
+}

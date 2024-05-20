@@ -10,8 +10,6 @@
 
 namespace gl3d::resources
 {
-    typedef unsigned char byte;
-
     gl::TextureWrapper convert_wrapper(int wrap)
     {
         switch (wrap) {
@@ -46,18 +44,21 @@ namespace gl3d::resources
         }
     }
 
-    std::span<byte> readBuffer(tinygltf::Model& model, int i, std::size_t offset, std::size_t size)
+    std::span<const std::byte> readBuffer(tinygltf::Model& model, int i, std::size_t offset, std::size_t size)
     {
-        return {model.buffers[i].data.begin() + offset, model.buffers[i].data.begin() + offset + size};
+        return std::as_bytes(std::span<unsigned char>{
+            model.buffers[i].data.begin() + offset,
+            model.buffers[i].data.begin() + offset + size
+        });
     }
 
-    std::span<byte> readBufferView(tinygltf::Model& model, int i, std::size_t offset, std::size_t byte_length)
+    std::span<const std::byte> readBufferView(tinygltf::Model& model, int i, std::size_t offset, std::size_t byte_length)
     {
         auto& bufferView = model.bufferViews[i];
         return readBuffer(model, bufferView.buffer, bufferView.byteOffset + offset, byte_length);
     }
 
-    std::span<byte> readAccessor(tinygltf::Model& model, tinygltf::Accessor& accessor)
+    std::span<const std::byte> readAccessor(tinygltf::Model& model, tinygltf::Accessor& accessor)
     {
         auto type_byte_length = tinygltf::GetNumComponentsInType(accessor.type) *
                                 tinygltf::GetComponentSizeInBytes(accessor.componentType);
@@ -116,7 +117,7 @@ namespace gl3d::resources
         auto tangents = readAccessor(model, tangent_accessor);
         auto tex_coords = readAccessor(model, tex_coord_accessor);
 
-        std::vector<byte> vertices;
+        std::vector<std::byte> vertices;
         vertices.insert(vertices.end(), positions.begin(), positions.end());
         vertices.insert(vertices.end(), normals.begin(), normals.end());
         vertices.insert(vertices.end(), tangents.begin(), tangents.end());
@@ -125,16 +126,16 @@ namespace gl3d::resources
         auto indices_accessor = model.accessors[primitive.indices];
         auto indices = readAccessor(model, indices_accessor);
 
-        const std::vector<unsigned int>& vertexLayout{
+        const std::vector<unsigned int> vertex_layout{
                 static_cast<unsigned int>(tinygltf::GetNumComponentsInType(position_accessor.type)),
                 static_cast<unsigned int>(tinygltf::GetNumComponentsInType(normal_accessor.type)),
                 static_cast<unsigned int>(tinygltf::GetNumComponentsInType(tangent_accessor.type)),
                 static_cast<unsigned int>(tinygltf::GetNumComponentsInType(tex_coord_accessor.type))
         };
-        std::shared_ptr<gl::IDrawable> drawable = drawableCreator.createDrawable(vertices, indices, vertexLayout,
-                                                       indices.size() / tinygltf::GetComponentSizeInBytes(
-                                                               indices_accessor.componentType),
-                                                       gl::VertexFormat::BATCHED);
+        std::shared_ptr<gl::IDrawable> drawable = drawableCreator.createDrawable(
+                vertices, indices, vertex_layout,
+                indices.size() / tinygltf::GetComponentSizeInBytes(indices_accessor.componentType),
+                gl::VertexFormat::BATCHED);
 
         auto& material = model.materials[primitive.material];
 

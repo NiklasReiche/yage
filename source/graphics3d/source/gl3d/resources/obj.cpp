@@ -4,6 +4,7 @@
 #include <tuple>
 #include <gml/vector.h>
 #include <utils/strings.h>
+#include <utils/NotImplementedException.h>
 
 namespace
 {
@@ -152,9 +153,13 @@ namespace gl3d::resources
 			}
 		}
 
+        throw NotImplementedException();
+
 		// TODO indexing
-		auto drawable = drawableCreator.createDrawable(vertexData, {}, { 3, 3 }, gl::VertexFormat::INTERLEAVED);
+#if 0
+		auto drawable = drawableCreator.createDrawable(vertexData, std::span<unsigned int>{}, { 3, 3 }, gl::VertexFormat::INTERLEAVED);
 		return std::make_tuple<std::unique_ptr<gl::IDrawable>, gl3d::Material>(std::move(drawable),
 		                                                                       static_cast<Material&&>(material));
+#endif
 	}
 }

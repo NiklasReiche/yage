@@ -19,8 +19,9 @@ namespace gui
 
         std::vector<unsigned int> indices = construct_indices();
         std::vector<float> vertices = construct_vertices(m_texture_atlas_view);
-        m_drawable = master->gl_context().getDrawableCreator()
-                           ->createDrawable(vertices, indices, {2, 4, 2}, gl::VertexFormat::BATCHED);
+        std::vector<unsigned int> vertex_layout{2, 4, 2};
+        m_drawable = master->gl_context().getDrawableCreator()->createDrawable(
+                vertices, indices, vertex_layout, gl::VertexFormat::BATCHED);
 
         Widget::update_geometry();
     }
