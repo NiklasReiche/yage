@@ -55,6 +55,9 @@ namespace gl::vulkan
         VkFormat swapChainImageFormat{};
         VkExtent2D swapChainExtent{};
         std::vector<VkImageView> swapChainImageViews{};
+        VkRenderPass renderPass{};
+        VkPipelineLayout pipelineLayout{};
+        VkPipeline graphicsPipeline{};
 
         void create_instance();
 
@@ -95,5 +98,11 @@ namespace gl::vulkan
         void create_swap_chain();
 
         void create_image_views();
+
+        void create_graphics_pipeline();
+
+        VkShaderModule createShaderModule(const std::vector<std::byte>& code);
+
+        void create_render_pass();
     };
 }
