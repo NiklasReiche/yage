@@ -20,6 +20,13 @@ namespace gl::vulkan
         }
     };
 
+    struct SwapChainSupportDetails
+    {
+        VkSurfaceCapabilitiesKHR capabilities;
+        std::vector<VkSurfaceFormatKHR> formats;
+        std::vector<VkPresentModeKHR> presentModes;
+    };
+
     class Instance
     {
     public:
@@ -31,6 +38,9 @@ namespace gl::vulkan
         const std::vector<const char*> m_validation_layers = {
                 "VK_LAYER_KHRONOS_validation"
         };
+        const std::vector<const char*> m_device_extensions = {
+                VK_KHR_SWAPCHAIN_EXTENSION_NAME
+        };
 
         std::weak_ptr<platform::desktop::GlfwWindow> m_window;
         VkInstance m_instance{};
@@ -40,6 +50,11 @@ namespace gl::vulkan
         VkDevice m_device{};
         VkQueue graphicsQueue{};
         VkQueue presentQueue{};
+        VkSwapchainKHR swapChain{};
+        std::vector<VkImage> swapChainImages{};
+        VkFormat swapChainImageFormat{};
+        VkExtent2D swapChainExtent{};
+        std::vector<VkImageView> swapChainImageViews{};
 
         void create_instance();
 
@@ -63,8 +78,22 @@ namespace gl::vulkan
 
         bool isDeviceSuitable(VkPhysicalDevice device);
 
+        bool checkDeviceExtensionSupport(VkPhysicalDevice device);
+
         QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
         void create_logical_device();
+
+        SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+
+        VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+
+        VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+
+        VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+
+        void create_swap_chain();
+
+        void create_image_views();
     };
 }
