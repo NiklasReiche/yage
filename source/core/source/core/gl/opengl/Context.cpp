@@ -271,7 +271,7 @@ namespace yage::opengl
 
 namespace yage::gl
 {
-	std::shared_ptr<IContext> createContext(const std::weak_ptr<platform::IWindow>& window)
+	std::shared_ptr<IContext> createOpenGlContext(const std::weak_ptr<platform::IWindow>& window)
 	{
 		return std::make_shared<opengl::Context>(window);
 	}

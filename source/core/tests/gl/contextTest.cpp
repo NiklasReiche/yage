@@ -7,14 +7,14 @@
 
 TEST_CASE("Context Test")
 {
-	std::shared_ptr<yage::platform::IWindow> window = std::make_shared<yage::platform::desktop::GlfwWindow>(100, 100);
-	std::shared_ptr<yage::gl::IContext> context = yage::gl::createContext(window);
+	std::shared_ptr<platform::IWindow> window = std::make_shared<platform::desktop::GlfwWindow>(100, 100);
+	std::shared_ptr<gl::IContext> context = gl::createOpenGlContext(window);
 
 
 	SECTION("FrameInitialization") {
-		std::shared_ptr<yage::gl::IFrameCreator> tCreator = context->getFrameCreator();
+		std::shared_ptr<gl::IFrameCreator> tCreator = context->getFrameCreator();
 
-		std::shared_ptr<yage::gl::IFrame> frame = tCreator->createFrame(90, 50, yage::gl::ImageFormat::RGBA);
+		std::shared_ptr<gl::IFrame> frame = tCreator->createFrame(90, 50, gl::ImageFormat::RGBA);
 
 		CHECK(90 == frame->getWidth());
 		CHECK(50 == frame->getHeight());

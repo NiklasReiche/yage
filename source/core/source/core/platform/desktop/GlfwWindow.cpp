@@ -30,7 +30,7 @@ namespace yage::platform::desktop
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
                 glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef DEBUG
+#ifndef NDEBUG
                 glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
                 glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // TODO
@@ -53,8 +53,10 @@ namespace yage::platform::desktop
 
 		glfwSetWindowUserPointer(glfwWindow, this);
 
-		glfwMakeContextCurrent(glfwWindow);
-		glfwSwapInterval(1);
+        if (gl_api == GlApi::API_OPENGL) {
+            glfwMakeContextCurrent(glfwWindow);
+            glfwSwapInterval(1);
+        }
 
 		glfwSetCharCallback(glfwWindow, onCharEvent);
 		glfwSetKeyCallback(glfwWindow, onKeyEvent);
@@ -62,6 +64,7 @@ namespace yage::platform::desktop
 		glfwSetMouseButtonCallback(glfwWindow, onMouseButtonEvent);
 		glfwSetScrollCallback(glfwWindow, onMouseWheelEvent);
 
+        // TODO
 		dpi = 96;
 	}
 	
@@ -111,6 +114,7 @@ namespace yage::platform::desktop
 
 	void GlfwWindow::makeCurrent()
 	{
+        // TODO: vulkan
 		glfwMakeContextCurrent(glfwWindow);
 	}
 
@@ -121,16 +125,19 @@ namespace yage::platform::desktop
 
 	void GlfwWindow::swapBuffers()
 	{
+        // TODO: vulkan
 		glfwSwapBuffers(glfwWindow);
 	}
 
 	void GlfwWindow::enableVSync()
 	{
+        // TODO: vulkan
 		glfwSwapInterval(1);
 	}
 
 	void GlfwWindow::disableVSync()
 	{
+        // TODO: vulkan
 		glfwSwapInterval(0);
 	}
 

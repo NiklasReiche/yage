@@ -21,7 +21,7 @@ int main(int argc, char* argv[], char*[])
 
 	std::shared_ptr<platform::IWindow> window =
 		std::make_shared<platform::desktop::GlfwWindow>(image.getWidth(), image.getHeight(),"ImageViewer");
-	std::shared_ptr<gl::IContext> context = gl::createContext(window);
+	std::shared_ptr<gl::IContext> context = gl::createOpenGlContext(window);
 
 
 	const std::array<float, 24> vertices = {

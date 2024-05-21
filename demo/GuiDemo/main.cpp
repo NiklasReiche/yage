@@ -625,8 +625,8 @@ void displayFPS(GuiTest& gui, double dt)
 int main()
 {
     std::shared_ptr<platform::desktop::GlfwWindow> window = std::make_shared<platform::desktop::GlfwWindow>(800, 400,
-        "GUI Demo");
-    std::shared_ptr<gl::IContext> context = gl::createContext(window);
+                                                                                                            "GUI Demo");
+    std::shared_ptr<gl::IContext> context = gl::createOpenGlContext(window);
 
     res::Store<font::Font> fontStore;
     font::FontFileLoader fontLoader(context->getTextureCreator(), window->getFileReader());

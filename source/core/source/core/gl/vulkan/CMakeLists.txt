@@ -1,3 +1,4 @@
 target_sources(yage_core PRIVATE
-        vulkan.h
+        Instance.h
+        Instance.cpp
 )

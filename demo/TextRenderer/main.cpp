@@ -20,7 +20,7 @@ int main(int argc, char *argv[], char *[])
 
     std::shared_ptr<platform::IWindow> window = std::make_shared<platform::desktop::GlfwWindow>(1200, 800,
                                                                                                 "Text Renderer");
-    std::shared_ptr<gl::IContext> context = gl::createContext(window);
+    std::shared_ptr<gl::IContext> context = gl::createOpenGlContext(window);
 
     auto fileReader = platform::desktop::FileReader();
 

@@ -34,5 +34,7 @@ namespace yage::gl
 		IContext& operator=(IContext&& other) = default;
 	};
 
-	std::shared_ptr<IContext> createContext(const std::weak_ptr<platform::IWindow>& window);
+	std::shared_ptr<IContext> createOpenGlContext(const std::weak_ptr<platform::IWindow>& window);
+
+    std::shared_ptr<IContext> createVulkanContext(const std::weak_ptr<platform::IWindow>& window);
 }
