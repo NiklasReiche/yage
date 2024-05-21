@@ -78,6 +78,8 @@ namespace yage::platform::desktop
 
 		static void onError(int error, const char* description);
 
+        GLFWwindow* glfw_window_ptr(); // TODO: ugly
+
 	private:
 		GLFWwindow* glfwWindow = nullptr;
 

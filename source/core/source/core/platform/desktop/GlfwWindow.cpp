@@ -465,4 +465,9 @@ namespace yage::platform::desktop
     {
         return std::make_unique<FileReader>(FileReader());
     }
+
+    GLFWwindow* GlfwWindow::glfw_window_ptr()
+    {
+        return glfwWindow;
+    }
 }

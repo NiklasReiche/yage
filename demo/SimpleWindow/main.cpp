@@ -1,3 +1,5 @@
+#include <memory>
+
 #include <core/platform/Window.h>
 #include <core/platform/desktop/GlfwWindow.h>
 #include <core/gl/Context.h>
@@ -13,7 +15,7 @@ int main()
     std::shared_ptr<platform::IWindow> window =
             std::make_shared<platform::desktop::GlfwWindow>(500, 500, "Hello Triangle",
                                                             platform::desktop::GlfwWindow::GlApi::API_VULKAN);
-    std::shared_ptr<gl::vulkan::Instance> context = std::make_shared<gl::vulkan::Instance>();
+    std::shared_ptr<gl::vulkan::Instance> context = std::make_shared<gl::vulkan::Instance>(std::static_pointer_cast<platform::desktop::GlfwWindow>(window));
 
 #if 0
     const std::array<float, 15> vertices = {

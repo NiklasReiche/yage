@@ -1,5 +1,7 @@
 #include <cstdint>
 #include <cstring>
+#include <utility>
+#include <set>
 #include "Instance.h"
 #include "GLFW/glfw3.h"
 
@@ -10,7 +12,7 @@ namespace gl::vulkan
                                           VkDebugUtilsMessengerEXT* pDebugMessenger)
     {
         auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(
-                instance,"vkCreateDebugUtilsMessengerEXT");
+                instance, "vkCreateDebugUtilsMessengerEXT");
         if (func != nullptr) {
             return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
         } else {
@@ -22,16 +24,18 @@ namespace gl::vulkan
                                        const VkAllocationCallbacks* pAllocator)
     {
         auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(
-                instance,"vkDestroyDebugUtilsMessengerEXT");
+                instance, "vkDestroyDebugUtilsMessengerEXT");
         if (func != nullptr) {
             func(instance, debugMessenger, pAllocator);
         }
     }
 
-    Instance::Instance()
+    Instance::Instance(std::weak_ptr<platform::desktop::GlfwWindow> window)
+            : m_window(std::move(window))
     {
         create_instance();
         setup_debug_messenger();
+        create_surface();
         pick_physical_device();
         create_logical_device();
     }
@@ -39,6 +43,8 @@ namespace gl::vulkan
     Instance::~Instance()
     {
         vkDestroyDevice(m_device, nullptr);
+
+        vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
 
 #ifndef NDEBUG
         DestroyDebugUtilsMessengerEXT(m_instance, m_debug_messenger, nullptr);
@@ -179,6 +185,13 @@ namespace gl::vulkan
         }
     }
 
+    void Instance::create_surface()
+    {
+        if (glfwCreateWindowSurface(m_instance, m_window.lock()->glfw_window_ptr(), nullptr, &m_surface) != VK_SUCCESS) {
+            throw std::runtime_error("Vulkan: failed to create window surface!");
+        }
+    }
+
     void Instance::pick_physical_device()
     {
         std::uint32_t device_count = 0;
@@ -228,6 +241,13 @@ namespace gl::vulkan
             if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
                 indices.graphicsFamily = i;
             }
+
+            VkBool32 presentSupport = false;
+            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_surface, &presentSupport);
+            if (presentSupport) {
+                indices.presentFamily = i;
+            }
+
             if (indices.is_complete()) {
                 break;
             }
@@ -241,21 +261,27 @@ namespace gl::vulkan
     {
         QueueFamilyIndices indices = findQueueFamilies(m_physical_device);
 
-        VkDeviceQueueCreateInfo queueCreateInfo{};
-        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
-        queueCreateInfo.queueCount = 1;
+        std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+        std::set<std::uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+
         float queuePriority = 1.0f;
-        queueCreateInfo.pQueuePriorities = &queuePriority;
+        for (std::uint32_t queueFamily : uniqueQueueFamilies) {
+            VkDeviceQueueCreateInfo queueCreateInfo{};
+            queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+            queueCreateInfo.queueFamilyIndex = queueFamily;
+            queueCreateInfo.queueCount = 1;
+            queueCreateInfo.pQueuePriorities = &queuePriority;
+            queueCreateInfos.push_back(queueCreateInfo);
+        }
 
         VkPhysicalDeviceFeatures deviceFeatures{};
 
         VkDeviceCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        createInfo.pQueueCreateInfos = &queueCreateInfo;
-        createInfo.queueCreateInfoCount = 1;
-        createInfo.pEnabledFeatures = &deviceFeatures;
+        createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+        createInfo.pQueueCreateInfos = queueCreateInfos.data();
 
+        createInfo.pEnabledFeatures = &deviceFeatures;
         createInfo.enabledExtensionCount = 0;
 
 #ifdef NDEBUG
@@ -271,5 +297,6 @@ namespace gl::vulkan
         }
 
         vkGetDeviceQueue(m_device, indices.graphicsFamily.value(), 0, &graphicsQueue);
+        vkGetDeviceQueue(m_device, indices.presentFamily.value(), 0, &presentQueue);
     }
 }

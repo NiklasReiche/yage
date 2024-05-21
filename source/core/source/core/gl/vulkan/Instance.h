@@ -11,18 +11,19 @@ namespace gl::vulkan
     struct QueueFamilyIndices
     {
         std::optional<uint32_t> graphicsFamily;
+        std::optional<uint32_t> presentFamily;
 
         [[nodiscard]]
         bool is_complete() const
         {
-            return graphicsFamily.has_value();
+            return graphicsFamily.has_value() && presentFamily.has_value();
         }
     };
 
     class Instance
     {
     public:
-        explicit Instance();
+        explicit Instance(std::weak_ptr<platform::desktop::GlfwWindow> window);
 
         ~Instance();
 
@@ -31,11 +32,14 @@ namespace gl::vulkan
                 "VK_LAYER_KHRONOS_validation"
         };
 
+        std::weak_ptr<platform::desktop::GlfwWindow> m_window;
         VkInstance m_instance{};
         VkDebugUtilsMessengerEXT m_debug_messenger{};
+        VkSurfaceKHR m_surface{};
         VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
         VkDevice m_device{};
         VkQueue graphicsQueue{};
+        VkQueue presentQueue{};
 
         void create_instance();
 
@@ -53,11 +57,13 @@ namespace gl::vulkan
 
         VkDebugUtilsMessengerCreateInfoEXT populate_debug_messenger_create_info();
 
+        void create_surface();
+
         void pick_physical_device();
 
-        static bool isDeviceSuitable(VkPhysicalDevice device);
+        bool isDeviceSuitable(VkPhysicalDevice device);
 
-        static QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+        QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
         void create_logical_device();
     };
