@@ -42,13 +42,14 @@ int main()
 
     window->show();
     while (!window->shouldDestroy()) {
+        window->pollEvents();
 #if 0
         renderer->clear();
         renderer->draw(*triangle);
         window->swapBuffers();
 #endif
 
-        window->pollEvents();
+        context->drawFrame();
     }
 
     return 0;

@@ -34,6 +34,8 @@ namespace gl::vulkan
 
         ~Instance();
 
+        void drawFrame();
+
     private:
         const std::vector<const char*> m_validation_layers = {
                 "VK_LAYER_KHRONOS_validation"
@@ -58,6 +60,12 @@ namespace gl::vulkan
         VkRenderPass renderPass{};
         VkPipelineLayout pipelineLayout{};
         VkPipeline graphicsPipeline{};
+        std::vector<VkFramebuffer> swapChainFramebuffers{};
+        VkCommandPool commandPool{};
+        VkCommandBuffer commandBuffer{};
+        VkSemaphore imageAvailableSemaphore{};
+        VkSemaphore renderFinishedSemaphore{};
+        VkFence inFlightFence{};
 
         void create_instance();
 
@@ -104,5 +112,15 @@ namespace gl::vulkan
         VkShaderModule createShaderModule(const std::vector<std::byte>& code);
 
         void create_render_pass();
+
+        void create_framebuffers();
+
+        void create_command_pool();
+
+        void create_command_buffer();
+
+        void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+
+        void create_sync_objects();
     };
 }
