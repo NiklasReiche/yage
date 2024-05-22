@@ -43,6 +43,7 @@ namespace gl::vulkan
         const std::vector<const char*> m_device_extensions = {
                 VK_KHR_SWAPCHAIN_EXTENSION_NAME
         };
+        const int MAX_FRAMES_IN_FLIGHT = 2;
 
         std::weak_ptr<platform::desktop::GlfwWindow> m_window;
         VkInstance m_instance{};
@@ -62,10 +63,12 @@ namespace gl::vulkan
         VkPipeline graphicsPipeline{};
         std::vector<VkFramebuffer> swapChainFramebuffers{};
         VkCommandPool commandPool{};
-        VkCommandBuffer commandBuffer{};
-        VkSemaphore imageAvailableSemaphore{};
-        VkSemaphore renderFinishedSemaphore{};
-        VkFence inFlightFence{};
+        std::vector<VkCommandBuffer> commandBuffers{};
+        std::vector<VkSemaphore> imageAvailableSemaphores{};
+        std::vector<VkSemaphore> renderFinishedSemaphores{};
+        std::vector<VkFence> inFlightFences{};
+        std::uint32_t currentFrame = 0;
+        bool framebufferResized = false;
 
         void create_instance();
 
@@ -117,10 +120,14 @@ namespace gl::vulkan
 
         void create_command_pool();
 
-        void create_command_buffer();
+        void create_command_buffers();
 
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
         void create_sync_objects();
+
+        void cleanupSwapChain();
+
+        void recreateSwapChain();
     };
 }

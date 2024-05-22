@@ -66,6 +66,7 @@ namespace yage::platform::desktop
 		std::string openFileDialog(std::string defaultPath) override;
 		std::string openFileDialog(std::string defaultPath = "", std::vector<std::string> filterList = {}, std::string filterName = "");
 
+        void attach_on_framebuffer_resize(std::function<void(int, int)> callback) override;
 
 		void attach(input::InputListener& listener) override;
 		void detach(input::InputListener& listener);
@@ -75,6 +76,7 @@ namespace yage::platform::desktop
 		static void onMousePosEvent(GLFWwindow* window, double xPos, double yPos);
 		static void onMouseButtonEvent(GLFWwindow* window, int button, int action, int mods);
 		static void onMouseWheelEvent(GLFWwindow* window, double xOffset, double yOffset);
+        static void on_framebuffer_resize_event(GLFWwindow* window, int width, int height);
 
 		static void onError(int error, const char* description);
 
@@ -84,6 +86,7 @@ namespace yage::platform::desktop
 		GLFWwindow* glfwWindow = nullptr;
 
 		std::vector<std::reference_wrapper<input::InputListener>> inputListeners;
+        std::vector<std::function<void(int, int)>> on_framebuffer_resize;
 
 	    bool cursorVisible = true;
 		bool isCharInputEnabled = false;

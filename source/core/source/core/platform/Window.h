@@ -4,6 +4,7 @@
 #include <string>
 
 #include <core/input/InputListener.h>
+#include <functional>
 #include "IFileReader.h"
 
 namespace yage::platform
@@ -24,6 +25,8 @@ namespace yage::platform
 		virtual void swapBuffers() = 0;
 
 		virtual void attach(input::InputListener & listener) = 0;
+
+        virtual void attach_on_framebuffer_resize(std::function<void(int, int)>) = 0;
 
 		virtual int shouldDestroy() = 0;
 

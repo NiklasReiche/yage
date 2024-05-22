@@ -33,16 +33,14 @@ namespace yage::platform::desktop
 #ifndef NDEBUG
                 glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
-                glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // TODO
                 break;
             case GlApi::API_VULKAN:
                 glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-                glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // TODO
                 break;
         }
 
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-
+        glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
 		glfwWindow = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 
@@ -63,6 +61,7 @@ namespace yage::platform::desktop
 		glfwSetCursorPosCallback(glfwWindow, onMousePosEvent);
 		glfwSetMouseButtonCallback(glfwWindow, onMouseButtonEvent);
 		glfwSetScrollCallback(glfwWindow, onMouseWheelEvent);
+        glfwSetFramebufferSizeCallback(glfwWindow, on_framebuffer_resize_event);
 
         // TODO
 		dpi = 96;
@@ -469,5 +468,19 @@ namespace yage::platform::desktop
     GLFWwindow* GlfwWindow::glfw_window_ptr()
     {
         return glfwWindow;
+    }
+
+    void GlfwWindow::attach_on_framebuffer_resize(std::function<void(int, int)> callback)
+    {
+        on_framebuffer_resize.push_back(callback);
+    }
+
+    void GlfwWindow::on_framebuffer_resize_event(GLFWwindow* window, int width, int height)
+    {
+        auto handle = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
+        for (auto& callback : handle->on_framebuffer_resize) {
+            if (callback)
+                callback(width, height);
+        }
     }
 }
