@@ -36,6 +36,10 @@ namespace gl::vulkan
 
         void drawFrame();
 
+        [[nodiscard]] VkDevice device() const { return m_device; }
+
+        [[nodiscard]] VkPhysicalDevice physical_device() const { return m_physical_device; }
+
     private:
         const std::vector<const char*> m_validation_layers = {
                 "VK_LAYER_KHRONOS_validation"
