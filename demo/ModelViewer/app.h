@@ -75,7 +75,7 @@ public:
 
         auto light_node_2 = std::make_shared<gl3d::SceneObject>();
         light_node_2->setTransform(gml::matrix::fromQuaternion<double>(
-                gml::quaternion::eulerAngle<double>(gml::toRad(180.0), gml::toRad(0.0), gml::toRad(0.0))));
+                gml::quaternion::eulerAngle<double>(gml::toRad(180.0), gml::toRad(0.0), gml::toRad(45.0))));
         light_node_2->bindLight(light_2);
         scene->addChild(light_node_2);
 

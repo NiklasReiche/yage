@@ -51,9 +51,11 @@ public:
 			gml::Vec2f dist = mouse.pos - gml::Vec2f(x, y);
 			gml::Vec2f angle = dist * mouse.sensitivity;
 
+            auto x_axis = std::abs(camPos.z()) > std::abs(camPos.x()) ? gml::Vec3f(1, 0, 0) : gml::Vec3f(0, 0, 1);
+
             auto newPos =
                     gml::matrix::axisAngle(gml::Vec3f(0, 1, 0), angle.x()) *
-                    gml::matrix::axisAngle(gml::Vec3f(1, 0, 0), angle.y()) *
+                    gml::matrix::axisAngle(x_axis, angle.y()) *
                     gml::Vec4f(camPos.x(), camPos.y(), camPos.z(), 1);
             camPos = {newPos.x() / newPos.w(), newPos.y() / newPos.w(), newPos.z() / newPos.w()};
 
