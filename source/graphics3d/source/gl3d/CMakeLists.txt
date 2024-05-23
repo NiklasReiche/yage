@@ -1,8 +1,12 @@
 # TODO: find a way to do this at build time
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/pbrShader.vert)
-file(READ shaders/pbrShader.vert PBR_VERT)
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/pbrShader.frag)
-file(READ shaders/pbrShader.frag PBR_FRAG)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/pbr_normal_mapping.vert)
+file(READ shaders/pbr_normal_mapping.vert PBR_NORMAL_VERT)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/pbr_normal_mapping.frag)
+file(READ shaders/pbr_normal_mapping.frag PBR_NORMAL_FRAG)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/pbr.vert)
+file(READ shaders/pbr.vert PBR_VERT)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/pbr.frag)
+file(READ shaders/pbr.frag PBR_FRAG)
 configure_file(shaders.in.cpp shaders.cpp @ONLY)
 configure_file(shaders.h shaders.h) #also copy the header to resolve relative include in cpp file
 

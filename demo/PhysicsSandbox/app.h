@@ -57,10 +57,12 @@ public:
 		csShader = glContext->getShaderCreator()->createShader(csVertexShader, csFragmentShader, csGeometryShader);
 
         std::string pbrVertexShader =
-#include "gl3d/shaders/pbrShader.vert"
+#include "gl3d/shaders/pbr_normal_mapping.vert"
+
         ;
         std::string pbrFragmentShader =
-#include "gl3d/shaders/pbrShader.frag"
+#include "gl3d/shaders/pbr_normal_mapping.frag"
+
         ;
 		pbrShader = glContext->getShaderCreator()->createShader(pbrVertexShader, pbrFragmentShader);
 
