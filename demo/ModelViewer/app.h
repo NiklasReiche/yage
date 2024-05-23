@@ -67,10 +67,11 @@ public:
 #endif
 
         auto light_2 = std::make_shared<gl3d::DirectionalLight>();
-        light_2->color = gml::Vec3f(2, 2, 2);
+        light_2->color = gml::Vec3f(5, 5, 5);
 
         auto light_node_2 = std::make_shared<gl3d::SceneObject>();
-        light_node_2->setTransform(gml::matrix::axisAngle(gml::Vec3f(0, 1, 0), 2));
+        light_node_2->setTransform(gml::matrix::fromQuaternion<double>(
+                gml::quaternion::eulerAngle<double>(gml::toRad(180.0), gml::toRad(0.0), gml::toRad(45.0))));
         light_node_2->bindLight(light_2);
         scene->addChild(light_node_2);
 
