@@ -78,7 +78,9 @@ public:
     {
         auto offset = event.getYOffset();
         if (offset < 0) {
-            offset = -1 / offset;
+            offset = 1 / (-offset + 1);
+        } else {
+            offset += 1;
         }
         world->setTransform(world->getTransform() * gml::matrix::scale<double>(offset, offset, offset));
     }
