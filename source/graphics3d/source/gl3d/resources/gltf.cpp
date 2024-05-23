@@ -227,10 +227,8 @@ namespace gl3d::resources
             std::string data = fileReader.openTextFile(filename, platform::IFile::AccessMode::READ)->readAll();
             ret = loader.LoadASCIIFromString(&model, &err, &warn, data.data(), data.length(), basedir);
         } else if (filetype == "glb") {
-            // TODO
-            //fileReader.openBinaryFile(filename, platform::IFile::AccessMode::READ);
-            //loader.LoadBinaryFromMemory();
-            throw NotImplementedException();
+            std::vector<std::byte> data = fileReader.openBinaryFile(filename, platform::IFile::AccessMode::READ)->read_all();
+            ret = loader.LoadBinaryFromMemory(&model, &err, &warn, reinterpret_cast<unsigned char*>(data.data()), data.size(), basedir);
         } else {
             throw std::invalid_argument("invalid filetype for gltf");
         }
