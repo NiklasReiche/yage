@@ -110,10 +110,9 @@ namespace gl3d::resources
     std::shared_ptr<gl3d::Material>
     read_material(tinygltf::Model& model, tinygltf::Material& material,
                   const std::vector<std::shared_ptr<gl::ITexture2D>>& textures,
-                  std::shared_ptr<gl::IShader>& shader)
+                  std::shared_ptr<gl::IShader>& shader,
+                  const std::shared_ptr<gl::ITexture2D>& full_texture)
     {
-        // TODO: use a 1x1 dummy texture or disable tex_coords in shader, if there's no textures
-
         auto gl3d_material = std::make_shared<Material>();
         gl3d_material->add_uniform("albedo", gml::Vec3f(
                 static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[0]),
@@ -126,19 +125,31 @@ namespace gl3d::resources
         if (material.pbrMetallicRoughness.baseColorTexture.index > -1) {
             gl3d_material->add_uniform("albedoMap",
                                        textures.at(material.pbrMetallicRoughness.baseColorTexture.index));
+        } else {
+            gl3d_material->add_uniform("albedoMap", full_texture);
         }
+
         if (material.pbrMetallicRoughness.metallicRoughnessTexture.index > -1) {
             gl3d_material->add_uniform("aoMap",
                                        textures.at(material.pbrMetallicRoughness.metallicRoughnessTexture.index));
+        } else {
+            gl3d_material->add_uniform("aoMap", full_texture);
         }
+
         if (material.normalTexture.index > -1) {
             gl3d_material->add_uniform("normalMap",
                                        textures.at(material.normalTexture.index));
+        } else {
+            gl3d_material->add_uniform("normalMap", full_texture);
         }
+
         if (material.occlusionTexture.index > -1) {
             gl3d_material->add_uniform("metallicRoughnessMap",
                                        textures.at(material.occlusionTexture.index));
+        } else {
+            gl3d_material->add_uniform("metallicRoughnessMap", full_texture);
         }
+
         gl3d_material->set_shader(shader);
 
         return gl3d_material;
@@ -148,38 +159,42 @@ namespace gl3d::resources
                                            gl::IDrawableCreator& drawableCreator,
                                            const std::vector<std::shared_ptr<gl3d::Material>>& materials)
     {
-        // TODO: fallback when attributes are not present
-        auto position_accessor = model.accessors[primitive.attributes["POSITION"]];
-        auto normal_accessor = model.accessors[primitive.attributes["NORMAL"]];
-        auto tangent_accessor = model.accessors[primitive.attributes["TANGENT"]];
-        auto tex_coord_accessor = model.accessors[primitive.attributes["TEXCOORD_0"]]; // TODO
-
-        auto positions = readAccessor(model, position_accessor);
-        auto normals = readAccessor(model, normal_accessor);
-        auto tangents = readAccessor(model, tangent_accessor);
-        auto tex_coords = readAccessor(model, tex_coord_accessor);
-
         std::vector<std::byte> vertices;
+        std::vector<unsigned int> vertex_layout;
+
+        auto position_accessor = model.accessors.at(primitive.attributes.at("POSITION"));
+        auto positions = readAccessor(model, position_accessor);
         vertices.insert(vertices.end(), positions.begin(), positions.end());
+        vertex_layout.push_back(static_cast<unsigned int>(tinygltf::GetNumComponentsInType(position_accessor.type)));
+
+        // TODO: construct normals if not present
+        auto normal_accessor = model.accessors.at(primitive.attributes.at("NORMAL"));
+        auto normals = readAccessor(model, normal_accessor);
         vertices.insert(vertices.end(), normals.begin(), normals.end());
-        vertices.insert(vertices.end(), tangents.begin(), tangents.end());
+        vertex_layout.push_back(static_cast<unsigned int>(tinygltf::GetNumComponentsInType(normal_accessor.type)));
+
+        if (primitive.attributes.contains("TANGENT")) {
+            auto tangent_accessor = model.accessors.at(primitive.attributes.at("TANGENT"));
+            auto tangents = readAccessor(model, tangent_accessor);
+            vertices.insert(vertices.end(), tangents.begin(), tangents.end());
+            vertex_layout.push_back(static_cast<unsigned int>(tinygltf::GetNumComponentsInType(tangent_accessor.type)));
+        }
+
+        // TODO: fill in dummy tex coords if not present
+        auto tex_coord_accessor = model.accessors.at(primitive.attributes.at("TEXCOORD_0")); // TODO
+        auto tex_coords = readAccessor(model, tex_coord_accessor);
         vertices.insert(vertices.end(), tex_coords.begin(), tex_coords.end());
+        vertex_layout.push_back(static_cast<unsigned int>(tinygltf::GetNumComponentsInType(tex_coord_accessor.type)));
 
         auto indices_accessor = model.accessors[primitive.indices];
         auto indices = readAccessor(model, indices_accessor);
 
-        const std::vector<unsigned int> vertex_layout{
-                static_cast<unsigned int>(tinygltf::GetNumComponentsInType(position_accessor.type)),
-                static_cast<unsigned int>(tinygltf::GetNumComponentsInType(normal_accessor.type)),
-                static_cast<unsigned int>(tinygltf::GetNumComponentsInType(tangent_accessor.type)),
-                static_cast<unsigned int>(tinygltf::GetNumComponentsInType(tex_coord_accessor.type))
-        };
         std::shared_ptr<gl::IDrawable> drawable = drawableCreator.createDrawable(
                 vertices, indices, vertex_layout,
                 indices.size() / tinygltf::GetComponentSizeInBytes(indices_accessor.componentType),
                 gl::VertexFormat::BATCHED);
 
-        auto& gl3d_material = materials[primitive.material];
+        auto& gl3d_material = materials.at(primitive.material);
         return std::make_unique<SubMesh>(drawable, gl3d_material);
     }
 
@@ -240,6 +255,10 @@ namespace gl3d::resources
             throw std::logic_error("TinyGLTF parsing error: " + err);
         }
 
+        std::vector<unsigned char> full_data{255, 255, 255, 255};
+        std::shared_ptr<gl::ITexture2D> full_texture = textureCreator.createTexture2D(
+                1, 1, gl::ImageFormat::RGBA, full_data);
+
         std::vector<std::shared_ptr<gl::ITexture2D>> textures;
         for (auto& texture: model.textures) {
             textures.push_back(read_texture(textureCreator, model, texture));
@@ -247,7 +266,7 @@ namespace gl3d::resources
 
         std::vector<std::shared_ptr<gl3d::Material>> materials;
         for (auto& material: model.materials) {
-            materials.push_back(read_material(model, material, textures, shader));
+            materials.push_back(read_material(model, material, textures, shader, full_texture));
         }
 
         std::vector<std::shared_ptr<gl3d::Mesh>> meshes;
@@ -261,6 +280,18 @@ namespace gl3d::resources
             gml::Mat4d transform = gml::matrix::Id4d;
             if (node.matrix.size() == 16) {
                 transform = gml::Mat4d(std::span<double, 16>{node.matrix.begin(), node.matrix.end()});
+            } else {
+                if (node.scale.size() == 3) {
+                    transform *= gml::matrix::scale(node.scale.at(0), node.scale.at(1), node.scale.at(2));
+                }
+                if (node.rotation.size() == 4) {
+                    transform *=gml::matrix::fromQuaternion(
+                            gml::Quatd(node.rotation.at(0), node.rotation.at(1),
+                                       node.rotation.at(2), node.rotation.at(3)));
+                }
+                if (node.translation.size() == 3) {
+                    transform *= gml::matrix::translate(node.translation.at(0), node.translation.at(1), node.translation.at(2));
+                }
             }
 
             if (node.children.empty()) {
@@ -288,7 +319,9 @@ namespace gl3d::resources
         for (auto& scene: model.scenes) {
             auto world_root = std::make_shared<gl3d::SceneGroup>("root");
             for (auto root_index : scene.nodes) {
-                construct_node(model, model.nodes[root_index], world_root, scene_nodes);
+                auto root = scene_nodes.at(root_index);
+                world_root->addChild(root);
+                construct_node(model, model.nodes.at(root_index), root, scene_nodes);
             }
             scenes.push_back(world_root);
         }
