@@ -24,4 +24,16 @@ namespace platform::desktop
 			throw FileException(FileException::ErrorCode::ACCESS_VIOLATION, "", filename);
 		}
 	}
+
+    std::vector<std::byte> BinaryFile::read_all()
+    {
+        fileStream->seekg(0, std::ios_base::end);
+        auto fileSize = fileStream->tellg();
+
+        std::vector<std::byte> buffer(fileSize);
+        fileStream->seekg(0, std::ios_base::beg);
+        fileStream->read(reinterpret_cast<char*>(buffer.data()), fileSize);
+
+        return buffer;
+    }
 }

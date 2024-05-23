@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <vector>
 
 #include "IFile.h"
 
@@ -14,5 +15,7 @@ namespace platform
 		virtual void read(void* buffer, size_t size) = 0;
 
 		virtual void write(void* buffer, size_t size) = 0;
+
+        virtual std::vector<std::byte> read_all() = 0;
 	};
 }

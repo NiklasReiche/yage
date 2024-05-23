@@ -14,5 +14,7 @@ namespace platform::desktop
 		void read(void* buffer, size_t size) override;
 
 		void write(void* buffer, size_t size) override;
+
+        std::vector<std::byte> read_all() override;
 	};
 }
