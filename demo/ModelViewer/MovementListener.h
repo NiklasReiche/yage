@@ -22,6 +22,7 @@ class MovementListener : public input::InputListener
 public:
     std::shared_ptr<gl3d::SceneNode> world;
     std::shared_ptr<gl::IShader> pbrShader;
+    std::shared_ptr<gl::IShader> pbrShader2;
     ProjectionView* m_projection_view;
     gml::Vec3f camPos;
 
@@ -59,6 +60,7 @@ public:
             m_projection_view->view = gml::matrix::lookAt<double>(camPos, gml::Vec3d(0, 0, 0));
             m_projection_view->syncView();
             pbrShader->setUniform("camPos", camPos);
+            pbrShader2->setUniform("camPos", camPos);
 		}
 		mouse.pos = gml::Vec2f(x, y);
 	}

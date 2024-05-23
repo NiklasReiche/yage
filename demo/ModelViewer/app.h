@@ -42,9 +42,12 @@ public:
 
         pbrShader = glContext->getShaderCreator()->createShader(gl3d::shaders::PbrShader::vert,
                                                                 gl3d::shaders::PbrShader::frag);
+        pbrShaderNormalMapping = glContext->getShaderCreator()->createShader(gl3d::shaders::PbrNormalMappingShader::vert,
+                                                                gl3d::shaders::PbrNormalMappingShader::frag);
 
         auto ubo = glContext->getShaderCreator()->createUniformBlock("ProjectionView");
         pbrShader->linkUniformBlock(*ubo);
+        pbrShaderNormalMapping->linkUniformBlock(*ubo);
         csShader->linkUniformBlock(*ubo);
 
         projViewUniform = ProjectionView(ubo);
@@ -52,7 +55,8 @@ public:
         projViewUniform.syncProjection();
         projViewUniform.view = gml::matrix::lookAt<double>(gml::Vec3d(5, 5, 5), gml::Vec3d(0, 0, 0));
         projViewUniform.syncView();
-        pbrShader->setUniform("camPos", camera->getPosition());
+        pbrShader->setUniform("camPos", gml::Vec3d(5, 5, 5));
+        pbrShaderNormalMapping->setUniform("camPos", gml::Vec3d(5, 5, 5));
 
         scene = loadScene(filename);
 
@@ -77,6 +81,7 @@ public:
 
         inputListener = MovementListener(window, camera);
         inputListener.pbrShader = pbrShader;
+        inputListener.pbrShader2 = pbrShaderNormalMapping;
         inputListener.m_projection_view = &projViewUniform;
         inputListener.world = scene;
         inputListener.camPos = gml::Vec3f(5);
@@ -122,6 +127,7 @@ private:
 
     std::shared_ptr<gl::IShader> csShader;
     std::shared_ptr<gl::IShader> pbrShader;
+    std::shared_ptr<gl::IShader> pbrShaderNormalMapping;
     std::shared_ptr<gl3d::Camera> camera;
     std::shared_ptr<gl::IRenderer> baseRenderer;
     std::unique_ptr<gl3d::SceneRenderer> renderer;
@@ -132,6 +138,6 @@ private:
     {
         return gl3d::resources::readGltf(platform::desktop::FileReader(),
                                                                      filename, *glContext->getDrawableCreator(),
-                                                                     *glContext->getTextureCreator(), pbrShader);
+                                                                     *glContext->getTextureCreator(), pbrShader, pbrShaderNormalMapping);
     }
 };

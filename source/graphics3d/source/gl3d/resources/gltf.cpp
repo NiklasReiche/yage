@@ -157,31 +157,52 @@ namespace gl3d::resources
 
     std::unique_ptr<SubMesh> read_sub_mesh(tinygltf::Model& model, tinygltf::Primitive& primitive,
                                            gl::IDrawableCreator& drawableCreator,
-                                           const std::vector<std::shared_ptr<gl3d::Material>>& materials)
+                                           const std::vector<std::shared_ptr<gl3d::Material>>& materials,
+                                           std::shared_ptr<gl::IShader>& shader,
+                                           std::shared_ptr<gl::IShader>& shader_normal_mapping)
     {
+        auto& gl3d_material = materials.at(primitive.material);
+
         std::vector<std::byte> vertices;
         std::vector<unsigned int> vertex_layout;
 
         auto position_accessor = model.accessors.at(primitive.attributes.at("POSITION"));
+        if (position_accessor.type != TINYGLTF_TYPE_VEC3 || position_accessor.componentType != TINYGLTF_COMPONENT_TYPE_FLOAT) {
+            throw std::runtime_error("unsupported format");
+        }
         auto positions = readAccessor(model, position_accessor);
         vertices.insert(vertices.end(), positions.begin(), positions.end());
         vertex_layout.push_back(static_cast<unsigned int>(tinygltf::GetNumComponentsInType(position_accessor.type)));
 
         // TODO: construct normals if not present
         auto normal_accessor = model.accessors.at(primitive.attributes.at("NORMAL"));
+        if (normal_accessor.type != TINYGLTF_TYPE_VEC3 || normal_accessor.componentType != TINYGLTF_COMPONENT_TYPE_FLOAT) {
+            throw std::runtime_error("unsupported format");
+        }
         auto normals = readAccessor(model, normal_accessor);
         vertices.insert(vertices.end(), normals.begin(), normals.end());
         vertex_layout.push_back(static_cast<unsigned int>(tinygltf::GetNumComponentsInType(normal_accessor.type)));
 
         if (primitive.attributes.contains("TANGENT")) {
             auto tangent_accessor = model.accessors.at(primitive.attributes.at("TANGENT"));
+            if (tangent_accessor.type != TINYGLTF_TYPE_VEC4 ||
+                    tangent_accessor.componentType != TINYGLTF_COMPONENT_TYPE_FLOAT) {
+                throw std::runtime_error("unsupported format");
+            }
             auto tangents = readAccessor(model, tangent_accessor);
             vertices.insert(vertices.end(), tangents.begin(), tangents.end());
             vertex_layout.push_back(static_cast<unsigned int>(tinygltf::GetNumComponentsInType(tangent_accessor.type)));
+            gl3d_material->set_shader(shader_normal_mapping);
+        } else {
+            gl3d_material->set_shader(shader);
         }
 
         // TODO: fill in dummy tex coords if not present
         auto tex_coord_accessor = model.accessors.at(primitive.attributes.at("TEXCOORD_0")); // TODO
+        if (tex_coord_accessor.type != TINYGLTF_TYPE_VEC2 ||
+                tex_coord_accessor.componentType != TINYGLTF_COMPONENT_TYPE_FLOAT) {
+            throw std::runtime_error("unsupported format");
+        }
         auto tex_coords = readAccessor(model, tex_coord_accessor);
         vertices.insert(vertices.end(), tex_coords.begin(), tex_coords.end());
         vertex_layout.push_back(static_cast<unsigned int>(tinygltf::GetNumComponentsInType(tex_coord_accessor.type)));
@@ -194,17 +215,19 @@ namespace gl3d::resources
                 indices.size() / tinygltf::GetComponentSizeInBytes(indices_accessor.componentType),
                 gl::VertexFormat::BATCHED);
 
-        auto& gl3d_material = materials.at(primitive.material);
+
         return std::make_unique<SubMesh>(drawable, gl3d_material);
     }
 
     std::unique_ptr<Mesh> read_mesh(tinygltf::Model& model, tinygltf::Mesh& mesh,
                                     gl::IDrawableCreator& drawableCreator,
-                                    const std::vector<std::shared_ptr<gl3d::Material>>& materials)
+                                    const std::vector<std::shared_ptr<gl3d::Material>>& materials,
+                                    std::shared_ptr <gl::IShader>& shader,
+                                    std::shared_ptr<gl::IShader>& shader_normal_mapping)
     {
         auto gl3d_mesh = std::make_unique<Mesh>();
         for (auto& primitive: mesh.primitives) {
-            gl3d_mesh->add_sub_mesh(read_sub_mesh(model, primitive, drawableCreator, materials));
+            gl3d_mesh->add_sub_mesh(read_sub_mesh(model, primitive, drawableCreator, materials, shader, shader_normal_mapping));
         }
         return gl3d_mesh;
     }
@@ -223,7 +246,8 @@ namespace gl3d::resources
     std::shared_ptr<SceneGroup> readGltf(
             const platform::IFileReader& fileReader, const std::string& filename,
             gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator,
-            std::shared_ptr<gl::IShader>& shader)
+            std::shared_ptr<gl::IShader>& shader,
+            std::shared_ptr<gl::IShader>& shader_normal_mapping)
     {
         auto tmp = utils::strip(filename, "/");
         std::string filetype = utils::strip(tmp.back(), ".").back();
@@ -271,7 +295,7 @@ namespace gl3d::resources
 
         std::vector<std::shared_ptr<gl3d::Mesh>> meshes;
         for (auto& mesh: model.meshes) {
-            meshes.push_back(read_mesh(model, mesh, drawableCreator, materials));
+            meshes.push_back(read_mesh(model, mesh, drawableCreator, materials, shader, shader_normal_mapping));
         }
 
         std::vector<std::shared_ptr<gl3d::SceneGroup>> scene_nodes;
@@ -279,7 +303,7 @@ namespace gl3d::resources
         for (auto& node: model.nodes) {
             gml::Mat4d transform = gml::matrix::Id4d;
             if (node.matrix.size() == 16) {
-                transform = gml::Mat4d(std::span<double, 16>{node.matrix.begin(), node.matrix.end()});
+                transform = gml::transpose(gml::Mat4d(std::span<double, 16>{node.matrix.begin(), node.matrix.end()}));
             } else {
                 if (node.scale.size() == 3) {
                     transform *= gml::matrix::scale(node.scale.at(0), node.scale.at(1), node.scale.at(2));
