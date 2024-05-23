@@ -48,11 +48,11 @@ public:
         csShader->linkUniformBlock(*ubo);
 
         projViewUniform = ProjectionView(ubo);
-        projViewUniform.projection = gml::matrix::perspective<float>(45.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
+        projViewUniform.projection = gml::matrix::perspective<float>(90.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
         projViewUniform.syncProjection();
         projViewUniform.view = gml::matrix::lookAt<double>(gml::Vec3d(5, 5, 5), gml::Vec3d(0, 0, 0));
         projViewUniform.syncView();
-        pbrShader->setUniform("camPos", gml::Vec3d(5, 5, 5));
+        pbrShader->setUniform("camPos", camera->getPosition());
 
         scene = loadScene(filename);
 
@@ -71,12 +71,15 @@ public:
 
         auto light_node_2 = std::make_shared<gl3d::SceneObject>();
         light_node_2->setTransform(gml::matrix::fromQuaternion<double>(
-                gml::quaternion::eulerAngle<double>(gml::toRad(180.0), gml::toRad(0.0), gml::toRad(45.0))));
+                gml::quaternion::eulerAngle<double>(gml::toRad(180.0), gml::toRad(0.0), gml::toRad(0.0))));
         light_node_2->bindLight(light_2);
         scene->addChild(light_node_2);
 
         inputListener = MovementListener(window, camera);
+        inputListener.pbrShader = pbrShader;
+        inputListener.m_projection_view = &projViewUniform;
         inputListener.world = scene;
+        inputListener.camPos = gml::Vec3f(5);
         window->attach(inputListener);
     }
 

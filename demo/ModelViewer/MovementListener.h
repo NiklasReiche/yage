@@ -7,19 +7,23 @@
 #include <gl3d/camera.h>
 
 #include <utility>
+#include "ProjectionView.h"
 
 struct Mouse
 {
 	gml::Vec2f pos;
-	float sensitivity = 0.2f;
-	bool isHidden = false;
+	float sensitivity = 0.02f;
 	bool first = true;
+    bool pressed = false;
 };
 
 class MovementListener : public input::InputListener
 {
 public:
     std::shared_ptr<gl3d::SceneNode> world;
+    std::shared_ptr<gl::IShader> pbrShader;
+    ProjectionView* m_projection_view;
+    gml::Vec3f camPos;
 
 	MovementListener() = default;
 
@@ -42,16 +46,19 @@ public:
 		float x = static_cast<const input::MousePosEvent&>(event).getXPos();
 		float y = static_cast<const input::MousePosEvent&>(event).getYPos();
 
-		if (mouse.isHidden) {
+		if (mouse.pressed) {
 			gml::Vec2f dist = mouse.pos - gml::Vec2f(x, y);
 			gml::Vec2f angle = dist * mouse.sensitivity;
 
-			//gml::Quaternion<float> q_yaw = gml::quaternion::eulerAngle<float>(0, angle.x, 0);
-			//gml::Quaternion<float> q_pitch = gml::quaternion::eulerAngle<float>(angle.y, 0, 0);
+            auto newPos =
+                    gml::matrix::axisAngle(gml::Vec3f(0, 1, 0), angle.x()) *
+                    gml::matrix::axisAngle(gml::Vec3f(1, 0, 0), angle.y()) *
+                    gml::Vec4f(camPos.x(), camPos.y(), camPos.z(), 1);
+            camPos = {newPos.x() / newPos.w(), newPos.y() / newPos.w(), newPos.z() / newPos.w()};
 
-			//gml::Quaternion<float> newRotation = gml::normalize<float>(q_yaw * camera.rotation * q_pitch);
-			camera->rotateYaw(angle.x());
-			camera->rotatePitch(angle.y());
+            m_projection_view->view = gml::matrix::lookAt<double>(camPos, gml::Vec3d(0, 0, 0));
+            m_projection_view->syncView();
+            pbrShader->setUniform("camPos", camPos);
 		}
 		mouse.pos = gml::Vec2f(x, y);
 	}
@@ -63,15 +70,12 @@ public:
 
 		keyStates[code] = action != input::KeyEvent::Action::RELEASE;
 
-		if (code == input::KeyEvent::Code::KEY_X && action == input::KeyEvent::Action::PRESS) {
-			if (mouse.isHidden) {
-				std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->showCursor();
-				mouse.isHidden = false;
-			} else {
-				std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->hideCursor();
-				mouse.isHidden = true;
-			}
-		}
+        if (code == input::KeyEvent::Code::KEY_MOUSE_1 && action == input::KeyEvent::Action::PRESS) {
+            mouse.pressed = true;
+        }
+        if (code == input::KeyEvent::Code::KEY_MOUSE_1 && action == input::KeyEvent::Action::RELEASE) {
+            mouse.pressed = false;
+        }
 	}
 
     void onMouseWheelEvent(const input::MouseWheelEvent& event) override
