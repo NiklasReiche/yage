@@ -44,7 +44,7 @@ namespace gl3d
 
         // TODO: use found camera from scene graph to set shader camPos, like we do with lights
 
-        root->updateChildren(collectGeometry);
+        root->updateChildren(collectGeometry, root->applyTransform(gml::matrix::Id4d));
 
         // TODO: sort by shader
         for (auto& geometry: drawablesLoop) {
