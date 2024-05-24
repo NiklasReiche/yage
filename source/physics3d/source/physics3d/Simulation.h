@@ -19,5 +19,7 @@ namespace physics3d
 	private:
 		std::vector<Particle> particles;
 		std::vector<std::shared_ptr<RigidBody>> bodies;
-	};
+
+        void resolve(RigidBody& a, RigidBody& b);
+    };
 }
