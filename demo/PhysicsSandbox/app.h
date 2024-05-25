@@ -26,7 +26,7 @@ public:
 		glContext = gl::createContext(window);
 
 		camera = std::make_shared<gl3d::Camera>(
-			gl3d::Camera(gml::Vec3f(0.0f, 0.0f, 5.0f),
+			gl3d::Camera(gml::Vec3f(0.0f, 0.0f, 10.0f),
 			             gml::quaternion::eulerAngle<double>(std::numbers::pi_v<float>, 0, 0)));
 
 		inputListener = MovementListener(window, camera);
@@ -68,19 +68,19 @@ public:
 		window->show();
 		std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
 
-		auto ball1 = loadModel("models/baseball/scene.gltf",
+		auto ball1 = loadModel("models/billiard_ball/scene.gltf",
                                physics3d::SphereShape(1, 1),
-                               gml::Vec3d(-2, 0, 0));
-        ball1->bounding_shape.center = gml::Vec3d(-2, 0, 0);
-        ball1->bounding_shape.radius = 0.4;
-        ball1->applyForce(gml::Vec3d(10, 0, 0), gml::Vec3d(0, 0, 0));
+                               gml::Vec3d(-4, 0, 0));
+        ball1->bounding_shape.center = gml::Vec3d(-4, 0, 0);
+        ball1->bounding_shape.radius = 1;
+        ball1->applyForce(gml::Vec3d(40, 0, 2), gml::Vec3d(0, 0, 0));
 
-        auto ball2 = loadModel("models/baseball/scene.gltf",
+        auto ball2 = loadModel("models/billiard_ball/scene.gltf",
                                physics3d::SphereShape(1, 1),
-                               gml::Vec3d(2, 0, 0));
-        ball2->bounding_shape.center = gml::Vec3d(2, 0, 0);
-        ball2->bounding_shape.radius = 0.4;
-        ball2->applyForce(gml::Vec3d(-10, 0, 0), gml::Vec3d(0, 0, 0));
+                               gml::Vec3d(4, 0, 0));
+        ball2->bounding_shape.center = gml::Vec3d(4, 0, 0);
+        ball2->bounding_shape.radius = 1;
+        ball2->applyForce(gml::Vec3d(-30, 5, 0), gml::Vec3d(0, 0, 0));
 
 		auto point = glContext->getDrawableCreator()->createDrawable(std::vector<float>{ },
 		                                                             std::vector<unsigned int>{ },

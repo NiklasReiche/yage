@@ -19,6 +19,13 @@ namespace gml
 	template<typename T, std::size_t M, std::size_t N> requires StrictlyPositive<M> && StrictlyPositive<N>
 	class Matrix;
 
+    template<std::size_t M, std::size_t N> requires StrictlyPositive<M> && StrictlyPositive<N>
+    using Mati = Matrix<int, M, N>;
+    template<std::size_t M, std::size_t N> requires StrictlyPositive<M> && StrictlyPositive<N>
+    using Matf = Matrix<float, M, N>;
+    template<std::size_t M, std::size_t N> requires StrictlyPositive<M> && StrictlyPositive<N>
+    using Matd = Matrix<double, M, N>;
+
 	template<typename T>
 	using Mat2 = Matrix<T, 2, 2>;
 
@@ -90,6 +97,7 @@ namespace gml
 		 */
 		constexpr Matrix(const std::initializer_list<T>& init)
 		{
+            // TODO: if we take init as an array we can have compile-time size correctness
 			if (init.size() != M * N) {
 				throw InvalidDimensionException();
 			}
@@ -194,6 +202,19 @@ namespace gml
 		{
 			return elements.at(m * N + n);
 		}
+
+        /**
+		 * @brief Unary component-wise negation.
+		 * @return A negated matrix.
+		 */
+        constexpr Matrix<T, M, N> operator-() const
+        {
+            Matrix<T, M, N> result;
+            for (std::size_t i = 0; i < M * N; ++i){
+                result.elements.at(i) = -elements.at(i);
+            }
+            return result;
+        }
 
 		/**
 		 * @brief Element-wise addition.
@@ -681,6 +702,21 @@ namespace gml
 
 namespace gml::matrix
 {
+    /**
+     * Constructs a square diagonal matrix.
+     * @param init values of the diagonal elements
+     */
+    template<typename T, std::size_t M>
+    requires StrictlyPositive<M>
+    Matrix<T, M, M> diagonal(const std::array<T, M>& init)
+    {
+        Matrix<T, M, M> m;
+        for (std::size_t i = 0; i < M; ++i) {
+            m(i, i) = init.at(i);
+        }
+        return m;
+    }
+
 	/**
 	 * @brief Constructs a translation matrix.
 	 *

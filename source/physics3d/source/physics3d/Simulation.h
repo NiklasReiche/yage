@@ -21,5 +21,7 @@ namespace physics3d
 		std::vector<std::shared_ptr<RigidBody>> bodies;
 
         void resolve(RigidBody& a, RigidBody& b);
+
+        void resolve_constraint(RigidBody& a, RigidBody& b);
     };
 }
