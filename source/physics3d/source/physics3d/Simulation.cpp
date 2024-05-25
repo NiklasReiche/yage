@@ -35,19 +35,49 @@ namespace physics3d
         contact(a.bounding_shape, b.bounding_shape, p_a, p_b, n);
         auto depth = gml::length(p_a - p_b);
 
-        auto m_inv = gml::matrix::diagonal<double, 6>({
-            1.0 / a.shape.mass, 1.0 / a.shape.mass, 1.0 / a.shape.mass,
-            1.0 / b.shape.mass, 1.0 / b.shape.mass, 1.0 / b.shape.mass,
-        });
+        gml::Matd<12, 12> m_inv;
+        m_inv(0, 0) = 1.0 / a.shape.mass;
+        m_inv(1, 1) = 1.0 / a.shape.mass;
+        m_inv(2, 2) = 1.0 / a.shape.mass;
+        m_inv(3, 3) = 1.0 / b.shape.mass;
+        m_inv(4, 4) = 1.0 / b.shape.mass;
+        m_inv(5, 5) = 1.0 / b.shape.mass;
 
-        gml::Matd<1, 6> j{
-            -n.x(), -n.y(), -n.z(), n.x(), n.y(), n.z()
+        m_inv(6, 6) = a.shape.inverseInertiaTensor(0, 0);
+        m_inv(6, 7) = a.shape.inverseInertiaTensor(0, 1);
+        m_inv(6, 8) = a.shape.inverseInertiaTensor(0, 2);
+        m_inv(7, 6) = a.shape.inverseInertiaTensor(1, 0);
+        m_inv(7, 7) = a.shape.inverseInertiaTensor(1, 1);
+        m_inv(7, 8) = a.shape.inverseInertiaTensor(1, 2);
+        m_inv(8, 6) = a.shape.inverseInertiaTensor(2, 0);
+        m_inv(8, 7) = a.shape.inverseInertiaTensor(2, 1);
+        m_inv(8, 8) = a.shape.inverseInertiaTensor(2, 2);
+
+        m_inv(9, 9) = b.shape.inverseInertiaTensor(0, 0);
+        m_inv(9, 10) = b.shape.inverseInertiaTensor(0, 1);
+        m_inv(9, 11) = b.shape.inverseInertiaTensor(0, 2);
+        m_inv(10, 9) = b.shape.inverseInertiaTensor(1, 0);
+        m_inv(10, 10) = b.shape.inverseInertiaTensor(1, 1);
+        m_inv(10, 11) = b.shape.inverseInertiaTensor(1, 2);
+        m_inv(11, 9) = b.shape.inverseInertiaTensor(2, 0);
+        m_inv(11, 10) = b.shape.inverseInertiaTensor(2, 1);
+        m_inv(11, 11) = b.shape.inverseInertiaTensor(2, 2);
+
+        auto t_1 = -(gml::cross(p_a - a.bounding_shape.center, n));
+        auto t_2 = (gml::cross(p_b - b.bounding_shape.center, n));
+        gml::Matd<1, 12> j{
+            -n.x(), -n.y(), -n.z(),
+            n.x(), n.y(), n.z(),
+            t_1.x(), t_1.y(), t_1.z(),
+            t_2.x(), t_2.y(), t_2.z(),
         };
         auto j_trans = gml::transpose(j);
 
-        gml::Matd<6, 1> q_pre{
+        gml::Matd<12, 1> q_pre{
             a.velocity.x(), a.velocity.y(), a.velocity.z(),
             b.velocity.x(), b.velocity.y(), b.velocity.z(),
+            a.angularVelocity.x(), a.angularVelocity.y(), a.angularVelocity.z(),
+            b.angularVelocity.x(), b.angularVelocity.y(), b.angularVelocity.z(),
         };
 
         auto nominator = -(j * q_pre);
@@ -59,6 +89,9 @@ namespace physics3d
 
         a.velocity = {q_post(0, 0), q_post(1, 0), q_post(2, 0)};
         b.velocity = {q_post(3, 0), q_post(4, 0), q_post(5, 0)};
+
+        a.angularVelocity = {q_post(6, 0), q_post(7, 0), q_post(8, 0)};
+        b.angularVelocity = {q_post(9, 0), q_post(10, 0), q_post(11, 0)};
 
         // TODO
         a.position -= n * depth / 2;
@@ -83,8 +116,8 @@ namespace physics3d
             rigidBody->velocity += rigidBody->momentum / rigidBody->shape.mass;
 
             // angular component
-            rigidBody->angularMomentum += rigidBody->torque * dt; // TODO: accumulate momentum or velocity
-            rigidBody->angularVelocity = rigidBody->shape.inverseInertiaTensor * rigidBody->angularMomentum;
+            rigidBody->angularMomentum = rigidBody->torque * dt; // TODO: accumulate momentum or velocity
+            rigidBody->angularVelocity += rigidBody->shape.inverseInertiaTensor * rigidBody->angularMomentum;
         }
 
 
