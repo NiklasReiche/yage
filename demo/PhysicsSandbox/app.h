@@ -73,14 +73,14 @@ public:
                                gml::Vec3d(-4, 0, 0));
         ball1->bounding_shape.center = gml::Vec3d(-4, 0, 0);
         ball1->bounding_shape.radius = 1;
-        ball1->applyForce(gml::Vec3d(40, 0, 0), gml::Vec3d(-4, 0, 0));
+        ball1->applyForce(gml::Vec3d(50, 20, 0), gml::Vec3d(-4, 0, 0));
 
         auto ball2 = loadModel("models/billiard_ball/scene.gltf",
                                physics3d::SphereShape(1, 1),
                                gml::Vec3d(4, 0, 0));
         ball2->bounding_shape.center = gml::Vec3d(4, 0, 0);
         ball2->bounding_shape.radius = 1;
-        ball2->applyForce(gml::Vec3d(-40, 10, 0), gml::Vec3d(4, 0, 0));
+        ball2->applyForce(gml::Vec3d(-60, 0, 0), gml::Vec3d(4, 0, 0));
 
 		auto point = glContext->getDrawableCreator()->createDrawable(std::vector<float>{ },
 		                                                             std::vector<unsigned int>{ },
@@ -148,7 +148,8 @@ private:
                                                *glContext->getTextureCreator(), pbrShader);
 		scene->addChild(model);
 
-		auto rb = std::make_shared<physics3d::RigidBody>(shape, position, gml::Quatd());
+		auto rb = std::make_shared<physics3d::RigidBody>(shape, position, gml::quaternion::fromMatrix(
+                gml::matrix::axisAngle(gml::Vec3d(0, 1, 0), - std::numbers::pi_v<double>/2).getRotation()));
 		simulation.addRigidBody(rb);
 
 		objects.emplace_back(model, rb);

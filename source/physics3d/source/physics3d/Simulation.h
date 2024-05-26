@@ -21,8 +21,6 @@ namespace physics3d
 		std::vector<Particle> particles;
 		std::vector<std::shared_ptr<RigidBody>> bodies;
 
-        void resolve(RigidBody& a, RigidBody& b);
-
         void resolve_constraint(RigidBody& a, RigidBody& b);
 
         void solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> q_pre,

@@ -4,53 +4,6 @@
 
 namespace physics3d
 {
-    void Simulation::resolve(RigidBody& a, RigidBody& b)
-    {
-        // linear impulse method
-        const auto e = std::min(a.restitution, b.restitution);
-
-        gml::Vec3d p_a;
-        gml::Vec3d p_b;
-        gml::Vec3d n;
-        contact(a.bounding_shape, b.bounding_shape, p_a, p_b, n);
-        auto depth = gml::length(p_a - p_b);
-
-        auto nominator = gml::dot(-(1 + e) * (b.velocity - a.velocity), n);
-        auto denominator = 1 / a.shape.mass + 1 / b.shape.mass;
-        auto j = nominator / denominator;
-
-        a.velocity -= j / a.shape.mass * n;
-        b.velocity += j / b.shape.mass * n;
-
-        a.position -= n * depth / 2;
-        b.position += n * depth / 2;
-        a.bounding_shape.center = a.position;
-        b.bounding_shape.center = b.position;
-    }
-
-    void get_tangents(gml::Vec3d n, gml::Vec3d& p, gml::Vec3d& q)
-    {
-        if (std::abs(n(2)) > std::sqrt(0.5)){
-            auto a = n(1) * n(1) + n(2) * n(2);
-            auto k = std::sqrt(a);
-            p(0) = 0;
-            p(1) = -k*n(2);
-            p(2) = -k*n(1);
-            q(0) = a*k;
-            q(1) = -n(0)*p(2);
-            q(2) = n(0)*p(1);
-        } else {
-            auto a = n(0) * n(0) + n(1) * n(1);
-            auto k = std::sqrt(a);
-            p(0) = -k * n(1);
-            p(1) = -k * n(0);
-            p(2) = 0;
-            q(0) = -n(2) * p(1);
-            q(1) = n(2) * p(2);
-            q(2) = a * k;
-        }
-    }
-
     gml::Matd<12, 12> Simulation::inverse_mass_matrix(RigidBody& a, RigidBody& b)
     {
         gml::Matd<12, 12> m_inv;
@@ -116,13 +69,16 @@ namespace physics3d
         gml::Vec3d n;
         contact(a.bounding_shape, b.bounding_shape, p_a, p_b, n);
         auto depth = gml::length(p_a - p_b);
-        gml::Vec3d u1;
-        gml::Vec3d u2;
-        get_tangents(n, u1, u2);
-        u1.normalize();
-        u2.normalize();
+
         auto r_a = p_a - a.bounding_shape.center;
         auto r_b = p_b - b.bounding_shape.center;
+
+        auto v_abs_p_a = a.velocity + gml::cross(a.angularVelocity, r_a);
+        auto v_abs_p_b = b.velocity + gml::cross(b.angularVelocity, r_b);
+        auto v_rel = v_abs_p_b - v_abs_p_a;
+
+        gml::Vec3d u1 = gml::normalize(v_rel - n * gml::dot(v_rel, n));
+        gml::Vec3d u2 = gml::normalize(gml::cross(u1, n));
 
         auto t_1 = gml::cross(r_a, n);
         auto t_2 = gml::cross(r_b, n);
@@ -133,8 +89,8 @@ namespace physics3d
             t_2.x(), t_2.y(), t_2.z(),
         };
 
-        t_1 = -gml::cross(r_a, u1); // the sign is due to handedness of the cross product
-        t_2 = -gml::cross(r_b, u1); // the sign is due to handedness of the cross product
+        t_1 = gml::cross(r_a, u1);
+        t_2 = gml::cross(r_b, u1);
         gml::Matd<1, 12> j_friction_1{
                 -u1.x(), -u1.y(), -u1.z(),
                 u1.x(), u1.y(), u1.z(),
@@ -142,8 +98,8 @@ namespace physics3d
                 t_2.x(), t_2.y(), t_2.z(),
         };
 
-        t_1 = -gml::cross(r_a, u2); // the sign is due to handedness of the cross product
-        t_2 = -gml::cross(r_b, u2); // the sign is due to handedness of the cross product
+        t_1 = gml::cross(r_a, u2);
+        t_2 = gml::cross(r_b, u2);
         gml::Matd<1, 12> j_friction_2{
                 -u2.x(), -u2.y(), -u2.z(),
                 u2.x(), u2.y(), u2.z(),
@@ -155,7 +111,7 @@ namespace physics3d
         double lambda_n;
         solve(m_inv, j_penetration, q_pre, delta_q_penetration, lambda_n);
 
-        const double friction_constant = 0.8;
+        const double friction_constant = 0.6;
         auto clamp_lambda = [lambda_n, friction_constant](double l){
             return gml::clamp(l, -friction_constant * lambda_n, friction_constant * lambda_n);
         };
@@ -220,7 +176,7 @@ namespace physics3d
             rigidBody->bounding_shape.center = rigidBody->position;
 
             // angular component
-            rigidBody->orientation += 0.5 * gml::Quatd(rigidBody->angularVelocity) * rigidBody->orientation;
+            rigidBody->orientation += 0.5 * gml::Quatd(rigidBody->angularVelocity) * rigidBody->orientation * dt;
             rigidBody->orientation.normalize();
             rigidBody->torque = gml::Vec3d();
         }
