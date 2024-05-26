@@ -1,5 +1,6 @@
 #include "Simulation.h"
 #include <gml/quaternion.h>
+#include <functional>
 
 namespace physics3d
 {
@@ -27,14 +28,31 @@ namespace physics3d
         b.bounding_shape.center = b.position;
     }
 
-    void Simulation::resolve_constraint(RigidBody& a, RigidBody& b)
+    void get_tangents(gml::Vec3d n, gml::Vec3d& p, gml::Vec3d& q)
     {
-        gml::Vec3d p_a;
-        gml::Vec3d p_b;
-        gml::Vec3d n;
-        contact(a.bounding_shape, b.bounding_shape, p_a, p_b, n);
-        auto depth = gml::length(p_a - p_b);
+        if (std::abs(n(2)) > std::sqrt(0.5)){
+            auto a = n(1) * n(1) + n(2) * n(2);
+            auto k = std::sqrt(a);
+            p(0) = 0;
+            p(1) = -k*n(2);
+            p(2) = -k*n(1);
+            q(0) = a*k;
+            q(1) = -n(0)*p(2);
+            q(2) = n(0)*p(1);
+        } else {
+            auto a = n(0) * n(0) + n(1) * n(1);
+            auto k = std::sqrt(a);
+            p(0) = -k * n(1);
+            p(1) = -k * n(0);
+            p(2) = 0;
+            q(0) = -n(2) * p(1);
+            q(1) = n(2) * p(2);
+            q(2) = a * k;
+        }
+    }
 
+    gml::Matd<12, 12> Simulation::inverse_mass_matrix(RigidBody& a, RigidBody& b)
+    {
         gml::Matd<12, 12> m_inv;
         m_inv(0, 0) = 1.0 / a.shape.mass;
         m_inv(1, 1) = 1.0 / a.shape.mass;
@@ -63,37 +81,100 @@ namespace physics3d
         m_inv(11, 10) = b.shape.inverseInertiaTensor(2, 1);
         m_inv(11, 11) = b.shape.inverseInertiaTensor(2, 2);
 
-        auto t_1 = -(gml::cross(p_a - a.bounding_shape.center, n));
-        auto t_2 = (gml::cross(p_b - b.bounding_shape.center, n));
-        gml::Matd<1, 12> j{
-            -n.x(), -n.y(), -n.z(),
-            n.x(), n.y(), n.z(),
-            t_1.x(), t_1.y(), t_1.z(),
-            t_2.x(), t_2.y(), t_2.z(),
-        };
-        auto j_trans = gml::transpose(j);
+        return m_inv;
+    }
 
-        gml::Matd<12, 1> q_pre{
-            a.velocity.x(), a.velocity.y(), a.velocity.z(),
-            b.velocity.x(), b.velocity.y(), b.velocity.z(),
-            a.angularVelocity.x(), a.angularVelocity.y(), a.angularVelocity.z(),
-            b.angularVelocity.x(), b.angularVelocity.y(), b.angularVelocity.z(),
-        };
+    void Simulation::solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> q_pre,
+                           gml::Matd<12, 1>& delta_q, double& lambda,
+                           const std::function<double(double)>& lambda_clamp)
+    {
+        auto j_t = gml::transpose(j);
 
         auto nominator = -(j * q_pre);
-        auto denominator = j * m_inv * j_trans;
-        auto lambda = nominator(0, 0) / denominator(0, 0);
+        auto denominator = j * m_inv * j_t;
+        lambda = nominator(0, 0) / denominator(0, 0);
 
-        auto p_c = lambda * j_trans;
-        auto q_post = q_pre + (m_inv * p_c);
+        lambda = lambda_clamp(lambda);
+
+        auto p_c = lambda * j_t;
+        delta_q = m_inv * p_c;
+    }
+
+    void Simulation::resolve_constraint(RigidBody& a, RigidBody& b)
+    {
+        auto m_inv = inverse_mass_matrix(a, b);
+
+        gml::Matd<12, 1> q_pre{
+                a.velocity.x(), a.velocity.y(), a.velocity.z(),
+                b.velocity.x(), b.velocity.y(), b.velocity.z(),
+                a.angularVelocity.x(), a.angularVelocity.y(), a.angularVelocity.z(),
+                b.angularVelocity.x(), b.angularVelocity.y(), b.angularVelocity.z(),
+        };
+
+        gml::Vec3d p_a;
+        gml::Vec3d p_b;
+        gml::Vec3d n;
+        contact(a.bounding_shape, b.bounding_shape, p_a, p_b, n);
+        auto depth = gml::length(p_a - p_b);
+        gml::Vec3d u1;
+        gml::Vec3d u2;
+        get_tangents(n, u1, u2);
+        u1.normalize();
+        u2.normalize();
+        auto r_a = p_a - a.bounding_shape.center;
+        auto r_b = p_b - b.bounding_shape.center;
+
+        auto t_1 = gml::cross(r_a, n);
+        auto t_2 = gml::cross(r_b, n);
+        gml::Matd<1, 12> j_penetration{
+            -n.x(), -n.y(), -n.z(),
+            n.x(), n.y(), n.z(),
+            -t_1.x(), -t_1.y(), -t_1.z(),
+            t_2.x(), t_2.y(), t_2.z(),
+        };
+
+        t_1 = -gml::cross(r_a, u1); // the sign is due to handedness of the cross product
+        t_2 = -gml::cross(r_b, u1); // the sign is due to handedness of the cross product
+        gml::Matd<1, 12> j_friction_1{
+                -u1.x(), -u1.y(), -u1.z(),
+                u1.x(), u1.y(), u1.z(),
+                -t_1.x(), -t_1.y(), -t_1.z(),
+                t_2.x(), t_2.y(), t_2.z(),
+        };
+
+        t_1 = -gml::cross(r_a, u2); // the sign is due to handedness of the cross product
+        t_2 = -gml::cross(r_b, u2); // the sign is due to handedness of the cross product
+        gml::Matd<1, 12> j_friction_2{
+                -u2.x(), -u2.y(), -u2.z(),
+                u2.x(), u2.y(), u2.z(),
+                -t_1.x(), -t_1.y(), -t_1.z(),
+                t_2.x(), t_2.y(), t_2.z(),
+        };
+
+        gml::Matd<12, 1> delta_q_penetration;
+        double lambda_n;
+        solve(m_inv, j_penetration, q_pre, delta_q_penetration, lambda_n);
+
+        const double friction_constant = 0.8;
+        auto clamp_lambda = [lambda_n, friction_constant](double l){
+            return gml::clamp(l, -friction_constant * lambda_n, friction_constant * lambda_n);
+        };
+
+        gml::Matd<12, 1> delta_q_friction_1;
+        double lambda_friction_1;
+        solve(m_inv, j_friction_1, q_pre, delta_q_friction_1, lambda_friction_1, clamp_lambda);
+        gml::Matd<12, 1> delta_q_friction_2;
+        double lambda_friction_2;
+        solve(m_inv, j_friction_2, q_pre, delta_q_friction_2,lambda_friction_2, clamp_lambda);
+
+        auto q_post = q_pre + delta_q_penetration + delta_q_friction_1 + delta_q_friction_2;
 
         a.velocity = {q_post(0, 0), q_post(1, 0), q_post(2, 0)};
         b.velocity = {q_post(3, 0), q_post(4, 0), q_post(5, 0)};
-
         a.angularVelocity = {q_post(6, 0), q_post(7, 0), q_post(8, 0)};
         b.angularVelocity = {q_post(9, 0), q_post(10, 0), q_post(11, 0)};
 
-        // TODO
+        // TODO: try Baumgarte stabilisation instead
         a.position -= n * depth / 2;
         b.position += n * depth / 2;
         a.bounding_shape.center = a.position;
