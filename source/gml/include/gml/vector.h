@@ -14,6 +14,13 @@ namespace gml
 	template<typename T, std::size_t Size> requires StrictlyPositive<Size>
 	class Vector;
 
+    template<std::size_t Size> requires StrictlyPositive<Size>
+    using Veci = Vector<int, Size>;
+    template<std::size_t Size> requires StrictlyPositive<Size>
+    using Vecf = Vector<float, Size>;
+    template<std::size_t Size> requires StrictlyPositive<Size>
+    using Vecd = Vector<double, Size>;
+
 	template<typename T>
 	using Vec2 = Vector<T, 2>;
 
@@ -104,6 +111,7 @@ namespace gml
 		*/
 		constexpr Vector(const std::initializer_list<T>& init)
 		{
+            // TODO: if we take init as an array we can have compile-time size correctness
 			if (init.size() != Size) {
 				throw InvalidDimensionException();
 			}

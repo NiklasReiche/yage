@@ -8,4 +8,6 @@ target_sources(yage_physics3d
 		Simulation.cpp
 		InertiaShape.h
 		InertiaShape.cpp
+		BoundingShape.h
+		BoundingShape.cpp
 	)

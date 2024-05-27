@@ -45,4 +45,9 @@ namespace gml
     {
         return (((val - min_in) / (max_in - min_in)) * (max_out - min_out)) + min_out;
     }
+
+    inline double clamp(double val, double min, double max)
+    {
+        return std::min(std::max(val, min), max);
+    }
 }

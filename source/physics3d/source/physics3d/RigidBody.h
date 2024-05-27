@@ -6,6 +6,7 @@
 #include <gml/quaternion.h>
 
 #include "InertiaShape.h"
+#include "BoundingShape.h"
 
 namespace physics3d
 {
@@ -22,6 +23,12 @@ namespace physics3d
 		[[nodiscard]]
 		gml::Quatd getOrientation();
 
+        void update_bounding_shape();
+
+        BoundingSphere bounding_shape{
+                .radius = 1
+        };
+
 	private:
 		gml::Vec3d position;
 		gml::Vec3d momentum;
@@ -34,7 +41,9 @@ namespace physics3d
 		gml::Vec3d force;
 		gml::Vec3d torque;
 
-		InertiaShape shape;
+		InertiaShape inertia_shape;
+
+
 
 		friend class Simulation;
 	};
