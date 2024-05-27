@@ -23,9 +23,7 @@ namespace physics3d
 
         void resolve_constraint(RigidBody& a, RigidBody& b);
 
-        void solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> q_pre,
-                   gml::Matd<12, 1>& delta_q, double& lambda,
-                   const std::function<double(double)>& lambda_clamp = [](double l){return l;});
+        double solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> j_t, gml::Matd<12, 1> q_pre);
 
         gml::Matd<12, 12> inverse_mass_matrix(RigidBody& a, RigidBody& b);
     };

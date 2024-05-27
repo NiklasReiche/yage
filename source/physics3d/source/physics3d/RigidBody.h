@@ -23,13 +23,13 @@ namespace physics3d
 		[[nodiscard]]
 		gml::Quatd getOrientation();
 
+        void update_bounding_shape();
+
         BoundingSphere bounding_shape{
                 .radius = 1
         };
 
 	private:
-        double restitution = 1;
-
 		gml::Vec3d position;
 		gml::Vec3d momentum;
 		gml::Quatd orientation;
@@ -41,7 +41,7 @@ namespace physics3d
 		gml::Vec3d force;
 		gml::Vec3d torque;
 
-		InertiaShape shape;
+		InertiaShape inertia_shape;
 
 
 

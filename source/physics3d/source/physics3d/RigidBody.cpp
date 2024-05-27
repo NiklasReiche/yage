@@ -3,7 +3,7 @@
 namespace physics3d
 {
 	RigidBody::RigidBody(const InertiaShape &shape, const gml::Vec3d &position, const gml::Quatd &orientation)
-		: position(position), orientation(orientation), shape(shape)
+		: position(position), orientation(orientation), inertia_shape(shape)
 	{
 
 	}
@@ -23,4 +23,9 @@ namespace physics3d
 	{
 		return orientation;
 	}
+
+    void RigidBody::update_bounding_shape()
+    {
+        bounding_shape.center = position;
+    }
 }
