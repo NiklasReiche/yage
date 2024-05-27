@@ -19,6 +19,8 @@ struct Mouse
 class MovementListener : public input::InputListener
 {
 public:
+    std::shared_ptr<physics3d::RigidBody> ball;
+
 	MovementListener() = default;
 
 	MovementListener(std::shared_ptr <platform::IWindow> window, std::shared_ptr <gl3d::Camera> camera)
@@ -65,6 +67,10 @@ public:
 				mouse.isHidden = true;
 			}
 		}
+
+        if (code == input::KeyEvent::Code::KEY_ENTER && action == input::KeyEvent::Action::PRESS){
+            ball->applyForce(gml::Vec3d(500, 0, 10), ball->getPosition());
+        }
 	}
 
 	void applyUpdate()

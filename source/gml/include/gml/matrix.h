@@ -768,13 +768,13 @@ namespace gml::matrix
 	/**
 	 * @brief Constructs a scaling matrix from a vector.
 	 *
-	 * @param scale the scaling vector
+	 * @param value the scaling vector
 	 * @return the scaling matrix
 	 */
 	template<typename T>
-	Mat4<T> scale(const Vec3<T>& scale)
+	Mat4<T> scale(const Vec3<T>& value)
 	{
-		return scale(scale.x(), scale.y(), scale.z());
+		return scale(value.x(), value.y(), value.z());
 	}
 
 	/**
