@@ -136,8 +136,8 @@ private:
 
     std::shared_ptr<gl3d::SceneGroup> loadScene(const std::string& filename)
     {
-        return gl3d::resources::readGltf(platform::desktop::FileReader(),
-                                                                     filename, *glContext->getDrawableCreator(),
-                                                                     *glContext->getTextureCreator(), pbrShader, pbrShaderNormalMapping);
+        return gl3d::resources::gltf_read_scene(platform::desktop::FileReader(),
+                                                filename, *glContext->getDrawableCreator(),
+                                                *glContext->getTextureCreator(), pbrShader, pbrShaderNormalMapping);
     }
 };

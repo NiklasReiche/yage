@@ -232,6 +232,48 @@ namespace gl3d::resources
         return gl3d_mesh;
     }
 
+    std::shared_ptr<SceneGroup> read_node(tinygltf::Node& node, const std::vector<std::shared_ptr<gl3d::Mesh>>& meshes)
+    {
+        gml::Mat4d transform;
+        if (node.matrix.size() == 16) {
+            transform = gml::transpose(gml::Mat4d(std::span<double, 16>{node.matrix.begin(), node.matrix.end()}));
+        } else {
+            transform = gml::matrix::Id4d;
+            if (node.scale.size() == 3) {
+                transform *= gml::matrix::scale(node.scale.at(0), node.scale.at(1), node.scale.at(2));
+            }
+            if (node.rotation.size() == 4) {
+                transform *= gml::matrix::fromQuaternion(
+                        gml::Quatd(node.rotation.at(0), node.rotation.at(1),
+                                   node.rotation.at(2), node.rotation.at(3)));
+            }
+            if (node.translation.size() == 3) {
+                transform *= gml::matrix::translate(node.translation.at(0), node.translation.at(1),
+                                                    node.translation.at(2));
+            }
+        }
+
+        if (node.children.empty()) {
+            auto object = std::make_shared<gl3d::SceneObject>(node.name, transform);
+            if (node.mesh > -1) {
+                object->bindMesh(meshes.at(node.mesh));
+            }
+
+            auto group = std::make_shared<gl3d::SceneGroup>(node.name + "_group");
+            group->addChild(object);
+            return group;
+        } else {
+            auto group = std::make_shared<gl3d::SceneGroup>(node.name, transform);
+            if (node.mesh > -1) {
+                auto object = std::make_shared<gl3d::SceneObject>(node.name + "_object");
+                object->bindMesh(meshes.at(node.mesh));
+                group->addChild(object);
+            }
+
+            return group;
+        }
+    }
+
     void construct_node(tinygltf::Model& model, tinygltf::Node& node,
                         const std::shared_ptr<gl3d::SceneGroup>& root,
                         const std::vector<std::shared_ptr<gl3d::SceneGroup>>& scene_nodes)
@@ -243,11 +285,7 @@ namespace gl3d::resources
         }
     }
 
-    std::shared_ptr<SceneGroup> readGltf(
-            const platform::IFileReader& fileReader, const std::string& filename,
-            gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator,
-            std::shared_ptr<gl::IShader>& shader,
-            std::shared_ptr<gl::IShader>& shader_normal_mapping)
+    tinygltf::Model read_file(const platform::IFileReader& fileReader, const std::string& filename)
     {
         auto tmp = utils::strip(filename, "/");
         std::string filetype = utils::strip(tmp.back(), ".").back();
@@ -266,8 +304,10 @@ namespace gl3d::resources
             std::string data = fileReader.openTextFile(filename, platform::IFile::AccessMode::READ)->readAll();
             ret = loader.LoadASCIIFromString(&model, &err, &warn, data.data(), data.length(), basedir);
         } else if (filetype == "glb") {
-            std::vector<std::byte> data = fileReader.openBinaryFile(filename, platform::IFile::AccessMode::READ)->read_all();
-            ret = loader.LoadBinaryFromMemory(&model, &err, &warn, reinterpret_cast<unsigned char*>(data.data()), data.size(), basedir);
+            std::vector<std::byte> data = fileReader.openBinaryFile(filename, platform::IFile::AccessMode::READ)
+                                                    ->read_all();
+            ret = loader.LoadBinaryFromMemory(&model, &err, &warn, reinterpret_cast<unsigned char*>(data.data()),
+                                              data.size(), basedir);
         } else {
             throw std::invalid_argument("invalid filetype for gltf");
         }
@@ -279,67 +319,59 @@ namespace gl3d::resources
             throw std::logic_error("TinyGLTF parsing error: " + err);
         }
 
+        return model;
+    }
+
+    std::vector<std::shared_ptr<gl3d::Mesh>> read_meshes(tinygltf::Model& model,
+                                                         gl::IDrawableCreator& drawableCreator,
+                                                         gl::ITextureCreator& textureCreator,
+                                                         std::shared_ptr<gl::IShader>& shader,
+                                                         std::shared_ptr<gl::IShader>& shader_normal_mapping)
+    {
         std::vector<unsigned char> full_data{255, 255, 255, 255};
         std::shared_ptr<gl::ITexture2D> full_texture = textureCreator.createTexture2D(
                 1, 1, gl::ImageFormat::RGBA, full_data);
 
         std::vector<std::shared_ptr<gl::ITexture2D>> textures;
+        textures.reserve(model.textures.size());
         for (auto& texture: model.textures) {
             textures.push_back(read_texture(textureCreator, model, texture));
         }
 
         std::vector<std::shared_ptr<gl3d::Material>> materials;
+        materials.reserve(model.materials.size());
         for (auto& material: model.materials) {
             materials.push_back(read_material(model, material, textures, shader, full_texture));
         }
 
         std::vector<std::shared_ptr<gl3d::Mesh>> meshes;
+        meshes.reserve(model.meshes.size());
         for (auto& mesh: model.meshes) {
             meshes.push_back(read_mesh(model, mesh, drawableCreator, materials, shader, shader_normal_mapping));
         }
 
+        return meshes;
+    }
+
+    std::shared_ptr<SceneGroup> gltf_read_scene(
+            const platform::IFileReader& fileReader, const std::string& filename,
+            gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator,
+            std::shared_ptr<gl::IShader>& shader,
+            std::shared_ptr<gl::IShader>& shader_normal_mapping)
+    {
+        tinygltf::Model model = read_file(fileReader, filename);
+
+        auto meshes = read_meshes(model, drawableCreator, textureCreator, shader, shader_normal_mapping);
+
         std::vector<std::shared_ptr<gl3d::SceneGroup>> scene_nodes;
+        scene_nodes.reserve(model.nodes.size());
         // TODO: camera
         for (auto& node: model.nodes) {
-            gml::Mat4d transform = gml::matrix::Id4d;
-            if (node.matrix.size() == 16) {
-                transform = gml::transpose(gml::Mat4d(std::span<double, 16>{node.matrix.begin(), node.matrix.end()}));
-            } else {
-                if (node.scale.size() == 3) {
-                    transform *= gml::matrix::scale(node.scale.at(0), node.scale.at(1), node.scale.at(2));
-                }
-                if (node.rotation.size() == 4) {
-                    transform *=gml::matrix::fromQuaternion(
-                            gml::Quatd(node.rotation.at(0), node.rotation.at(1),
-                                       node.rotation.at(2), node.rotation.at(3)));
-                }
-                if (node.translation.size() == 3) {
-                    transform *= gml::matrix::translate(node.translation.at(0), node.translation.at(1), node.translation.at(2));
-                }
-            }
-
-            if (node.children.empty()) {
-                auto object = std::make_shared<gl3d::SceneObject>(node.name, transform);
-                if (node.mesh > -1) {
-                    object->bindMesh(meshes.at(node.mesh));
-                }
-
-                auto group = std::make_shared<gl3d::SceneGroup>(node.name + "_group");
-                group->addChild(object);
-                scene_nodes.push_back(group);
-            } else {
-                auto group = std::make_shared<gl3d::SceneGroup>(node.name, transform);
-                scene_nodes.push_back(group);
-
-                if (node.mesh > -1) {
-                    auto object = std::make_shared<gl3d::SceneObject>(node.name + "_object");
-                    object->bindMesh(meshes.at(node.mesh));
-                    group->addChild(object);
-                }
-            }
+            scene_nodes.push_back(read_node(node, meshes));
         }
 
         std::vector<std::shared_ptr<gl3d::SceneGroup>> scenes;
+        scenes.reserve(model.scenes.size());
         for (auto& scene: model.scenes) {
             auto world_root = std::make_shared<gl3d::SceneGroup>("root");
             for (auto root_index : scene.nodes) {
@@ -354,5 +386,14 @@ namespace gl3d::resources
         return scenes.at(model.defaultScene);
 
         // TODO: do we need to handle sparse accessors explicitly?
+    }
+
+    std::vector<std::shared_ptr<gl3d::Mesh>> gltf_read_meshes(const platform::IFileReader& fileReader, const std::string& filename,
+                                             gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator,
+                                             std::shared_ptr<gl::IShader>& shader,
+                                             std::shared_ptr<gl::IShader>& shader_normal_mapping)
+    {
+        tinygltf::Model model = read_file(fileReader, filename);
+        return read_meshes(model, drawableCreator, textureCreator, shader, shader_normal_mapping);
     }
 }

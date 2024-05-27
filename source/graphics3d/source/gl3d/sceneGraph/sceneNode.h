@@ -37,7 +37,7 @@ namespace gl3d
 		gml::Mat4d transform;
 
 	protected:
-		std::vector<std::shared_ptr<SceneNode>> children;
+		std::vector<std::shared_ptr<SceneNode>> children; // TODO: unique_ptr is more fitting
 
 		/**
 		 * @brief Constructs a new node of a specific type with a custom name

@@ -73,16 +73,28 @@ public:
 		auto ball1 = loadModel("models/billiard_ball/scene.gltf",
                                physics3d::SphereShape(1, 1),
                                gml::Vec3d(-4, 0, 0));
-        ball1->bounding_shape.center = gml::Vec3d(-4, 0, 0);
+        ball1->update_bounding_shape();
         ball1->bounding_shape.radius = 1;
         ball1->applyForce(gml::Vec3d(50, 20, 0), gml::Vec3d(-4, 0, 0));
 
         auto ball2 = loadModel("models/billiard_ball/scene.gltf",
                                physics3d::SphereShape(1, 1),
                                gml::Vec3d(4, 0, 0));
-        ball2->bounding_shape.center = gml::Vec3d(4, 0, 0);
+        ball2->update_bounding_shape();
         ball2->bounding_shape.radius = 1;
         ball2->applyForce(gml::Vec3d(-60, 0, 0), gml::Vec3d(4, 0, 0));
+
+        auto ball3 = loadModel("models/billiard_ball/scene.gltf",
+                               physics3d::SphereShape(1, 1),
+                               gml::Vec3d(0.5, 1, 0));
+        ball3->update_bounding_shape();
+        ball3->bounding_shape.radius = 1;
+
+        auto ball4 = loadModel("models/billiard_ball/scene.gltf",
+                               physics3d::SphereShape(1, 1),
+                               gml::Vec3d(0, -1.5, 0));
+        ball4->update_bounding_shape();
+        ball4->bounding_shape.radius = 1;
 
 		auto point = glContext->getDrawableCreator()->createDrawable(std::vector<float>{ },
 		                                                             std::vector<unsigned int>{ },
@@ -134,6 +146,8 @@ private:
 	physics3d::Simulation simulation;
 	std::vector<std::tuple<std::shared_ptr<gl3d::SceneNode>, std::shared_ptr<physics3d::RigidBody>>> objects;
 
+    std::shared_ptr<gl3d::Mesh> ball_mesh;
+
 	void updateSceneGraph()
 	{
 		for (auto& pair : objects) {
@@ -146,16 +160,22 @@ private:
 
 	std::shared_ptr<physics3d::RigidBody> loadModel(const std::string& filename, physics3d::InertiaShape shape, gml::Vec3d position)
 	{
-        auto model = gl3d::resources::readGltf(platform::desktop::FileReader(),
-                                               filename, *glContext->getDrawableCreator(),
-                                               *glContext->getTextureCreator(), pbrShader, pbrShaderNormalMapping);
-		scene->addChild(model);
+        if (!ball_mesh) {
+            ball_mesh = gl3d::resources::gltf_read_meshes(platform::desktop::FileReader(),
+                                                         filename, *glContext->getDrawableCreator(),
+                                                         *glContext->getTextureCreator(), pbrShader,
+                                                         pbrShaderNormalMapping).at(0);
+        }
+
+        auto scene_object = std::make_shared<gl3d::SceneObject>();
+        scene->addChild(scene_object);
+        scene_object->bindMesh(ball_mesh);
 
 		auto rb = std::make_shared<physics3d::RigidBody>(shape, position, gml::quaternion::fromMatrix(
                 gml::matrix::axisAngle(gml::Vec3d(0, 1, 0), - std::numbers::pi_v<double>/2).getRotation()));
 		simulation.addRigidBody(rb);
 
-		objects.emplace_back(model, rb);
+		objects.emplace_back(scene_object, rb);
 		return rb;
 	}
 
