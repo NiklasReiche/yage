@@ -47,11 +47,13 @@ public:
 			openTextFile("shaders/pointShader.geom", platform::IFile::AccessMode::READ)->readAll();
 		csShader = glContext->getShaderCreator()->createShader(csVertexShader, csFragmentShader, csGeometryShader);
 
+        pbrShaderNormalMapping = glContext->getShaderCreator()->createShader(gl3d::shaders::PbrNormalMappingShader::vert,
+                                                                             gl3d::shaders::PbrNormalMappingShader::frag);
         pbrShader = glContext->getShaderCreator()->createShader(gl3d::shaders::PbrShader::vert,
-                                                                gl3d::shaders::PbrShader::frag);
+                                                                             gl3d::shaders::PbrShader::frag);
 
 		auto ubo = glContext->getShaderCreator()->createUniformBlock("ProjectionView");
-		pbrShader->linkUniformBlock(*ubo);
+		pbrShaderNormalMapping->linkUniformBlock(*ubo);
 		csShader->linkUniformBlock(*ubo);
 
 		projViewUniform = ProjectionView(ubo);
@@ -102,8 +104,8 @@ public:
 			baseRenderer->useShader(*csShader);
 			baseRenderer->draw(*point);
 
-			baseRenderer->useShader(*pbrShader);
-			pbrShader->setUniform("camPos", camera->getPosition());
+			baseRenderer->useShader(*pbrShaderNormalMapping);
+			pbrShaderNormalMapping->setUniform("camPos", camera->getPosition());
 
 			renderer->renderGraph(scene);
 
@@ -121,7 +123,8 @@ private:
 
 	std::shared_ptr<gl::IShader> shader;
 	std::shared_ptr<gl::IShader> csShader;
-	std::shared_ptr<gl::IShader> pbrShader;
+	std::shared_ptr<gl::IShader> pbrShaderNormalMapping;
+    std::shared_ptr<gl::IShader> pbrShader;
 	std::shared_ptr<gl3d::Camera> camera;
 	std::shared_ptr<gl::IRenderer> baseRenderer;
 	std::shared_ptr<gl3d::SceneRenderer> renderer;
@@ -145,7 +148,7 @@ private:
 	{
         auto model = gl3d::resources::readGltf(platform::desktop::FileReader(),
                                                filename, *glContext->getDrawableCreator(),
-                                               *glContext->getTextureCreator(), pbrShader);
+                                               *glContext->getTextureCreator(), pbrShader, pbrShaderNormalMapping);
 		scene->addChild(model);
 
 		auto rb = std::make_shared<physics3d::RigidBody>(shape, position, gml::quaternion::fromMatrix(
