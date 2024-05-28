@@ -69,7 +69,7 @@ public:
 		}
 
         if (code == input::KeyEvent::Code::KEY_ENTER && action == input::KeyEvent::Action::PRESS){
-            ball->applyForce(gml::Vec3d(100, 0, 10), ball->getPosition());
+            ball->applyForce(gml::Vec3d(5, 0, 0), ball->getPosition());
         }
 	}
 

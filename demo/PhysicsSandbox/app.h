@@ -86,7 +86,7 @@ public:
         }
 
         auto barrier1 = std::make_shared<physics3d::RigidBody>(
-                physics3d::BoxShape(100, 100, 1, 100),
+                physics3d::StaticShape(),
                 physics3d::BoundingVolume{physics3d::BPlane{
                         .normal = gml::Vec3d(-1, 0, 0),
                 }},
@@ -95,7 +95,7 @@ public:
                 gml::Vec3d(0));
         simulation.addRigidBody(barrier1);
         auto barrier2 = std::make_shared<physics3d::RigidBody>(
-                physics3d::BoxShape(100, 100, 1, 100),
+                physics3d::StaticShape(),
                 physics3d::BoundingVolume{physics3d::BPlane{
                         .normal = gml::Vec3d(0, 0, -1),
                 }},
@@ -104,7 +104,7 @@ public:
                 gml::Vec3d(0));
         simulation.addRigidBody(barrier2);
         auto barrier3 = std::make_shared<physics3d::RigidBody>(
-                physics3d::BoxShape(100, 100, 1, 100),
+                physics3d::StaticShape(),
                 physics3d::BoundingVolume{physics3d::BPlane{
                         .normal = gml::Vec3d(0, 0, 1),
                 }},
@@ -113,7 +113,7 @@ public:
                 gml::Vec3d(0));
         simulation.addRigidBody(barrier3);
         auto barrier4 = std::make_shared<physics3d::RigidBody>(
-                physics3d::BoxShape(100, 100, 1, 100),
+                physics3d::StaticShape(),
                 physics3d::BoundingVolume{physics3d::BPlane{
                         .normal = gml::Vec3d(1, 0, 0),
                 }},

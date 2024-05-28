@@ -4,11 +4,23 @@
 
 namespace physics3d
 {
-    struct InertiaShape
+    class InertiaShape
     {
-        double mass = 1;
-        gml::Mat3d inertiaTensor;
-        gml::Mat3d inverseInertiaTensor;
+    public:
+        [[nodiscard]] double inverse_mass() const;
+
+        [[nodiscard]] gml::Mat3d inverse_inertia_tensor() const;
+
+    protected:
+        InertiaShape() = default;
+
+        double m_inverse_mass = 1;
+        gml::Mat3d m_inverse_inertia_tensor;
+    };
+
+    struct StaticShape : public InertiaShape
+    {
+        StaticShape();
     };
 
     struct CubeShape : public InertiaShape

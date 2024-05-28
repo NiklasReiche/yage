@@ -6,33 +6,36 @@ namespace physics3d
 {
     gml::Matd<12, 12> Simulation::inverse_mass_matrix(RigidBody& a, RigidBody& b)
     {
+        // TODO: instead of this sparse matrix multiplication, use the direct formula for the effective mass matrix
         gml::Matd<12, 12> m_inv;
-        m_inv(0, 0) = 1.0 / a.inertia_shape.mass;
-        m_inv(1, 1) = 1.0 / a.inertia_shape.mass;
-        m_inv(2, 2) = 1.0 / a.inertia_shape.mass;
-        m_inv(3, 3) = 1.0 / b.inertia_shape.mass;
-        m_inv(4, 4) = 1.0 / b.inertia_shape.mass;
-        m_inv(5, 5) = 1.0 / b.inertia_shape.mass;
+        m_inv(0, 0) = a.inertia_shape.inverse_mass();
+        m_inv(1, 1) = a.inertia_shape.inverse_mass();
+        m_inv(2, 2) = a.inertia_shape.inverse_mass();
+        m_inv(3, 3) = b.inertia_shape.inverse_mass();
+        m_inv(4, 4) = b.inertia_shape.inverse_mass();
+        m_inv(5, 5) = b.inertia_shape.inverse_mass();
 
-        m_inv(6, 6) = a.inertia_shape.inverseInertiaTensor(0, 0);
-        m_inv(6, 7) = a.inertia_shape.inverseInertiaTensor(0, 1);
-        m_inv(6, 8) = a.inertia_shape.inverseInertiaTensor(0, 2);
-        m_inv(7, 6) = a.inertia_shape.inverseInertiaTensor(1, 0);
-        m_inv(7, 7) = a.inertia_shape.inverseInertiaTensor(1, 1);
-        m_inv(7, 8) = a.inertia_shape.inverseInertiaTensor(1, 2);
-        m_inv(8, 6) = a.inertia_shape.inverseInertiaTensor(2, 0);
-        m_inv(8, 7) = a.inertia_shape.inverseInertiaTensor(2, 1);
-        m_inv(8, 8) = a.inertia_shape.inverseInertiaTensor(2, 2);
+        auto inv_inertia_a = a.inertia_shape.inverse_inertia_tensor();
+        m_inv(6, 6) = inv_inertia_a(0, 0);
+        m_inv(6, 7) = inv_inertia_a(0, 1);
+        m_inv(6, 8) = inv_inertia_a(0, 2);
+        m_inv(7, 6) = inv_inertia_a(1, 0);
+        m_inv(7, 7) = inv_inertia_a(1, 1);
+        m_inv(7, 8) = inv_inertia_a(1, 2);
+        m_inv(8, 6) = inv_inertia_a(2, 0);
+        m_inv(8, 7) = inv_inertia_a(2, 1);
+        m_inv(8, 8) = inv_inertia_a(2, 2);
 
-        m_inv(9, 9) = b.inertia_shape.inverseInertiaTensor(0, 0);
-        m_inv(9, 10) = b.inertia_shape.inverseInertiaTensor(0, 1);
-        m_inv(9, 11) = b.inertia_shape.inverseInertiaTensor(0, 2);
-        m_inv(10, 9) = b.inertia_shape.inverseInertiaTensor(1, 0);
-        m_inv(10, 10) = b.inertia_shape.inverseInertiaTensor(1, 1);
-        m_inv(10, 11) = b.inertia_shape.inverseInertiaTensor(1, 2);
-        m_inv(11, 9) = b.inertia_shape.inverseInertiaTensor(2, 0);
-        m_inv(11, 10) = b.inertia_shape.inverseInertiaTensor(2, 1);
-        m_inv(11, 11) = b.inertia_shape.inverseInertiaTensor(2, 2);
+        auto inv_inertia_b = b.inertia_shape.inverse_inertia_tensor();
+        m_inv(9, 9) = inv_inertia_b(0, 0);
+        m_inv(9, 10) = inv_inertia_b(0, 1);
+        m_inv(9, 11) = inv_inertia_b(0, 2);
+        m_inv(10, 9) = inv_inertia_b(1, 0);
+        m_inv(10, 10) = inv_inertia_b(1, 1);
+        m_inv(10, 11) = inv_inertia_b(1, 2);
+        m_inv(11, 9) = inv_inertia_b(2, 0);
+        m_inv(11, 10) = inv_inertia_b(2, 1);
+        m_inv(11, 11) = inv_inertia_b(2, 2);
 
         return m_inv;
     }
@@ -108,6 +111,7 @@ namespace physics3d
             u2 = gml::cross(u1, n); // normalization not necessary
         }
 
+        // penetration
         auto t_1 = gml::cross(r_a, n);
         auto t_2 = gml::cross(r_b, n);
         gml::Matd<1, 12> j_penetration{
@@ -120,6 +124,8 @@ namespace physics3d
         double lambda_n = solve(m_inv, j_penetration, j_penetration_t, q_pre);
         auto p_c = lambda_n * j_penetration_t;
 
+        // friction along u1
+        const double friction_coefficient = 0.6;
         t_1 = gml::cross(r_a, u1);
         t_2 = gml::cross(r_b, u1);
         gml::Matd<1, 12> j_friction_1{
@@ -130,8 +136,12 @@ namespace physics3d
         };
         auto j_friction_1_t = gml::transpose(j_friction_1);
         double lambda_friction_1 = solve(m_inv, j_friction_1, j_friction_1_t, q_pre);
+        lambda_friction_1 = gml::clamp(lambda_friction_1,
+                                       -friction_coefficient * lambda_n,
+                                       friction_coefficient * lambda_n);
         p_c += lambda_friction_1 * j_friction_1_t;
 
+        // friction along u2
         t_1 = gml::cross(r_a, u2);
         t_2 = gml::cross(r_b, u2);
         gml::Matd<1, 12> j_friction_2{
@@ -142,11 +152,10 @@ namespace physics3d
         };
         auto j_friction_2_t = gml::transpose(j_friction_2);
         double lambda_friction_2 = solve(m_inv, j_friction_2, j_friction_2_t, q_pre);
+        lambda_friction_2 = gml::clamp(lambda_friction_2,
+                                       -friction_coefficient * lambda_n,
+                                       friction_coefficient * lambda_n);
         p_c += lambda_friction_2 * j_friction_2_t;
-
-        const double friction_coefficient = 0.6;
-        lambda_friction_1 = gml::clamp(lambda_friction_1, -friction_coefficient * lambda_n, friction_coefficient * lambda_n);
-        lambda_friction_2 = gml::clamp(lambda_friction_2, -friction_coefficient * lambda_n, friction_coefficient * lambda_n);
 
         auto q_post = q_pre + m_inv * p_c;
         a.velocity = {q_post(0, 0), q_post(1, 0), q_post(2, 0)};
@@ -171,14 +180,14 @@ namespace physics3d
 
 
         for (auto& rigidBody: bodies) {
-            // TODO: accumulate momentum or velocity?
+            // TODO: accumulate momentum or velocity? Probably doesn't matter
             // linear
             rigidBody->momentum = rigidBody->force * dt;
-            rigidBody->velocity += rigidBody->momentum / rigidBody->inertia_shape.mass;
+            rigidBody->velocity += rigidBody->inertia_shape.inverse_mass() * rigidBody->momentum;
 
             // angular component
-            rigidBody->angularMomentum = rigidBody->torque * dt; // TODO: accumulate momentum or velocity
-            rigidBody->angularVelocity += rigidBody->inertia_shape.inverseInertiaTensor * rigidBody->angularMomentum;
+            rigidBody->angularMomentum = rigidBody->torque * dt;
+            rigidBody->angularVelocity += rigidBody->inertia_shape.inverse_inertia_tensor() * rigidBody->angularMomentum;
         }
 
         std::vector<Collision> collisions;
