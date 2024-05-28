@@ -30,9 +30,9 @@ namespace physics3d
 		std::vector<std::shared_ptr<RigidBody>> bodies;
         CollisionVisitor m_collision_visitor{};
 
-        void resolve_collision(const Collision& collision);
+        void resolve_collision(const Collision& collision, double bias, double dt);
 
-        static double solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> j_t, gml::Matd<12, 1> q_pre);
+        static double solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> j_t, gml::Matd<12, 1> q_pre, double b);
 
         static gml::Matd<12, 12> inverse_mass_matrix(RigidBody& a, RigidBody& b);
 

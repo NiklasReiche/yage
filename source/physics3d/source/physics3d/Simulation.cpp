@@ -40,9 +40,9 @@ namespace physics3d
         return m_inv;
     }
 
-    double Simulation::solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> j_t, gml::Matd<12, 1> q_pre)
+    double Simulation::solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> j_t, gml::Matd<12, 1> q_pre, double b)
     {
-        auto nominator = -(j * q_pre);
+        auto nominator = -(j * q_pre + gml::Matd<1, 1>(b));
         auto denominator = j * m_inv * j_t;
         return nominator(0, 0) / denominator(0, 0);
     }
@@ -77,7 +77,7 @@ namespace physics3d
         return {u1, u2};
     }
 
-    void Simulation::resolve_collision(const Collision& collision)
+    void Simulation::resolve_collision(const Collision& collision, double bias, double dt)
     {
         auto& a = collision.rb_a;
         auto& b = collision.rb_b;
@@ -122,7 +122,8 @@ namespace physics3d
             t_2.x(), t_2.y(), t_2.z(),
         };
         auto j_penetration_t = gml::transpose(j_penetration);
-        double lambda_n = solve(m_inv, j_penetration, j_penetration_t, q_pre);
+        auto baumgarte = bias / dt * gml::dot((p_b - p_a), n);
+        double lambda_n = solve(m_inv, j_penetration, j_penetration_t, q_pre, baumgarte);
         auto p_c = lambda_n * j_penetration_t;
 
         // friction along u1
@@ -136,7 +137,7 @@ namespace physics3d
                 t_2.x(), t_2.y(), t_2.z(),
         };
         auto j_friction_1_t = gml::transpose(j_friction_1);
-        double lambda_friction_1 = solve(m_inv, j_friction_1, j_friction_1_t, q_pre);
+        double lambda_friction_1 = solve(m_inv, j_friction_1, j_friction_1_t, q_pre, 0);
 #if 0
         // TODO: clamping introduces lateral movement, is that expected?
         lambda_friction_1 = gml::clamp(lambda_friction_1,
@@ -144,8 +145,6 @@ namespace physics3d
                                        friction_coefficient * lambda_n);
 #endif
         p_c += lambda_friction_1 * j_friction_1_t;
-
-
 
         // friction along u2
         t_1 = gml::cross(r_a, u2);
@@ -157,7 +156,7 @@ namespace physics3d
                 t_2.x(), t_2.y(), t_2.z(),
         };
         auto j_friction_2_t = gml::transpose(j_friction_2);
-        double lambda_friction_2 = solve(m_inv, j_friction_2, j_friction_2_t, q_pre);
+        double lambda_friction_2 = solve(m_inv, j_friction_2, j_friction_2_t, q_pre, 0);
 #if 0
         // TODO: clamping introduces lateral movement, is that expected?
         lambda_friction_2 = gml::clamp(lambda_friction_2,
@@ -171,12 +170,6 @@ namespace physics3d
         b.velocity = {q_post(3, 0), q_post(4, 0), q_post(5, 0)};
         a.angularVelocity = {q_post(6, 0), q_post(7, 0), q_post(8, 0)};
         b.angularVelocity = {q_post(9, 0), q_post(10, 0), q_post(11, 0)};
-
-        // TODO: try Baumgarte stabilisation instead
-        a.position -= n * depth / 2;
-        b.position += n * depth / 2;
-        a.update_bounding_volume();
-        b.update_bounding_volume();
     }
 
     void Simulation::integrate(double dt)
@@ -220,7 +213,7 @@ namespace physics3d
         }
 
         for (const auto& collision: collisions) {
-            resolve_collision(collision);
+            resolve_collision(collision, 0.6, dt);
         }
 
 
