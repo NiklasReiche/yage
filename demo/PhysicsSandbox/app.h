@@ -58,6 +58,7 @@ public:
 
         auto ubo = glContext->getShaderCreator()->createUniformBlock("ProjectionView");
         pbrShaderNormalMapping->linkUniformBlock(*ubo);
+        pbrShader->linkUniformBlock(*ubo);
         csShader->linkUniformBlock(*ubo);
 
         projViewUniform = ProjectionView(ubo);
@@ -85,42 +86,60 @@ public:
             }
         }
 
+        auto barrier_mesh = gl3d::resources::gltf_read_meshes(platform::desktop::FileReader(),
+                                                      "models/barrier.glb", *glContext->getDrawableCreator(),
+                                                      *glContext->getTextureCreator(), pbrShader,
+                                                      pbrShaderNormalMapping).at(0);
+
+
         auto barrier1 = std::make_shared<physics3d::RigidBody>(
                 physics3d::StaticShape(),
-                physics3d::BoundingVolume{physics3d::BPlane{
-                        .normal = gml::Vec3d(-1, 0, 0),
-                }},
+                physics3d::BoundingVolume{physics3d::BPlane{}},
                 gml::Vec3d(1, 0, 0),
-                gml::Quatd(),
-                gml::Vec3d(0));
+                gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double> / 2, 0, 0));
         simulation.addRigidBody(barrier1);
+
+        auto scene_barrier1 = std::make_shared<gl3d::SceneObject>();
+        scene->addChild(scene_barrier1);
+        scene_barrier1->bindMesh(barrier_mesh);
+
         auto barrier2 = std::make_shared<physics3d::RigidBody>(
                 physics3d::StaticShape(),
-                physics3d::BoundingVolume{physics3d::BPlane{
-                        .normal = gml::Vec3d(0, 0, -1),
-                }},
+                physics3d::BoundingVolume{physics3d::BPlane{}},
                 gml::Vec3d(0, 0, 1),
-                gml::Quatd(),
-                gml::Vec3d(0));
+                gml::Quatd());
         simulation.addRigidBody(barrier2);
+
+        auto scene_barrier2 = std::make_shared<gl3d::SceneObject>();
+        scene->addChild(scene_barrier2);
+        scene_barrier2->bindMesh(barrier_mesh);
+
         auto barrier3 = std::make_shared<physics3d::RigidBody>(
                 physics3d::StaticShape(),
-                physics3d::BoundingVolume{physics3d::BPlane{
-                        .normal = gml::Vec3d(0, 0, 1),
-                }},
+                physics3d::BoundingVolume{physics3d::BPlane{}},
                 gml::Vec3d(0, 0, -1),
-                gml::Quatd(),
-                gml::Vec3d(0));
+                gml::Quatd());
         simulation.addRigidBody(barrier3);
+
+        auto scene_barrier3 = std::make_shared<gl3d::SceneObject>();
+        scene->addChild(scene_barrier3);
+        scene_barrier3->bindMesh(barrier_mesh);
+
         auto barrier4 = std::make_shared<physics3d::RigidBody>(
                 physics3d::StaticShape(),
-                physics3d::BoundingVolume{physics3d::BPlane{
-                        .normal = gml::Vec3d(1, 0, 0),
-                }},
+                physics3d::BoundingVolume{physics3d::BPlane{}},
                 gml::Vec3d(-1, 0, 0),
-                gml::Quatd(),
-                gml::Vec3d(0));
+                gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double> / 2, 0, 0));
         simulation.addRigidBody(barrier4);
+
+        auto scene_barrier4 = std::make_shared<gl3d::SceneObject>();
+        scene->addChild(scene_barrier4);
+        scene_barrier4->bindMesh(barrier_mesh);
+
+        objects.emplace_back(scene_barrier1, barrier1);
+        objects.emplace_back(scene_barrier2, barrier2);
+        objects.emplace_back(scene_barrier3, barrier3);
+        objects.emplace_back(scene_barrier4, barrier4);
 
         inputListener.ball = loadModel("models/billiard_ball/scene.gltf",
                                        physics3d::SphereShape(radius, mass),
@@ -146,8 +165,9 @@ public:
             baseRenderer->useShader(*csShader);
             baseRenderer->draw(*point);
 
-            baseRenderer->useShader(*pbrShaderNormalMapping);
             pbrShaderNormalMapping->setUniform("camPos", camera->getPosition());
+
+            pbrShader->setUniform("camPos", camera->getPosition());
 
             renderer->renderGraph(scene);
 
@@ -232,15 +252,15 @@ private:
         auto light = std::make_shared<gl3d::SceneObject>("light");
         light->bindLight(lightRes);
         light->setTransform(
-                gml::matrix::fromQuaternion<double>(gml::quaternion::eulerAngle<double>(3.14, 0, 0)));
+                gml::matrix::fromQuaternion<double>(gml::quaternion::eulerAngle<double>(1.2, 0, 0)));
         scene->addChild(light);
 
         lightRes = std::make_shared<gl3d::DirectionalLight>();
-        lightRes->color = gml::Vec3f(2.5);
+        lightRes->color = gml::Vec3f(5);
         light = std::make_shared<gl3d::SceneObject>("light");
         light->bindLight(lightRes);
         light->setTransform(
-                gml::matrix::fromQuaternion<double>(gml::quaternion::eulerAngle<double>(0, 0, 0)));
+                gml::matrix::fromQuaternion<double>(gml::quaternion::eulerAngle<double>(0, 0, 1.2)));
         scene->addChild(light);
     }
 };

@@ -38,7 +38,7 @@ namespace physics3d
                 },
                 [this](BPlane& plane) {
                     plane.support = position + m_bounding_volume_offset;
-                    // TODO: normal
+                    plane.normal = this->orientation.getForward();
                 },
         }, m_bounding_volume);
     }
