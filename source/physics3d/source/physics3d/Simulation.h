@@ -32,8 +32,10 @@ namespace physics3d
 
         void resolve_collision(const Collision& collision);
 
-        double solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> j_t, gml::Matd<12, 1> q_pre);
+        static double solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> j_t, gml::Matd<12, 1> q_pre);
 
-        gml::Matd<12, 12> inverse_mass_matrix(RigidBody& a, RigidBody& b);
+        static gml::Matd<12, 12> inverse_mass_matrix(RigidBody& a, RigidBody& b);
+
+        static std::tuple<gml::Vec3d, gml::Vec3d> tangent_plane(const gml::Vec3d& n);
     };
 }

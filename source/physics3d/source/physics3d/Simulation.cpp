@@ -44,6 +44,36 @@ namespace physics3d
         return nominator(0, 0) / denominator(0, 0);
     }
 
+    std::tuple<gml::Vec3d, gml::Vec3d> Simulation::tangent_plane(const gml::Vec3d& n)
+    {
+        // TODO: this can be optimized if we simplify the formulas and assume |n| = 1
+
+        // choose linearly independent (non-parallel) vector to n by using the basis-vector in the direction of the smallest element
+        gml::Vec3d u1{};
+        // TODO: build an argmax function
+        if (std::abs(n.x()) < std::abs(n.y())) {
+            if (std::abs(n.z()) < std::abs(n.x())) {
+                u1.z() = 1;
+            } else {
+                u1.x() = 1;
+            }
+        } else {
+            if (std::abs(n.z()) < std::abs(n.y())) {
+                u1.z() = 1;
+            } else {
+                u1.y() = 1;
+            }
+        }
+
+        // Gram-Schmidt method: project u1 onto n and subtract from u1 to get orthogonal vector
+        u1 -= gml::dot(u1, n) * n; // denominator not needed, as n is unit length
+        u1.normalize();
+
+        // find second orthogonal vector; since n and u1 are orthonormal, u2 is already normalized
+        auto u2 = gml::cross(u1, n);
+        return {u1, u2};
+    }
+
     void Simulation::resolve_collision(const Collision& collision)
     {
         auto& a = collision.rb_a;
@@ -69,9 +99,14 @@ namespace physics3d
         auto v_abs_p_b = b.velocity + gml::cross(b.angularVelocity, r_b);
         auto v_rel = v_abs_p_b - v_abs_p_a;
 
-        // TODO: handle case where relative velocity is zero
-        gml::Vec3d u1 = gml::normalize(v_rel - n * gml::dot(v_rel, n));
-        gml::Vec3d u2 = gml::normalize(gml::cross(u1, n));
+        gml::Vec3d u1, u2;
+        if (gml::length(v_rel) < 0.0001) {
+            std::tie(u1, u2) = tangent_plane(n);
+        } else{
+            // Gram-Schmidt method using the relative velocity as the initial guess
+            u1 = gml::normalize(v_rel - n * gml::dot(v_rel, n));
+            u2 = gml::cross(u1, n); // normalization not necessary
+        }
 
         auto t_1 = gml::cross(r_a, n);
         auto t_2 = gml::cross(r_b, n);
