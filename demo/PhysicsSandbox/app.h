@@ -75,18 +75,56 @@ public:
         std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
 
         const double epsilon = 0.00000001;
+        const double height = std::sqrt(- 5 * 0.5 * 2 * radius * 5 * 0.5 * 2 * radius + 5 * 2 * radius * 5 * 2 * radius) / 5.;
         for (int i = 0; i < 5; ++i) {
             for (int j = 0; j < i + 1; ++j) {
                 auto b = loadModel("models/billiard_ball/scene.gltf",
                                    physics3d::SphereShape(radius, mass),
-                                   gml::Vec3d(i * std::sqrt(radius * 2) + epsilon * i, 0,
+                                   gml::Vec3d(i * height + epsilon * i, 0,
                                               -(i * radius * 2) / 2.0 + j * radius * 2 + j * epsilon));
             }
         }
 
+        auto barrier1 = std::make_shared<physics3d::RigidBody>(
+                physics3d::BoxShape(100, 100, 1, 100),
+                physics3d::BoundingVolume{physics3d::BPlane{
+                        .normal = gml::Vec3d(-1, 0, 0),
+                }},
+                gml::Vec3d(1, 0, 0),
+                gml::Quatd(),
+                gml::Vec3d(0));
+        simulation.addRigidBody(barrier1);
+        auto barrier2 = std::make_shared<physics3d::RigidBody>(
+                physics3d::BoxShape(100, 100, 1, 100),
+                physics3d::BoundingVolume{physics3d::BPlane{
+                        .normal = gml::Vec3d(0, 0, -1),
+                }},
+                gml::Vec3d(0, 0, 1),
+                gml::Quatd(),
+                gml::Vec3d(0));
+        simulation.addRigidBody(barrier2);
+        auto barrier3 = std::make_shared<physics3d::RigidBody>(
+                physics3d::BoxShape(100, 100, 1, 100),
+                physics3d::BoundingVolume{physics3d::BPlane{
+                        .normal = gml::Vec3d(0, 0, 1),
+                }},
+                gml::Vec3d(0, 0, -1),
+                gml::Quatd(),
+                gml::Vec3d(0));
+        simulation.addRigidBody(barrier3);
+        auto barrier4 = std::make_shared<physics3d::RigidBody>(
+                physics3d::BoxShape(100, 100, 1, 100),
+                physics3d::BoundingVolume{physics3d::BPlane{
+                        .normal = gml::Vec3d(1, 0, 0),
+                }},
+                gml::Vec3d(-1, 0, 0),
+                gml::Quatd(),
+                gml::Vec3d(0));
+        simulation.addRigidBody(barrier4);
+
         inputListener.ball = loadModel("models/billiard_ball/scene.gltf",
                                        physics3d::SphereShape(radius, mass),
-                                       gml::Vec3d(-10, 0, 0));
+                                       gml::Vec3d(-0.5, 0, 0));
 
         auto point = glContext->getDrawableCreator()->createDrawable(std::vector<float>{},
                                                                      std::vector<unsigned int>{},
@@ -119,7 +157,7 @@ public:
     }
 
 private:
-    const double radius = 0.6;
+    const double radius = 0.03;
     const double mass = 0.17;
 
     std::shared_ptr<platform::IWindow> window;

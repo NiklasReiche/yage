@@ -33,8 +33,13 @@ namespace physics3d
     void RigidBody::update_bounding_volume()
     {
         std::visit(utils::overload{
-                [this](BSphere& sphere) { sphere.center = position + m_bounding_volume_offset; },
-                [this](BPlane& plane) { plane.support = position + m_bounding_volume_offset; },
+                [this](BSphere& sphere) {
+                    sphere.center = position + m_bounding_volume_offset;
+                },
+                [this](BPlane& plane) {
+                    plane.support = position + m_bounding_volume_offset;
+                    // TODO: normal
+                },
         }, m_bounding_volume);
     }
 }
