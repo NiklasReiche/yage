@@ -75,6 +75,7 @@ public:
         window->show();
         std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
 
+#if 1
         const double epsilon = 0.00000001;
         const double height = std::sqrt(- 5 * 0.5 * 2 * radius * 5 * 0.5 * 2 * radius + 5 * 2 * radius * 5 * 2 * radius) / 5.;
         for (int i = 0; i < 5; ++i) {
@@ -85,6 +86,7 @@ public:
                                               -(i * radius * 2) / 2.0 + j * radius * 2 + j * epsilon));
             }
         }
+#endif
 
         auto barrier_mesh = gl3d::resources::gltf_read_meshes(platform::desktop::FileReader(),
                                                       "models/barrier.glb", *glContext->getDrawableCreator(),
@@ -95,6 +97,8 @@ public:
                                                               "models/ground.glb", *glContext->getDrawableCreator(),
                                                               *glContext->getTextureCreator(), pbrShader,
                                                               pbrShaderNormalMapping).at(0);
+
+
 
         auto ground = std::make_shared<physics3d::RigidBody>(
                 physics3d::StaticShape(),
@@ -154,7 +158,7 @@ public:
                 physics3d::StaticShape(),
                 physics3d::BoundingVolume{physics3d::BPlane{}},
                 gml::Vec3d(-1, 0, 0),
-                gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double> / 2, 0, 0));
+                gml::quaternion::eulerAngle<double>(-std::numbers::pi_v<double> / 2, 0, 0)); // TODO: if the normal faces away, the balls bounce
         simulation.addRigidBody(barrier4);
 
         auto scene_barrier4 = std::make_shared<gl3d::SceneObject>();
@@ -169,6 +173,8 @@ public:
         inputListener.ball = loadModel("models/billiard_ball/scene.gltf",
                                        physics3d::SphereShape(radius, mass),
                                        gml::Vec3d(-0.5, 0, 0));
+
+        inputListener.sim = &simulation;
 
         auto point = glContext->getDrawableCreator()->createDrawable(std::vector<float>{},
                                                                      std::vector<unsigned int>{},

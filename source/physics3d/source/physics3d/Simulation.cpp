@@ -92,11 +92,11 @@ namespace physics3d
         };
 
         auto& r_a = collision.contact_manifold.contact.r_a;
-        auto& r_b = collision.contact_manifold.contact.r_a;
+        auto& r_b = collision.contact_manifold.contact.r_b;
         auto& p_a = collision.contact_manifold.contact.p_a;
         auto& p_b = collision.contact_manifold.contact.p_b;
         auto& n = collision.contact_manifold.contact.n;
-        auto depth = gml::length(p_a - p_b);
+        auto depth = gml::dot(p_b - p_a, n);
 
         auto v_abs_p_a = a.velocity + gml::cross(a.angularVelocity, r_a);
         auto v_abs_p_b = b.velocity + gml::cross(b.angularVelocity, r_b);
@@ -122,7 +122,7 @@ namespace physics3d
             t_2.x(), t_2.y(), t_2.z(),
         };
         auto j_penetration_t = gml::transpose(j_penetration);
-        auto baumgarte = bias / dt * gml::dot((p_b - p_a), n);
+        auto baumgarte = bias / dt * depth;
         double lambda_n = solve(m_inv, j_penetration, j_penetration_t, q_pre, baumgarte);
         auto p_c = lambda_n * j_penetration_t;
 
@@ -182,6 +182,8 @@ namespace physics3d
 
 
         for (auto& rigidBody: bodies) {
+            rigidBody->force += m_external_force;
+
             // TODO: accumulate momentum or velocity? Probably doesn't matter
             // linear
             rigidBody->momentum = rigidBody->force * dt;
@@ -239,5 +241,10 @@ namespace physics3d
     void Simulation::addRigidBody(const std::shared_ptr<RigidBody>& rigidBody)
     {
         bodies.emplace_back(rigidBody);
+    }
+
+    void Simulation::enable_gravity()
+    {
+        m_external_force = {0, -9.81, 0};
     }
 }

@@ -34,7 +34,7 @@ namespace physics3d
         contact.r_a = contact.n * a.radius;
         contact.p_a = a.center + contact.r_a;
         contact.p_b = a.center + contact.n * dist;
-        contact.r_b = contact.p_a - b.support;
+        contact.r_b = contact.p_b - b.support;
 
         CollisionContactManifold result;
         result.contact = contact;
@@ -43,11 +43,26 @@ namespace physics3d
 
     std::optional<CollisionContactManifold> CollisionVisitor::operator()(const BPlane& a, const BSphere& b)
     {
-        return operator()(b, a);
+        // dist is positive if the circle collides on the outer side and negative otherwise (b.normal points outward)
+        auto dist = gml::dot(b.center - a.support, a.normal); // projection does not need denominator, since normal is unit length
+        if (std::abs(dist) > b.radius) {
+            return {};
+        }
+
+        CollisionContact contact;
+        contact.n = dist > 0 ? a.normal : -a.normal;
+        contact.r_b = -contact.n * b.radius;
+        contact.p_b = b.center + contact.r_b;
+        contact.p_a = b.center - contact.n * dist;
+        contact.r_a = contact.p_a - a.support;
+
+        CollisionContactManifold result;
+        result.contact = contact;
+        return {result};
     }
 
     std::optional<CollisionContactManifold> CollisionVisitor::operator()(const BPlane& a, const BPlane& b)
     {
-        return {}; // TODO
+        return {}; // TODO: planes should probably not collide with themselves, since they are infinite
     }
 }

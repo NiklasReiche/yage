@@ -302,6 +302,7 @@ namespace platform::desktop
 			case GLFW_KEY_D: return input::KeyEvent::Code::KEY_D;
 			case GLFW_KEY_E: return input::KeyEvent::Code::KEY_E;
 			case GLFW_KEY_F: return input::KeyEvent::Code::KEY_F;
+            case GLFW_KEY_G: return input::KeyEvent::Code::KEY_G;
 			case GLFW_KEY_H: return input::KeyEvent::Code::KEY_H;
 			case GLFW_KEY_I: return input::KeyEvent::Code::KEY_I;
 			case GLFW_KEY_J: return input::KeyEvent::Code::KEY_J;

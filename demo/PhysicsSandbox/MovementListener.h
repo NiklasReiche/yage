@@ -20,6 +20,7 @@ class MovementListener : public input::InputListener
 {
 public:
     std::shared_ptr<physics3d::RigidBody> ball;
+    physics3d::Simulation* sim;
 
 	MovementListener() = default;
 
@@ -69,7 +70,15 @@ public:
 		}
 
         if (code == input::KeyEvent::Code::KEY_ENTER && action == input::KeyEvent::Action::PRESS){
-            ball->applyForce(gml::Vec3d(50, 0, 0), ball->getPosition());
+            ball->applyForce(gml::Vec3d(-10, 0, 0), ball->getPosition());
+        }
+
+        if (code == input::KeyEvent::Code::KEY_G && action == input::KeyEvent::Action::PRESS) {
+            sim->enable_gravity();
+        }
+
+        if (code == input::KeyEvent::Code::KEY_RIGHT && action == input::KeyEvent::Action::PRESS) {
+            sim->integrate(1./60);
         }
 	}
 
