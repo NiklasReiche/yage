@@ -137,10 +137,15 @@ namespace physics3d
         };
         auto j_friction_1_t = gml::transpose(j_friction_1);
         double lambda_friction_1 = solve(m_inv, j_friction_1, j_friction_1_t, q_pre);
+#if 0
+        // TODO: clamping introduces lateral movement, is that expected?
         lambda_friction_1 = gml::clamp(lambda_friction_1,
                                        -friction_coefficient * lambda_n,
                                        friction_coefficient * lambda_n);
+#endif
         p_c += lambda_friction_1 * j_friction_1_t;
+
+
 
         // friction along u2
         t_1 = gml::cross(r_a, u2);
@@ -153,9 +158,12 @@ namespace physics3d
         };
         auto j_friction_2_t = gml::transpose(j_friction_2);
         double lambda_friction_2 = solve(m_inv, j_friction_2, j_friction_2_t, q_pre);
+#if 0
+        // TODO: clamping introduces lateral movement, is that expected?
         lambda_friction_2 = gml::clamp(lambda_friction_2,
                                        -friction_coefficient * lambda_n,
                                        friction_coefficient * lambda_n);
+#endif
         p_c += lambda_friction_2 * j_friction_2_t;
 
         auto q_post = q_pre + m_inv * p_c;
