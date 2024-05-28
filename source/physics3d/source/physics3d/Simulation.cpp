@@ -102,13 +102,14 @@ namespace physics3d
         auto v_abs_p_b = b.velocity + gml::cross(b.angularVelocity, r_b);
         auto v_rel = v_abs_p_b - v_abs_p_a;
 
-        gml::Vec3d u1, u2;
-        if (gml::length(v_rel) < 0.0001) {
+        // Gram-Schmidt method using the relative velocity as the initial vector for the projection
+        gml::Vec3d u1 = v_rel - n * gml::dot(v_rel, n); // non-normalized, since it might be zero-length
+        gml::Vec3d u2;
+        if (gml::sqrLength(u1) < 0.0000001) { // u1 is parallel to n, so we need another approach
             std::tie(u1, u2) = tangent_plane(n);
-        } else{
-            // Gram-Schmidt method using the relative velocity as the initial guess
-            u1 = gml::normalize(v_rel - n * gml::dot(v_rel, n));
-            u2 = gml::cross(u1, n); // normalization not necessary
+        } else {
+            u1.normalize();
+            u2 = gml::cross(u1, n); // normalization not necessary, since u1 and n are already normalized
         }
 
         // penetration
