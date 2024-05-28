@@ -79,17 +79,14 @@ public:
             for (int j = 0; j < i + 1; ++j) {
                 auto b = loadModel("models/billiard_ball/scene.gltf",
                                    physics3d::SphereShape(radius, mass),
-                                   gml::Vec3d(i * std::sqrt(radius * 2) + epsilon * i, 0, -(i*radius*2) / 2.0 + j * radius * 2 + j * epsilon));
-                b->bounding_shape.radius = 0.6;
-                b->update_bounding_shape();
+                                   gml::Vec3d(i * std::sqrt(radius * 2) + epsilon * i, 0,
+                                              -(i * radius * 2) / 2.0 + j * radius * 2 + j * epsilon));
             }
         }
 
         inputListener.ball = loadModel("models/billiard_ball/scene.gltf",
                                        physics3d::SphereShape(radius, mass),
                                        gml::Vec3d(-10, 0, 0));
-        inputListener.ball->bounding_shape.radius = 0.6;
-        inputListener.ball->update_bounding_shape();
 
         auto point = glContext->getDrawableCreator()->createDrawable(std::vector<float>{},
                                                                      std::vector<unsigned int>{},
@@ -175,8 +172,15 @@ private:
         scene->addChild(scene_object);
         scene_object->bindMesh(ball_mesh);
 
-        auto rb = std::make_shared<physics3d::RigidBody>(shape, position, gml::quaternion::fromMatrix(
-                gml::matrix::axisAngle(gml::Vec3d(0, 0, 1), std::numbers::pi_v<double> / 2).getRotation()));
+        auto rb = std::make_shared<physics3d::RigidBody>(
+                shape,
+                physics3d::BoundingVolume{physics3d::BSphere{
+                        .radius = radius,
+                }},
+                position,
+                gml::quaternion::fromMatrix(
+                        gml::matrix::axisAngle(gml::Vec3d(0, 0, 1), std::numbers::pi_v<double> / 2).getRotation()),
+                gml::Vec3d(0));
         simulation.addRigidBody(rb);
 
         objects.emplace_back(scene_object, rb);

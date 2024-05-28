@@ -44,8 +44,11 @@ namespace physics3d
         return nominator(0, 0) / denominator(0, 0);
     }
 
-    void Simulation::resolve_constraint(RigidBody& a, RigidBody& b)
+    void Simulation::resolve_collision(const Collision& collision)
     {
+        auto& a = collision.rb_a;
+        auto& b = collision.rb_b;
+
         auto m_inv = inverse_mass_matrix(a, b);
 
         gml::Matd<12, 1> q_pre{
@@ -55,19 +58,18 @@ namespace physics3d
                 b.angularVelocity.x(), b.angularVelocity.y(), b.angularVelocity.z(),
         };
 
-        gml::Vec3d p_a;
-        gml::Vec3d p_b;
-        gml::Vec3d n;
-        contact(a.bounding_shape, b.bounding_shape, p_a, p_b, n);
+        auto& r_a = collision.contact_manifold.contact.r_a;
+        auto& r_b = collision.contact_manifold.contact.r_a;
+        auto& p_a = collision.contact_manifold.contact.p_a;
+        auto& p_b = collision.contact_manifold.contact.p_b;
+        auto& n = collision.contact_manifold.contact.n;
         auto depth = gml::length(p_a - p_b);
-
-        auto r_a = p_a - a.bounding_shape.center;
-        auto r_b = p_b - b.bounding_shape.center;
 
         auto v_abs_p_a = a.velocity + gml::cross(a.angularVelocity, r_a);
         auto v_abs_p_b = b.velocity + gml::cross(b.angularVelocity, r_b);
         auto v_rel = v_abs_p_b - v_abs_p_a;
 
+        // TODO: handle case where relative velocity is zero
         gml::Vec3d u1 = gml::normalize(v_rel - n * gml::dot(v_rel, n));
         gml::Vec3d u2 = gml::normalize(gml::cross(u1, n));
 
@@ -120,8 +122,8 @@ namespace physics3d
         // TODO: try Baumgarte stabilisation instead
         a.position -= n * depth / 2;
         b.position += n * depth / 2;
-        a.update_bounding_shape();
-        b.update_bounding_shape();
+        a.update_bounding_volume();
+        b.update_bounding_volume();
     }
 
     void Simulation::integrate(double dt)
@@ -144,15 +146,28 @@ namespace physics3d
             rigidBody->angularVelocity += rigidBody->inertia_shape.inverseInertiaTensor * rigidBody->angularMomentum;
         }
 
+        std::vector<Collision> collisions;
 
+        // narrow phase
         for (std::size_t i = 0; i < bodies.size() - 1; ++i) {
             auto& a = bodies.at(i);
             for (std::size_t j = i + 1; j < bodies.size(); ++j) {
                 auto& b = bodies.at(j);
-                if (collide(a->bounding_shape, b->bounding_shape)) {
-                    resolve_constraint(*a, *b);
+
+                auto result = std::visit(m_collision_visitor, a->m_bounding_volume, b->m_bounding_volume);
+                if (result.has_value()) {
+                    Collision collision{
+                            .contact_manifold = result.value(),
+                            .rb_a = *a,
+                            .rb_b = *b,
+                    };
+                    collisions.push_back(collision);
                 }
             }
+        }
+
+        for (const auto& collision: collisions) {
+            resolve_collision(collision);
         }
 
 
@@ -166,7 +181,7 @@ namespace physics3d
             rigidBody->orientation.normalize();
             rigidBody->torque = gml::Vec3d();
 
-            rigidBody->update_bounding_shape();
+            rigidBody->update_bounding_volume();
         }
     }
 
