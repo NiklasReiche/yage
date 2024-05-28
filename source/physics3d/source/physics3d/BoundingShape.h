@@ -14,7 +14,8 @@ namespace physics3d
     struct BPlane
     {
         gml::Vec3d support{};
-        gml::Vec3d normal{0.0, 1.0, 0.0};
+        gml::Vec3d original_normal{0.0, 0.0, -1.0};
+        gml::Vec3d normal{};
     };
 
     struct CollisionContact

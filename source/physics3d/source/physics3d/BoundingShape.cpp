@@ -24,7 +24,7 @@ namespace physics3d
     std::optional<CollisionContactManifold> CollisionVisitor::operator()(const BSphere& a, const BPlane& b)
     {
         // dist is positive if the circle collides on the outer side and negative otherwise (b.normal points outward)
-        auto dist = gml::dot(a.center - b.support, b.normal); // TODO: projection missing denominator component
+        auto dist = gml::dot(a.center - b.support, b.normal); // projection does not need denominator, since normal is unit length
         if (std::abs(dist) > a.radius) {
             return {};
         }

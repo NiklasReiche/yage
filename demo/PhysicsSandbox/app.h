@@ -91,10 +91,31 @@ public:
                                                       *glContext->getTextureCreator(), pbrShader,
                                                       pbrShaderNormalMapping).at(0);
 
+        auto ground_mesh = gl3d::resources::gltf_read_meshes(platform::desktop::FileReader(),
+                                                              "models/ground.glb", *glContext->getDrawableCreator(),
+                                                              *glContext->getTextureCreator(), pbrShader,
+                                                              pbrShaderNormalMapping).at(0);
+
+        auto ground = std::make_shared<physics3d::RigidBody>(
+                physics3d::StaticShape(),
+                physics3d::BoundingVolume{physics3d::BPlane{
+                    .original_normal = {0, 1, 0},
+                }},
+                gml::Vec3d(0, -0.04, 0),
+                gml::Quatd());
+        simulation.addRigidBody(ground);
+
+        auto scene_ground = std::make_shared<gl3d::SceneObject>();
+        scene->addChild(scene_ground);
+        scene_ground->bindMesh(ground_mesh);
+
+        objects.emplace_back(scene_ground, ground);
 
         auto barrier1 = std::make_shared<physics3d::RigidBody>(
                 physics3d::StaticShape(),
-                physics3d::BoundingVolume{physics3d::BPlane{}},
+                physics3d::BoundingVolume{physics3d::BPlane{
+                        .original_normal = {0, 0, -1},
+                }},
                 gml::Vec3d(1, 0, 0),
                 gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double> / 2, 0, 0));
         simulation.addRigidBody(barrier1);
@@ -105,7 +126,9 @@ public:
 
         auto barrier2 = std::make_shared<physics3d::RigidBody>(
                 physics3d::StaticShape(),
-                physics3d::BoundingVolume{physics3d::BPlane{}},
+                physics3d::BoundingVolume{physics3d::BPlane{
+                        .original_normal = {0, 0, -1},
+                }},
                 gml::Vec3d(0, 0, 1),
                 gml::Quatd());
         simulation.addRigidBody(barrier2);
@@ -116,9 +139,11 @@ public:
 
         auto barrier3 = std::make_shared<physics3d::RigidBody>(
                 physics3d::StaticShape(),
-                physics3d::BoundingVolume{physics3d::BPlane{}},
+                physics3d::BoundingVolume{physics3d::BPlane{
+                        .original_normal = {0, 0, -1},
+                }},
                 gml::Vec3d(0, 0, -1),
-                gml::Quatd());
+                gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double>, 0, 0));
         simulation.addRigidBody(barrier3);
 
         auto scene_barrier3 = std::make_shared<gl3d::SceneObject>();

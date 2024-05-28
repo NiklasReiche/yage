@@ -38,7 +38,10 @@ namespace physics3d
                 },
                 [this](BPlane& plane) {
                     plane.support = position + m_bounding_volume_offset;
-                    plane.normal = this->orientation.getForward();
+                    // TODO: implement rotation without matrix conversion
+                    auto p = gml::matrix::fromQuaternion(orientation) *
+                             gml::Vec4d(plane.original_normal.x(), plane.original_normal.y(), plane.original_normal.z(), 1);
+                    plane.normal = gml::normalize(gml::Vec3d{p.x() / p.w(), p.y() / p.w(), p.z() / p.w()});
                 },
         }, m_bounding_volume);
     }
