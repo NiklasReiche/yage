@@ -29,9 +29,6 @@ public:
                 gl3d::Camera(gml::Vec3f(0.0f, 6.0f, 10.0f),
                              gml::quaternion::eulerAngle<double>(std::numbers::pi_v<float>, 0, 0)));
 
-        inputListener = MovementListener(window, camera);
-        window->attach(inputListener);
-
         baseRenderer = glContext->getRenderer();
         baseRenderer->setClearColor(0x008080FFu);
         baseRenderer->enableDepthTest();
@@ -67,6 +64,9 @@ public:
 
         scene = std::make_shared<gl3d::SceneGroup>("world");
         loadResources();
+
+        inputListener = MovementListener(window, camera, &simulation, this);
+        window->attach(inputListener);
     }
 
 
@@ -170,11 +170,10 @@ public:
         objects.emplace_back(scene_barrier3, barrier3);
         objects.emplace_back(scene_barrier4, barrier4);
 
-        inputListener.ball = loadModel("models/billiard_ball/scene.gltf",
+        auto ball = loadModel("models/billiard_ball/scene.gltf",
                                        physics3d::SphereShape(radius, mass),
                                        gml::Vec3d(-0.5, 0, 0));
-
-        inputListener.sim = &simulation;
+        inputListener.ball = ball.get();
 
         auto point = glContext->getDrawableCreator()->createDrawable(std::vector<float>{},
                                                                      std::vector<unsigned int>{},
@@ -186,7 +185,9 @@ public:
 
             inputListener.applyUpdate();
 
-            //simulation.integrate(1.0 / 60);
+            if (simulate) {
+                simulation.integrate(1.0 / 60);
+            }
 
             updateSceneGraph();
 
@@ -206,6 +207,9 @@ public:
             window->pollEvents();
         }
     }
+
+public:
+    bool simulate = false;
 
 private:
     const double radius = 0.03;

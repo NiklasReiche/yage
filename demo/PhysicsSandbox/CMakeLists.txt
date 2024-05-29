@@ -1,10 +1,11 @@
 ###################################################################
-# tools/PhysicsSandbox				                                      #
+# tools/PhysicsSandbox				                              #
 ###################################################################
 
 add_executable(physics_sandbox
 	"main.cpp"
 	"MovementListener.h"
+	"MovementListener.cpp"
 	"ProjectionView.h"
 	"ProjectionView.cpp"
 	"app.h" 
