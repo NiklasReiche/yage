@@ -74,6 +74,7 @@ namespace gl3d::resources
     {
         auto& image = model.images[texture.source];
 
+        // TODO: consider image bit depth
         gl::ImageFormat format;
         switch (image.component) {
             case 1:

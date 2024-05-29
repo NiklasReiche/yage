@@ -282,7 +282,7 @@ private:
     void loadResources()
     {
         auto lightRes = std::make_shared<gl3d::DirectionalLight>();
-        lightRes->color = gml::Vec3f(4);
+        lightRes->color = gml::Vec3f(3.5);
         auto light = std::make_shared<gl3d::SceneObject>("light");
         light->bindLight(lightRes);
         light->setTransform(
