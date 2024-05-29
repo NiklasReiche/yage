@@ -69,10 +69,12 @@ public:
 			}
 		}
 
-        if (code == input::KeyEvent::Code::KEY_BACKSLASH && action == input::KeyEvent::Action::PRESS) {
+        if (code == input::KeyEvent::Code::KEY_BACKSLASH && (action == input::KeyEvent::Action::PRESS ||
+                                                             action == input::KeyEvent::Action::REPEAT)) {
             speed *= 0.9;
         }
-        if (code == input::KeyEvent::Code::KEY_RIGHT_BRACKET && action == input::KeyEvent::Action::PRESS) {
+        if (code == input::KeyEvent::Code::KEY_RIGHT_BRACKET && (action == input::KeyEvent::Action::PRESS ||
+                                                                 action == input::KeyEvent::Action::REPEAT)) {
             speed *= 1.1;
         }
 
@@ -80,15 +82,12 @@ public:
             ball->applyForce(gml::Vec3d(50, 0, 0), ball->getPosition());
         }
 
-        if (code == input::KeyEvent::Code::KEY_ENTER && action == input::KeyEvent::Action::PRESS){
-            ball->applyForce(gml::Vec3d(50, 0, 0), ball->getPosition());
-        }
-
         if (code == input::KeyEvent::Code::KEY_G && action == input::KeyEvent::Action::PRESS) {
             sim->enable_gravity();
         }
 
-        if (code == input::KeyEvent::Code::KEY_RIGHT && action == input::KeyEvent::Action::PRESS) {
+        if (code == input::KeyEvent::Code::KEY_RIGHT && (action == input::KeyEvent::Action::PRESS ||
+                action == input::KeyEvent::Action::REPEAT)) {
             sim->integrate(1./60);
         }
 	}

@@ -33,7 +33,7 @@ namespace physics3d
         CollisionVisitor m_collision_visitor{};
         gml::Vec3d m_external_acceleration{};
 
-        void resolve_collision(const Collision& collision, double bias, double dt);
+        void resolve_collision(Collision& collision, double bias, double dt);
 
         static double solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> j_t, gml::Matd<12, 1> q_pre, double b);
 

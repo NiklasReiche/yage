@@ -77,7 +77,7 @@ namespace physics3d
         return {u1, u2};
     }
 
-    void Simulation::resolve_collision(const Collision& collision, double bias, double dt)
+    void Simulation::resolve_collision(Collision& collision, double bias, double dt)
     {
         auto& a = collision.rb_a;
         auto& b = collision.rb_b;
@@ -123,9 +123,15 @@ namespace physics3d
         };
         auto j_penetration_t = gml::transpose(j_penetration);
         auto baumgarte = bias / dt * depth;
+
+        double old_lambda_n = collision.contact_manifold.lambda_n;
         double lambda_n = solve(m_inv, j_penetration, j_penetration_t, q_pre, baumgarte);
+        collision.contact_manifold.lambda_n += lambda_n;
+        collision.contact_manifold.lambda_n = std::max(0.0, collision.contact_manifold.lambda_n);
+        lambda_n = collision.contact_manifold.lambda_n - old_lambda_n;
         auto p_c = lambda_n * j_penetration_t;
 
+#if 0
         // friction along u1
         const double friction_coefficient = 0.6;
         t_1 = gml::cross(r_a, u1);
@@ -164,6 +170,7 @@ namespace physics3d
                                        friction_coefficient * lambda_n);
 #endif
         //p_c += lambda_friction_2 * j_friction_2_t;
+#endif
 
         auto q_post = q_pre + m_inv * p_c;
         a.velocity = {q_post(0, 0), q_post(1, 0), q_post(2, 0)};
@@ -216,8 +223,8 @@ namespace physics3d
             }
         }
 
-        for (int i = 0; i < 1; ++i) {
-            for (const auto& collision: collisions) {
+        for (int i = 0; i < 10; ++i) {
+            for (auto& collision: collisions) {
                 resolve_collision(collision, 0.2, dt);
             }
         }

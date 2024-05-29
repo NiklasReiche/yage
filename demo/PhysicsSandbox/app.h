@@ -82,7 +82,7 @@ public:
             for (int j = 0; j < i + 1; ++j) {
                 auto b = loadModel("models/billiard_ball/scene.gltf",
                                    physics3d::SphereShape(radius, mass),
-                                   gml::Vec3d(i * height + epsilon * i, 0,
+                                   gml::Vec3d(i * height + epsilon * i, 0.5,
                                               -(i * radius * 2) / 2.0 + j * radius * 2 + j * epsilon));
             }
         }
@@ -106,7 +106,7 @@ public:
                     .original_normal = {0, -1, 0},
                 }},
                 gml::Vec3d(0, -0.04, 0),
-                gml::quaternion::eulerAngle<double>(0, gml::toRad(1.0), gml::toRad(1.0)));
+                gml::quaternion::eulerAngle<double>(0, gml::toRad(10.0), gml::toRad(10.0)));
         simulation.addRigidBody(ground);
 
         auto scene_ground = std::make_shared<gl3d::SceneObject>();
@@ -186,7 +186,7 @@ public:
 
             inputListener.applyUpdate();
 
-            simulation.integrate(1.0 / 60);
+            //simulation.integrate(1.0 / 60);
 
             updateSceneGraph();
 
