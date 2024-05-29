@@ -44,15 +44,13 @@ public:
         float y = static_cast<const input::MousePosEvent&>(event).getYPos();
 
         if (mouse.isHidden) {
-            gml::Vec2f dist = mouse.pos - gml::Vec2f(x, y);
-            gml::Vec2f angle = dist * mouse.sensitivity;
+            gml::Vec2d dist = mouse.pos - gml::Vec2f(x, y);
+            gml::Vec2d angle = dist * mouse.sensitivity;
 
-            //gml::Quaternion<float> q_yaw = gml::quaternion::eulerAngle<float>(0, angle.x, 0);
-            //gml::Quaternion<float> q_pitch = gml::quaternion::eulerAngle<float>(angle.y, 0, 0);
-
-            //gml::Quaternion<float> newRotation = gml::normalize<float>(q_yaw * camera.rotation * q_pitch);
-            camera->rotateYaw(angle.x());
-            camera->rotatePitch(angle.y());
+            gml::Quatd q_yaw = gml::quaternion::eulerAngle<double>(gml::toRad(angle.x()), 0.0, 0.0);
+            gml::Quatd q_pitch = gml::quaternion::eulerAngle<double>(0.0, 0.0, -gml::toRad(angle.y()));
+            gml::Quatd rotation = gml::normalize(q_yaw * camera->getRotation() * q_pitch);
+            camera->rotateTo(rotation);
         }
         mouse.pos = gml::Vec2f(x, y);
     }
@@ -122,7 +120,7 @@ public:
 
 private:
     Mouse mouse;
-    float speed = 0.1;
+    float speed = 0.05;
     std::map<input::KeyEvent::Code, bool> keyStates;
     std::shared_ptr<platform::IWindow> window;
     std::shared_ptr<gl3d::Camera> camera;
