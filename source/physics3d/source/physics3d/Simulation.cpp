@@ -42,7 +42,7 @@ namespace physics3d
 
     double Simulation::solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> j_t, gml::Matd<12, 1> q_pre, double b)
     {
-        auto nominator = -j * q_pre + gml::Matd<1, 1>(b);
+        auto nominator = -(j * q_pre + gml::Matd<1, 1>(b));
         auto denominator = j * m_inv * j_t;
         return nominator(0, 0) / denominator(0, 0);
     }
@@ -77,7 +77,7 @@ namespace physics3d
         return {u1, u2};
     }
 
-    void Simulation::resolve_collision(Collision& collision, double bias, double dt, double slop)
+    void Simulation::resolve_collision(Collision& collision, double baumgarte_factor, double dt, double slop)
     {
         auto& a = collision.rb_a;
         auto& b = collision.rb_b;
@@ -103,6 +103,7 @@ namespace physics3d
         auto v_rel = v_abs_p_b - v_abs_p_a;
 
         const double friction_coefficient = a.friction * b.friction;
+        const double restitution = 0.9;
 
         // Gram-Schmidt method using the relative velocity as the initial vector for the projection
         gml::Vec3d u1 = v_rel - n * gml::dot(v_rel, n); // non-normalized, since it might be zero-length
@@ -124,11 +125,13 @@ namespace physics3d
             t_2.x(), t_2.y(), t_2.z(),
         };
         auto j_n_t = gml::transpose(j_n);
-        auto baumgarte = bias / dt * std::max(depth - slop, 0.0);
+        auto baumgarte_bias = -baumgarte_factor / dt * std::max(depth - slop, 0.0);
+        auto restitution_bias = restitution * gml::dot(v_rel, -n);
+        auto bias = baumgarte_bias + restitution_bias;
 
         // accumulate impulses
         double old_lambda_n = collision.contact_manifold.lambda_n;
-        double lambda_n = solve(m_inv, j_n, j_n_t, q_pre, baumgarte);
+        double lambda_n = solve(m_inv, j_n, j_n_t, q_pre, bias);
         collision.contact_manifold.lambda_n += lambda_n;
         // clamp to prevent objects pulling together for negative lambdas
         collision.contact_manifold.lambda_n = std::max(0.0, collision.contact_manifold.lambda_n);
