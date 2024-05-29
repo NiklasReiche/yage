@@ -25,7 +25,8 @@ namespace physics3d
     {
         // dist is positive if the circle collides on the outer side and negative otherwise (b.normal points outward)
         auto dist = gml::dot(a.center - b.support, b.normal); // projection does not need denominator, since normal is unit length
-        if (std::abs(dist) > a.radius) {
+        auto abs_dist = std::abs(dist);
+        if (abs_dist > a.radius) {
             return {};
         }
 
@@ -33,7 +34,7 @@ namespace physics3d
         contact.n = dist > 0 ? -b.normal : b.normal;
         contact.r_a = contact.n * a.radius;
         contact.p_a = a.center + contact.r_a;
-        contact.p_b = a.center + contact.n * dist;
+        contact.p_b = a.center + contact.n * abs_dist;
         contact.r_b = contact.p_b - b.support;
 
         CollisionContactManifold result;
@@ -45,7 +46,8 @@ namespace physics3d
     {
         // dist is positive if the circle collides on the outer side and negative otherwise (b.normal points outward)
         auto dist = gml::dot(b.center - a.support, a.normal); // projection does not need denominator, since normal is unit length
-        if (std::abs(dist) > b.radius) {
+        auto abs_dist = std::abs(dist);
+        if (abs_dist > b.radius) {
             return {};
         }
 
@@ -53,7 +55,7 @@ namespace physics3d
         contact.n = dist > 0 ? a.normal : -a.normal;
         contact.r_b = -contact.n * b.radius;
         contact.p_b = b.center + contact.r_b;
-        contact.p_a = b.center - contact.n * dist;
+        contact.p_a = b.center - contact.n * abs_dist;
         contact.r_a = contact.p_a - a.support;
 
         CollisionContactManifold result;

@@ -103,7 +103,7 @@ public:
         auto ground = std::make_shared<physics3d::RigidBody>(
                 physics3d::StaticShape(),
                 physics3d::BoundingVolume{physics3d::BPlane{
-                    .original_normal = {0, 1, 0},
+                    .original_normal = {0, -1, 0},
                 }},
                 gml::Vec3d(0, -0.04, 0),
                 gml::Quatd());
