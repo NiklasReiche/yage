@@ -130,10 +130,10 @@ namespace gl3d::resources
         }
 
         if (material.pbrMetallicRoughness.metallicRoughnessTexture.index > -1) {
-            gl3d_material->add_uniform("aoMap",
+            gl3d_material->add_uniform("metallicRoughnessMap",
                                        textures.at(material.pbrMetallicRoughness.metallicRoughnessTexture.index));
         } else {
-            gl3d_material->add_uniform("aoMap", full_texture);
+            gl3d_material->add_uniform("metallicRoughnessMap", full_texture);
         }
 
         if (material.normalTexture.index > -1) {
@@ -144,10 +144,10 @@ namespace gl3d::resources
         }
 
         if (material.occlusionTexture.index > -1) {
-            gl3d_material->add_uniform("metallicRoughnessMap",
+            gl3d_material->add_uniform("aoMap",
                                        textures.at(material.occlusionTexture.index));
         } else {
-            gl3d_material->add_uniform("metallicRoughnessMap", full_texture);
+            gl3d_material->add_uniform("aoMap", full_texture);
         }
 
         gl3d_material->set_shader(shader);
