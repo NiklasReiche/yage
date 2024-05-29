@@ -103,7 +103,8 @@ public:
                         .original_normal = {0, -1, 0},
                 }},
                 gml::Vec3d(0, -0.04, 0),
-                gml::quaternion::eulerAngle<double>(0, gml::toRad(0.0), gml::toRad(0.0)));
+                gml::quaternion::eulerAngle<double>(0, gml::toRad(0.0), gml::toRad(0.0)),
+                1.0);
         simulation.addRigidBody(ground);
 
         auto scene_ground = std::make_shared<gl3d::SceneObject>();
@@ -118,7 +119,8 @@ public:
                         .original_normal = {0, 0, -1},
                 }},
                 gml::Vec3d(1, 0, 0),
-                gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double> / 2, 0, 0));
+                gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double> / 2, 0, 0),
+                1.0);
         simulation.addRigidBody(barrier1);
 
         auto scene_barrier1 = std::make_shared<gl3d::SceneObject>();
@@ -131,7 +133,8 @@ public:
                         .original_normal = {0, 0, -1},
                 }},
                 gml::Vec3d(0, 0, 1),
-                gml::Quatd());
+                gml::Quatd(),
+                1.0);
         simulation.addRigidBody(barrier2);
 
         auto scene_barrier2 = std::make_shared<gl3d::SceneObject>();
@@ -144,7 +147,8 @@ public:
                         .original_normal = {0, 0, -1},
                 }},
                 gml::Vec3d(0, 0, -1),
-                gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double>, 0, 0));
+                gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double>, 0, 0),
+                1.0);
         simulation.addRigidBody(barrier3);
 
         auto scene_barrier3 = std::make_shared<gl3d::SceneObject>();
@@ -155,7 +159,8 @@ public:
                 physics3d::StaticShape(),
                 physics3d::BoundingVolume{physics3d::BPlane{}},
                 gml::Vec3d(-1, 0, 0),
-                gml::quaternion::eulerAngle<double>(-std::numbers::pi_v<double> / 2, 0, 0));
+                gml::quaternion::eulerAngle<double>(-std::numbers::pi_v<double> / 2, 0, 0),
+                        1.0);
         simulation.addRigidBody(barrier4);
 
         auto scene_barrier4 = std::make_shared<gl3d::SceneObject>();
@@ -235,9 +240,7 @@ private:
 
     void updateSceneGraph()
     {
-        for (auto& pair: objects) {
-            auto& object = std::get<0>(pair);
-            auto& rb = std::get<1>(pair);
+        for (const auto& [object, rb]: objects) {
             object->setTransform(
                     gml::matrix::translate(rb->getPosition()) *
                     gml::matrix::fromQuaternion(rb->getOrientation()) *
@@ -269,7 +272,7 @@ private:
                 position,
                 gml::quaternion::fromMatrix(
                         gml::matrix::axisAngle(gml::Vec3d(0, 0, 1), std::numbers::pi_v<double> / 2).getRotation()),
-                gml::Vec3d(0));
+                0.2);
         simulation.addRigidBody(rb);
 
         objects.emplace_back(scene_object, rb);

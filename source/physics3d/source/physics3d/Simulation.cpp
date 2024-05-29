@@ -102,6 +102,8 @@ namespace physics3d
         auto v_abs_p_b = b.velocity + gml::cross(b.angularVelocity, r_b);
         auto v_rel = v_abs_p_b - v_abs_p_a;
 
+        const double friction_coefficient = a.friction * b.friction;
+
         // Gram-Schmidt method using the relative velocity as the initial vector for the projection
         gml::Vec3d u1 = v_rel - n * gml::dot(v_rel, n); // non-normalized, since it might be zero-length
         gml::Vec3d u2;
@@ -135,7 +137,6 @@ namespace physics3d
         auto p_c = lambda_n * j_n_t;
 
         // friction along u1
-        const double friction_coefficient = 0.6;
         t_1 = gml::cross(r_a, u1);
         t_2 = gml::cross(r_b, u1);
         gml::Matd<1, 12> j_f1{

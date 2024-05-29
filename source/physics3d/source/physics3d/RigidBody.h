@@ -20,6 +20,7 @@ namespace physics3d
                   const BoundingVolume& bounding_volume,
                   const gml::Vec3d& position,
                   const gml::Quatd& orientation,
+                  double friction = 0.6,
                   const gml::Vec3d& bounding_volume_offset = {});
 
 		void applyForce(const gml::Vec3d& _force, const gml::Vec3d& point);
@@ -48,6 +49,8 @@ namespace physics3d
 
         BoundingVolume m_bounding_volume;
         gml::Vec3d m_bounding_volume_offset{};
+
+        double friction{};
 
 		friend class Simulation;
 	};

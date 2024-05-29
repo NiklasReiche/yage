@@ -7,9 +7,10 @@ namespace physics3d
                          const BoundingVolume& bounding_volume,
                          const gml::Vec3d& position,
                          const gml::Quatd& orientation,
+                         double friction,
                          const gml::Vec3d& bounding_volume_offset)
             : position(position), orientation(orientation), inertia_shape(shape), m_bounding_volume(bounding_volume),
-              m_bounding_volume_offset(bounding_volume_offset)
+              m_bounding_volume_offset(bounding_volume_offset), friction(friction)
     {
         update_bounding_volume();
     }
