@@ -42,7 +42,7 @@ namespace physics3d
 
     double Simulation::solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> j_t, gml::Matd<12, 1> q_pre, double b)
     {
-        auto nominator = -(j * q_pre + gml::Matd<1, 1>(b));
+        auto nominator = -j * q_pre + gml::Matd<1, 1>(b);
         auto denominator = j * m_inv * j_t;
         return nominator(0, 0) / denominator(0, 0);
     }
@@ -77,7 +77,7 @@ namespace physics3d
         return {u1, u2};
     }
 
-    void Simulation::resolve_collision(Collision& collision, double bias, double dt)
+    void Simulation::resolve_collision(Collision& collision, double bias, double dt, double slop)
     {
         auto& a = collision.rb_a;
         auto& b = collision.rb_b;
@@ -96,7 +96,7 @@ namespace physics3d
         auto& p_a = collision.contact_manifold.contact.p_a;
         auto& p_b = collision.contact_manifold.contact.p_b;
         auto& n = collision.contact_manifold.contact.n;
-        auto depth = gml::dot(p_b - p_a, n);
+        auto depth = gml::dot(p_b - p_a, -n);
 
         auto v_abs_p_a = a.velocity + gml::cross(a.angularVelocity, r_a);
         auto v_abs_p_b = b.velocity + gml::cross(b.angularVelocity, r_b);
@@ -124,7 +124,7 @@ namespace physics3d
             t_2.x(), t_2.y(), t_2.z(),
         };
         auto j_n_t = gml::transpose(j_n);
-        auto baumgarte = bias / dt * depth;
+        auto baumgarte = bias / dt * std::max(depth - slop, 0.0);
 
         // accumulate impulses
         double old_lambda_n = collision.contact_manifold.lambda_n;
@@ -235,7 +235,7 @@ namespace physics3d
 
         for (int i = 0; i < m_solver_iterations; ++i) {
             for (auto& collision: collisions) {
-                resolve_collision(collision, m_baumgarte_factor, dt);
+                resolve_collision(collision, m_baumgarte_factor, dt, m_baumgarte_slop);
             }
         }
 

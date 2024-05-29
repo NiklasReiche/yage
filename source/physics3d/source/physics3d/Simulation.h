@@ -29,6 +29,7 @@ namespace physics3d
 
 	private:
         const double m_baumgarte_factor = 0.2;
+        const double m_baumgarte_slop = 0.0005; // allowed penetration distance in meters
         const int m_solver_iterations = 10;
 
 		std::vector<Particle> particles;
@@ -37,10 +38,10 @@ namespace physics3d
         gml::Vec3d m_external_acceleration{};
 
         /**
-         * @param bias Bias factor for Baumgarte stabilisation. Values between 0.1 and 0.2 net good results.
+         * @param bias Bias factor for Baumgarte stabilisation. Values between 0.1 and 0.3 net good results.
          * @param dt Delta time of the integration step.
          */
-        static void resolve_collision(Collision& collision, double bias, double dt);
+        static void resolve_collision(Collision& collision, double bias, double dt, double slop);
 
         static double solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> j_t, gml::Matd<12, 1> q_pre, double b);
 
