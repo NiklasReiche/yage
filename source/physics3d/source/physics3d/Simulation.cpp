@@ -77,7 +77,7 @@ namespace physics3d
         return {u1, u2};
     }
 
-    void Simulation::resolve_collision(Collision& collision, double baumgarte_factor, double dt, double slop)
+    void Simulation::resolve_collision(Collision& collision, double dt)
     {
         auto& a = collision.rb_a;
         auto& b = collision.rb_b;
@@ -125,7 +125,7 @@ namespace physics3d
             t_2.x(), t_2.y(), t_2.z(),
         };
         auto j_n_t = gml::transpose(j_n);
-        auto baumgarte_bias = -baumgarte_factor / dt * std::max(depth - slop, 0.0);
+        auto baumgarte_bias = -m_baumgarte_factor / dt * std::max(depth - m_penetration_slop, 0.0);
         auto restitution_bias = restitution * gml::dot(v_rel, -n);
         auto bias = baumgarte_bias + restitution_bias;
 
@@ -238,7 +238,7 @@ namespace physics3d
 
         for (int i = 0; i < m_solver_iterations; ++i) {
             for (auto& collision: collisions) {
-                resolve_collision(collision, m_baumgarte_factor, dt, m_baumgarte_slop);
+                resolve_collision(collision, dt);
             }
         }
 
