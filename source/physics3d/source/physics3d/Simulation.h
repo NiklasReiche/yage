@@ -40,7 +40,7 @@ namespace physics3d
          * @param bias Bias factor for Baumgarte stabilisation. Values between 0.1 and 0.2 net good results.
          * @param dt Delta time of the integration step.
          */
-        void resolve_collision(Collision& collision, double bias, double dt);
+        static void resolve_collision(Collision& collision, double bias, double dt);
 
         static double solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> j_t, gml::Matd<12, 1> q_pre, double b);
 

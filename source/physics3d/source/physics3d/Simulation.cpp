@@ -200,18 +200,16 @@ namespace physics3d
 
 
         for (auto& rigidBody: bodies) {
+            // external forces
             if (rigidBody->inertia_shape.inverse_mass() > 0) {
-                rigidBody->force += m_external_acceleration * dt;
+                rigidBody->velocity += m_external_acceleration * dt;
             }
 
-            // TODO: accumulate momentum or velocity? Probably doesn't matter
-            // linear
-            rigidBody->momentum = rigidBody->force * dt;
-            rigidBody->velocity += rigidBody->inertia_shape.inverse_mass() * rigidBody->momentum;
+            // linear component
+            rigidBody->velocity += rigidBody->inertia_shape.inverse_mass() * rigidBody->force * dt;
 
             // angular component
-            rigidBody->angularMomentum = rigidBody->torque * dt;
-            rigidBody->angularVelocity += rigidBody->inertia_shape.inverse_inertia_tensor() * rigidBody->angularMomentum;
+            rigidBody->angularVelocity += rigidBody->inertia_shape.inverse_inertia_tensor() * rigidBody->torque * dt;
         }
 
         std::vector<Collision> collisions;
