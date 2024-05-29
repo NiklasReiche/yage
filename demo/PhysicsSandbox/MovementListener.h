@@ -20,7 +20,7 @@ class MovementListener : public input::InputListener
 {
 public:
     std::shared_ptr<physics3d::RigidBody> ball;
-    physics3d::Simulation* sim;
+    physics3d::Simulation* sim{};
 
 	MovementListener() = default;
 
@@ -69,6 +69,17 @@ public:
 			}
 		}
 
+        if (code == input::KeyEvent::Code::KEY_BACKSLASH && action == input::KeyEvent::Action::PRESS) {
+            speed *= 0.9;
+        }
+        if (code == input::KeyEvent::Code::KEY_RIGHT_BRACKET && action == input::KeyEvent::Action::PRESS) {
+            speed *= 1.1;
+        }
+
+        if (code == input::KeyEvent::Code::KEY_ENTER && action == input::KeyEvent::Action::PRESS) {
+            ball->applyForce(gml::Vec3d(50, 0, 0), ball->getPosition());
+        }
+
         if (code == input::KeyEvent::Code::KEY_ENTER && action == input::KeyEvent::Action::PRESS){
             ball->applyForce(gml::Vec3d(50, 0, 0), ball->getPosition());
         }
@@ -85,21 +96,22 @@ public:
 	void applyUpdate()
 	{
 		if (keyStates[input::KeyEvent::Code::KEY_W]) {
-			camera->moveForward(0.1);
+			camera->moveForward(speed);
 		}
 		if (keyStates[input::KeyEvent::Code::KEY_A]) {
-			camera->moveLeft(0.1);
+			camera->moveLeft(speed);
 		}
 		if (keyStates[input::KeyEvent::Code::KEY_S]) {
-			camera->moveBackward(0.1);
+			camera->moveBackward(speed);
 		}
 		if (keyStates[input::KeyEvent::Code::KEY_D]) {
-			camera->moveRight(0.1);
+			camera->moveRight(speed);
 		}
 	}
 
 private:
 	Mouse mouse;
+    float speed = 0.1;
 	std::map<input::KeyEvent::Code, bool> keyStates;
 	std::shared_ptr <platform::IWindow> window;
 	std::shared_ptr <gl3d::Camera> camera;
