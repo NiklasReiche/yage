@@ -28,7 +28,7 @@ public:
         camera = std::make_shared<gl3d::Camera>(
                 gl3d::Camera(gml::Vec3f(0.0f, 2.0f, 2.0f),
                              gml::quaternion::eulerAngle<double>(gml::toRad(180.), 0, 0) *
-                                     gml::quaternion::eulerAngle<double>(0, 0, gml::toRad(45.))));
+                             gml::quaternion::eulerAngle<double>(0, 0, gml::toRad(45.))));
 
         baseRenderer = glContext->getRenderer();
         baseRenderer->setClearColor(0x008080FFu);
@@ -155,7 +155,7 @@ public:
                 physics3d::StaticShape(),
                 physics3d::BoundingVolume{physics3d::BPlane{}},
                 gml::Vec3d(-1, 0, 0),
-                gml::quaternion::eulerAngle<double>(-std::numbers::pi_v<double> / 2, 0,0));
+                gml::quaternion::eulerAngle<double>(-std::numbers::pi_v<double> / 2, 0, 0));
         simulation.addRigidBody(barrier4);
 
         auto scene_barrier4 = std::make_shared<gl3d::SceneObject>();
@@ -283,15 +283,10 @@ private:
         auto light = std::make_shared<gl3d::SceneObject>("light");
         light->bindLight(lightRes);
         light->setTransform(
-                gml::matrix::fromQuaternion<double>(gml::quaternion::eulerAngle<double>(1.2, 0, 0)));
-        scene->addChild(light);
-
-        lightRes = std::make_shared<gl3d::DirectionalLight>();
-        lightRes->color = gml::Vec3f(5);
-        light = std::make_shared<gl3d::SceneObject>("light");
-        light->bindLight(lightRes);
-        light->setTransform(
-                gml::matrix::fromQuaternion<double>(gml::quaternion::eulerAngle<double>(0, 0, 1.2)));
+                gml::matrix::fromQuaternion<double>(
+                        gml::quaternion::eulerAngle<double>(gml::toRad(165.), 0, 0) *
+                        gml::quaternion::eulerAngle<double>(0, 0, gml::toRad(75.))
+                ));
         scene->addChild(light);
     }
 };
