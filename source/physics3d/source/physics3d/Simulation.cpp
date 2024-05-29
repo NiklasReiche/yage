@@ -144,7 +144,7 @@ namespace physics3d
                                        -friction_coefficient * lambda_n,
                                        friction_coefficient * lambda_n);
 #endif
-        p_c += lambda_friction_1 * j_friction_1_t;
+        //p_c += lambda_friction_1 * j_friction_1_t;
 
         // friction along u2
         t_1 = gml::cross(r_a, u2);
@@ -163,7 +163,7 @@ namespace physics3d
                                        -friction_coefficient * lambda_n,
                                        friction_coefficient * lambda_n);
 #endif
-        p_c += lambda_friction_2 * j_friction_2_t;
+        //p_c += lambda_friction_2 * j_friction_2_t;
 
         auto q_post = q_pre + m_inv * p_c;
         a.velocity = {q_post(0, 0), q_post(1, 0), q_post(2, 0)};
@@ -182,7 +182,9 @@ namespace physics3d
 
 
         for (auto& rigidBody: bodies) {
-            rigidBody->force += m_external_force;
+            if (rigidBody->inertia_shape.inverse_mass() > 0) {
+                rigidBody->force += m_external_acceleration * dt;
+            }
 
             // TODO: accumulate momentum or velocity? Probably doesn't matter
             // linear
@@ -214,10 +216,11 @@ namespace physics3d
             }
         }
 
-        for (const auto& collision: collisions) {
-            resolve_collision(collision, 0.2, dt);
+        for (int i = 0; i < 1; ++i) {
+            for (const auto& collision: collisions) {
+                resolve_collision(collision, 0.2, dt);
+            }
         }
-
 
         for (auto& rigidBody: bodies) {
             // linear component
@@ -245,6 +248,6 @@ namespace physics3d
 
     void Simulation::enable_gravity()
     {
-        m_external_force = {0, -9.81, 0};
+        m_external_acceleration = {0, -9.81, 0};
     }
 }
