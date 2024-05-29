@@ -32,6 +32,8 @@ namespace physics3d
         // TODO
         CollisionContact contact;
         double lambda_n{};
+        double lambda_f1{};
+        double lambda_f2{};
     };
 
     class CollisionVisitor

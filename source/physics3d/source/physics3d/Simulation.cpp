@@ -115,62 +115,73 @@ namespace physics3d
         // penetration
         auto t_1 = gml::cross(r_a, n);
         auto t_2 = gml::cross(r_b, n);
-        gml::Matd<1, 12> j_penetration{
+        gml::Matd<1, 12> j_n{
             -n.x(), -n.y(), -n.z(),
             n.x(), n.y(), n.z(),
             -t_1.x(), -t_1.y(), -t_1.z(),
             t_2.x(), t_2.y(), t_2.z(),
         };
-        auto j_penetration_t = gml::transpose(j_penetration);
+        auto j_n_t = gml::transpose(j_n);
         auto baumgarte = bias / dt * depth;
 
+        // accumulate impulses
         double old_lambda_n = collision.contact_manifold.lambda_n;
-        double lambda_n = solve(m_inv, j_penetration, j_penetration_t, q_pre, baumgarte);
+        double lambda_n = solve(m_inv, j_n, j_n_t, q_pre, baumgarte);
         collision.contact_manifold.lambda_n += lambda_n;
+        // clamp to prevent objects pulling together for negative lambdas
         collision.contact_manifold.lambda_n = std::max(0.0, collision.contact_manifold.lambda_n);
+        // restore delta lambda after clamping
         lambda_n = collision.contact_manifold.lambda_n - old_lambda_n;
-        auto p_c = lambda_n * j_penetration_t;
+        auto p_c = lambda_n * j_n_t;
 
-#if 0
         // friction along u1
         const double friction_coefficient = 0.6;
         t_1 = gml::cross(r_a, u1);
         t_2 = gml::cross(r_b, u1);
-        gml::Matd<1, 12> j_friction_1{
+        gml::Matd<1, 12> j_f1{
                 -u1.x(), -u1.y(), -u1.z(),
                 u1.x(), u1.y(), u1.z(),
                 -t_1.x(), -t_1.y(), -t_1.z(),
                 t_2.x(), t_2.y(), t_2.z(),
         };
-        auto j_friction_1_t = gml::transpose(j_friction_1);
-        double lambda_friction_1 = solve(m_inv, j_friction_1, j_friction_1_t, q_pre, 0);
-#if 1
-        // TODO: clamping introduces lateral movement, is that expected?
-        lambda_friction_1 = gml::clamp(lambda_friction_1,
-                                       -friction_coefficient * lambda_n,
-                                       friction_coefficient * lambda_n);
-#endif
-        //p_c += lambda_friction_1 * j_friction_1_t;
+        auto j_f1_t = gml::transpose(j_f1);
+
+        // accumulate impulses
+        double old_lambda_f1 = collision.contact_manifold.lambda_f1;
+        double lambda_f1 = solve(m_inv, j_f1, j_f1_t, q_pre, 0); // no positional bias for friction constraint
+        collision.contact_manifold.lambda_f1 += lambda_f1;
+        // clamp with accumulated normal impulse for the Coulomb friction model
+        collision.contact_manifold.lambda_f1 = gml::clamp(
+                collision.contact_manifold.lambda_f1,
+                -friction_coefficient * collision.contact_manifold.lambda_n,
+                friction_coefficient * collision.contact_manifold.lambda_n);
+        // restore delta lambda after clamping
+        lambda_f1 = collision.contact_manifold.lambda_f1 - old_lambda_f1;
+        p_c += lambda_f1 * j_f1_t;
 
         // friction along u2
         t_1 = gml::cross(r_a, u2);
         t_2 = gml::cross(r_b, u2);
-        gml::Matd<1, 12> j_friction_2{
+        gml::Matd<1, 12> j_f2{
                 -u2.x(), -u2.y(), -u2.z(),
                 u2.x(), u2.y(), u2.z(),
                 -t_1.x(), -t_1.y(), -t_1.z(),
                 t_2.x(), t_2.y(), t_2.z(),
         };
-        auto j_friction_2_t = gml::transpose(j_friction_2);
-        double lambda_friction_2 = solve(m_inv, j_friction_2, j_friction_2_t, q_pre, 0);
-#if 1
-        // TODO: clamping introduces lateral movement, is that expected?
-        lambda_friction_2 = gml::clamp(lambda_friction_2,
-                                       -friction_coefficient * lambda_n,
-                                       friction_coefficient * lambda_n);
-#endif
-        //p_c += lambda_friction_2 * j_friction_2_t;
-#endif
+        auto j_f2_t = gml::transpose(j_f2);
+
+        // accumulate impulses
+        double old_lambda_f2 = collision.contact_manifold.lambda_f2;
+        double lambda_f2 = solve(m_inv, j_f2, j_f2_t, q_pre, 0); // no positional bias for friction constraint
+        collision.contact_manifold.lambda_f2 += lambda_f2;
+        // clamp with accumulated normal impulse for the Coulomb friction model
+        collision.contact_manifold.lambda_f2 = gml::clamp(
+                collision.contact_manifold.lambda_f2 + lambda_f2,
+                -friction_coefficient * collision.contact_manifold.lambda_n,
+                friction_coefficient * collision.contact_manifold.lambda_n);
+        // restore delta lambda after clamping
+        lambda_f2 = collision.contact_manifold.lambda_f2 - old_lambda_f2;
+        p_c += lambda_f2 * j_f2_t;
 
         auto q_post = q_pre + m_inv * p_c;
         a.velocity = {q_post(0, 0), q_post(1, 0), q_post(2, 0)};
@@ -223,9 +234,9 @@ namespace physics3d
             }
         }
 
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < m_solver_iterations; ++i) {
             for (auto& collision: collisions) {
-                resolve_collision(collision, 0.2, dt);
+                resolve_collision(collision, m_baumgarte_factor, dt);
             }
         }
 
