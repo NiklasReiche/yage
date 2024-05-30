@@ -120,7 +120,8 @@ namespace physics3d
         };
         auto j_n_t = gml::transpose(j_n);
         auto baumgarte_bias = -m_baumgarte_factor / dt * std::max(depth - m_penetration_slop, 0.0);
-        auto restitution_bias = restitution * gml::dot(v_rel, n); // TODO: wrong
+        auto v_rel_n = gml::dot(v_rel, n);
+        auto restitution_bias = restitution * std::min(v_rel_n + m_restitution_slop, 0.0);
         auto bias = baumgarte_bias + restitution_bias;
 
         // accumulate impulses
