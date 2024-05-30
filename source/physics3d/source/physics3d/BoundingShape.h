@@ -34,6 +34,7 @@ namespace physics3d
         double lambda_n{};
         double lambda_f1{};
         double lambda_f2{};
+        double lambda_rf{};
     };
 
     class CollisionVisitor

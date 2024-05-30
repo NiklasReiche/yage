@@ -98,7 +98,7 @@ namespace physics3d
         auto v_rel = collision.rel_v;
 
         const double friction_coefficient = a.friction * b.friction;
-        const double restitution = 0.9;
+        const double restitution = 0;
 
         // Gram-Schmidt method using the relative velocity as the initial vector for the projection
         gml::Vec3d u1 = v_rel - n * gml::dot(v_rel, n); // non-normalized, since it might be zero-length
@@ -121,7 +121,7 @@ namespace physics3d
         };
         auto j_n_t = gml::transpose(j_n);
         auto baumgarte_bias = -m_baumgarte_factor / dt * std::max(depth - m_penetration_slop, 0.0);
-        auto restitution_bias = restitution * gml::dot(v_rel, -n);
+        auto restitution_bias = restitution * gml::dot(v_rel, -n); // TODO: wrong
         auto bias = baumgarte_bias + restitution_bias;
 
         // accumulate impulses
@@ -134,9 +134,47 @@ namespace physics3d
         lambda_n = collision.contact_manifold.lambda_n - old_lambda_n;
         auto p_c = lambda_n * j_n_t;
 
+        auto q_post = q_pre + m_inv * p_c;
+        a.velocity = {q_post(0, 0), q_post(1, 0), q_post(2, 0)};
+        b.velocity = {q_post(3, 0), q_post(4, 0), q_post(5, 0)};
+        a.angularVelocity = {q_post(6, 0), q_post(7, 0), q_post(8, 0)};
+        b.angularVelocity = {q_post(9, 0), q_post(10, 0), q_post(11, 0)};
+    }
+
+    void Simulation::resolve_collision_f(Collision& collision)
+    {
+        auto& a = collision.rb_a;
+        auto& b = collision.rb_b;
+
+        auto m_inv = inverse_mass_matrix(a, b);
+
+        gml::Matd<12, 1> q_pre{
+                a.velocity.x(), a.velocity.y(), a.velocity.z(),
+                b.velocity.x(), b.velocity.y(), b.velocity.z(),
+                a.angularVelocity.x(), a.angularVelocity.y(), a.angularVelocity.z(),
+                b.angularVelocity.x(), b.angularVelocity.y(), b.angularVelocity.z(),
+        };
+
+        auto& r_a = collision.contact_manifold.contact.r_a;
+        auto& r_b = collision.contact_manifold.contact.r_b;
+        auto& n = collision.contact_manifold.contact.n;
+        auto v_rel = collision.rel_v;
+
+        const double friction_coefficient = a.friction * b.friction;
+
+        // Gram-Schmidt method using the relative velocity as the initial vector for the projection
+        gml::Vec3d u1 = v_rel - n * gml::dot(v_rel, n); // non-normalized, since it might be zero-length
+        gml::Vec3d u2;
+        if (gml::sqrLength(u1) < 0.0000001) { // u1 is parallel to n, so we need another approach
+            std::tie(u1, u2) = tangent_plane(n);
+        } else {
+            u1.normalize();
+            u2 = gml::cross(u1, n); // normalization not necessary, since u1 and n are already normalized
+        }
+
         // friction along u1
-        t_1 = gml::cross(r_a, u1);
-        t_2 = gml::cross(r_b, u1);
+        auto t_1 = gml::cross(r_a, u1);
+        auto t_2 = gml::cross(r_b, u1);
         gml::Matd<1, 12> j_f1{
                 -u1.x(), -u1.y(), -u1.z(),
                 u1.x(), u1.y(), u1.z(),
@@ -145,7 +183,7 @@ namespace physics3d
         };
         auto j_f1_t = gml::transpose(j_f1);
 
-        // accumulate impulses TODO: we may need to clamp after the normal impulse converges (i.e. at the end)
+        // accumulate impulses
         double old_lambda_f1 = collision.contact_manifold.lambda_f1;
         double lambda_f1 = solve(m_inv, j_f1, j_f1_t, q_pre, 0); // no positional bias for friction constraint
         collision.contact_manifold.lambda_f1 += lambda_f1;
@@ -156,7 +194,7 @@ namespace physics3d
                 friction_coefficient * collision.contact_manifold.lambda_n);
         // restore delta lambda after clamping
         lambda_f1 = collision.contact_manifold.lambda_f1 - old_lambda_f1;
-        p_c += lambda_f1 * j_f1_t;
+        auto p_c = lambda_f1 * j_f1_t;
 
         // friction along u2
         t_1 = gml::cross(r_a, u2);
@@ -239,6 +277,9 @@ namespace physics3d
         for (int i = 0; i < m_solver_iterations; ++i) {
             for (auto& collision: collisions) {
                 resolve_collision(collision, dt);
+            }
+            for (auto& collision: collisions) {
+                resolve_collision_f(collision);
             }
         }
 

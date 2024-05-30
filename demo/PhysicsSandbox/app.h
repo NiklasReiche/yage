@@ -72,7 +72,7 @@ public:
         window->show();
         std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
 
-#if 1
+#if 0
         const double epsilon = 0.00000001;
         const double height =
                 std::sqrt(-5 * 0.5 * 2 * radius * 5 * 0.5 * 2 * radius + 5 * 2 * radius * 5 * 2 * radius) / 5.;
@@ -80,7 +80,7 @@ public:
             for (int j = 0; j < i + 1; ++j) {
                 auto b = loadModel("models/billiard_ball/scene.gltf",
                                    physics3d::SphereShape(radius, mass),
-                                   gml::Vec3d(i * height + epsilon * i, 0,
+                                   gml::Vec3d(i * height + epsilon * i, 0.04,
                                               -(i * radius * 2) / 2.0 + j * radius * 2 + j * epsilon));
             }
         }
@@ -102,7 +102,7 @@ public:
                 physics3d::BoundingVolume{physics3d::BPlane{
                         .original_normal = {0, -1, 0},
                 }},
-                gml::Vec3d(0, -0.04, 0),
+                gml::Vec3d(0, 0, 0),
                 gml::quaternion::eulerAngle<double>(0, gml::toRad(0.0), gml::toRad(0.0)),
                 1.0);
         simulation.addRigidBody(ground);
@@ -119,7 +119,7 @@ public:
                         .original_normal = {0, 0, -1},
                 }},
                 gml::Vec3d(1, 0, 0),
-                gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double> / 2, 0, 0),
+                gml::quaternion::eulerAngle<double>(-std::numbers::pi_v<double> / 2, 0, 0),
                 1.0);
         simulation.addRigidBody(barrier1);
 
@@ -133,7 +133,7 @@ public:
                         .original_normal = {0, 0, -1},
                 }},
                 gml::Vec3d(0, 0, 1),
-                gml::Quatd(),
+        gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double>, 0, 0),
                 1.0);
         simulation.addRigidBody(barrier2);
 
@@ -147,7 +147,7 @@ public:
                         .original_normal = {0, 0, -1},
                 }},
                 gml::Vec3d(0, 0, -1),
-                gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double>, 0, 0),
+                gml::Quatd(),
                 1.0);
         simulation.addRigidBody(barrier3);
 
@@ -159,7 +159,7 @@ public:
                 physics3d::StaticShape(),
                 physics3d::BoundingVolume{physics3d::BPlane{}},
                 gml::Vec3d(-1, 0, 0),
-                gml::quaternion::eulerAngle<double>(-std::numbers::pi_v<double> / 2, 0, 0),
+                gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double> / 2, 0, 0),
                         1.0);
         simulation.addRigidBody(barrier4);
 
@@ -174,7 +174,7 @@ public:
 
         auto ball = loadModel("models/billiard_ball/scene.gltf",
                               physics3d::SphereShape(radius, mass),
-                              gml::Vec3d(-0.5, 0, 0));
+                              gml::Vec3d(-0.5, 0.04, 0));
         inputListener.ball = ball.get();
 
         auto point = glContext->getDrawableCreator()->createDrawable(std::vector<float>{},
