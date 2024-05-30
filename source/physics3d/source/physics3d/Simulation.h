@@ -13,6 +13,8 @@ namespace physics3d
         CollisionContactManifold contact_manifold;
         RigidBody& rb_a;
         RigidBody& rb_b;
+        double depth{};
+        gml::Vec3d rel_v{};
     };
 
 	class Simulation

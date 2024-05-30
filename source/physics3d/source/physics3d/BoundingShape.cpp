@@ -16,6 +16,8 @@ namespace physics3d
         contact.r_b = -contact.n * a.radius;
         contact.p_b = b.center + contact.r_b;
 
+        // TODO: maybe we should have one contact point in the center between the contacts?
+
         CollisionContactManifold result;
         result.contact = contact;
         return {result};

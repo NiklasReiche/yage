@@ -72,7 +72,7 @@ public:
         window->show();
         std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
 
-#if 0
+#if 1
         const double epsilon = 0.00000001;
         const double height =
                 std::sqrt(-5 * 0.5 * 2 * radius * 5 * 0.5 * 2 * radius + 5 * 2 * radius * 5 * 2 * radius) / 5.;

@@ -93,14 +93,9 @@ namespace physics3d
 
         auto& r_a = collision.contact_manifold.contact.r_a;
         auto& r_b = collision.contact_manifold.contact.r_b;
-        auto& p_a = collision.contact_manifold.contact.p_a;
-        auto& p_b = collision.contact_manifold.contact.p_b;
         auto& n = collision.contact_manifold.contact.n;
-        auto depth = gml::dot(p_b - p_a, -n);
-
-        auto v_abs_p_a = a.velocity + gml::cross(a.angularVelocity, r_a);
-        auto v_abs_p_b = b.velocity + gml::cross(b.angularVelocity, r_b);
-        auto v_rel = v_abs_p_b - v_abs_p_a;
+        auto depth = collision.depth;
+        auto v_rel = collision.rel_v;
 
         const double friction_coefficient = a.friction * b.friction;
         const double restitution = 0.9;
@@ -150,7 +145,7 @@ namespace physics3d
         };
         auto j_f1_t = gml::transpose(j_f1);
 
-        // accumulate impulses
+        // accumulate impulses TODO: we may need to clamp after the normal impulse converges (i.e. at the end)
         double old_lambda_f1 = collision.contact_manifold.lambda_f1;
         double lambda_f1 = solve(m_inv, j_f1, j_f1_t, q_pre, 0); // no positional bias for friction constraint
         collision.contact_manifold.lambda_f1 += lambda_f1;
@@ -226,10 +221,15 @@ namespace physics3d
 
                 auto result = std::visit(m_collision_visitor, a->m_bounding_volume, b->m_bounding_volume);
                 if (result.has_value()) {
+                    auto& contact = result.value();
+                    auto v_abs_p_a = a->velocity + gml::cross(a->angularVelocity, contact.contact.r_a);
+                    auto v_abs_p_b = b->velocity + gml::cross(b->angularVelocity, contact.contact.r_b);
                     Collision collision{
-                            .contact_manifold = result.value(),
+                            .contact_manifold = contact,
                             .rb_a = *a,
                             .rb_b = *b,
+                            .depth = gml::dot(contact.contact.p_b - contact.contact.p_a, -contact.contact.n),
+                            .rel_v = v_abs_p_b - v_abs_p_a,
                     };
                     collisions.push_back(collision);
                 }
