@@ -97,7 +97,7 @@ namespace physics3d
         auto depth = collision.depth;
         auto v_rel = collision.rel_v;
 
-        const double restitution = 0;
+        const double restitution = 0.5;
 
         // Gram-Schmidt method using the relative velocity as the initial vector for the projection
         gml::Vec3d u1 = v_rel - n * gml::dot(v_rel, n); // non-normalized, since it might be zero-length
@@ -120,7 +120,7 @@ namespace physics3d
         };
         auto j_n_t = gml::transpose(j_n);
         auto baumgarte_bias = -m_baumgarte_factor / dt * std::max(depth - m_penetration_slop, 0.0);
-        auto restitution_bias = restitution * gml::dot(v_rel, -n); // TODO: wrong
+        auto restitution_bias = restitution * gml::dot(v_rel, n); // TODO: wrong
         auto bias = baumgarte_bias + restitution_bias;
 
         // accumulate impulses

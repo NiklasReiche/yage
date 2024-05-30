@@ -82,7 +82,7 @@ public:
         }
 
         if (code == input::KeyEvent::Code::KEY_ENTER && action == input::KeyEvent::Action::PRESS && ball != nullptr) {
-            ball->applyForce(gml::Vec3d(2, 0, 0), ball->getPosition() + gml::Vec3d(0, 0, 0.03));
+            ball->applyForce(gml::Vec3d(10, 0, 0), ball->getPosition());
         }
 
         if (code == input::KeyEvent::Code::KEY_G && action == input::KeyEvent::Action::PRESS) {

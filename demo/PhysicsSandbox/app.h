@@ -174,7 +174,7 @@ public:
 
         auto ball = loadModel("models/billiard_ball/scene.gltf",
                               physics3d::SphereShape(radius, mass),
-                              gml::Vec3d(-0.5, 0.04, 0));
+                              gml::Vec3d(-0, 10, 0));
         inputListener.ball = ball.get();
 
         auto point = glContext->getDrawableCreator()->createDrawable(std::vector<float>{},
@@ -213,7 +213,7 @@ public:
     bool simulate = false;
 
 private:
-    const double radius = 0.03;
+    const double radius = 0.8;//0.03;
     const double mass = 0.17;
 
     std::shared_ptr<platform::IWindow> window;
