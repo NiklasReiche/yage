@@ -72,7 +72,8 @@ public:
         window->show();
         std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
 
-#if 0
+#if 1
+        const double start = 0.35;
         const double epsilon = 0.00000001;
         const double height =
                 std::sqrt(-5 * 0.5 * 2 * radius * 5 * 0.5 * 2 * radius + 5 * 2 * radius * 5 * 2 * radius) / 5.;
@@ -80,7 +81,7 @@ public:
             for (int j = 0; j < i + 1; ++j) {
                 auto b = loadModel("models/billiard_ball/scene.gltf",
                                    physics3d::SphereShape(radius, mass),
-                                   gml::Vec3d(i * height + epsilon * i, 0.04,
+                                   gml::Vec3d(start + i * height + epsilon * i, 0.031,
                                               -(i * radius * 2) / 2.0 + j * radius * 2 + j * epsilon));
             }
         }
@@ -174,7 +175,7 @@ public:
 
         auto ball = loadModel("models/billiard_ball/scene.gltf",
                               physics3d::SphereShape(radius, mass),
-                              gml::Vec3d(-0.5, 0.04, 0));
+                              gml::Vec3d(-0.5, 0.031, 0));
         inputListener.ball = ball.get();
 
         auto point = glContext->getDrawableCreator()->createDrawable(std::vector<float>{},
