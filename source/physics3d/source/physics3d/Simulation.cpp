@@ -97,7 +97,6 @@ namespace physics3d
         auto depth = collision.depth;
         auto v_rel = collision.rel_v;
 
-        const double friction_coefficient = a.friction * b.friction;
         const double restitution = 0;
 
         // Gram-Schmidt method using the relative velocity as the initial vector for the projection
@@ -227,6 +226,82 @@ namespace physics3d
         b.angularVelocity = {q_post(9, 0), q_post(10, 0), q_post(11, 0)};
     }
 
+    void Simulation::resolve_collision_rf(Collision& collision)
+    {
+        auto& a = collision.rb_a;
+        auto& b = collision.rb_b;
+
+        auto m_inv = inverse_mass_matrix(a, b);
+
+        gml::Matd<12, 1> q_pre{
+                a.velocity.x(), a.velocity.y(), a.velocity.z(),
+                b.velocity.x(), b.velocity.y(), b.velocity.z(),
+                a.angularVelocity.x(), a.angularVelocity.y(), a.angularVelocity.z(),
+                b.angularVelocity.x(), b.angularVelocity.y(), b.angularVelocity.z(),
+        };
+
+        auto& n = collision.contact_manifold.contact.n;
+        double spin_coefficient = 0.001; // TODO: model like with friction
+
+        gml::Matd<1, 12> j_spin{
+                0, 0, 0,
+                0, 0, 0,
+                -n.x(), -n.y(), -n.z(),
+                n.x(), n.y(), n.z(),
+        };
+        auto j_spin_t = gml::transpose(j_spin);
+
+        // accumulate impulses
+        double old_lambda_spin = collision.contact_manifold.lambda_rf_1;
+        double lambda_spin = solve(m_inv, j_spin, j_spin_t, q_pre, 0);
+        collision.contact_manifold.lambda_rf_1 += lambda_spin;
+        // clamp to prevent reversing spin // TODO: clamp to zero in direction of sign
+        // restore delta lambda after clamping
+        lambda_spin = collision.contact_manifold.lambda_rf_1 - old_lambda_spin;
+        auto p_c = spin_coefficient * lambda_spin * j_spin_t; // TODO: can we do something more specific?
+
+        auto [u1, u2] = tangent_plane(n);
+        gml::Matd<1, 12> j_u1{
+                0, 0, 0,
+                0, 0, 0,
+                -u1.x(), -u1.y(), -u1.z(),
+                u1.x(), u1.y(), u1.z(),
+        };
+        auto j_u1_t = gml::transpose(j_u1);
+
+        // accumulate impulses
+        double old_lambda_u1 = collision.contact_manifold.lambda_rf_2;
+        double lambda_u1 = solve(m_inv, j_u1, j_u1_t, q_pre, 0);
+        collision.contact_manifold.lambda_rf_2 += lambda_u1;
+        // clamp to prevent reversing spin // TODO: clamp to zero in direction of sign
+        // restore delta lambda after clamping
+        lambda_u1 = collision.contact_manifold.lambda_rf_2 - old_lambda_u1;
+        p_c += spin_coefficient * lambda_u1 * j_u1_t; // TODO: can we do something more specific?
+
+        gml::Matd<1, 12> j_u2{
+                0, 0, 0,
+                0, 0, 0,
+                -u2.x(), -u2.y(), -u2.z(),
+                u2.x(), u2.y(), u2.z(),
+        };
+        auto j_u2_t = gml::transpose(j_u2);
+
+        // accumulate impulses
+        double old_lambda_u2 = collision.contact_manifold.lambda_rf_3;
+        double lambda_u2 = solve(m_inv, j_u2, j_u2_t, q_pre, 0);
+        collision.contact_manifold.lambda_rf_3 += lambda_u2;
+        // clamp to prevent reversing spin // TODO: clamp to zero in direction of sign
+        // restore delta lambda after clamping
+        lambda_u2 = collision.contact_manifold.lambda_rf_3 - old_lambda_u2;
+        p_c += spin_coefficient * lambda_u2 * j_u2_t; // TODO: can we do something more specific?
+
+        auto q_post = q_pre + m_inv * p_c;
+        a.velocity = {q_post(0, 0), q_post(1, 0), q_post(2, 0)};
+        b.velocity = {q_post(3, 0), q_post(4, 0), q_post(5, 0)};
+        a.angularVelocity = {q_post(6, 0), q_post(7, 0), q_post(8, 0)};
+        b.angularVelocity = {q_post(9, 0), q_post(10, 0), q_post(11, 0)};
+    }
+
     void Simulation::integrate(double dt)
     {
         for (auto& particle: particles) {
@@ -280,6 +355,9 @@ namespace physics3d
             }
             for (auto& collision: collisions) {
                 resolve_collision_f(collision);
+            }
+            for (auto& collision: collisions) {
+                resolve_collision_rf(collision);
             }
         }
 

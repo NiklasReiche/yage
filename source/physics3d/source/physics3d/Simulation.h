@@ -48,6 +48,8 @@ namespace physics3d
 
         void resolve_collision_f(Collision& collision);
 
+        void resolve_collision_rf(Collision& collision);
+
         static double solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> j_t, gml::Matd<12, 1> q_pre, double b);
 
         static gml::Matd<12, 12> inverse_mass_matrix(RigidBody& a, RigidBody& b);
