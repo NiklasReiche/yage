@@ -22,10 +22,12 @@ namespace physics3d
 	public:
 		void integrate(double dt);
 
-		Particle& addParticle(const gml::Vec3d& position, const gml::Vec3d& velocity, double mass);
-
-        // TODO: make this a factory method
-		void addRigidBody(const std::shared_ptr<RigidBody>& rigidBody);
+        template<typename... Args>
+        std::shared_ptr<RigidBody> create_rigid_body(Args&&... args)
+        {
+            bodies.push_back(std::make_shared<RigidBody>(args...));
+            return bodies.back();
+        }
 
         void enable_gravity();
 
@@ -35,7 +37,6 @@ namespace physics3d
         const double m_restitution_slop = 0.2; // allowed relative velocity in the normal direction // TODO: if this is too low we somehow add energy to the system?
         const int m_solver_iterations = 10;
 
-		std::vector<Particle> particles;
 		std::vector<std::shared_ptr<RigidBody>> bodies;
         CollisionVisitor m_collision_visitor{};
         gml::Vec3d m_external_acceleration{};

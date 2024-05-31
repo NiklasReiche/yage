@@ -98,15 +98,14 @@ public:
                                                              pbrShaderNormalMapping).at(0);
 
 
-        auto ground = std::make_shared<physics3d::RigidBody>(
+        auto ground = simulation.create_rigid_body(
                 physics3d::StaticShape(),
                 physics3d::BoundingVolume{physics3d::BPlane{
                         .original_normal = {0, -1, 0},
                 }},
+                billiard_table,
                 gml::Vec3d(0, 0, 0),
-                gml::quaternion::eulerAngle<double>(0, gml::toRad(0.0), gml::toRad(0.0)),
-                1.0);
-        simulation.addRigidBody(ground);
+                gml::quaternion::eulerAngle<double>(0, 0, 0));
 
         auto scene_ground = std::make_shared<gl3d::SceneObject>();
         scene->addChild(scene_ground);
@@ -114,55 +113,51 @@ public:
 
         objects.emplace_back(scene_ground, ground);
 
-        auto barrier1 = std::make_shared<physics3d::RigidBody>(
+        auto barrier1 = simulation.create_rigid_body(
                 physics3d::StaticShape(),
                 physics3d::BoundingVolume{physics3d::BPlane{
                         .original_normal = {0, 0, -1},
                 }},
+                billiard_table,
                 gml::Vec3d(1, 0, 0),
-                gml::quaternion::eulerAngle<double>(-std::numbers::pi_v<double> / 2, 0, 0),
-                1.0);
-        simulation.addRigidBody(barrier1);
+                gml::quaternion::eulerAngle<double>(-std::numbers::pi_v<double> / 2, 0, 0));
 
         auto scene_barrier1 = std::make_shared<gl3d::SceneObject>();
         scene->addChild(scene_barrier1);
         scene_barrier1->bindMesh(barrier_mesh);
 
-        auto barrier2 = std::make_shared<physics3d::RigidBody>(
+        auto barrier2 = simulation.create_rigid_body(
                 physics3d::StaticShape(),
                 physics3d::BoundingVolume{physics3d::BPlane{
                         .original_normal = {0, 0, -1},
                 }},
+                billiard_table,
                 gml::Vec3d(0, 0, 1),
-        gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double>, 0, 0),
-                1.0);
-        simulation.addRigidBody(barrier2);
+                gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double>, 0, 0));
 
         auto scene_barrier2 = std::make_shared<gl3d::SceneObject>();
         scene->addChild(scene_barrier2);
         scene_barrier2->bindMesh(barrier_mesh);
 
-        auto barrier3 = std::make_shared<physics3d::RigidBody>(
+        auto barrier3 = simulation.create_rigid_body(
                 physics3d::StaticShape(),
                 physics3d::BoundingVolume{physics3d::BPlane{
                         .original_normal = {0, 0, -1},
                 }},
+                billiard_table,
                 gml::Vec3d(0, 0, -1),
-                gml::Quatd(),
-                1.0);
-        simulation.addRigidBody(barrier3);
+                gml::Quatd());
 
         auto scene_barrier3 = std::make_shared<gl3d::SceneObject>();
         scene->addChild(scene_barrier3);
         scene_barrier3->bindMesh(barrier_mesh);
 
-        auto barrier4 = std::make_shared<physics3d::RigidBody>(
+        auto barrier4 = simulation.create_rigid_body(
                 physics3d::StaticShape(),
                 physics3d::BoundingVolume{physics3d::BPlane{}},
+                billiard_table,
                 gml::Vec3d(-1, 0, 0),
-                gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double> / 2, 0, 0),
-                        1.0);
-        simulation.addRigidBody(barrier4);
+                gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double> / 2, 0, 0));
 
         auto scene_barrier4 = std::make_shared<gl3d::SceneObject>();
         scene->addChild(scene_barrier4);
@@ -238,13 +233,27 @@ private:
 
     std::shared_ptr<gl3d::Mesh> ball_mesh;
 
+    physics3d::Material billiard_ball{
+            .restitution = 0.99,
+            .kinetic_friction = 0.2,
+            .spinning_friction = 0.0001,
+            .rolling_friction = 0.0001,
+    };
+
+    physics3d::Material billiard_table{
+            .restitution = 0.9,
+            .kinetic_friction = 1.0,
+            .spinning_friction = 1.0,
+            .rolling_friction = 1.0,
+    };
+
 
     void updateSceneGraph()
     {
         for (const auto& [object, rb]: objects) {
             object->setTransform(
-                    gml::matrix::translate(rb->getPosition()) *
-                    gml::matrix::fromQuaternion(rb->getOrientation()) *
+                    gml::matrix::translate(rb->position()) *
+                    gml::matrix::fromQuaternion(rb->orientation()) *
                     gml::matrix::scale(object->getTransform().getScale())
             );
         }
@@ -265,16 +274,15 @@ private:
         scene->addChild(scene_object);
         scene_object->bindMesh(ball_mesh);
 
-        auto rb = std::make_shared<physics3d::RigidBody>(
+        auto rb = simulation.create_rigid_body(
                 shape,
                 physics3d::BoundingVolume{physics3d::BSphere{
                         .radius = radius,
                 }},
+                billiard_ball,
                 position,
                 gml::quaternion::fromMatrix(
-                        gml::matrix::axisAngle(gml::Vec3d(0, 0, 1), std::numbers::pi_v<double> / 2).getRotation()),
-                0.2);
-        simulation.addRigidBody(rb);
+                        gml::matrix::axisAngle(gml::Vec3d(0, 0, 1), std::numbers::pi_v<double> / 2).getRotation()));
 
         objects.emplace_back(scene_object, rb);
         return rb;

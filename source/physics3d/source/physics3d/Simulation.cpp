@@ -8,14 +8,14 @@ namespace physics3d
     {
         // TODO: instead of this sparse matrix multiplication, use the direct formula for the effective mass matrix
         gml::Matd<12, 12> m_inv;
-        m_inv(0, 0) = a.inertia_shape.inverse_mass();
-        m_inv(1, 1) = a.inertia_shape.inverse_mass();
-        m_inv(2, 2) = a.inertia_shape.inverse_mass();
-        m_inv(3, 3) = b.inertia_shape.inverse_mass();
-        m_inv(4, 4) = b.inertia_shape.inverse_mass();
-        m_inv(5, 5) = b.inertia_shape.inverse_mass();
+        m_inv(0, 0) = a.m_inertia_shape.inverse_mass();
+        m_inv(1, 1) = a.m_inertia_shape.inverse_mass();
+        m_inv(2, 2) = a.m_inertia_shape.inverse_mass();
+        m_inv(3, 3) = b.m_inertia_shape.inverse_mass();
+        m_inv(4, 4) = b.m_inertia_shape.inverse_mass();
+        m_inv(5, 5) = b.m_inertia_shape.inverse_mass();
 
-        auto inv_inertia_a = a.inertia_shape.inverse_inertia_tensor();
+        auto inv_inertia_a = a.m_inertia_shape.inverse_inertia_tensor();
         m_inv(6, 6) = inv_inertia_a(0, 0);
         m_inv(6, 7) = inv_inertia_a(0, 1);
         m_inv(6, 8) = inv_inertia_a(0, 2);
@@ -26,7 +26,7 @@ namespace physics3d
         m_inv(8, 7) = inv_inertia_a(2, 1);
         m_inv(8, 8) = inv_inertia_a(2, 2);
 
-        auto inv_inertia_b = b.inertia_shape.inverse_inertia_tensor();
+        auto inv_inertia_b = b.m_inertia_shape.inverse_inertia_tensor();
         m_inv(9, 9) = inv_inertia_b(0, 0);
         m_inv(9, 10) = inv_inertia_b(0, 1);
         m_inv(9, 11) = inv_inertia_b(0, 2);
@@ -85,10 +85,10 @@ namespace physics3d
         auto m_inv = inverse_mass_matrix(a, b);
 
         gml::Matd<12, 1> q_pre{
-                a.velocity.x(), a.velocity.y(), a.velocity.z(),
-                b.velocity.x(), b.velocity.y(), b.velocity.z(),
-                a.angularVelocity.x(), a.angularVelocity.y(), a.angularVelocity.z(),
-                b.angularVelocity.x(), b.angularVelocity.y(), b.angularVelocity.z(),
+                a.m_velocity.x(), a.m_velocity.y(), a.m_velocity.z(),
+                b.m_velocity.x(), b.m_velocity.y(), b.m_velocity.z(),
+                a.m_angular_velocity.x(), a.m_angular_velocity.y(), a.m_angular_velocity.z(),
+                b.m_angular_velocity.x(), b.m_angular_velocity.y(), b.m_angular_velocity.z(),
         };
 
         auto& r_a = collision.contact_manifold.contact.r_a;
@@ -96,8 +96,6 @@ namespace physics3d
         auto& n = collision.contact_manifold.contact.n;
         auto depth = collision.depth;
         auto v_rel = collision.rel_v;
-
-        const double restitution = 0.95;
 
         // Gram-Schmidt method using the relative velocity as the initial vector for the projection
         gml::Vec3d u1 = v_rel - n * gml::dot(v_rel, n); // non-normalized, since it might be zero-length
@@ -122,6 +120,7 @@ namespace physics3d
         auto baumgarte_bias = -m_baumgarte_factor / dt * std::max(depth - m_penetration_slop, 0.0);
         auto v_rel_n = gml::dot(v_rel, n);
         // TODO: maybe we can scale the slop with something
+        const double restitution = std::min(a.material.restitution, b.material.restitution);
         auto restitution_bias = restitution * std::min(v_rel_n + m_restitution_slop, 0.0);
         auto bias = baumgarte_bias + restitution_bias;
 
@@ -136,10 +135,10 @@ namespace physics3d
         auto p_c = lambda_n * j_n_t;
 
         auto q_post = q_pre + m_inv * p_c;
-        a.velocity = {q_post(0, 0), q_post(1, 0), q_post(2, 0)};
-        b.velocity = {q_post(3, 0), q_post(4, 0), q_post(5, 0)};
-        a.angularVelocity = {q_post(6, 0), q_post(7, 0), q_post(8, 0)};
-        b.angularVelocity = {q_post(9, 0), q_post(10, 0), q_post(11, 0)};
+        a.m_velocity = {q_post(0, 0), q_post(1, 0), q_post(2, 0)};
+        b.m_velocity = {q_post(3, 0), q_post(4, 0), q_post(5, 0)};
+        a.m_angular_velocity = {q_post(6, 0), q_post(7, 0), q_post(8, 0)};
+        b.m_angular_velocity = {q_post(9, 0), q_post(10, 0), q_post(11, 0)};
     }
 
     void Simulation::resolve_collision_f(Collision& collision)
@@ -150,10 +149,10 @@ namespace physics3d
         auto m_inv = inverse_mass_matrix(a, b);
 
         gml::Matd<12, 1> q_pre{
-                a.velocity.x(), a.velocity.y(), a.velocity.z(),
-                b.velocity.x(), b.velocity.y(), b.velocity.z(),
-                a.angularVelocity.x(), a.angularVelocity.y(), a.angularVelocity.z(),
-                b.angularVelocity.x(), b.angularVelocity.y(), b.angularVelocity.z(),
+                a.m_velocity.x(), a.m_velocity.y(), a.m_velocity.z(),
+                b.m_velocity.x(), b.m_velocity.y(), b.m_velocity.z(),
+                a.m_angular_velocity.x(), a.m_angular_velocity.y(), a.m_angular_velocity.z(),
+                b.m_angular_velocity.x(), b.m_angular_velocity.y(), b.m_angular_velocity.z(),
         };
 
         auto& r_a = collision.contact_manifold.contact.r_a;
@@ -161,7 +160,7 @@ namespace physics3d
         auto& n = collision.contact_manifold.contact.n;
         auto v_rel = collision.rel_v;
 
-        const double friction_coefficient = a.friction * b.friction;
+        const double friction_coefficient = a.material.kinetic_friction * b.material.kinetic_friction;
 
         // Gram-Schmidt method using the relative velocity as the initial vector for the projection
         gml::Vec3d u1 = v_rel - n * gml::dot(v_rel, n); // non-normalized, since it might be zero-length
@@ -222,10 +221,10 @@ namespace physics3d
         p_c += lambda_f2 * j_f2_t;
 
         auto q_post = q_pre + m_inv * p_c;
-        a.velocity = {q_post(0, 0), q_post(1, 0), q_post(2, 0)};
-        b.velocity = {q_post(3, 0), q_post(4, 0), q_post(5, 0)};
-        a.angularVelocity = {q_post(6, 0), q_post(7, 0), q_post(8, 0)};
-        b.angularVelocity = {q_post(9, 0), q_post(10, 0), q_post(11, 0)};
+        a.m_velocity = {q_post(0, 0), q_post(1, 0), q_post(2, 0)};
+        b.m_velocity = {q_post(3, 0), q_post(4, 0), q_post(5, 0)};
+        a.m_angular_velocity = {q_post(6, 0), q_post(7, 0), q_post(8, 0)};
+        b.m_angular_velocity = {q_post(9, 0), q_post(10, 0), q_post(11, 0)};
     }
 
     void Simulation::resolve_collision_rf(Collision& collision)
@@ -236,10 +235,10 @@ namespace physics3d
         auto m_inv = inverse_mass_matrix(a, b);
 
         gml::Matd<12, 1> q_pre{
-                a.velocity.x(), a.velocity.y(), a.velocity.z(),
-                b.velocity.x(), b.velocity.y(), b.velocity.z(),
-                a.angularVelocity.x(), a.angularVelocity.y(), a.angularVelocity.z(),
-                b.angularVelocity.x(), b.angularVelocity.y(), b.angularVelocity.z(),
+                a.m_velocity.x(), a.m_velocity.y(), a.m_velocity.z(),
+                b.m_velocity.x(), b.m_velocity.y(), b.m_velocity.z(),
+                a.m_angular_velocity.x(), a.m_angular_velocity.y(), a.m_angular_velocity.z(),
+                b.m_angular_velocity.x(), b.m_angular_velocity.y(), b.m_angular_velocity.z(),
         };
 
         auto& n = collision.contact_manifold.contact.n;
@@ -298,32 +297,25 @@ namespace physics3d
         p_c += spin_coefficient * lambda_u2 * j_u2_t; // TODO: can we do something more specific?
 
         auto q_post = q_pre + m_inv * p_c;
-        a.velocity = {q_post(0, 0), q_post(1, 0), q_post(2, 0)};
-        b.velocity = {q_post(3, 0), q_post(4, 0), q_post(5, 0)};
-        a.angularVelocity = {q_post(6, 0), q_post(7, 0), q_post(8, 0)};
-        b.angularVelocity = {q_post(9, 0), q_post(10, 0), q_post(11, 0)};
+        a.m_velocity = {q_post(0, 0), q_post(1, 0), q_post(2, 0)};
+        b.m_velocity = {q_post(3, 0), q_post(4, 0), q_post(5, 0)};
+        a.m_angular_velocity = {q_post(6, 0), q_post(7, 0), q_post(8, 0)};
+        b.m_angular_velocity = {q_post(9, 0), q_post(10, 0), q_post(11, 0)};
     }
 
     void Simulation::integrate(double dt)
     {
-        for (auto& particle: particles) {
-            particle.velocity = particle.velocity + particle.force / particle.mass * dt;
-            particle.position = particle.position + particle.velocity * dt;
-            particle.force = gml::Vec3d(0, 0, 0);
-        }
-
-
         for (auto& rigidBody: bodies) {
             // external forces
-            if (rigidBody->inertia_shape.inverse_mass() > 0) {
-                rigidBody->velocity += m_external_acceleration * dt;
+            if (rigidBody->m_inertia_shape.inverse_mass() > 0) {
+                rigidBody->m_velocity += m_external_acceleration * dt;
             }
 
             // linear component
-            rigidBody->velocity += rigidBody->inertia_shape.inverse_mass() * rigidBody->force * dt;
+            rigidBody->m_velocity += rigidBody->m_inertia_shape.inverse_mass() * rigidBody->m_force * dt;
 
             // angular component
-            rigidBody->angularVelocity += rigidBody->inertia_shape.inverse_inertia_tensor() * rigidBody->torque * dt;
+            rigidBody->m_angular_velocity += rigidBody->m_inertia_shape.inverse_inertia_tensor() * rigidBody->m_torque * dt;
         }
 
         std::vector<Collision> collisions;
@@ -337,8 +329,8 @@ namespace physics3d
                 auto result = std::visit(m_collision_visitor, a->m_bounding_volume, b->m_bounding_volume);
                 if (result.has_value()) {
                     auto& contact = result.value();
-                    auto v_abs_p_a = a->velocity + gml::cross(a->angularVelocity, contact.contact.r_a);
-                    auto v_abs_p_b = b->velocity + gml::cross(b->angularVelocity, contact.contact.r_b);
+                    auto v_abs_p_a = a->m_velocity + gml::cross(a->m_angular_velocity, contact.contact.r_a);
+                    auto v_abs_p_b = b->m_velocity + gml::cross(b->m_angular_velocity, contact.contact.r_b);
                     Collision collision{
                             .contact_manifold = contact,
                             .rb_a = *a,
@@ -365,26 +357,16 @@ namespace physics3d
 
         for (auto& rigidBody: bodies) {
             // linear component
-            rigidBody->position += rigidBody->velocity * dt;
-            rigidBody->force = gml::Vec3d();
+            rigidBody->m_position += rigidBody->m_velocity * dt;
+            rigidBody->m_force = gml::Vec3d();
 
             // angular component
-            rigidBody->orientation += 0.5 * gml::Quatd(rigidBody->angularVelocity) * rigidBody->orientation * dt;
-            rigidBody->orientation.normalize();
-            rigidBody->torque = gml::Vec3d();
+            rigidBody->m_orientation += 0.5 * gml::Quatd(rigidBody->m_angular_velocity) * rigidBody->m_orientation * dt;
+            rigidBody->m_orientation.normalize();
+            rigidBody->m_torque = gml::Vec3d();
 
             rigidBody->update_bounding_volume();
         }
-    }
-
-    Particle& Simulation::addParticle(const gml::Vec3d& position, const gml::Vec3d& velocity, double mass)
-    {
-        return particles.emplace_back(position, velocity, mass);
-    }
-
-    void Simulation::addRigidBody(const std::shared_ptr<RigidBody>& rigidBody)
-    {
-        bodies.emplace_back(rigidBody);
     }
 
     void Simulation::enable_gravity()

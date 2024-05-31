@@ -13,7 +13,7 @@
 
         <activity
           android:name="android.app.NativeActivity"
-          android:configChanges="orientation|keyboardHidden" >
+          android:configChanges="m_orientation|keyboardHidden" >
           <meta-data
             android:name="android.app.lib_name"
             android:value="native-lib" />
