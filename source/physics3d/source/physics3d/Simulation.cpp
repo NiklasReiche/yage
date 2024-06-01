@@ -90,25 +90,41 @@ namespace physics3d
 
     void Simulation::update(double dt)
     {
-        for (auto& rigidBody: bodies) {
+        std::vector<std::size_t> indices_to_delete;
+
+        for (std::size_t i = 0; i < bodies.size(); ++i) {
+            auto& rb = bodies.at(i);
+
+            if (rb->m_should_destroy) {
+                indices_to_delete.push_back(i);
+                continue;
+            }
+
             // external forces
-            if (rigidBody->m_inertia_shape.inverse_mass() > 0) {
-                rigidBody->m_velocity += m_external_acceleration * dt;
+            if (rb->m_inertia_shape.inverse_mass() > 0) {
+                rb->m_velocity += m_external_acceleration * dt;
             }
 
             // linear component
-            rigidBody->m_velocity += rigidBody->m_inertia_shape.inverse_mass() * rigidBody->m_force * dt;
+            rb->m_velocity += rb->m_inertia_shape.inverse_mass() * rb->m_force * dt;
 
             // angular component
-            rigidBody->m_angular_velocity +=
-                    rigidBody->m_inertia_shape.inverse_inertia_tensor() * rigidBody->m_torque * dt;
+            rb->m_angular_velocity +=
+                    rb->m_inertia_shape.inverse_inertia_tensor() * rb->m_torque * dt;
+        }
+
+        // erase bodies marked for deletion
+        std::ptrdiff_t n_deleted = 0;
+        for (std::size_t i : indices_to_delete) {
+            bodies.erase(bodies.begin() + static_cast<std::ptrdiff_t>(i) - n_deleted);
+            n_deleted++;
         }
 
         m_penetration_constraints.clear();
         m_friction_constraints.clear();
         m_rolling_friction_constraints.clear();
 
-        // narrow phase
+        // collision detection narrow phase
         for (std::size_t i = 0; i < bodies.size() - 1; ++i) {
             auto& rb_a = bodies.at(i);
             for (std::size_t j = i + 1; j < bodies.size(); ++j) {
