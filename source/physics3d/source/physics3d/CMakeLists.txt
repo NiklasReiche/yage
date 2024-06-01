@@ -1,7 +1,5 @@
 target_sources(yage_physics3d
 	PRIVATE
-		Particle.h
-		Particle.cpp
 		RigidBody.h
 		RigidBody.cpp
 		Simulation.h
