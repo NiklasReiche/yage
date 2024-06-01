@@ -29,7 +29,7 @@ Provides a framework for building simple hierarchical GUIs with some preliminary
 TODO: add screenshots
 
 ### Physics simulation:
-TODO add screenshots
+![New Project](https://github.com/NiklasReiche/yage/assets/29310846/33ae2170-e69c-4650-bbad-0cdec81dcc04)
 
 ### GUI showcase:
 >![gui_demo_WolSdPGhhf](https://github.com/NiklasReiche/yage/assets/29310846/2a8c30e1-f8b3-4e37-9a8d-a6393054becd)
