@@ -392,7 +392,7 @@ namespace physics3d
 
         // once all constraints are created, we can construct the dependencies
         for (std::size_t i = 0; i < friction_constraints.size(); ++i) {
-            friction_constraints.at(i).dependent_constraint = {&penetration_constraints.at(i % 2)};
+            friction_constraints.at(i).dependent_constraint = {&penetration_constraints.at(i / 2)};
         }
 
         for (int i = 0; i < m_solver_iterations; ++i) {
@@ -503,7 +503,8 @@ namespace physics3d
                 .m_inv = inverse_mass_matrix(rb_a, rb_b),
                 .j = j,
                 .j_t = gml::transpose(j),
-                .bias = baumgarte_bias + restitution_bias,
+                // don't add the biases, since the baumgarte bias is already satisfied if there's enough restitution
+                .bias = std::min(baumgarte_bias, restitution_bias),
                 .rb_a = rb_a,
                 .rb_b = rb_b,
         };

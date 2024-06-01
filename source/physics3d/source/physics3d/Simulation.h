@@ -25,7 +25,7 @@ namespace physics3d
 	private:
         const double m_baumgarte_factor = 0.2;
         const double m_penetration_slop = 0.0001; // allowed penetration distance in meters
-        const double m_restitution_slop = 0.2; // allowed relative velocity in the normal direction // TODO: if this is too low we somehow add energy to the system?
+        const double m_restitution_slop = 0.2; // allowed relative velocity in the normal direction
         const int m_solver_iterations = 10;
 
         std::vector<std::shared_ptr<RigidBody>> bodies;
