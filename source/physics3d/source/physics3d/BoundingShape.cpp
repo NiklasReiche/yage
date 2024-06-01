@@ -8,6 +8,26 @@ namespace physics3d
         return gml::dot(p_b - p_a, -n);
     }
 
+    std::optional<ContactManifold> CollisionVisitor::operator()(const BNoCollider&, const BNoCollider&)
+    {
+        return {}; // no collision with non-existent collider
+    }
+
+    std::optional<ContactManifold> CollisionVisitor::operator()(const BNoCollider&, const BSphere&)
+    {
+        return {}; // no collision with non-existent collider
+    }
+
+    std::optional<ContactManifold> CollisionVisitor::operator()(const BNoCollider&, const BPlane&)
+    {
+        return {}; // no collision with non-existent collider
+    }
+
+    std::optional<ContactManifold> CollisionVisitor::operator()(const BSphere&, const BNoCollider&)
+    {
+        return {}; // no collision with non-existent collider
+    }
+
     std::optional<ContactManifold> CollisionVisitor::operator()(const BSphere& a, const BSphere& b)
     {
         auto ab = b.center - a.center;
@@ -52,6 +72,11 @@ namespace physics3d
         return {manifold};
     }
 
+    std::optional<ContactManifold> CollisionVisitor::operator()(const BPlane&, const BNoCollider&)
+    {
+        return {}; // no collision with non-existent collider
+    }
+
     std::optional<ContactManifold> CollisionVisitor::operator()(const BPlane& a, const BSphere& b)
     {
         // dist is positive if the circle collides on the outer side and negative otherwise (b.normal points outward)
@@ -75,7 +100,7 @@ namespace physics3d
         return {manifold};
     }
 
-    std::optional<ContactManifold> CollisionVisitor::operator()(const BPlane& a, const BPlane& b)
+    std::optional<ContactManifold> CollisionVisitor::operator()(const BPlane&, const BPlane&)
     {
         return {}; // planes should probably not collide with themselves, since they are infinite
     }

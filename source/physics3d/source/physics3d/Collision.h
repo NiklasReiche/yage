@@ -8,6 +8,9 @@
 
 namespace physics3d
 {
+    /**
+     * Represents a point of contact between two colliding bodies.
+     */
     struct ContactPoint
     {
         /**
@@ -46,8 +49,14 @@ namespace physics3d
         double rel_v_n{};
     };
 
+    /**
+     * Represents a collision containing one or more contact points between two colliding bodies.
+     */
     struct ContactManifold
     {
+        /**
+         * Points of contact for this collision. Must contain at east one contact point.
+         */
         std::vector<ContactPoint> contacts;
 
         /**
@@ -66,16 +75,26 @@ namespace physics3d
         gml::Vec3d tangent_2;
     };
 
-    struct Collision
-    {
-        ContactManifold contact_manifold;
-    };
-
+    /**
+     * Represent a singular constraint between two bodies to be solved by the constraint solver.
+     */
     struct Constraint
     {
+        /**
+         * The inverted mass matrix.
+         */
         const gml::Matd<12, 12> m_inv;
+
+        /**
+         * The Jacobian.
+         */
         const gml::Matd<1, 12> j;
+
+        /**
+         * The transpose of the Jacobian.
+         */
         const gml::Matd<12, 1> j_t;
+
         const double bias{};
 
         RigidBody& rb_a;
@@ -83,6 +102,9 @@ namespace physics3d
 
         double accumulated_lambda{};
 
+        /**
+         * An optional constraint that this constraint depends on.
+         */
         std::optional<const Constraint *> dependent_constraint{};
     };
 }

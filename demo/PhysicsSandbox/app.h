@@ -184,7 +184,7 @@ public:
             inputListener.applyUpdate();
 
             if (simulate) {
-                simulation.integrate(1.0 / 60);
+                simulation.update(1.0 / 60);
             }
 
             updateSceneGraph();
@@ -236,14 +236,12 @@ private:
     physics3d::Material billiard_ball{
             .restitution = 0.99,
             .kinetic_friction = 0.2,
-            .spinning_friction = 0.0001,
-            .rolling_friction = 0.0001,
+            .rolling_friction = 0.001,
     };
 
     physics3d::Material billiard_table{
             .restitution = 0.9,
             .kinetic_friction = 1.0,
-            .spinning_friction = 1.0,
             .rolling_friction = 1.0,
     };
 

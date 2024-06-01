@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <variant>
 
 #include <gml/vector.h>
 #include <gml/quaternion.h>
@@ -11,8 +10,6 @@
 
 namespace physics3d
 {
-    using BoundingVolume = std::variant<BSphere, BPlane>;
-
     /**
      * Contains properties related to bounciness and friction for rigid bodies.
      */
@@ -20,7 +17,6 @@ namespace physics3d
     {
         double restitution{};
         double kinetic_friction{};
-        double spinning_friction{};
         double rolling_friction{};
     };
 

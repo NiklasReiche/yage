@@ -28,6 +28,7 @@ namespace physics3d
     void RigidBody::update_bounding_volume()
     {
         std::visit(utils::overload{
+                [](BNoCollider&) {},
                 [this](BSphere& sphere) {
                     sphere.center = m_position + m_bounding_volume_offset;
                 },
