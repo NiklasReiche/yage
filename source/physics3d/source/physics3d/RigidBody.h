@@ -1,10 +1,10 @@
 #pragma once
 
 #include <memory>
+#include <variant>
 
 #include <gml/vector.h>
 #include <gml/quaternion.h>
-#include <variant>
 
 #include "InertiaShape.h"
 #include "BoundingShape.h"

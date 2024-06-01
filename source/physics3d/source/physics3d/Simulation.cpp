@@ -40,7 +40,8 @@ namespace physics3d
         return m_inv;
     }
 
-    double Simulation::solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> j_t, gml::Matd<12, 1> q_pre, double b)
+    double Simulation::solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> j_t, gml::Matd<12, 1> q_pre,
+                             double b)
     {
         auto nominator = -(j * q_pre + gml::Matd<1, 1>(b));
         auto denominator = j * m_inv * j_t;
@@ -77,6 +78,27 @@ namespace physics3d
         return {u1, u2};
     }
 
+
+    double Simulation::solve_constraint(Constraint& constraint)
+    {
+        auto& a = constraint.rb_a;
+        auto& b = constraint.rb_b;
+
+        gml::Matd<12, 1> q_pre{
+                a.m_velocity.x(), a.m_velocity.y(), a.m_velocity.z(),
+                b.m_velocity.x(), b.m_velocity.y(), b.m_velocity.z(),
+                a.m_angular_velocity.x(), a.m_angular_velocity.y(), a.m_angular_velocity.z(),
+                b.m_angular_velocity.x(), b.m_angular_velocity.y(), b.m_angular_velocity.z(),
+        };
+
+        gml::Matd<1, 1> nominator = -(constraint.j * q_pre + gml::Matd<1, 1>(constraint.bias));
+        gml::Matd<1, 1> denominator = constraint.j * constraint.m_inv * constraint.j_t;
+        double delta_lambda = nominator(0, 0) / denominator(0, 0);
+
+        return delta_lambda;
+    }
+
+#if 0
     void Simulation::resolve_collision(Collision& collision, double dt)
     {
         auto& a = collision.rb_a;
@@ -91,9 +113,9 @@ namespace physics3d
                 b.m_angular_velocity.x(), b.m_angular_velocity.y(), b.m_angular_velocity.z(),
         };
 
-        auto& r_a = collision.contact_manifold.contact.r_a;
-        auto& r_b = collision.contact_manifold.contact.r_b;
-        auto& n = collision.contact_manifold.contact.n;
+        auto& r_a = collision.contact_manifold.contacts.r_a;
+        auto& r_b = collision.contact_manifold.contacts.r_b;
+        auto& n = collision.contact_manifold.contacts.normal;
         auto depth = collision.depth;
         auto v_rel = collision.rel_v;
 
@@ -111,10 +133,10 @@ namespace physics3d
         auto t_1 = gml::cross(r_a, n);
         auto t_2 = gml::cross(r_b, n);
         gml::Matd<1, 12> j_n{
-            -n.x(), -n.y(), -n.z(),
-            n.x(), n.y(), n.z(),
-            -t_1.x(), -t_1.y(), -t_1.z(),
-            t_2.x(), t_2.y(), t_2.z(),
+                -n.x(), -n.y(), -n.z(),
+                n.x(), n.y(), n.z(),
+                -t_1.x(), -t_1.y(), -t_1.z(),
+                t_2.x(), t_2.y(), t_2.z(),
         };
         auto j_n_t = gml::transpose(j_n);
         auto baumgarte_bias = -m_baumgarte_factor / dt * std::max(depth - m_penetration_slop, 0.0);
@@ -155,9 +177,9 @@ namespace physics3d
                 b.m_angular_velocity.x(), b.m_angular_velocity.y(), b.m_angular_velocity.z(),
         };
 
-        auto& r_a = collision.contact_manifold.contact.r_a;
-        auto& r_b = collision.contact_manifold.contact.r_b;
-        auto& n = collision.contact_manifold.contact.n;
+        auto& r_a = collision.contact_manifold.contacts.r_a;
+        auto& r_b = collision.contact_manifold.contacts.r_b;
+        auto& n = collision.contact_manifold.contacts.normal;
         auto v_rel = collision.rel_v;
 
         const double friction_coefficient = a.material.kinetic_friction * b.material.kinetic_friction;
@@ -241,7 +263,7 @@ namespace physics3d
                 b.m_angular_velocity.x(), b.m_angular_velocity.y(), b.m_angular_velocity.z(),
         };
 
-        auto& n = collision.contact_manifold.contact.n;
+        auto& n = collision.contact_manifold.contacts.normal;
         double spin_coefficient = 0.0005; // TODO: model like with friction
 
         gml::Matd<1, 12> j_spin{
@@ -302,6 +324,7 @@ namespace physics3d
         a.m_angular_velocity = {q_post(6, 0), q_post(7, 0), q_post(8, 0)};
         b.m_angular_velocity = {q_post(9, 0), q_post(10, 0), q_post(11, 0)};
     }
+#endif
 
     void Simulation::integrate(double dt)
     {
@@ -315,10 +338,14 @@ namespace physics3d
             rigidBody->m_velocity += rigidBody->m_inertia_shape.inverse_mass() * rigidBody->m_force * dt;
 
             // angular component
-            rigidBody->m_angular_velocity += rigidBody->m_inertia_shape.inverse_inertia_tensor() * rigidBody->m_torque * dt;
+            rigidBody->m_angular_velocity +=
+                    rigidBody->m_inertia_shape.inverse_inertia_tensor() * rigidBody->m_torque * dt;
         }
 
-        std::vector<Collision> collisions;
+        std::vector<Constraint> penetration_constraints;
+        std::vector<Constraint> friction_constraints;
+        std::vector<Constraint> spinning_friction_constraints;
+        std::vector<Constraint> rolling_friction_constraints;
 
         // narrow phase
         for (std::size_t i = 0; i < bodies.size() - 1; ++i) {
@@ -328,30 +355,110 @@ namespace physics3d
 
                 auto result = std::visit(m_collision_visitor, a->m_bounding_volume, b->m_bounding_volume);
                 if (result.has_value()) {
-                    auto& contact = result.value();
-                    auto v_abs_p_a = a->m_velocity + gml::cross(a->m_angular_velocity, contact.contact.r_a);
-                    auto v_abs_p_b = b->m_velocity + gml::cross(b->m_angular_velocity, contact.contact.r_b);
-                    Collision collision{
-                            .contact_manifold = contact,
-                            .rb_a = *a,
-                            .rb_b = *b,
-                            .depth = gml::dot(contact.contact.p_b - contact.contact.p_a, -contact.contact.n),
-                            .rel_v = v_abs_p_b - v_abs_p_a,
-                    };
-                    collisions.push_back(collision);
+                    auto& manifold = result.value();
+                    for (auto& contact: manifold.contacts) {
+                        auto v_abs_p_a = a->m_velocity + gml::cross(a->m_angular_velocity, contact.r_a);
+                        auto v_abs_p_b = b->m_velocity + gml::cross(b->m_angular_velocity, contact.r_b);
+                        contact.rel_v = v_abs_p_b - v_abs_p_a;
+                        contact.rel_v_n = gml::dot(contact.rel_v, manifold.normal);
+
+                        // Gram-Schmidt method using the relative velocity as the initial vector for the projection
+                        // don't normalize tangent here, since it might be zero-length
+                        manifold.tangent_1 = contact.rel_v - manifold.normal * gml::dot(contact.rel_v, manifold.normal);
+                        if (gml::sqrLength(manifold.tangent_1) < 0.0000001) {
+                            // tangent is parallel to n, so we need another approach
+                            std::tie(manifold.tangent_1, manifold.tangent_2) = tangent_plane(manifold.normal);
+                        } else {
+                            manifold.tangent_1.normalize();
+                            // normalization not necessary, since tangent and normal are already normalized
+                            manifold.tangent_2 = gml::cross(manifold.tangent_1,manifold.normal);
+                        }
+
+                        penetration_constraints.push_back(prepare_penetration_constraint(*a, *b, manifold, contact, dt));
+
+                        auto [cf1, cf2] = prepare_friction_constraints(*a, *b, manifold, contact);
+                        friction_constraints.push_back(cf1);
+                        friction_constraints.push_back(cf2);
+
+                        spinning_friction_constraints.push_back(prepare_spinning_friction_constraint(*a, *b, manifold));
+
+                        auto [crf1, crf2] = prepare_rolling_friction_constraints(*a, *b, manifold);
+                        rolling_friction_constraints.push_back(crf1);
+                        rolling_friction_constraints.push_back(crf2);
+                    }
                 }
             }
         }
 
+        // once all constraints are created, we can construct the dependencies
+        for (std::size_t i = 0; i < friction_constraints.size(); ++i) {
+            friction_constraints.at(i).dependent_constraint = {&penetration_constraints.at(i % 2)};
+        }
+
         for (int i = 0; i < m_solver_iterations; ++i) {
-            for (auto& collision: collisions) {
-                resolve_collision(collision, dt);
+            // don't interleave constraints, since the friction impulse depends on the normal impulse
+            for (auto& constraint: penetration_constraints) {
+                // accumulate impulses
+                double old_lambda = constraint.accumulated_lambda;
+                double delta_lambda = solve_constraint(constraint);
+                // clamp to prevent objects pulling together for negative lambdas
+                constraint.accumulated_lambda = std::max(0.0, constraint.accumulated_lambda + delta_lambda);
+                // restore delta lambda after clamping
+                delta_lambda = constraint.accumulated_lambda - old_lambda;
+                auto delta_impulse = delta_lambda * constraint.j_t;
+                apply_impulse(constraint, delta_impulse);
             }
-            for (auto& collision: collisions) {
-                resolve_collision_f(collision);
+
+            for (auto& constraint: friction_constraints) {
+                // accumulate impulses
+                double old_lambda = constraint.accumulated_lambda;
+                double delta_lambda = solve_constraint(constraint);
+                // clamp with accumulated normal impulse for the Coulomb friction model
+                const double friction_coefficient =
+                        constraint.rb_a.material.kinetic_friction *
+                        constraint.rb_b.material.kinetic_friction;
+                double lambda_n = constraint.dependent_constraint.value()->accumulated_lambda;
+                constraint.accumulated_lambda = gml::clamp(
+                        constraint.accumulated_lambda + delta_lambda,
+                        -friction_coefficient * lambda_n,
+                        friction_coefficient * lambda_n);
+                // restore delta lambda after clamping
+                delta_lambda = constraint.accumulated_lambda - old_lambda;
+                auto delta_impulse = delta_lambda * constraint.j_t;
+                apply_impulse(constraint, delta_impulse);
             }
-            for (auto& collision: collisions) {
-                resolve_collision_rf(collision);
+
+            for (auto& constraint: spinning_friction_constraints) {
+                // accumulate impulses
+                double old_lambda = constraint.accumulated_lambda;
+                double delta_lambda = solve_constraint(constraint);
+                // clamp with accumulated normal impulse for the Coulomb friction model
+                const double friction_coefficient =
+                        constraint.rb_a.material.spinning_friction *
+                        constraint.rb_b.material.spinning_friction;
+                // TODO: clamp in zero direction preserving sign
+                constraint.accumulated_lambda += delta_lambda;
+                // restore delta lambda after clamping
+                delta_lambda = constraint.accumulated_lambda - old_lambda;
+                auto delta_impulse = friction_coefficient * delta_lambda * constraint.j_t;
+                apply_impulse(constraint, delta_impulse);
+            }
+
+            for (auto& constraint: rolling_friction_constraints) {
+                solve_constraint(constraint);
+                // accumulate impulses
+                double old_lambda = constraint.accumulated_lambda;
+                double delta_lambda = solve_constraint(constraint);
+                // clamp with accumulated normal impulse for the Coulomb friction model
+                const double friction_coefficient =
+                        constraint.rb_a.material.rolling_friction *
+                        constraint.rb_b.material.rolling_friction;
+                // TODO: clamp in zero direction preserving sign
+                constraint.accumulated_lambda += delta_lambda;
+                // restore delta lambda after clamping
+                delta_lambda = constraint.accumulated_lambda - old_lambda;
+                auto delta_impulse = friction_coefficient * delta_lambda * constraint.j_t;
+                apply_impulse(constraint, delta_impulse);
             }
         }
 
@@ -372,5 +479,138 @@ namespace physics3d
     void Simulation::enable_gravity()
     {
         m_external_acceleration = {0, -9.81, 0};
+    }
+
+    Constraint Simulation::prepare_penetration_constraint(RigidBody& rb_a, RigidBody& rb_b, const ContactManifold& manifold,
+                                                          const ContactPoint& contact, double dt)
+    {
+        gml::Vec3d temp_1 = gml::cross(contact.r_a, manifold.normal);
+        gml::Vec3d temp_2 = gml::cross(contact.r_b, manifold.normal);
+        gml::Matd<1, 12> j{
+                -manifold.normal.x(), -manifold.normal.y(), -manifold.normal.z(),
+                manifold.normal.x(), manifold.normal.y(), manifold.normal.z(),
+                -temp_1.x(), -temp_1.y(), -temp_1.z(),
+                temp_2.x(), temp_2.y(), temp_2.z(),
+        };
+
+        const double baumgarte_bias = -m_baumgarte_factor / dt * std::max(contact.depth - m_penetration_slop, 0.0);
+
+        // TODO: maybe we can scale the restitution slop with something
+        const double restitution = std::min(rb_a.material.restitution, rb_b.material.restitution);
+        const double restitution_bias = restitution * std::min(contact.rel_v_n + m_restitution_slop, 0.0);
+
+        return {
+                .m_inv = inverse_mass_matrix(rb_a, rb_b),
+                .j = j,
+                .j_t = gml::transpose(j),
+                .bias = baumgarte_bias + restitution_bias,
+                .rb_a = rb_a,
+                .rb_b = rb_b,
+        };
+    }
+
+    std::tuple<Constraint, Constraint>
+    Simulation::prepare_friction_constraints(RigidBody& rb_a, RigidBody& rb_b, const ContactManifold& manifold,
+                                             const ContactPoint& contact)
+    {
+        // friction along first tangent
+        gml::Vec3d temp_1 = gml::cross(contact.r_a, manifold.tangent_1);
+        gml::Vec3d temp_2 = gml::cross(contact.r_b, manifold.tangent_1);
+        gml::Matd<1, 12> j_1{
+                -manifold.tangent_1.x(), -manifold.tangent_1.y(), -manifold.tangent_1.z(),
+                manifold.tangent_1.x(), manifold.tangent_1.y(), manifold.tangent_1.z(),
+                -temp_1.x(), -temp_1.y(), -temp_1.z(),
+                temp_2.x(), temp_2.y(), temp_2.z(),
+        };
+
+        // friction along second tangent
+        temp_1 = gml::cross(contact.r_a, manifold.tangent_2);
+        temp_2 = gml::cross(contact.r_b, manifold.tangent_2);
+        gml::Matd<1, 12> j_2{
+                -manifold.tangent_2.x(), -manifold.tangent_2.y(), -manifold.tangent_2.z(),
+                manifold.tangent_2.x(), manifold.tangent_2.y(), manifold.tangent_2.z(),
+                -temp_1.x(), -temp_1.y(), -temp_1.z(),
+                temp_2.x(), temp_2.y(), temp_2.z(),
+        };
+
+        return {
+                {
+                        .m_inv = inverse_mass_matrix(rb_a, rb_b),
+                        .j = j_1,
+                        .j_t = gml::transpose(j_1),
+                        .rb_a = rb_a,
+                        .rb_b = rb_b,
+                },
+                {
+                        .m_inv = inverse_mass_matrix(rb_a, rb_b),
+                        .j = j_2,
+                        .j_t = gml::transpose(j_2),
+                        .rb_a = rb_a,
+                        .rb_b = rb_b,
+                }
+        };
+    }
+
+    Constraint
+    Simulation::prepare_spinning_friction_constraint(RigidBody& rb_a, RigidBody& rb_b, const ContactManifold& manifold)
+    {
+        gml::Matd<1, 12> j{
+                0, 0, 0,
+                0, 0, 0,
+                -manifold.normal.x(), -manifold.normal.y(), -manifold.normal.z(),
+                manifold.normal.x(), manifold.normal.y(), manifold.normal.z(),
+        };
+
+        return {
+                .m_inv = inverse_mass_matrix(rb_a, rb_b),
+                .j = j,
+                .j_t = gml::transpose(j),
+                .rb_a = rb_a,
+                .rb_b = rb_b,
+        };
+    }
+
+    std::tuple<Constraint, Constraint>
+    Simulation::prepare_rolling_friction_constraints(RigidBody& rb_a, RigidBody& rb_b, const ContactManifold& manifold)
+    {
+        gml::Matd<1, 12> j_1{
+                0, 0, 0,
+                0, 0, 0,
+                -manifold.tangent_1.x(), -manifold.tangent_1.y(), -manifold.tangent_1.z(),
+                manifold.tangent_1.x(), manifold.tangent_1.y(), manifold.tangent_1.z(),
+        };
+
+        gml::Matd<1, 12> j_2{
+                0, 0, 0,
+                0, 0, 0,
+                -manifold.tangent_2.x(), -manifold.tangent_2.y(), -manifold.tangent_2.z(),
+                manifold.tangent_2.x(), manifold.tangent_2.y(), manifold.tangent_2.z(),
+        };
+
+        return {
+                {
+                        .m_inv = inverse_mass_matrix(rb_a, rb_b),
+                        .j = j_1,
+                        .j_t = gml::transpose(j_1),
+                        .rb_a = rb_a,
+                        .rb_b = rb_b,
+                },
+                {
+                        .m_inv = inverse_mass_matrix(rb_a, rb_b),
+                        .j = j_2,
+                        .j_t = gml::transpose(j_2),
+                        .rb_a = rb_a,
+                        .rb_b = rb_b,
+                }
+        };
+    }
+
+    void Simulation::apply_impulse(const Constraint& constraint, gml::Matd<12, 1> impulse)
+    {
+        auto delta_q = constraint.m_inv * impulse;
+        constraint.rb_a.m_velocity += {delta_q(0, 0), delta_q(1, 0), delta_q(2, 0)};
+        constraint.rb_b.m_velocity += {delta_q(3, 0), delta_q(4, 0), delta_q(5, 0)};
+        constraint.rb_a.m_angular_velocity += {delta_q(6, 0), delta_q(7, 0), delta_q(8, 0)};
+        constraint.rb_b.m_angular_velocity += {delta_q(9, 0), delta_q(10, 0), delta_q(11, 0)};
     }
 }

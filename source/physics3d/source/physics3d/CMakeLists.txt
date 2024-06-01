@@ -10,4 +10,5 @@ target_sources(yage_physics3d
 		InertiaShape.cpp
 		BoundingShape.h
 		BoundingShape.cpp
+		Collision.h
 	)

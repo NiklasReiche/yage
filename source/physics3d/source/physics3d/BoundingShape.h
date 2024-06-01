@@ -1,10 +1,13 @@
 #pragma once
 
 #include <optional>
-#include "gml/vector.h"
+
+#include <gml/vector.h>
 
 namespace physics3d
 {
+    struct ContactManifold;
+
     struct BSphere
     {
         gml::Vec3d center{};
@@ -18,36 +21,15 @@ namespace physics3d
         gml::Vec3d normal{};
     };
 
-    struct CollisionContact
-    {
-        gml::Vec3d r_a;
-        gml::Vec3d p_a;
-        gml::Vec3d r_b;
-        gml::Vec3d p_b;
-        gml::Vec3d n;
-    };
-
-    struct CollisionContactManifold
-    {
-        // TODO
-        CollisionContact contact;
-        double lambda_n{};
-        double lambda_f1{};
-        double lambda_f2{};
-        double lambda_rf_1{};
-        double lambda_rf_2{};
-        double lambda_rf_3{};
-    };
-
     class CollisionVisitor
     {
     public:
-        std::optional<CollisionContactManifold> operator()(const BSphere& a, const BSphere& b);
+        std::optional<ContactManifold> operator()(const BSphere& a, const BSphere& b);
 
-        std::optional<CollisionContactManifold> operator()(const BSphere& a, const BPlane& b);
+        std::optional<ContactManifold> operator()(const BSphere& a, const BPlane& b);
 
-        std::optional<CollisionContactManifold> operator()(const BPlane& a, const BSphere& b);
+        std::optional<ContactManifold> operator()(const BPlane& a, const BSphere& b);
 
-        std::optional<CollisionContactManifold> operator()(const BPlane& a, const BPlane& b);
+        std::optional<ContactManifold> operator()(const BPlane& a, const BPlane& b);
     };
 }

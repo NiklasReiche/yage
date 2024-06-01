@@ -3,27 +3,18 @@
 #include <vector>
 #include <functional>
 
-#include "Particle.h"
 #include "RigidBody.h"
+#include "Collision.h"
 
 namespace physics3d
 {
-    struct Collision
+    class Simulation
     {
-        CollisionContactManifold contact_manifold;
-        RigidBody& rb_a;
-        RigidBody& rb_b;
-        double depth{};
-        gml::Vec3d rel_v{};
-    };
-
-	class Simulation
-	{
-	public:
-		void integrate(double dt);
+    public:
+        void integrate(double dt);
 
         template<typename... Args>
-        std::shared_ptr<RigidBody> create_rigid_body(Args&&... args)
+        std::shared_ptr<RigidBody> create_rigid_body(Args&& ... args)
         {
             bodies.push_back(std::make_shared<RigidBody>(args...));
             return bodies.back();
@@ -37,21 +28,29 @@ namespace physics3d
         const double m_restitution_slop = 0.2; // allowed relative velocity in the normal direction // TODO: if this is too low we somehow add energy to the system?
         const int m_solver_iterations = 10;
 
-		std::vector<std::shared_ptr<RigidBody>> bodies;
+        std::vector<std::shared_ptr<RigidBody>> bodies;
         CollisionVisitor m_collision_visitor{};
         gml::Vec3d m_external_acceleration{};
 
-        /**
-         * @param baumgarte_factor Bias factor for Baumgarte stabilisation. Values between 0.1 and 0.3 net good results.
-         * @param dt Delta time of the integration step.
-         */
-        void resolve_collision(Collision& collision, double dt);
+        double solve_constraint(Constraint& constraint);
 
-        void resolve_collision_f(Collision& collision);
+        void apply_impulse(const Constraint& constraint, gml::Matd<12, 1> impulse);
 
-        void resolve_collision_rf(Collision& collision);
+        Constraint prepare_penetration_constraint(RigidBody& rb_a, RigidBody& rb_b, const ContactManifold& manifold,
+                                                  const ContactPoint& contact, double dt);
 
-        static double solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> j_t, gml::Matd<12, 1> q_pre, double b);
+        std::tuple<Constraint, Constraint>
+        prepare_friction_constraints(RigidBody& rb_a, RigidBody& rb_b, const ContactManifold& manifold,
+                                     const ContactPoint& contact);
+
+        Constraint
+        prepare_spinning_friction_constraint(RigidBody& rb_a, RigidBody& rb_b, const ContactManifold& manifold);
+
+        std::tuple<Constraint, Constraint>
+        prepare_rolling_friction_constraints(RigidBody& rb_a, RigidBody& rb_b, const ContactManifold& manifold);
+
+        static double
+        solve(gml::Matd<12, 12> m_inv, gml::Matd<1, 12> j, gml::Matd<12, 1> j_t, gml::Matd<12, 1> q_pre, double b);
 
         static gml::Matd<12, 12> inverse_mass_matrix(RigidBody& a, RigidBody& b);
 
