@@ -17,7 +17,7 @@ The graphics pipeline has its own abstraction layer with high-level interfaces f
 Handles image file reading/writing and provides a common representation for image data on the CPU (as opposed to GPU textures). 
 ### 3D-Graphics module
 Bundles graphics primitives into higher-order objects like meshes, materials, or lights and organizes them in a scene graph for hierarchical rendering.   
-### 3D-Physics module
+### 3D-Physics module ([goto](source/physics3d))
 Implements the simulation of rigid bodies in 3D. Contains a force integrator, collision detection, and collision resolution through a constraint-based approach (Sequential Impulses). 
 ### Text rendering module
 Uses signed distance fields to generate fonts in order to render unicode text at arbitrary sizes with a minimal memory footprint. Includes a generator for SDF fonts from true type fonts and a text renderer.
