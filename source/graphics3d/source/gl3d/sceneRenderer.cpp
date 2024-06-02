@@ -19,32 +19,31 @@ namespace gl3d
         uniformValues.point_lights.clear();
         uniformValues.dir_lights.clear();
 
-        auto collectGeometry = [this, &drawablesLoop](SceneObject* node, gml::Mat4d transform) {
-            if (node->hasMesh()) {
-                drawablesLoop.emplace_back(node->getMesh(), transform);
+        auto collectGeometry = [this, &drawablesLoop](SceneObject& node) {
+            const auto& transform = node.world_transform();
+            if (node.mesh) {
+                drawablesLoop.emplace_back(node.mesh, transform);
             }
-            if (node->hasLight()) {
-                std::shared_ptr<Light> light = node->getLight();
-                light->update_from_transform(transform);
-                switch (light->type()) {
+            if (node.light) {
+                node.light->update_from_transform(transform);
+                switch (node.light->type()) {
                     case LightType::DIRECTIONAL_LIGHT:
-                        uniformValues.dir_lights.push_back(light);
+                        uniformValues.dir_lights.push_back(node.light);
                         break;
                     case LightType::POINT_LIGHT:
-                        uniformValues.point_lights.push_back(light);
+                        uniformValues.point_lights.push_back(node.light);
                         break;
                 }
             }
-            if (node->hasCamera()) {
-                std::shared_ptr<Camera> camera = node->getCamera();
-                camera->moveTo(transform.getTranslation());
-                camera->rotateTo(gml::quaternion::fromMatrix<double>(transform.getRotation()));
+            if (node.camera) {
+                node.camera->moveTo(transform.getTranslation());
+                node.camera->rotateTo(gml::quaternion::fromMatrix<double>(transform.getRotation()));
             }
         };
 
         // TODO: use found camera from scene graph to set shader camPos, like we do with lights
 
-        root->updateChildren(collectGeometry, root->applyTransform(gml::matrix::Id4d));
+        root->apply(collectGeometry, gml::matrix::Id4d);
 
         // TODO: sort by shader
         for (auto& geometry: drawablesLoop) {

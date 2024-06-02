@@ -10,7 +10,7 @@
 
 namespace gl3d::resources
 {
-    std::shared_ptr<gl3d::SceneGroup> gltf_read_scene(
+    std::unique_ptr<gl3d::SceneGroup> gltf_read_scene(
             const platform::IFileReader& fileReader, const std::string& filename,
             gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator,
             std::shared_ptr<gl::IShader>& shader,

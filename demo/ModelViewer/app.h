@@ -60,24 +60,12 @@ public:
 
         scene = loadScene(filename);
 
-#if 0
-        auto light = std::make_shared<gl3d::PointLight>();
-        light->color = gml::Vec3f(50, 50, 50);
-
-        auto light_node = std::make_shared<gl3d::SceneObject>();
-        light_node->setTransform(gml::matrix::translate(2, 2, 3));
-        light_node->bindLight(light);
-        scene->addChild(light_node);
-#endif
-
-        auto light_2 = std::make_shared<gl3d::DirectionalLight>();
-        light_2->color = gml::Vec3f(5, 5, 5);
-
-        auto light_node_2 = std::make_shared<gl3d::SceneObject>();
-        light_node_2->setTransform(gml::matrix::fromQuaternion<double>(
-                gml::quaternion::eulerAngle<double>(gml::toRad(180.0), gml::toRad(0.0), gml::toRad(45.0))));
-        light_node_2->bindLight(light_2);
-        scene->addChild(light_node_2);
+        auto light = std::make_shared<gl3d::DirectionalLight>();
+        light->color = gml::Vec3f(5, 5, 5);
+        auto& light_node = scene->create_object("light");
+        light_node.local_transform = gml::matrix::fromQuaternion<double>(
+                gml::quaternion::eulerAngle<double>(gml::toRad(180.0), gml::toRad(0.0), gml::toRad(45.0)));
+        light_node.light = light;
 
         inputListener = MovementListener(window, camera);
         inputListener.pbrShader = pbrShader;

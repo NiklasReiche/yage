@@ -1,113 +1,61 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <memory>
 #include <functional>
+#include <string>
 
 #include <gml/matrix.h>
-
 
 namespace gl3d
 {
 	class SceneObject;
-	class SceneGroup;
 
 	/**
-	 * @brief Represents the different node types.
-	 */
-	enum class NodeType
-	{
-		NODE,
-		GROUP,
-		OBJECT,
-	};
-
-	/**
-	 * @brief Represents a basic node in a scene graph.
+	 * Represents an interface for composite and leaf nodes in a scene graph. A node contains local translation,
+	 * rotation, and scaling components with respect to its parent node.
 	 */
 	class SceneNode
 	{
-	private:
-		/** @brief This node's type. Used for class identification. */
-		const NodeType type;
-		/** @brief This node's name. Used for object identification. */
-		std::string name;
-		/** @brief This node's local transformation matrix. */
-		gml::Mat4d transform;
-
-	protected:
-		std::vector<std::shared_ptr<SceneNode>> children; // TODO: unique_ptr is more fitting
-
-		/**
-		 * @brief Constructs a new node of a specific type with a custom name
-		 * and a custom transform.
-		 * 
-		 * @param type the type
-		 * @param name the name
-		 * @param transform the transform
-		 */
-		SceneNode(NodeType type, std::string name, gml::Mat4d transform);
-
 	public:
-		/**
-		 * @brief Constructs a new node with an empty name and identity transform.
-		 */
-		SceneNode();
+        /** This node's transformation matrix in local space. */
+        gml::Mat4d local_transform;
 
-		/**
-		 * @brief Assignment operator overload.
-		 * 
-		 * @param other assign object
-		 * @return this
-		 */
-		SceneNode& operator=(const SceneNode & other);
+        virtual ~SceneNode() = default;
 
-		/**
-		 * @brief Traverses this node's child nodes and calls the given functions.
-		 * 
-		 * @param func function to handle an object node
-		 * @param transform the node's transform
-		 */
-		void updateChildren(
-			std::function<void(SceneObject*, gml::Mat4d)> func,
-			gml::Mat4d transform = gml::matrix::Id<double, 4>);
+        /**
+         * Recursively updates this node's world transform by chaining together the transforms from it's parents.
+         * Additionally, applies a given function to any leaf nodes encountered. Traversal happens depth-first.
+         * @param f A function that gets invoked for any leaf. The argument is the visited leaf.
+         * @param parent_transform The matrix that transforms from the parents local space to world space.
+         */
+        virtual void apply(const std::function<void(SceneObject&)>& f, const gml::Mat4d& parent_transform) = 0;
 
-		/**
-		* @brief Applies the given transform to this node's transform.
-		* The matrices are multiplied. This node's transform remains unmodified.
-		*
-		* @param transform the transform to apply
-		* @return the resulting transform
-		*/
-		gml::Mat4d applyTransform(const gml::Mat4d& transform) const;
+        /**
+         * @return This node's current transformation matrix for mapping from local to world space.
+         */
+        [[nodiscard]] gml::Mat4d world_transform() const;
 
-		/**
-		* @brief Sets this node's transfomation matrix.
-		*
-		* @param tranform the transform to set
-		*/
-		void setTransform(const gml::Mat4d& tranform);
+        /**
+         * @return This node's name.
+         */
+        [[nodiscard]] std::string_view name() const;
 
-		/**
-		 * @brief Return's this node's local transform.
-		 * 
-		 * @return the transformation matrix
-		 */
-		gml::Mat4d getTransform() const;
+    protected:
+        SceneNode(const std::string_view& name, const gml::Mat4d& transform);
 
-		/**
-		 * @brief Returns the node's type.
-		 * 
-		 * @return the type
-		 */
-		NodeType getType() const;
+        /**
+         * Updates this node's world transform by applying a parents accumulated world transform matrix.
+         */
+        void apply_transform(const gml::Mat4d& parent_transform);
 
-		/**
-		 * @brief Returns this node's custom name.
-		 * 
-		 * @return the name
-		 */
-		std::string getName() const;
+    private:
+        /**
+         * This node's name. Used for object identification.
+         */
+        const std::string m_name;
+
+        /**
+         * The matrix that transforms from this node's local space to world space.
+         */
+        gml::Mat4d m_world_transform;
 	};
 }

@@ -90,7 +90,7 @@ public:
         } else {
             offset += 1;
         }
-        world->setTransform(world->getTransform() * gml::matrix::scale<double>(offset, offset, offset));
+        world->local_transform = world->local_transform * gml::matrix::scale<double>(offset, offset, offset);
     }
 
 	void applyUpdate()

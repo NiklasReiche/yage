@@ -7,7 +7,6 @@
 #include "sceneGraph/sceneNode.h"
 #include "sceneGraph/sceneGroup.h"
 #include "sceneGraph/sceneObject.h"
-#include "resourceManager.h"
 #include "material.h"
 #include "mesh.h"
 #include "light.h"

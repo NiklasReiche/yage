@@ -79,8 +79,7 @@ public:
                 std::sqrt(-5 * 0.5 * 2 * radius * 5 * 0.5 * 2 * radius + 5 * 2 * radius * 5 * 2 * radius) / 5.;
         for (int i = 0; i < 5; ++i) {
             for (int j = 0; j < i + 1; ++j) {
-                auto b = loadModel("models/billiard_ball/scene.gltf",
-                                   physics3d::InertiaShape::sphere(radius, mass),
+                auto b = load_ball("models/billiard_ball/scene.gltf",
                                    gml::Vec3d(start + i * height + epsilon * i, 0.031,
                                               -(i * radius * 2) / 2.0 + j * radius * 2 + j * epsilon));
             }
@@ -107,9 +106,8 @@ public:
                 gml::Vec3d(0, 0, 0),
                 gml::quaternion::eulerAngle<double>(0, 0, 0));
 
-        auto scene_ground = std::make_shared<gl3d::SceneObject>();
-        scene->addChild(scene_ground);
-        scene_ground->bindMesh(ground_mesh);
+        auto& scene_ground = scene->create_object("ground");
+        scene_ground.mesh = ground_mesh;
 
         objects.emplace_back(scene_ground, ground);
 
@@ -121,10 +119,9 @@ public:
                 billiard_table,
                 gml::Vec3d(1, 0, 0),
                 gml::quaternion::eulerAngle<double>(-std::numbers::pi_v<double> / 2, 0, 0));
-
-        auto scene_barrier1 = std::make_shared<gl3d::SceneObject>();
-        scene->addChild(scene_barrier1);
-        scene_barrier1->bindMesh(barrier_mesh);
+        auto& scene_barrier1 = scene->create_object("barrier1");
+        scene_barrier1.mesh = barrier_mesh;
+        objects.emplace_back(scene_barrier1, barrier1);
 
         auto barrier2 = simulation.create_rigid_body(
                 physics3d::InertiaShape::static_shape(),
@@ -134,10 +131,9 @@ public:
                 billiard_table,
                 gml::Vec3d(0, 0, 1),
                 gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double>, 0, 0));
-
-        auto scene_barrier2 = std::make_shared<gl3d::SceneObject>();
-        scene->addChild(scene_barrier2);
-        scene_barrier2->bindMesh(barrier_mesh);
+        auto& scene_barrier2 = scene->create_object("barrier2");
+        scene_barrier2.mesh = barrier_mesh;
+        objects.emplace_back(scene_barrier2, barrier2);
 
         auto barrier3 = simulation.create_rigid_body(
                 physics3d::InertiaShape::static_shape(),
@@ -147,10 +143,9 @@ public:
                 billiard_table,
                 gml::Vec3d(0, 0, -1),
                 gml::Quatd());
-
-        auto scene_barrier3 = std::make_shared<gl3d::SceneObject>();
-        scene->addChild(scene_barrier3);
-        scene_barrier3->bindMesh(barrier_mesh);
+        auto& scene_barrier3 = scene->create_object("barrier3");
+        scene_barrier3.mesh = barrier_mesh;
+        objects.emplace_back(scene_barrier3, barrier3);
 
         auto barrier4 = simulation.create_rigid_body(
                 physics3d::InertiaShape::static_shape(),
@@ -158,18 +153,11 @@ public:
                 billiard_table,
                 gml::Vec3d(-1, 0, 0),
                 gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double> / 2, 0, 0));
-
-        auto scene_barrier4 = std::make_shared<gl3d::SceneObject>();
-        scene->addChild(scene_barrier4);
-        scene_barrier4->bindMesh(barrier_mesh);
-
-        objects.emplace_back(scene_barrier1, barrier1);
-        objects.emplace_back(scene_barrier2, barrier2);
-        objects.emplace_back(scene_barrier3, barrier3);
+        auto& scene_barrier4 = scene->create_object("barrier4");
+        scene_barrier4.mesh = barrier_mesh;
         objects.emplace_back(scene_barrier4, barrier4);
 
-        auto ball = loadModel("models/billiard_ball/scene.gltf",
-                              physics3d::InertiaShape::sphere(radius, mass),
+        auto ball = load_ball("models/billiard_ball/scene.gltf",
                               gml::Vec3d(-0.5, 0.031, 0));
         inputListener.ball = ball.get();
 
@@ -229,7 +217,7 @@ private:
     std::shared_ptr<gl3d::SceneGroup> scene;
 
     physics3d::Simulation simulation;
-    std::vector<std::tuple<std::shared_ptr<gl3d::SceneNode>, std::shared_ptr<physics3d::RigidBody>>> objects;
+    std::vector<std::tuple<std::reference_wrapper<gl3d::SceneNode>, std::shared_ptr<physics3d::RigidBody>>> objects;
 
     std::shared_ptr<gl3d::Mesh> ball_mesh;
 
@@ -248,17 +236,15 @@ private:
 
     void updateSceneGraph()
     {
-        for (const auto& [object, rb]: objects) {
-            object->setTransform(
-                    gml::matrix::translate(rb->position()) *
-                    gml::matrix::fromQuaternion(rb->orientation()) *
-                    gml::matrix::scale(object->getTransform().getScale())
-            );
+        for (auto& [object, rb]: objects) {
+            object.get().local_transform = gml::matrix::translate(rb->position()) *
+                                           gml::matrix::fromQuaternion(rb->orientation()) *
+                                           gml::matrix::scale(object.get().local_transform.getScale());
         }
     }
 
     std::shared_ptr<physics3d::RigidBody>
-    loadModel(const std::string& filename, physics3d::InertiaShape shape, gml::Vec3d position)
+    load_ball(const std::string& filename, gml::Vec3d position)
     {
         if (!ball_mesh) {
             ball_mesh = gl3d::resources::gltf_read_meshes(platform::desktop::FileReader(),
@@ -267,13 +253,12 @@ private:
                                                           pbrShaderNormalMapping).at(0);
         }
 
-        auto scene_object = std::make_shared<gl3d::SceneObject>();
-        scene_object->setTransform(gml::matrix::scale<double>(gml::Vec3d(radius)));
-        scene->addChild(scene_object);
-        scene_object->bindMesh(ball_mesh);
+        auto& scene_object = scene->create_object("ball");
+        scene_object.local_transform = gml::matrix::scale<double>(gml::Vec3d(radius));
+        scene_object.mesh = ball_mesh;
 
         auto rb = simulation.create_rigid_body(
-                shape,
+                physics3d::InertiaShape::sphere(radius, mass),
                 physics3d::BoundingVolume{physics3d::BSphere{
                         .radius = radius,
                 }},
@@ -290,13 +275,13 @@ private:
     {
         auto lightRes = std::make_shared<gl3d::DirectionalLight>();
         lightRes->color = gml::Vec3f(3.5);
-        auto light = std::make_shared<gl3d::SceneObject>("light");
-        light->bindLight(lightRes);
-        light->setTransform(
+
+        auto& light = scene->create_object("light");
+        light.light = lightRes;
+        light.local_transform =
                 gml::matrix::fromQuaternion<double>(
                         gml::quaternion::eulerAngle<double>(gml::toRad(165.), 0, 0) *
                         gml::quaternion::eulerAngle<double>(0, 0, gml::toRad(75.))
-                ));
-        scene->addChild(light);
+                );
     }
 };
