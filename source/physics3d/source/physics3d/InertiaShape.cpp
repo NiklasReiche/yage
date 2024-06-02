@@ -2,6 +2,11 @@
 
 namespace physics3d
 {
+    InertiaShape::InertiaShape(double inverse_mass, gml::Mat3d inverse_inertia_tensor)
+            : m_inverse_mass(inverse_mass), m_inverse_inertia_tensor(inverse_inertia_tensor)
+    {
+    }
+
     double InertiaShape::inverse_mass() const
     {
         return m_inverse_mass;
@@ -12,44 +17,43 @@ namespace physics3d
         return m_inverse_inertia_tensor;
     }
 
-    StaticShape::StaticShape()
+    InertiaShape InertiaShape::static_shape()
     {
-        m_inverse_mass = 0;
-        m_inverse_inertia_tensor = gml::Mat3d(0);
+        return {0, gml::Mat3d(0)};
     }
 
-    CubeShape::CubeShape(double length, double mass)
+    InertiaShape InertiaShape::sphere(double radius, double mass)
     {
-        m_inverse_mass = 1. / mass;
-
-        double moment = mass * length * length / 6.;
-        m_inverse_inertia_tensor = {
-                1. / moment, 0, 0,
-                0, 1. / moment, 0,
-                0, 0, 1. / moment
-        };
-    }
-
-    BoxShape::BoxShape(double width, double height, double depth, double mass)
-    {
-        m_inverse_mass = 1. / mass;
-
-        m_inverse_inertia_tensor = {
-                1. / mass * (height * height + depth * depth) / 12., 0, 0,
-                0, 1. / mass * (width * width + height * height) / 12., 0,
-                0, 0, 1. / mass * (width * width + depth * depth) / 12.
-        };
-    }
-
-    SphereShape::SphereShape(double radius, double mass)
-    {
-        m_inverse_mass = 1. / mass;
-
         double moment = mass * radius * radius * 2. / 5.;
-        m_inverse_inertia_tensor = {
-                1. / moment, 0, 0,
-                0, 1. / moment, 0,
-                0, 0, 1. / moment
-        };
+        return InertiaShape(
+                1. / mass,
+                gml::Mat3d{
+                        1. / moment, 0, 0,
+                        0, 1. / moment, 0,
+                        0, 0, 1. / moment
+                });
+    }
+
+    InertiaShape InertiaShape::cube(double length, double mass)
+    {
+        double moment = mass * length * length / 6.;
+        return InertiaShape(
+                1. / mass,
+                gml::Mat3d{
+                        1. / moment, 0, 0,
+                        0, 1. / moment, 0,
+                        0, 0, 1. / moment
+                });
+    }
+
+    InertiaShape InertiaShape::cuboid(double width, double height, double depth, double mass)
+    {
+        return InertiaShape(
+                1. / mass,
+                gml::Mat3d{
+                        1. / mass * (height * height + depth * depth) / 12., 0, 0,
+                        0, 1. / mass * (width * width + height * height) / 12., 0,
+                        0, 0, 1. / mass * (width * width + depth * depth) / 12.
+                });
     }
 }

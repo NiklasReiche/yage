@@ -80,7 +80,7 @@ public:
         for (int i = 0; i < 5; ++i) {
             for (int j = 0; j < i + 1; ++j) {
                 auto b = loadModel("models/billiard_ball/scene.gltf",
-                                   physics3d::SphereShape(radius, mass),
+                                   physics3d::InertiaShape::sphere(radius, mass),
                                    gml::Vec3d(start + i * height + epsilon * i, 0.031,
                                               -(i * radius * 2) / 2.0 + j * radius * 2 + j * epsilon));
             }
@@ -99,7 +99,7 @@ public:
 
 
         auto ground = simulation.create_rigid_body(
-                physics3d::StaticShape(),
+                physics3d::InertiaShape::static_shape(),
                 physics3d::BoundingVolume{physics3d::BPlane{
                         .original_normal = {0, -1, 0},
                 }},
@@ -114,7 +114,7 @@ public:
         objects.emplace_back(scene_ground, ground);
 
         auto barrier1 = simulation.create_rigid_body(
-                physics3d::StaticShape(),
+                physics3d::InertiaShape::static_shape(),
                 physics3d::BoundingVolume{physics3d::BPlane{
                         .original_normal = {0, 0, -1},
                 }},
@@ -127,7 +127,7 @@ public:
         scene_barrier1->bindMesh(barrier_mesh);
 
         auto barrier2 = simulation.create_rigid_body(
-                physics3d::StaticShape(),
+                physics3d::InertiaShape::static_shape(),
                 physics3d::BoundingVolume{physics3d::BPlane{
                         .original_normal = {0, 0, -1},
                 }},
@@ -140,7 +140,7 @@ public:
         scene_barrier2->bindMesh(barrier_mesh);
 
         auto barrier3 = simulation.create_rigid_body(
-                physics3d::StaticShape(),
+                physics3d::InertiaShape::static_shape(),
                 physics3d::BoundingVolume{physics3d::BPlane{
                         .original_normal = {0, 0, -1},
                 }},
@@ -153,7 +153,7 @@ public:
         scene_barrier3->bindMesh(barrier_mesh);
 
         auto barrier4 = simulation.create_rigid_body(
-                physics3d::StaticShape(),
+                physics3d::InertiaShape::static_shape(),
                 physics3d::BoundingVolume{physics3d::BPlane{}},
                 billiard_table,
                 gml::Vec3d(-1, 0, 0),
@@ -169,7 +169,7 @@ public:
         objects.emplace_back(scene_barrier4, barrier4);
 
         auto ball = loadModel("models/billiard_ball/scene.gltf",
-                              physics3d::SphereShape(radius, mass),
+                              physics3d::InertiaShape::sphere(radius, mass),
                               gml::Vec3d(-0.5, 0.031, 0));
         inputListener.ball = ball.get();
 
