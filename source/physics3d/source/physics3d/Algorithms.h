@@ -23,6 +23,8 @@ namespace physics3d
              */
             gml::Vec3d normal;
         };
+
+        using Rectangle = std::array<gml::Vec3d, 4>;
     }
 
     /**
@@ -67,4 +69,23 @@ namespace physics3d
      */
     std::vector<std::tuple<gml::Vec3d, double>>
     clip_discard(const geometry::Plane& clipping_plane, std::span<gml::Vec3d> points);
+
+    /**
+     * Finds the face of a cube such that the face normal is the most perpendicular to a given vector.
+     * @param n The vector to compare against.
+     * @param vertices The 8 vertices of the cube following the following ordering convention:
+     *    3-------------2
+     *   /|            /|
+     *  / |           / |
+     * 7-------------6  |
+     * |  |          |  |      y
+     * |  0----------|--1      |
+     * | /           | /       o---x
+     * |/            |/       /
+     * 4-------------5       z
+     *
+     * @return The most perpendicular face along with its face normal, pointing outwards.
+     */
+    std::tuple<geometry::Rectangle, gml::Vec3d>
+    most_perpendicular_cube_face(const gml::Vec3d& n, std::span<gml::Vec3d> vertices);
 }

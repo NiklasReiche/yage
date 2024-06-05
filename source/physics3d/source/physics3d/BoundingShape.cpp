@@ -115,108 +115,6 @@ namespace physics3d
         return {}; // planes should probably not collide with themselves, since they are infinite
     }
 
-    using Face = std::array<gml::Vec3d, 4>;
-
-    std::pair<Face, gml::Vec3d> best_face(const gml::Vec3d& n, const std::vector<gml::Vec3d>& vertices)
-    {
-        /*
-         *    3-------------2
-         *   /|            /|
-         *  / |           / |
-         * 7-------------6  |
-         * |  |          |  |      y
-         * |  0----------|--1      |
-         * | /           | /       o---x
-         * |/            |/       /
-         * 4-------------5       z
-         */
-
-        constexpr const std::array<std::array<int, 15>, 8> encoding{
-                // vertex 0:
-                std::array<int, 15>{
-                        0, 4, 7, 3, 1, // x-face (vertex, vertex, vertex, vertex, normal)
-                        0, 1, 5, 4, 3, // y-face
-                        0, 1, 2, 3, 4, // z-face
-                },
-                // vertex 1:
-                std::array<int, 15>{
-                        1, 5, 6, 2, 0,
-                        1, 5, 4, 0, 2,
-                        1, 2, 3, 0, 5,
-                },
-                // vertex 2:
-                std::array<int, 15>{
-                        2, 1, 5, 6, 3,
-                        2, 6, 7, 3, 1,
-                        2, 1, 0, 3, 6,
-                },
-                // vertex 3:
-                std::array<int, 15>{
-                        3, 0, 4, 7, 2,
-                        3, 2, 6, 7, 0,
-                        3, 2, 1, 0, 7,
-                },
-                // vertex 4:
-                std::array<int, 15>{
-                        4, 0, 3, 7, 5,
-                        4, 0, 1, 5, 7,
-                        4, 5, 6, 7, 0,
-                },
-                // vertex 5:
-                std::array<int, 15>{
-                        5, 1, 2, 6, 4,
-                        5, 1, 0, 4, 6,
-                        5, 6, 7, 4, 1,
-                },
-                // vertex 6:
-                std::array<int, 15>{
-                        6, 5, 1, 2, 7,
-                        6, 2, 3, 7, 5,
-                        6, 5, 4, 7, 2,
-                },
-                // vertex 7:
-                std::array<int, 15>{
-                        7, 3, 0, 4, 6,
-                        7, 3, 2, 6, 4,
-                        7, 6, 4, 5, 3,
-                },
-        };
-
-        // find the vertex farthest along the collision normal
-        std::size_t max_i = 0;
-        double max = gml::dot(vertices[0], n);
-        for (std::size_t i = 0; i < vertices.size(); ++i) {
-            double proj = gml::dot(vertices[i], n);
-            if (proj > max) {
-                max = proj;
-                max_i = i;
-            }
-        }
-
-        // find the faces that the farthest vertex is part of
-        auto v0 = vertices[max_i];
-        Face fx = {vertices[encoding[max_i][0]], vertices[encoding[max_i][1]],
-                   vertices[encoding[max_i][2]], vertices[encoding[max_i][3]]};
-        gml::Vec3d nx = gml::normalize(v0 - vertices[encoding[max_i][4]]);
-        Face fy = {vertices[encoding[max_i][5]], vertices[encoding[max_i][6]],
-                   vertices[encoding[max_i][7]], vertices[encoding[max_i][8]]};
-        gml::Vec3d ny = gml::normalize(v0 - vertices[encoding[max_i][9]]);
-        Face fz = {vertices[encoding[max_i][10]], vertices[encoding[max_i][11]],
-                   vertices[encoding[max_i][12]], vertices[encoding[max_i][13]]};
-        gml::Vec3d nz = gml::normalize(v0 - vertices[encoding[max_i][14]]);
-
-        // find the face that is most perpendicular to the collision normal
-        if (gml::dot(nx, n) > gml::dot(ny, n) &&
-            gml::dot(nx, n) > gml::dot(nz, n)) {
-            return {fx, nx};
-        } else if (gml::dot(ny, n) > gml::dot(nx, n) &&
-                   gml::dot(ny, n) > gml::dot(nz, n)) {
-            return {fy, ny};
-        } else {
-            return {fz, nz};
-        }
-    }
-
     std::optional<ContactManifold> CollisionVisitor::operator()(const BOrientedBox& a, const BOrientedBox& b)
     {
         /*
@@ -231,41 +129,45 @@ namespace physics3d
          * 4-------------5       z
          */
 
-        std::vector<gml::Vec3d> vertices_a;
-        vertices_a.emplace_back(-a.half_size.x(), -a.half_size.y(), -a.half_size.z());
-        vertices_a.emplace_back(a.half_size.x(), -a.half_size.y(), -a.half_size.z());
-        vertices_a.emplace_back(a.half_size.x(), a.half_size.y(), -a.half_size.z());
-        vertices_a.emplace_back(-a.half_size.x(), a.half_size.y(), -a.half_size.z());
-        vertices_a.emplace_back(-a.half_size.x(), -a.half_size.y(), a.half_size.z());
-        vertices_a.emplace_back(a.half_size.x(), -a.half_size.y(), a.half_size.z());
-        vertices_a.emplace_back(a.half_size.x(), a.half_size.y(), a.half_size.z());
-        vertices_a.emplace_back(-a.half_size.x(), a.half_size.y(), a.half_size.z());
-        for (auto& vertex: vertices_a) {
+        // TODO: these can be precomputed
+        std::vector<gml::Vec3d> vertices_a{
+                gml::Vec3d(-a.half_size.x(), -a.half_size.y(), -a.half_size.z()),
+                gml::Vec3d(a.half_size.x(), -a.half_size.y(), -a.half_size.z()),
+                gml::Vec3d(a.half_size.x(), a.half_size.y(), -a.half_size.z()),
+                gml::Vec3d(-a.half_size.x(), a.half_size.y(), -a.half_size.z()),
+                gml::Vec3d(-a.half_size.x(), -a.half_size.y(), a.half_size.z()),
+                gml::Vec3d(a.half_size.x(), -a.half_size.y(), a.half_size.z()),
+                gml::Vec3d(a.half_size.x(), a.half_size.y(), a.half_size.z()),
+                gml::Vec3d(-a.half_size.x(), a.half_size.y(), a.half_size.z()),
+        };
+        std::vector<gml::Vec3d> vertices_b{
+                gml::Vec3d(-b.half_size.x(), -b.half_size.y(), -b.half_size.z()),
+                gml::Vec3d(b.half_size.x(), -b.half_size.y(), -b.half_size.z()),
+                gml::Vec3d(b.half_size.x(), b.half_size.y(), -b.half_size.z()),
+                gml::Vec3d(-b.half_size.x(), b.half_size.y(), -b.half_size.z()),
+                gml::Vec3d(-b.half_size.x(), -b.half_size.y(), b.half_size.z()),
+                gml::Vec3d(b.half_size.x(), -b.half_size.y(), b.half_size.z()),
+                gml::Vec3d(b.half_size.x(), b.half_size.y(), b.half_size.z()),
+                gml::Vec3d(-b.half_size.x(), b.half_size.y(), b.half_size.z()),
+        };
+
+        for (gml::Vec3d& vertex: vertices_a) {
             vertex = a.orientation * vertex + a.center;
         }
+        std::vector<gml::Vec3d> normals_a{
+                gml::normalize(gml::cross(vertices_a[1] - vertices_a[0], vertices_a[3] - vertices_a[0])),
+                gml::normalize(gml::cross(vertices_a[4] - vertices_a[0], vertices_a[3] - vertices_a[0])),
+                gml::normalize(gml::cross(vertices_a[4] - vertices_a[0], vertices_a[1] - vertices_a[0]))
+        };
 
-        std::vector<gml::Vec3d> normals_a;
-        normals_a.push_back(gml::normalize(gml::cross(vertices_a[1] - vertices_a[0], vertices_a[3] - vertices_a[0])));
-        normals_a.push_back(gml::normalize(gml::cross(vertices_a[4] - vertices_a[0], vertices_a[3] - vertices_a[0])));
-        normals_a.push_back(gml::normalize(gml::cross(vertices_a[4] - vertices_a[0], vertices_a[1] - vertices_a[0])));
-
-        std::vector<gml::Vec3d> vertices_b;
-        vertices_b.emplace_back(-b.half_size.x(), -b.half_size.y(), -b.half_size.z());
-        vertices_b.emplace_back(b.half_size.x(), -b.half_size.y(), -b.half_size.z());
-        vertices_b.emplace_back(b.half_size.x(), b.half_size.y(), -b.half_size.z());
-        vertices_b.emplace_back(-b.half_size.x(), b.half_size.y(), -b.half_size.z());
-        vertices_b.emplace_back(-b.half_size.x(), -b.half_size.y(), b.half_size.z());
-        vertices_b.emplace_back(b.half_size.x(), -b.half_size.y(), b.half_size.z());
-        vertices_b.emplace_back(b.half_size.x(), b.half_size.y(), b.half_size.z());
-        vertices_b.emplace_back(-b.half_size.x(), b.half_size.y(), b.half_size.z());
-        for (auto& vertex: vertices_b) {
+        for (gml::Vec3d& vertex: vertices_b) {
             vertex = b.orientation * vertex + b.center;
         }
-
-        std::vector<gml::Vec3d> normals_b;
-        normals_b.push_back(gml::normalize(gml::cross(vertices_b[1] - vertices_b[0], vertices_b[3] - vertices_b[0])));
-        normals_b.push_back(gml::normalize(gml::cross(vertices_b[4] - vertices_b[0], vertices_b[3] - vertices_b[0])));
-        normals_b.push_back(gml::normalize(gml::cross(vertices_b[4] - vertices_b[0], vertices_b[1] - vertices_b[0])));
+        std::vector<gml::Vec3d> normals_b{
+                gml::normalize(gml::cross(vertices_b[1] - vertices_b[0], vertices_b[3] - vertices_b[0])),
+                gml::normalize(gml::cross(vertices_b[4] - vertices_b[0], vertices_b[3] - vertices_b[0])),
+                gml::normalize(gml::cross(vertices_b[4] - vertices_b[0], vertices_b[1] - vertices_b[0])),
+        };
 
         // get the minimum translation vector with the SAT
         std::optional<gml::Vec3d> maybe_mtv = sat_3d(vertices_a, vertices_b, normals_a, normals_b);
@@ -281,18 +183,20 @@ namespace physics3d
             manifold.normal = -gml::normalize(maybe_mtv.value());
         }
 
+        const auto [face_a, face_a_normal] =
+                most_perpendicular_cube_face(manifold.normal, vertices_a);
+        const auto [face_b, face_b_normal] =
+                most_perpendicular_cube_face(-manifold.normal, vertices_b);
 
-        auto [f_a, n_a] = best_face(manifold.normal, vertices_a);
-        auto [f_b, n_b] = best_face(-manifold.normal, vertices_b);
-
-        Face reference, incident;
+        geometry::Rectangle reference, incident;
         bool flipped = false;
-        if (gml::dot(n_a, manifold.normal) > gml::dot(n_b, -manifold.normal)) {
-            reference = f_a;
-            incident = f_b;
+        // choose the more perpendicular face as the reference face
+        if (gml::dot(face_a_normal, manifold.normal) > gml::dot(face_b_normal, -manifold.normal)) {
+            reference = face_a;
+            incident = face_b;
         } else {
-            reference = f_b;
-            incident = f_a;
+            reference = face_b;
+            incident = face_a;
             flipped = true;
         }
         std::vector<gml::Vec3d> contact_points = {incident[0], incident[1], incident[2], incident[3]};

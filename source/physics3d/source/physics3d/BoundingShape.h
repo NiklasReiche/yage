@@ -51,6 +51,8 @@ namespace physics3d
         gml::Vec3d half_size;
         gml::Vec3d center{};
         gml::Quatd orientation{};
+        // TODO: we could precompute the original vertices as well as the rotated vertices
+        // TODO: normals can also be precomputed
     };
 
     using BoundingVolume = std::variant<BNoCollider, BSphere, BPlane, BOrientedBox>;
