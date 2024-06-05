@@ -34,11 +34,11 @@ namespace physics3d
                 },
                 [this](BPlane& plane) {
                     plane.support = m_position + m_bounding_volume_offset;
-                    // TODO: implement rotation without matrix conversion
-                    auto p = gml::matrix::fromQuaternion(m_orientation) *
-                             gml::Vec4d(plane.original_normal.x(), plane.original_normal.y(), plane.original_normal.z(),
-                                        1);
-                    plane.normal = gml::normalize(gml::Vec3d{p.x() / p.w(), p.y() / p.w(), p.z() / p.w()});
+                    plane.normal = m_orientation * plane.original_normal;
+                },
+                [this](BOrientedBox& box) {
+                    box.orientation = m_orientation;
+                    box.center = m_position;
                 },
         }, m_bounding_volume);
     }

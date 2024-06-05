@@ -17,3 +17,4 @@
 - Broad phase for collision detection (Octree, BVH)
 - Different approaches for position correction (Split Impulse)
 - Warm starting for the constraint solver
+- Continuous collision detection

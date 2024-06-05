@@ -72,7 +72,7 @@ public:
         window->show();
         std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
 
-#if 1
+#if 0
         const double start = 0.35;
         const double epsilon = 0.00000001;
         const double height =
@@ -166,6 +166,10 @@ public:
                                                                      {},
                                                                      gl::VertexFormat::INTERLEAVED);
 
+        load_cube("models/box.glb", gml::Vec3d(0,1,0), physics3d::InertiaShape::static_shape());
+        load_cube("models/box.glb", gml::Vec3d(0.5, 4, 0), physics3d::InertiaShape::cube(2, 1),
+                  gml::quaternion::eulerAngle<double>(0.0, gml::toRad(10.0), gml::toRad(40.0)));
+
         while (!window->shouldDestroy()) {
             baseRenderer->clear();
 
@@ -220,6 +224,7 @@ private:
     std::vector<std::tuple<std::reference_wrapper<gl3d::SceneNode>, std::shared_ptr<physics3d::RigidBody>>> objects;
 
     std::shared_ptr<gl3d::Mesh> ball_mesh;
+    std::shared_ptr<gl3d::Mesh> cube_mesh;
 
     physics3d::Material billiard_ball{
             .restitution = 0.99,
@@ -229,6 +234,12 @@ private:
 
     physics3d::Material billiard_table{
             .restitution = 0.9,
+            .kinetic_friction = 1.0,
+            .rolling_friction = 1.0,
+    };
+
+    physics3d::Material cube_material{
+            .restitution = 0.0,
             .kinetic_friction = 1.0,
             .rolling_friction = 1.0,
     };
@@ -266,6 +277,32 @@ private:
                 position,
                 gml::quaternion::fromMatrix(
                         gml::matrix::axisAngle(gml::Vec3d(0, 0, 1), std::numbers::pi_v<double> / 2).getRotation()));
+
+        objects.emplace_back(scene_object, rb);
+        return rb;
+    }
+
+    std::shared_ptr<physics3d::RigidBody>
+    load_cube(const std::string& filename, gml::Vec3d position, physics3d::InertiaShape shape, gml::Quatd orientation = gml::Quatd())
+    {
+        if (!cube_mesh) {
+            cube_mesh = gl3d::resources::gltf_read_meshes(platform::desktop::FileReader(),
+                                                          filename, *glContext->getDrawableCreator(),
+                                                          *glContext->getTextureCreator(), pbrShader,
+                                                          pbrShaderNormalMapping).at(0);
+        }
+
+        auto& scene_object = scene->create_object("cube");
+        scene_object.mesh = cube_mesh;
+
+        auto rb = simulation.create_rigid_body(
+                shape,
+                physics3d::BoundingVolume{physics3d::BOrientedBox{
+                        .half_size = gml::Vec3d(1, 1, 1),
+                }},
+                cube_material,
+                position,
+                orientation);
 
         objects.emplace_back(scene_object, rb);
         return rb;

@@ -5,10 +5,10 @@
 
 #include <gml/vector.h>
 
+#include "Collision.h"
+
 namespace physics3d
 {
-    struct ContactManifold;
-
     /**
      * Represents a non-existent collider.
      */
@@ -46,7 +46,14 @@ namespace physics3d
         gml::Vec3d normal{};
     };
 
-    using BoundingVolume = std::variant<BNoCollider, BSphere, BPlane>;
+    struct BOrientedBox
+    {
+        gml::Vec3d half_size;
+        gml::Vec3d center{};
+        gml::Quatd orientation{};
+    };
+
+    using BoundingVolume = std::variant<BNoCollider, BSphere, BPlane, BOrientedBox>;
 
     /**
      * Implements collision detection between the various bounding volume types.
@@ -60,16 +67,47 @@ namespace physics3d
 
         std::optional<ContactManifold> operator()(const BNoCollider& a, const BPlane& b);
 
+        std::optional<ContactManifold> operator()(const BNoCollider&, const BOrientedBox&)
+        {
+            return {}; // TODO
+        }
+
         std::optional<ContactManifold> operator()(const BSphere& a, const BNoCollider& b);
 
         std::optional<ContactManifold> operator()(const BSphere& a, const BSphere& b);
 
         std::optional<ContactManifold> operator()(const BSphere& a, const BPlane& b);
 
+        std::optional<ContactManifold> operator()(const BSphere&, const BOrientedBox&)
+        {
+            return {}; // TODO
+        }
+
         std::optional<ContactManifold> operator()(const BPlane& a, const BSphere& b);
 
         std::optional<ContactManifold> operator()(const BPlane& a, const BNoCollider& b);
 
         std::optional<ContactManifold> operator()(const BPlane& a, const BPlane& b);
+
+        std::optional<ContactManifold> operator()(const BPlane&, const BOrientedBox&)
+        {
+            return {}; // TODO
+        }
+
+        std::optional<ContactManifold> operator()(const BOrientedBox&, const BNoCollider&){
+            return {}; // TODO
+        }
+
+        std::optional<ContactManifold> operator()(const BOrientedBox&, const BSphere&)
+        {
+            return {}; // TODO
+        }
+
+        std::optional<ContactManifold> operator()(const BOrientedBox&, const BPlane&)
+        {
+            return {}; // TODO
+        }
+
+        std::optional<ContactManifold> operator()(const BOrientedBox& a, const BOrientedBox& b);
     };
 }

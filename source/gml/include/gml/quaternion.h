@@ -46,7 +46,7 @@ namespace gml
 	class Quaternion
 	{
 	public:
-		T w, x, y, z;
+		T w, x, y, z; // TODO: make private to be consistent with vectors
 
 		/**
 		 * @brief Initializes an identity quaternion.
@@ -266,6 +266,15 @@ namespace gml
 	{
 		return Quaternion<T>(lhs) *= rhs;
 	}
+
+    template<typename T>
+    constexpr gml::Vec3<T> operator*(const Quaternion<T>& lhs, const Vec3<T>& rhs)
+    {
+        // TODO: simplify
+        Quaternion<T> p(0, rhs.x(), rhs.y(), rhs.z());
+        p = lhs * p * gml::conjugate(lhs);
+        return gml::Vec3<T>(p.x, p.y, p.z);
+    }
 
 	template<typename T, typename T2>
 	constexpr Quaternion<T> operator*(const Quaternion<T>& lhs, const T2& rhs)

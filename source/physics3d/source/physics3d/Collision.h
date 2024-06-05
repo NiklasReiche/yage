@@ -3,11 +3,12 @@
 #include <vector>
 
 #include <gml/vector.h>
-
-#include "RigidBody.h"
+#include <gml/matrix.h>
 
 namespace physics3d
 {
+    class RigidBody;
+
     /**
      * Represents a point of contact between two colliding bodies.
      */
