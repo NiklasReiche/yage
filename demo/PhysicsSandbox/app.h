@@ -167,9 +167,10 @@ public:
                                                                      {},
                                                                      gl::VertexFormat::INTERLEAVED);
 
-        load_cube("models/box.glb", gml::Vec3d(0,1,0), physics3d::InertiaShape::static_shape());
+
         load_cube("models/box.glb", gml::Vec3d(0.5, 4, 0), physics3d::InertiaShape::cube(2, 1),
                   gml::quaternion::eulerAngle<double>(0.0, gml::toRad(10.0), gml::toRad(40.0)));
+        load_cube("models/box.glb", gml::Vec3d(0, 1, 0), physics3d::InertiaShape::static_shape());
 
         while (!window->shouldDestroy()) {
             baseRenderer->clear();
