@@ -96,7 +96,7 @@ public:
                                                              *glContext->getTextureCreator(), pbrShader,
                                                              pbrShaderNormalMapping).at(0);
 
-
+#if 0
         auto ground = simulation.create_rigid_body(
                 physics3d::InertiaShape::static_shape(),
                 physics3d::BoundingVolume{physics3d::BPlane{
@@ -156,6 +156,7 @@ public:
         auto& scene_barrier4 = scene->create_object("barrier4");
         scene_barrier4.mesh = barrier_mesh;
         objects.emplace_back(scene_barrier4, barrier4);
+#endif
 
         auto ball = load_ball("models/billiard_ball/scene.gltf",
                               gml::Vec3d(-0.5, 0.031, 0));
@@ -240,8 +241,7 @@ private:
 
     physics3d::Material cube_material{
             .restitution = 0.0,
-            .kinetic_friction = 1.0,
-            .rolling_friction = 1.0,
+            .kinetic_friction = 0.5,
     };
 
 

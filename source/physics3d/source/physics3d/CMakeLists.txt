@@ -9,4 +9,6 @@ target_sources(yage_physics3d
 		BoundingShape.h
 		BoundingShape.cpp
 		Collision.h
+		Algorithms.h
+		Algorithms.cpp
 	)

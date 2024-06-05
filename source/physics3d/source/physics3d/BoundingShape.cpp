@@ -2,6 +2,7 @@
 #include <map>
 #include "BoundingShape.h"
 #include "Collision.h"
+#include "Algorithms.h"
 
 namespace physics3d
 {
@@ -321,45 +322,20 @@ namespace physics3d
             }
         }
 
-
-        double min_overlap = std::numeric_limits<double>::max();
-        gml::Vec3d min_axis;
-        for (auto& axis: normals) {
-            std::vector<double> projections_a;
-            for (auto& vertex: vertices_a) {
-                projections_a.push_back(gml::dot(vertex, axis));
-            }
-            std::vector<double> projections_b;
-            for (auto& vertex: vertices_b) {
-                projections_b.push_back(gml::dot(vertex, axis));
-            }
-            std::sort(projections_a.begin(), projections_a.end());
-            std::sort(projections_b.begin(), projections_b.end());
-
-            double a_min = projections_a.front();
-            double a_max = projections_a.back();
-            double b_min = projections_b.front();
-            double b_max = projections_b.back();
-
-            if (a_min <= b_min && a_max >= b_min) {
-                double penetration = a_max - b_min;
-                if (penetration < min_overlap) {
-                    min_overlap = penetration;
-                    min_axis = axis;
-                }
-            } else if (b_min <= a_min && b_max >= a_min) {
-                double penetration = b_max - a_min;
-                if (penetration < min_overlap) {
-                    min_overlap = penetration;
-                    min_axis = -axis;
-                }
-            } else {
-                return {};
-            }
+        // get the minimum translation vector with the SAT
+        std::optional<gml::Vec3d> maybe_mtv = sat_3d(vertices_a, vertices_b, normals);
+        if (!maybe_mtv.has_value()) {
+            return {};
         }
 
         ContactManifold manifold;
-        manifold.normal = min_axis;
+        // make sure that the collision normal points away from A
+        if (gml::dot(maybe_mtv.value(), b.center - a.center) >= 0) {
+            manifold.normal = gml::normalize(maybe_mtv.value());
+        } else {
+            manifold.normal = -gml::normalize(maybe_mtv.value());
+        }
+
 
         auto [f_a, n_a] = best_face(manifold.normal, vertices_a);
         auto [f_b, n_b] = best_face(-manifold.normal, vertices_b);
