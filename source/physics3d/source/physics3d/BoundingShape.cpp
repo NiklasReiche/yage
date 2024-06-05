@@ -217,45 +217,6 @@ namespace physics3d
         }
     }
 
-    gml::Vec3d intersection(const gml::Vec3d& support, const gml::Vec3d& n, const gml::Vec3d& v0, const gml::Vec3d& v1)
-    {
-        gml::Vec3d line_direction = gml::normalize(v1 - v0);
-        double d = gml::dot(support - v0, n) / gml::dot(line_direction, n);
-        return v0 + (line_direction * d);
-    }
-
-    std::vector<gml::Vec3d> clip(const gml::Vec3d& support, const gml::Vec3d& normal, const std::vector<gml::Vec3d>& input)
-    {
-        std::vector<gml::Vec3d> output;
-        output.reserve(input.size());
-        for (std::size_t i = 0; i < input.size(); ++i) {
-            gml::Vec3d current = input[i];
-            gml::Vec3d previous = input[(i-1) % 4];
-            if (gml::dot(current - support, normal) >= 0) { // current inside
-                if (gml::dot(previous - support, normal) < 0) { // previous outside
-                    output.push_back(intersection(support, normal, previous, current));
-                }
-                output.push_back(current);
-            } else if (gml::dot(previous - support, normal) >= 0) { // current outside && previous inside
-                output.push_back(intersection(support, normal, previous, current));
-            }
-        }
-        return output;
-    }
-
-    std::vector<std::pair<gml::Vec3d, double>> clip_discard(const gml::Vec3d& support, const gml::Vec3d& normal, const std::vector<gml::Vec3d>& input)
-    {
-        std::vector<std::pair<gml::Vec3d, double>> result;
-        result.reserve(input.size());
-        for (gml::Vec3d vertex : input) {
-            double dist = gml::dot(vertex - support, normal);
-            if (dist < 0) { // outside
-                result.emplace_back(vertex, -dist);
-            }
-        }
-        return result;
-    }
-
     std::optional<ContactManifold> CollisionVisitor::operator()(const BOrientedBox& a, const BOrientedBox& b)
     {
         /*
@@ -335,19 +296,27 @@ namespace physics3d
             flipped = true;
         }
         std::vector<gml::Vec3d> contact_points = {incident[0], incident[1], incident[2], incident[3]};
-        // Sutherland-Hodgman clip against he 4 adjacent faces
-        contact_points = clip(reference[0], gml::normalize(reference[1] - reference[0]), contact_points);
-        contact_points = clip(reference[1], gml::normalize(reference[2] - reference[1]), contact_points);
-        contact_points = clip(reference[2], gml::normalize(reference[3] - reference[2]), contact_points);
-        contact_points = clip(reference[3], gml::normalize(reference[0] - reference[3]), contact_points);
+        // Sutherland-Hodgman clip against the 4 adjacent faces
+        std::array<geometry::Plane, 4> clipping_planes = {
+                geometry::Plane{.support = reference[0], .normal = gml::normalize(reference[1] - reference[0])},
+                geometry::Plane{.support = reference[1], .normal = gml::normalize(reference[2] - reference[1])},
+                geometry::Plane{.support = reference[2], .normal = gml::normalize(reference[3] - reference[2])},
+                geometry::Plane{.support = reference[3], .normal = gml::normalize(reference[0] - reference[3])},
+        };
+        contact_points = clip_sutherland_hodgman(clipping_planes, contact_points);
         // clip and discard against reference face
-        auto contacts = clip_discard(reference[0], flipped ? -manifold.normal : manifold.normal, contact_points);
+        std::vector<std::tuple<gml::Vec3d, double>> contacts_with_depth = clip_discard(
+                geometry::Plane{
+                        .support = reference[0],
+                        .normal = flipped ? manifold.normal : -manifold.normal
+                },
+                contact_points);
 
-        for (auto& [p, d] : contacts) {
+        for (const auto& [point, depth]: contacts_with_depth) {
             ContactPoint contact;
-            contact.depth = d;
-            contact.p_a = flipped ? p : p + -manifold.normal * d;
-            contact.p_b = flipped ? p + -manifold.normal * d : p;
+            contact.depth = depth;
+            contact.p_a = flipped ? point : point + manifold.normal * depth;
+            contact.p_b = flipped ? point - manifold.normal * depth : point;
             contact.r_a = contact.p_a - a.center;
             contact.r_b = contact.p_b - b.center;
 

@@ -67,3 +67,54 @@ physics3d::sat_3d(std::span<gml::Vec3d> vertices_a, std::span<gml::Vec3d> vertic
     // adjust the length to be equal to the penetration distance
     return {min_penetration * gml::normalize(min_penetration_axis)};
 }
+
+gml::Vec3d
+physics3d::intersection(const gml::Vec3d& support, const gml::Vec3d& normal, const gml::Vec3d& l0, const gml::Vec3d& l1)
+{
+    gml::Vec3d line_direction = gml::normalize(l1 - l0);
+    double d = gml::dot(support - l0, normal) / gml::dot(line_direction, normal);
+    return l0 + (line_direction * d);
+}
+
+std::vector<gml::Vec3d>
+physics3d::clip_sutherland_hodgman(std::span<geometry::Plane> clipping_planes, std::span<gml::Vec3d> polygon)
+{
+    std::vector<gml::Vec3d> output;
+    output.insert(output.end(), polygon.begin(), polygon.end());
+    std::vector<gml::Vec3d> input;
+    input.reserve(output.size());
+
+    for (const auto& [support, normal] : clipping_planes) {
+        input.clear();
+        input.insert(input.end(), output.begin(), output.end());
+        output.clear();
+        for (std::size_t i = 0; i < input.size(); ++i) {
+            gml::Vec3d current = input[i];
+            gml::Vec3d previous = input[(i - 1) % 4];
+            if (gml::dot(current - support, normal) >= 0) { // current is inside
+                if (gml::dot(previous - support, normal) < 0) { // previous is outside
+                    output.push_back(intersection(support, normal, previous, current));
+                }
+                output.push_back(current);
+            } else if (gml::dot(previous - support, normal) >= 0) { // current is outside && previous is inside
+                output.push_back(intersection(support, normal, previous, current));
+            }
+        }
+    }
+
+    return output;
+}
+
+std::vector<std::tuple<gml::Vec3d, double>>
+physics3d::clip_discard(const geometry::Plane& clipping_plane, std::span<gml::Vec3d> points)
+{
+    std::vector<std::tuple<gml::Vec3d, double>> result;
+    result.reserve(points.size());
+    for (gml::Vec3d vertex: points) {
+        double dist = gml::dot(vertex - clipping_plane.support, clipping_plane.normal);
+        if (dist >= 0) { // point is inside
+            result.emplace_back(vertex, dist);
+        }
+    }
+    return result;
+}
