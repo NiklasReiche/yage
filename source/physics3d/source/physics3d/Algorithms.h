@@ -11,11 +11,13 @@ namespace physics3d
      * Runs the Separating Axis Theorem solver.
      * @param vertices_a Vertices of body A in world space.
      * @param vertices_b Vertices of body B in world space.
-     * @param axes Projection axes on which to test for separation
+     * @param normals_a Face normals of body A in world space. Parallel normals are redundant and can be omitted.
+     * @param normals_b Face normals of body B in world space. Parallel normals are redundant and can be omitted.
      * @return The minimum translation vector between bodies A and B or empty if a separating axis is found. The length
      * of this vector is equal to the overlap between bodies A and B. The MTV may point from A to B or B to A.
      */
     std::optional<gml::Vec3d> sat_3d(std::span<gml::Vec3d> vertices_a,
                                      std::span<gml::Vec3d> vertices_b,
-                                     std::span<gml::Vec3d> axes);
+                                     std::span<gml::Vec3d> normals_a,
+                                     std::span<gml::Vec3d> normals_b);
 }

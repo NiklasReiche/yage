@@ -1,8 +1,25 @@
+#include <vector>
 #include "Algorithms.h"
 
 std::optional<gml::Vec3d>
-physics3d::sat_3d(std::span<gml::Vec3d> vertices_a, std::span<gml::Vec3d> vertices_b, std::span<gml::Vec3d> axes)
+physics3d::sat_3d(std::span<gml::Vec3d> vertices_a, std::span<gml::Vec3d> vertices_b,
+                  std::span<gml::Vec3d> normals_a, std::span<gml::Vec3d> normals_b)
 {
+    std::vector<gml::Vec3d> axes;
+    axes.reserve(normals_a.size() + normals_b.size() + normals_a.size() * normals_b.size());
+    axes.insert(axes.end(), normals_a.begin(), normals_a.end());
+    axes.insert(axes.end(), normals_b.begin(), normals_b.end());
+    // for 3D SAT we must additionally check the cross products of each normal from A and each normal from B
+    for (const gml::Vec3d& n_a: normals_a) {
+        for (const gml::Vec3d& n_b: normals_b) {
+            gml::Vec3d cross = gml::cross(n_a, n_b);
+            // if the cross product is zero, the normals are parallel, so we can skip this combination
+            if (cross != gml::Vec3d(0)) {
+                axes.push_back(cross);
+            }
+        }
+    }
+
     double min_penetration = std::numeric_limits<double>::max();
     gml::Vec3d min_penetration_axis;
 

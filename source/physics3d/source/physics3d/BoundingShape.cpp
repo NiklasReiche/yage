@@ -306,24 +306,8 @@ namespace physics3d
         normals_b.push_back(gml::normalize(gml::cross(vertices_b[4] - vertices_b[0], vertices_b[3] - vertices_b[0])));
         normals_b.push_back(gml::normalize(gml::cross(vertices_b[4] - vertices_b[0], vertices_b[1] - vertices_b[0])));
 
-        std::vector<gml::Vec3d> normals;
-        for (const auto& n: normals_a) {
-            normals.push_back(n);
-        }
-        for (const auto& n: normals_b) {
-            normals.push_back(n);
-        }
-        for (const auto& n_a: normals_a) {
-            for (const auto& n_b: normals_b) {
-                auto cross = gml::cross(n_a, n_b);
-                if (cross != gml::Vec3d(0)) {
-                    normals.push_back(cross);
-                }
-            }
-        }
-
         // get the minimum translation vector with the SAT
-        std::optional<gml::Vec3d> maybe_mtv = sat_3d(vertices_a, vertices_b, normals);
+        std::optional<gml::Vec3d> maybe_mtv = sat_3d(vertices_a, vertices_b, normals_a, normals_b);
         if (!maybe_mtv.has_value()) {
             return {};
         }
