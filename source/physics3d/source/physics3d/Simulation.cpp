@@ -99,18 +99,23 @@ namespace physics3d
 
     void Simulation::update(double dt)
     {
+        remove_destroyed_bodies();
         integrate_forces(dt);
         detect_collisions(dt);
         resolve_collisions(dt);
         integrate_positions(dt);
+        clear_forces();
     }
 
     void Simulation::update_staggered(double dt)
     {
+        remove_destroyed_bodies();
         resolve_collisions(dt);
         integrate_positions(dt);
+
         integrate_forces(dt);
         detect_collisions(dt);
+        clear_forces();
     }
 
     void Simulation::enable_gravity()
@@ -312,16 +317,7 @@ namespace physics3d
 
     void Simulation::integrate_forces(double dt)
     {
-        std::vector<std::size_t> indices_to_delete;
-
-        for (std::size_t i = 0; i < bodies.size(); ++i) {
-            auto& rb = bodies.at(i);
-
-            if (rb->m_should_destroy) {
-                indices_to_delete.push_back(i);
-                continue;
-            }
-
+        for (auto& rb : bodies) {
             // external forces
             if (rb->m_inertia_shape.inverse_mass() > 0) {
                 rb->m_velocity += m_external_acceleration * dt;
@@ -334,13 +330,6 @@ namespace physics3d
             rb->m_angular_velocity +=
                     rb->m_inertia_shape.inverse_inertia_tensor() * rb->m_torque * dt;
         }
-
-        // erase bodies marked for deletion
-        std::ptrdiff_t n_deleted = 0;
-        for (std::size_t i: indices_to_delete) {
-            bodies.erase(bodies.begin() + static_cast<std::ptrdiff_t>(i) - n_deleted);
-            n_deleted++;
-        }
     }
 
     void Simulation::integrate_positions(double dt)
@@ -348,12 +337,10 @@ namespace physics3d
         for (auto& rigidBody: bodies) {
             // linear component
             rigidBody->m_position += rigidBody->m_velocity * dt;
-            rigidBody->m_force = gml::Vec3d();
 
             // angular component
             rigidBody->m_orientation += 0.5 * gml::Quatd(rigidBody->m_angular_velocity) * rigidBody->m_orientation * dt;
             rigidBody->m_orientation.normalize();
-            rigidBody->m_torque = gml::Vec3d();
 
             rigidBody->update_bounding_volume();
         }
@@ -444,6 +431,32 @@ namespace physics3d
             for (auto& constraint: m_rolling_friction_constraints) {
                 resolve_rolling_friction_constraint(constraint);
             }
+        }
+    }
+
+    void Simulation::remove_destroyed_bodies()
+    {
+        // gather bodies marked for deletion
+        std::vector<std::size_t> indices_to_delete;
+        for (std::size_t i = 0; i < bodies.size(); ++i) {
+            if (bodies[i]->m_should_destroy) {
+                indices_to_delete.push_back(i);
+            }
+        }
+
+        // erase bodies marked for deletion
+        std::ptrdiff_t n_deleted = 0;
+        for (std::size_t i: indices_to_delete) {
+            bodies.erase(bodies.begin() + static_cast<std::ptrdiff_t>(i) - n_deleted);
+            n_deleted++;
+        }
+    }
+
+    void Simulation::clear_forces()
+    {
+        for (auto& rb : bodies) {
+            rb->m_force = gml::Vec3d();
+            rb->m_torque = gml::Vec3d();
         }
     }
 }

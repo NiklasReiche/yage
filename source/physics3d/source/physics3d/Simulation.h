@@ -96,6 +96,10 @@ namespace physics3d
 
         void resolve_collisions(double dt);
 
+        void remove_destroyed_bodies();
+
+        void clear_forces();
+
         static double solve_constraint(Constraint& constraint);
 
         static void apply_impulse(const Constraint& constraint, gml::Matd<12, 1> impulse);
