@@ -82,6 +82,38 @@ namespace physics3d
         return {manifold};
     }
 
+    std::optional<ContactManifold> CollisionVisitor::operator()(const BSphere& a, const BOrientedBox& b)
+    {
+        // transform the sphere's center into the local space of the box
+        gml::Vec3d center = gml::conjugate(b.orientation) * (a.center - b.center);
+        // find the closest point on the box to the sphere's center in the box's local space
+        gml::Vec3d point;
+        point.x() = std::max(-b.half_size.x(), std::min(b.half_size.x(), center.x()));
+        point.y() = std::max(-b.half_size.y(), std::min(b.half_size.y(), center.y()));
+        point.z() = std::max(-b.half_size.z(), std::min(b.half_size.z(), center.z()));
+        // transform point to world space
+        point = b.orientation * point + b.center;
+
+        gml::Vec3d offset = point - a.center;
+        double offset_length = gml::length(offset);
+        if (offset_length > a.radius) {
+            return {};
+        }
+
+        ContactManifold manifold;
+        manifold.normal = gml::normalize(offset);
+
+        ContactPoint contact;
+        contact.depth = a.radius - offset_length;
+        contact.p_a = a.center + a.radius * manifold.normal;
+        contact.p_b = point;
+        contact.r_a = contact.p_a - a.center;
+        contact.r_b = contact.p_b - b.center;
+
+        manifold.contacts.push_back(contact);
+        return {manifold};
+    }
+
     std::optional<ContactManifold> CollisionVisitor::operator()(const BPlane& a, const BSphere& b)
     {
         // The direction of the collision is determined by which side of the plane has more overlap with the sphere,
@@ -152,6 +184,38 @@ namespace physics3d
         }
 
         return manifold;
+    }
+
+    std::optional<ContactManifold> CollisionVisitor::operator()(const BOrientedBox& a, const BSphere& b)
+    {
+        // transform the sphere's center into the local space of the box
+        gml::Vec3d center = gml::conjugate(a.orientation) * (b.center - a.center);
+        // find the closest point on the box to the sphere's center in the box's local space
+        gml::Vec3d point;
+        point.x() = std::max(-a.half_size.x(), std::min(a.half_size.x(), center.x()));
+        point.y() = std::max(-a.half_size.y(), std::min(a.half_size.y(), center.y()));
+        point.z() = std::max(-a.half_size.z(), std::min(a.half_size.z(), center.z()));
+        // transform point to world space
+        point = a.orientation * point + a.center;
+
+        gml::Vec3d offset = point - b.center;
+        double offset_length = gml::length(offset);
+        if (offset_length > b.radius) {
+            return {};
+        }
+
+        ContactManifold manifold;
+        manifold.normal = -gml::normalize(offset);
+
+        ContactPoint contact;
+        contact.depth = b.radius - offset_length;
+        contact.p_a = point;
+        contact.p_b = b.center - b.radius * manifold.normal;
+        contact.r_a = contact.p_a - a.center;
+        contact.r_b = contact.p_b - b.center;
+
+        manifold.contacts.push_back(contact);
+        return {manifold};
     }
 
     std::optional<ContactManifold> CollisionVisitor::operator()(const BOrientedBox& a, const BPlane& b)

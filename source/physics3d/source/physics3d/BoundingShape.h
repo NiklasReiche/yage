@@ -60,10 +60,7 @@ namespace physics3d
 
         std::optional<ContactManifold> operator()(const BSphere& a, const BPlane& b);
 
-        std::optional<ContactManifold> operator()(const BSphere&, const BOrientedBox&)
-        {
-            return {}; // TODO
-        }
+        std::optional<ContactManifold> operator()(const BSphere&, const BOrientedBox&);
 
         std::optional<ContactManifold> operator()(const BPlane& a, const BSphere& b);
 
@@ -71,10 +68,7 @@ namespace physics3d
 
         std::optional<ContactManifold> operator()(const BPlane&, const BOrientedBox&);
 
-        std::optional<ContactManifold> operator()(const BOrientedBox&, const BSphere&)
-        {
-            return {}; // TODO
-        }
+        std::optional<ContactManifold> operator()(const BOrientedBox&, const BSphere&);
 
         std::optional<ContactManifold> operator()(const BOrientedBox&, const BPlane&);
 

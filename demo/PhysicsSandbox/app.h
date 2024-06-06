@@ -160,8 +160,12 @@ public:
         objects.emplace_back(scene_barrier4, barrier4);
 #endif
 
+        load_cube("models/box.glb", gml::Vec3d(0, 2, 0), physics3d::InertiaShape::static_shape());
+
+        //auto ball = load_ball("models/billiard_ball/scene.gltf",
+         //                     gml::Vec3d(-0.5, 0.031, 0));
         auto ball = load_ball("models/billiard_ball/scene.gltf",
-                              gml::Vec3d(-0.5, 0.031, 0));
+                              gml::Vec3d(-0.5, 3.1, 0));
         inputListener.ball = ball.get();
 
         auto point = glContext->getDrawableCreator()->createDrawable(std::vector<float>{},
@@ -170,9 +174,7 @@ public:
                                                                      gl::VertexFormat::INTERLEAVED);
 
 
-        load_cube("models/box.glb", gml::Vec3d(0, 2, 0), physics3d::InertiaShape::cube(2, 1));
-        load_cube("models/box.glb", gml::Vec3d(5.1, 20, 0), physics3d::InertiaShape::cube(2, 1),
-                  gml::quaternion::eulerAngle<double>(0.0, gml::toRad(10.0), gml::toRad(30.0)));
+
 
         load_cube("models/box.glb", gml::Vec3d(5, 2, 0), physics3d::InertiaShape::cube(2, 0.1));
         load_cube("models/box.glb", gml::Vec3d(5.5, 4.1, 0), physics3d::InertiaShape::cube(2, 0.1));
@@ -182,6 +184,9 @@ public:
         load_cube("models/box.glb", gml::Vec3d(5.5, 12.5, 0), physics3d::InertiaShape::cube(2, 0.1));
         load_cube("models/box.glb", gml::Vec3d(5, 14.6, 0), physics3d::InertiaShape::cube(2, 0.1));
         load_cube("models/box.glb", gml::Vec3d(5.5, 16.7, 0), physics3d::InertiaShape::cube(2, 0.1));
+
+        load_cube("models/box.glb", gml::Vec3d(5.1, 20, 0), physics3d::InertiaShape::cube(2, 1),
+                  gml::quaternion::eulerAngle<double>(0.0, gml::toRad(10.0), gml::toRad(30.0)));
 
         while (!window->shouldDestroy()) {
             baseRenderer->clear();
@@ -203,11 +208,11 @@ public:
             pbrShaderNormalMapping->setUniform("camPos", camera->getPosition());
             pbrShader->setUniform("camPos", camera->getPosition());
 
-            //baseRenderer->enableWireframe();
+            baseRenderer->enableWireframe();
             renderer->renderGraph(scene);
-            //baseRenderer->disableWireframe();
+            baseRenderer->disableWireframe();
 
-            //simulation.visualize_collisions(projViewUniform.projection, projViewUniform.view);
+            simulation.visualize_collisions(projViewUniform.projection, projViewUniform.view);
 
             window->swapBuffers();
             window->pollEvents();
