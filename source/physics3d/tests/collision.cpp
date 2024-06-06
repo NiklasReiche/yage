@@ -7,12 +7,12 @@ using namespace gml;
 
 TEST_CASE("RadDegConversion")
 {
-    BOrientedBox b1{
+    BVOrientedBox b1{
             .min = Vec3d(-1, 0, 0),
             .max = Vec3d(0.1, 1, 1),
     };
 
-    BOrientedBox b2{
+    BVOrientedBox b2{
             .min = Vec3d(0, 0, 0),
             .max = Vec3d(1, 1, 1),
     };

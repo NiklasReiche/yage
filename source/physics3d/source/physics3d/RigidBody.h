@@ -26,7 +26,7 @@ namespace physics3d
         Material material;
 
         RigidBody(const InertiaShape& inertia_shape,
-                  const BoundingVolume& bounding_volume,
+                  const Collider& bounding_volume,
                   const Material& material,
                   const gml::Vec3d& initial_position,
                   const gml::Quatd& initial_orientation,
@@ -39,6 +39,10 @@ namespace physics3d
          */
         void apply_force(const gml::Vec3d& force, const gml::Vec3d& point);
 
+        /**
+         * Marks this rigid body for destruction before the next simulation step. While the object itself is not
+         * destroyed, it does get removed from the simulation.
+         */
         void destroy();
 
         [[nodiscard]]
@@ -71,12 +75,12 @@ namespace physics3d
 
         InertiaShape m_inertia_shape;
 
-        std::optional<BoundingVolume> m_bounding_volume;
-        gml::Vec3d m_bounding_volume_offset;
+        std::optional<Collider> m_collider;
+        gml::Vec3d m_collider_offset;
 
         bool m_should_destroy{};
 
-        void update_bounding_volume();
+        void update_collider();
 
         friend class Simulation;
     };

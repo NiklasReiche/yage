@@ -100,9 +100,9 @@ public:
 
         auto ground = simulation.create_rigid_body(
                 physics3d::InertiaShape::static_shape(),
-                physics3d::BoundingVolume{physics3d::BPlane{
+                physics3d::colliders::OrientedPlane{
                         .original_normal = {0, -1, 0},
-                }},
+                },
                 billiard_table,
                 gml::Vec3d(0, 0, 0),
                 gml::quaternion::eulerAngle<double>(0, 0, 0));
@@ -291,9 +291,9 @@ private:
 
         auto rb = simulation.create_rigid_body(
                 physics3d::InertiaShape::sphere(radius, mass),
-                physics3d::BoundingVolume{physics3d::BSphere{
+                physics3d::colliders::Sphere{
                         .radius = radius,
-                }},
+                },
                 billiard_ball,
                 position,
                 gml::quaternion::fromMatrix(
@@ -318,9 +318,9 @@ private:
 
         auto rb = simulation.create_rigid_body(
                 shape,
-                physics3d::BoundingVolume{physics3d::BOrientedBox{
+                physics3d::colliders::OrientedBox{
                         .half_size = gml::Vec3d(1, 1, 1),
-                }},
+                },
                 cube_material,
                 position,
                 orientation);

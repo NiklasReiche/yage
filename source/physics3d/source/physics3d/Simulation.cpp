@@ -342,7 +342,7 @@ namespace physics3d
             rigidBody->m_orientation += 0.5 * gml::Quatd(rigidBody->m_angular_velocity) * rigidBody->m_orientation * dt;
             rigidBody->m_orientation.normalize();
 
-            rigidBody->update_bounding_volume();
+            rigidBody->update_collider();
         }
     }
 
@@ -360,17 +360,17 @@ namespace physics3d
         // collision detection narrow phase
         for (std::size_t i = 0; i < bodies.size() - 1; ++i) {
             auto& rb_a = bodies.at(i);
-            if (!rb_a->m_bounding_volume.has_value())
+            if (!rb_a->m_collider.has_value())
                 continue;
 
             for (std::size_t j = i + 1; j < bodies.size(); ++j) {
                 auto& rb_b = bodies.at(j);
-                if (!rb_b->m_bounding_volume.has_value())
+                if (!rb_b->m_collider.has_value())
                     continue;
 
                 std::optional<ContactManifold> result = std::visit(m_collision_visitor,
-                                                                   rb_a->m_bounding_volume.value(),
-                                                                   rb_b->m_bounding_volume.value());
+                                                                   rb_a->m_collider.value(),
+                                                                   rb_b->m_collider.value());
                 if (result.has_value()) {
                     ContactManifold& manifold = result.value();
                     for (ContactPoint& contact: manifold.contacts) {

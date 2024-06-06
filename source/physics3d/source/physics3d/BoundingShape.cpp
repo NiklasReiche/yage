@@ -16,7 +16,7 @@ namespace physics3d
         return gml::dot(p_b - p_a, -n);
     }
 
-    std::vector<gml::Vec3d> construct_vertices(const BOrientedBox& box)
+    std::vector<gml::Vec3d> construct_vertices(const colliders::OrientedBox& box)
     {
         std::vector<gml::Vec3d> vertices{
                 gml::Vec3d(-box.half_size.x(), -box.half_size.y(), -box.half_size.z()),
@@ -34,7 +34,7 @@ namespace physics3d
         return vertices;
     }
 
-    std::optional<ContactManifold> CollisionVisitor::operator()(const BSphere& a, const BSphere& b)
+    std::optional<ContactManifold> CollisionVisitor::operator()(const colliders::Sphere& a, const colliders::Sphere& b)
     {
         auto ab = b.center - a.center;
         if (gml::sqrLength(ab) > (a.radius + b.radius) * (a.radius + b.radius)) {
@@ -55,14 +55,14 @@ namespace physics3d
         return {manifold};
     }
 
-    std::optional<ContactManifold> CollisionVisitor::operator()(const BSphere& a, const BPlane& b)
+    std::optional<ContactManifold> CollisionVisitor::operator()(const colliders::Sphere& a, const colliders::OrientedPlane& b)
     {
         // The direction of the collision is determined by which side of the plane has more overlap with the sphere,
         // which means that if the sphere's center overshoots the plane, the direction is the wrong way around.
         // This can be solved by continuous collision detection or by incorporating the relative velocity here.
 
         // dist is positive if the circle collides on the outer side and negative otherwise (b.normal points outward)
-        auto dist = gml::dot(a.center - b.support,b.normal);
+        auto dist = gml::dot(a.center - b.support, b.normal);
         auto abs_dist = std::abs(dist);
         if (abs_dist > a.radius) {
             return {};
@@ -82,7 +82,8 @@ namespace physics3d
         return {manifold};
     }
 
-    std::optional<ContactManifold> CollisionVisitor::operator()(const BSphere& a, const BOrientedBox& b)
+    std::optional<ContactManifold>
+    CollisionVisitor::operator()(const colliders::Sphere& a, const colliders::OrientedBox& b)
     {
         // transform the sphere's center into the local space of the box
         gml::Vec3d center = gml::conjugate(b.orientation) * (a.center - b.center);
@@ -114,14 +115,14 @@ namespace physics3d
         return {manifold};
     }
 
-    std::optional<ContactManifold> CollisionVisitor::operator()(const BPlane& a, const BSphere& b)
+    std::optional<ContactManifold> CollisionVisitor::operator()(const colliders::OrientedPlane& a, const colliders::Sphere& b)
     {
         // The direction of the collision is determined by which side of the plane has more overlap with the sphere,
         // which means that if the sphere's center overshoots the plane, the direction is the wrong way around.
         // This can be solved by continuous collision detection or by incorporating the relative velocity here.
 
         // dist is positive if the circle collides on the outer side and negative otherwise (b.normal points outward)
-        auto dist = gml::dot(b.center - a.support,a.normal);
+        auto dist = gml::dot(b.center - a.support, a.normal);
         auto abs_dist = std::abs(dist);
         if (abs_dist > b.radius) {
             return {};
@@ -141,12 +142,13 @@ namespace physics3d
         return {manifold};
     }
 
-    std::optional<ContactManifold> CollisionVisitor::operator()(const BPlane&, const BPlane&)
+    std::optional<ContactManifold> CollisionVisitor::operator()(const colliders::OrientedPlane&, const colliders::OrientedPlane&)
     {
         return {}; // planes should probably not collide with themselves, since they are infinite
     }
 
-    std::optional<ContactManifold> CollisionVisitor::operator()(const BPlane& a, const BOrientedBox& b)
+    std::optional<ContactManifold>
+    CollisionVisitor::operator()(const colliders::OrientedPlane& a, const colliders::OrientedBox& b)
     {
         // The direction of the collision is determined by which side of the plane has more overlap with the box,
         // which means that if the sphere's center overshoots the plane, the direction is the wrong way around.
@@ -159,7 +161,7 @@ namespace physics3d
          */
 
         // dist is positive if the box collides on the outer side and negative otherwise (b.normal points outward)
-        auto dist = gml::dot(b.center - a.support,a.normal);
+        auto dist = gml::dot(b.center - a.support, a.normal);
         ContactManifold manifold;
         manifold.normal = dist > 0 ? a.normal : -a.normal;
 
@@ -186,7 +188,8 @@ namespace physics3d
         return manifold;
     }
 
-    std::optional<ContactManifold> CollisionVisitor::operator()(const BOrientedBox& a, const BSphere& b)
+    std::optional<ContactManifold>
+    CollisionVisitor::operator()(const colliders::OrientedBox& a, const colliders::Sphere& b)
     {
         // transform the sphere's center into the local space of the box
         gml::Vec3d center = gml::conjugate(a.orientation) * (b.center - a.center);
@@ -218,7 +221,8 @@ namespace physics3d
         return {manifold};
     }
 
-    std::optional<ContactManifold> CollisionVisitor::operator()(const BOrientedBox& a, const BPlane& b)
+    std::optional<ContactManifold>
+    CollisionVisitor::operator()(const colliders::OrientedBox& a, const colliders::OrientedPlane& b)
     {
         // The direction of the collision is determined by which side of the plane has more overlap with the box,
         // which means that if the sphere's center overshoots the plane, the direction is the wrong way around.
@@ -258,7 +262,8 @@ namespace physics3d
         return manifold;
     }
 
-    std::optional<ContactManifold> CollisionVisitor::operator()(const BOrientedBox& a, const BOrientedBox& b)
+    std::optional<ContactManifold>
+    CollisionVisitor::operator()(const colliders::OrientedBox& a, const colliders::OrientedBox& b)
     {
         /* Encoding convention for box vertices:
          *    3-------------2

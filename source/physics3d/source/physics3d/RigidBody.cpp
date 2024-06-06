@@ -4,7 +4,7 @@
 namespace physics3d
 {
     RigidBody::RigidBody(const InertiaShape& inertia_shape,
-                         const BoundingVolume& bounding_volume,
+                         const Collider& bounding_volume,
                          const Material& material,
                          const gml::Vec3d& position,
                          const gml::Quatd& orientation,
@@ -13,10 +13,10 @@ namespace physics3d
               m_position(position),
               m_orientation(orientation),
               m_inertia_shape(inertia_shape),
-              m_bounding_volume(bounding_volume),
-              m_bounding_volume_offset(bounding_volume_offset)
+              m_collider(bounding_volume),
+              m_collider_offset(bounding_volume_offset)
     {
-        update_bounding_volume();
+        update_collider();
     }
 
     void RigidBody::apply_force(const gml::Vec3d& force, const gml::Vec3d& point)
@@ -25,24 +25,24 @@ namespace physics3d
         m_torque += gml::cross(force, gml::Vec3d(point - m_position));
     }
 
-    void RigidBody::update_bounding_volume()
+    void RigidBody::update_collider()
     {
-        if (!m_bounding_volume.has_value())
+        if (!m_collider.has_value())
             return;
 
         std::visit(utils::overload{
-                [this](BSphere& sphere) {
-                    sphere.center = m_position + m_bounding_volume_offset;
+                [this](colliders::Sphere& sphere) {
+                    sphere.center = m_position + m_collider_offset;
                 },
-                [this](BPlane& plane) {
-                    plane.support = m_position + m_bounding_volume_offset;
+                [this](colliders::OrientedPlane& plane) {
+                    plane.support = m_position + m_collider_offset;
                     plane.normal = m_orientation * plane.original_normal;
                 },
-                [this](BOrientedBox& box) {
-                    box.center = m_position + m_bounding_volume_offset;
+                [this](colliders::OrientedBox& box) {
+                    box.center = m_position + m_collider_offset;
                     box.orientation = m_orientation;
                 },
-        }, m_bounding_volume.value());
+        }, m_collider.value());
     }
 
     gml::Vec3d RigidBody::position() const
