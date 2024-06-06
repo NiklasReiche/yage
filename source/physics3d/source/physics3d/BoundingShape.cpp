@@ -176,12 +176,7 @@ namespace physics3d
         }
 
         ContactManifold manifold;
-        // make sure that the collision normal points away from A
-        if (gml::dot(maybe_mtv.value(), b.center - a.center) >= 0) {
-            manifold.normal = gml::normalize(maybe_mtv.value());
-        } else {
-            manifold.normal = -gml::normalize(maybe_mtv.value());
-        }
+        manifold.normal = gml::normalize(maybe_mtv.value());
 
         const auto [face_a, face_a_normal] =
                 most_perpendicular_cube_face(manifold.normal, vertices_a);

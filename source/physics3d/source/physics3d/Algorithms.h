@@ -33,8 +33,8 @@ namespace physics3d
      * @param vertices_b Vertices of body B in world space.
      * @param normals_a Face normals of body A in world space. Parallel normals are redundant and can be omitted.
      * @param normals_b Face normals of body B in world space. Parallel normals are redundant and can be omitted.
-     * @return The minimum translation vector between bodies A and B or empty if a separating axis is found. The length
-     * of this vector is equal to the overlap between bodies A and B. The MTV may point from A to B or B to A.
+     * @return The minimum translation vector (MTV) between bodies A and B or empty if a separating axis is found.
+     * The MTV's magnitude is equal to the overlap between bodies A and B. The MTV points away from A.
      */
     std::optional<gml::Vec3d> sat_3d(std::span<gml::Vec3d> vertices_a,
                                      std::span<gml::Vec3d> vertices_b,

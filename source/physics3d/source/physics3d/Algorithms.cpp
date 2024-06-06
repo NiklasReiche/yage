@@ -15,7 +15,7 @@ physics3d::sat_3d(std::span<gml::Vec3d> vertices_a, std::span<gml::Vec3d> vertic
             gml::Vec3d cross = gml::cross(n_a, n_b);
             // if the cross product is zero, the normals are parallel, so we can skip this combination
             if (cross != gml::Vec3d(0)) {
-                axes.push_back(cross);
+                axes.push_back(gml::normalize(cross));
             }
         }
     }
@@ -44,26 +44,25 @@ physics3d::sat_3d(std::span<gml::Vec3d> vertices_a, std::span<gml::Vec3d> vertic
         // test whether the projected ranges overlap
         if (a_min <= b_min && b_min <= a_max) {
             // a:  a_min |---------------| a_max
-            // b:          b_min |----------------| b_max
-            double penetration = a_max - b_min;
+            // b:          b_min |----~~~~~~~
+            double penetration = std::min(a_max, b_max) - b_min;
             if (penetration < min_penetration) {
                 min_penetration = penetration;
                 min_penetration_axis = axis;
             }
         } else if (b_min <= a_min && a_min <= b_max) {
-            // a:         a_min |----------------| a_max
+            // a:         a_min |---~~~~~~~~~
             // b: b_min |--------------| b_max
-            double penetration = b_max - a_min;
+            double penetration = std::min(b_max, a_max) - a_min;
             if (penetration < min_penetration) {
                 min_penetration = penetration;
-                min_penetration_axis = axis;
+                min_penetration_axis = -axis; // invert axis so it points away from A
             }
         } else {
             // no overlap, we found a separating axis
             return {};
         }
     }
-    // TODO: wrong axis one frame after edge-face collision
 
     // adjust the length to be equal to the penetration distance
     return {min_penetration * gml::normalize(min_penetration_axis)};
