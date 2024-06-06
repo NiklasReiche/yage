@@ -12,7 +12,7 @@ uniform vec3 point = vec3(0, 0, 0);
 uniform float size = 5.0;
 uniform vec3 color = vec3(1, 1, 1);
 
-void main() {    
+void main() {
 	gl_PointSize = size;
 	fColor = color;
 

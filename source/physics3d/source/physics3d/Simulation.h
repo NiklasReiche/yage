@@ -4,12 +4,9 @@
 #include <tuple>
 #include <vector>
 
-#include <core/gl/Context.h>
-#include <core/gl/Shader.h>
-#include <core/gl/Drawable.h>
-
 #include "RigidBody.h"
 #include "Collision.h"
+#include "Visualizer.h"
 
 namespace physics3d
 {
@@ -22,7 +19,7 @@ namespace physics3d
     public:
         Simulation() = default;
 
-        explicit Simulation(gl::IContext& context);
+        explicit Simulation(Visualizer visualizer);
 
         /**
          * Performs one full simulation step. The order of operation is:
@@ -61,7 +58,7 @@ namespace physics3d
 
         void disable_gravity();
 
-        void visualize(const gml::Mat4d& projection, const gml::Mat4d& view);
+        void visualize_collisions(const gml::Mat4d& projection, const gml::Mat4d& view);
 
     private:
         /**
@@ -89,10 +86,7 @@ namespace physics3d
         std::vector<Constraint> m_friction_constraints;
         std::vector<Constraint> m_rolling_friction_constraints;
 
-        std::vector<ContactPoint> m_contact_points;
-        std::shared_ptr<gl::IShader> m_point_shader;
-        std::shared_ptr<gl::IDrawable> m_empty_drawable;
-        std::shared_ptr<gl::IRenderer> m_renderer;
+        std::unique_ptr<Visualizer> m_visualizer;
 
         void integrate_forces(double dt);
 

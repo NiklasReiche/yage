@@ -1,22 +1,15 @@
 #include "Simulation.h"
+#include "core/gl/color.h"
 #include <gml/quaternion.h>
-#include "shaders.h"
-#include <core/gl/color.h>
+
+#include <memory>
+#include <utility>
 
 namespace physics3d
 {
-    Simulation::Simulation(gl::IContext& context)
+    Simulation::Simulation(Visualizer visualizer)
     {
-        m_point_shader = context.getShaderCreator()->createShader(shaders::PointShader::vert,
-                                                                  shaders::PointShader::frag,
-                                                                  shaders::PointShader::geom);
-
-        m_empty_drawable = context.getDrawableCreator()->createDrawable(std::vector<float>{},
-                                                        std::vector<unsigned int>{},
-                                                        {},
-                                                        gl::VertexFormat::INTERLEAVED);
-
-        m_renderer = context.getRenderer();
+        m_visualizer = std::make_unique<Visualizer>(std::move(visualizer));
     }
 
     gml::Matd<12, 12> Simulation::inverse_mass_matrix(RigidBody& a, RigidBody& b)
@@ -310,25 +303,10 @@ namespace physics3d
         apply_impulse(constraint, delta_impulse);
     }
 
-    void Simulation::visualize(const gml::Mat4d& projection, const gml::Mat4d& view)
+    void Simulation::visualize_collisions(const gml::Mat4d& projection, const gml::Mat4d& view)
     {
-        if (m_renderer == nullptr){
-            throw std::runtime_error("Calling visualize but no context provided");
-        }
-
-        m_renderer->enablePointSize();
-        m_renderer->useShader(*m_point_shader);
-        m_point_shader->setUniform("projection", projection);
-        m_point_shader->setUniform("view", view);
-        m_point_shader->setUniform("size", 10.0f);
-
-        for (const ContactPoint& contact_point : m_contact_points) {
-            m_point_shader->setUniform("point", contact_point.p_a);
-            m_point_shader->setUniform("color", gl::toVec3(gl::Color::GREEN));
-            m_renderer->draw(*m_empty_drawable);
-            m_point_shader->setUniform("point", contact_point.p_b);
-            m_point_shader->setUniform("color", gl::toVec3(gl::Color::BLUE));
-            m_renderer->draw(*m_empty_drawable);
+        if (m_visualizer) {
+            m_visualizer->draw(projection, view);
         }
     }
 
@@ -387,7 +365,10 @@ namespace physics3d
         m_friction_constraints.clear();
         m_rolling_friction_constraints.clear();
 
-        m_contact_points.clear();
+        if (m_visualizer) {
+            m_visualizer->points.clear();
+            m_visualizer->vectors.clear();
+        }
 
         // collision detection narrow phase
         for (std::size_t i = 0; i < bodies.size() - 1; ++i) {
@@ -428,7 +409,10 @@ namespace physics3d
                         m_rolling_friction_constraints.push_back(crf_1);
                         m_rolling_friction_constraints.push_back(crf_2);
 
-                        m_contact_points.push_back(contact);
+                        if (m_visualizer) {
+                            m_visualizer->points.emplace_back(contact.p_a, gl::Color::GREEN);
+                            m_visualizer->points.emplace_back(contact.p_b, gl::Color::BLUE);
+                        }
                     }
                 }
             }

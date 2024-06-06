@@ -10,4 +10,11 @@ namespace physics3d::shaders
         static const std::string geom;
         static const std::string frag;
 	};
+
+    struct VectorShader
+    {
+        static const std::string vert;
+        static const std::string geom;
+        static const std::string frag;
+    };
 }

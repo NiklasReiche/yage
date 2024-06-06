@@ -25,7 +25,7 @@ public:
         window = std::make_shared<platform::desktop::GlfwWindow>(1500, 900, "Sandbox");
         glContext = gl::createContext(window);
 
-        simulation = physics3d::Simulation(*glContext);
+        simulation = physics3d::Simulation(physics3d::Visualizer(*glContext));
 
         camera = std::make_shared<gl3d::Camera>(
                 gl3d::Camera(gml::Vec3f(0.0f, 2.0f, 2.0f),
@@ -171,8 +171,8 @@ public:
 
 
         load_cube("models/box.glb", gml::Vec3d(0, 1, 0), physics3d::InertiaShape::static_shape());
-        load_cube("models/box.glb", gml::Vec3d(0.5, 4, 0), physics3d::InertiaShape::cube(2, 1),
-                  gml::quaternion::eulerAngle<double>(0.0, gml::toRad(0.), gml::toRad(45.0)));
+        load_cube("models/box.glb", gml::Vec3d(1.01, 4, 0), physics3d::InertiaShape::cube(2, 1),
+                  gml::quaternion::eulerAngle<double>(0.0, gml::toRad(10.0), gml::toRad(30.0)));
 
         while (!window->shouldDestroy()) {
             baseRenderer->clear();
@@ -194,11 +194,9 @@ public:
             pbrShaderNormalMapping->setUniform("camPos", camera->getPosition());
             pbrShader->setUniform("camPos", camera->getPosition());
 
-            baseRenderer->enableWireframe();
             renderer->renderGraph(scene);
-            baseRenderer->disableWireframe();
 
-            simulation.visualize(projViewUniform.projection, projViewUniform.view);
+            //simulation.visualize_collisions(projViewUniform.projection, projViewUniform.view);
 
             window->swapBuffers();
             window->pollEvents();
