@@ -16,6 +16,24 @@ namespace physics3d
         return gml::dot(p_b - p_a, -n);
     }
 
+    std::vector<gml::Vec3d> construct_vertices(const BOrientedBox& box)
+    {
+        std::vector<gml::Vec3d> vertices{
+                gml::Vec3d(-box.half_size.x(), -box.half_size.y(), -box.half_size.z()),
+                gml::Vec3d(box.half_size.x(), -box.half_size.y(), -box.half_size.z()),
+                gml::Vec3d(box.half_size.x(), box.half_size.y(), -box.half_size.z()),
+                gml::Vec3d(-box.half_size.x(), box.half_size.y(), -box.half_size.z()),
+                gml::Vec3d(-box.half_size.x(), -box.half_size.y(), box.half_size.z()),
+                gml::Vec3d(box.half_size.x(), -box.half_size.y(), box.half_size.z()),
+                gml::Vec3d(box.half_size.x(), box.half_size.y(), box.half_size.z()),
+                gml::Vec3d(-box.half_size.x(), box.half_size.y(), box.half_size.z()),
+        };
+        for (gml::Vec3d& vertex: vertices) {
+            vertex = box.orientation * vertex + box.center;
+        }
+        return vertices;
+    }
+
     std::optional<ContactManifold> CollisionVisitor::operator()(const BSphere& a, const BSphere& b)
     {
         auto ab = b.center - a.center;
@@ -39,9 +57,12 @@ namespace physics3d
 
     std::optional<ContactManifold> CollisionVisitor::operator()(const BSphere& a, const BPlane& b)
     {
+        // The direction of the collision is determined by which side of the plane has more overlap with the sphere,
+        // which means that if the sphere's center overshoots the plane, the direction is the wrong way around.
+        // This can be solved by continuous collision detection or by incorporating the relative velocity here.
+
         // dist is positive if the circle collides on the outer side and negative otherwise (b.normal points outward)
-        auto dist = gml::dot(a.center - b.support,
-                             b.normal); // projection does not need denominator, since normal is unit length
+        auto dist = gml::dot(a.center - b.support,b.normal);
         auto abs_dist = std::abs(dist);
         if (abs_dist > a.radius) {
             return {};
@@ -63,9 +84,12 @@ namespace physics3d
 
     std::optional<ContactManifold> CollisionVisitor::operator()(const BPlane& a, const BSphere& b)
     {
+        // The direction of the collision is determined by which side of the plane has more overlap with the sphere,
+        // which means that if the sphere's center overshoots the plane, the direction is the wrong way around.
+        // This can be solved by continuous collision detection or by incorporating the relative velocity here.
+
         // dist is positive if the circle collides on the outer side and negative otherwise (b.normal points outward)
-        auto dist = gml::dot(b.center - a.support,
-                             a.normal); // projection does not need denominator, since normal is unit length
+        auto dist = gml::dot(b.center - a.support,a.normal);
         auto abs_dist = std::abs(dist);
         if (abs_dist > b.radius) {
             return {};
@@ -90,9 +114,89 @@ namespace physics3d
         return {}; // planes should probably not collide with themselves, since they are infinite
     }
 
+    std::optional<ContactManifold> CollisionVisitor::operator()(const BPlane& a, const BOrientedBox& b)
+    {
+        // The direction of the collision is determined by which side of the plane has more overlap with the box,
+        // which means that if the sphere's center overshoots the plane, the direction is the wrong way around.
+        // This can be solved by continuous collision detection or by incorporating the relative velocity here.
+
+        /*             ___      ^                          ^
+         *            | b |     |                  ___     |
+         *      --a---|___|--------         --a---| b |--------
+         *                                        |___|
+         */
+
+        // dist is positive if the box collides on the outer side and negative otherwise (b.normal points outward)
+        auto dist = gml::dot(b.center - a.support,a.normal);
+        ContactManifold manifold;
+        manifold.normal = dist > 0 ? a.normal : -a.normal;
+
+        // TODO: these can be precomputed
+        std::vector<gml::Vec3d> vertices_b = construct_vertices(b);
+
+        std::vector<std::tuple<gml::Vec3d, double>> contacts_with_depth =
+                clip_discard(geometry::Plane{.support = a.support, .normal = -manifold.normal}, vertices_b);
+
+        if (contacts_with_depth.empty())
+            return {};
+
+        for (const auto& [point, depth]: contacts_with_depth) {
+            ContactPoint contact;
+            contact.depth = depth;
+            contact.p_a = point + manifold.normal * depth;
+            contact.p_b = point;
+            contact.r_a = contact.p_a - a.support;
+            contact.r_b = contact.p_b - b.center;
+
+            manifold.contacts.push_back(contact);
+        }
+
+        return manifold;
+    }
+
+    std::optional<ContactManifold> CollisionVisitor::operator()(const BOrientedBox& a, const BPlane& b)
+    {
+        // The direction of the collision is determined by which side of the plane has more overlap with the box,
+        // which means that if the sphere's center overshoots the plane, the direction is the wrong way around.
+        // This can be solved by continuous collision detection or by incorporating the relative velocity here.
+
+        /*             ___      ^                          ^
+         *            | a |     |                  ___     |
+         *      --b---|___|--------         --b---| a |--------
+         *                                        |___|
+         */
+
+        // dist is positive if the circle collides on the outer side and negative otherwise (b.normal points outward)
+        auto dist = gml::dot(a.center - b.support, b.normal);
+        ContactManifold manifold;
+        manifold.normal = dist > 0 ? -b.normal : b.normal;
+
+        // TODO: these can be precomputed
+        std::vector<gml::Vec3d> vertices_a = construct_vertices(a);
+
+        std::vector<std::tuple<gml::Vec3d, double>> contacts_with_depth =
+                clip_discard(geometry::Plane{.support = b.support, .normal = manifold.normal}, vertices_a);
+
+        if (contacts_with_depth.empty())
+            return {};
+
+        for (const auto& [point, depth]: contacts_with_depth) {
+            ContactPoint contact;
+            contact.depth = depth;
+            contact.p_a = point;
+            contact.p_b = point - manifold.normal * depth;
+            contact.r_a = contact.p_a - a.center;
+            contact.r_b = contact.p_b - b.support;
+
+            manifold.contacts.push_back(contact);
+        }
+
+        return manifold;
+    }
+
     std::optional<ContactManifold> CollisionVisitor::operator()(const BOrientedBox& a, const BOrientedBox& b)
     {
-        /*
+        /* Encoding convention for box vertices:
          *    3-------------2
          *   /|            /|
          *  / |           / |
@@ -105,39 +209,13 @@ namespace physics3d
          */
 
         // TODO: these can be precomputed
-        std::vector<gml::Vec3d> vertices_a{
-                gml::Vec3d(-a.half_size.x(), -a.half_size.y(), -a.half_size.z()),
-                gml::Vec3d(a.half_size.x(), -a.half_size.y(), -a.half_size.z()),
-                gml::Vec3d(a.half_size.x(), a.half_size.y(), -a.half_size.z()),
-                gml::Vec3d(-a.half_size.x(), a.half_size.y(), -a.half_size.z()),
-                gml::Vec3d(-a.half_size.x(), -a.half_size.y(), a.half_size.z()),
-                gml::Vec3d(a.half_size.x(), -a.half_size.y(), a.half_size.z()),
-                gml::Vec3d(a.half_size.x(), a.half_size.y(), a.half_size.z()),
-                gml::Vec3d(-a.half_size.x(), a.half_size.y(), a.half_size.z()),
-        };
-        std::vector<gml::Vec3d> vertices_b{
-                gml::Vec3d(-b.half_size.x(), -b.half_size.y(), -b.half_size.z()),
-                gml::Vec3d(b.half_size.x(), -b.half_size.y(), -b.half_size.z()),
-                gml::Vec3d(b.half_size.x(), b.half_size.y(), -b.half_size.z()),
-                gml::Vec3d(-b.half_size.x(), b.half_size.y(), -b.half_size.z()),
-                gml::Vec3d(-b.half_size.x(), -b.half_size.y(), b.half_size.z()),
-                gml::Vec3d(b.half_size.x(), -b.half_size.y(), b.half_size.z()),
-                gml::Vec3d(b.half_size.x(), b.half_size.y(), b.half_size.z()),
-                gml::Vec3d(-b.half_size.x(), b.half_size.y(), b.half_size.z()),
-        };
-
-        for (gml::Vec3d& vertex: vertices_a) {
-            vertex = a.orientation * vertex + a.center;
-        }
+        std::vector<gml::Vec3d> vertices_a = construct_vertices(a);
+        std::vector<gml::Vec3d> vertices_b = construct_vertices(b);
         std::vector<gml::Vec3d> normals_a{
                 gml::normalize(gml::cross(vertices_a[1] - vertices_a[0], vertices_a[3] - vertices_a[0])),
                 gml::normalize(gml::cross(vertices_a[4] - vertices_a[0], vertices_a[3] - vertices_a[0])),
                 gml::normalize(gml::cross(vertices_a[4] - vertices_a[0], vertices_a[1] - vertices_a[0]))
         };
-
-        for (gml::Vec3d& vertex: vertices_b) {
-            vertex = b.orientation * vertex + b.center;
-        }
         std::vector<gml::Vec3d> normals_b{
                 gml::normalize(gml::cross(vertices_b[1] - vertices_b[0], vertices_b[3] - vertices_b[0])),
                 gml::normalize(gml::cross(vertices_b[4] - vertices_b[0], vertices_b[3] - vertices_b[0])),

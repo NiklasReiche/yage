@@ -98,7 +98,6 @@ public:
                                                              *glContext->getTextureCreator(), pbrShader,
                                                              pbrShaderNormalMapping).at(0);
 
-#if 0
         auto ground = simulation.create_rigid_body(
                 physics3d::InertiaShape::static_shape(),
                 physics3d::BoundingVolume{physics3d::BPlane{
@@ -113,6 +112,7 @@ public:
 
         objects.emplace_back(scene_ground, ground);
 
+#if 0
         auto barrier1 = simulation.create_rigid_body(
                 physics3d::InertiaShape::static_shape(),
                 physics3d::BoundingVolume{physics3d::BPlane{
@@ -170,9 +170,18 @@ public:
                                                                      gl::VertexFormat::INTERLEAVED);
 
 
-        load_cube("models/box.glb", gml::Vec3d(0, 1, 0), physics3d::InertiaShape::static_shape());
-        load_cube("models/box.glb", gml::Vec3d(1.01, 4, 0), physics3d::InertiaShape::cube(2, 1),
+        load_cube("models/box.glb", gml::Vec3d(0, 2, 0), physics3d::InertiaShape::cube(2, 1));
+        load_cube("models/box.glb", gml::Vec3d(5.1, 20, 0), physics3d::InertiaShape::cube(2, 1),
                   gml::quaternion::eulerAngle<double>(0.0, gml::toRad(10.0), gml::toRad(30.0)));
+
+        load_cube("models/box.glb", gml::Vec3d(5, 2, 0), physics3d::InertiaShape::cube(2, 0.1));
+        load_cube("models/box.glb", gml::Vec3d(5.5, 4.1, 0), physics3d::InertiaShape::cube(2, 0.1));
+        load_cube("models/box.glb", gml::Vec3d(5, 6.2, 0), physics3d::InertiaShape::cube(2, 0.1));
+        load_cube("models/box.glb", gml::Vec3d(5.5, 8.3, 0), physics3d::InertiaShape::cube(2, 0.1));
+        load_cube("models/box.glb", gml::Vec3d(5, 10.4, 0), physics3d::InertiaShape::cube(2, 0.1));
+        load_cube("models/box.glb", gml::Vec3d(5.5, 12.5, 0), physics3d::InertiaShape::cube(2, 0.1));
+        load_cube("models/box.glb", gml::Vec3d(5, 14.6, 0), physics3d::InertiaShape::cube(2, 0.1));
+        load_cube("models/box.glb", gml::Vec3d(5.5, 16.7, 0), physics3d::InertiaShape::cube(2, 0.1));
 
         while (!window->shouldDestroy()) {
             baseRenderer->clear();
@@ -194,7 +203,9 @@ public:
             pbrShaderNormalMapping->setUniform("camPos", camera->getPosition());
             pbrShader->setUniform("camPos", camera->getPosition());
 
+            //baseRenderer->enableWireframe();
             renderer->renderGraph(scene);
+            //baseRenderer->disableWireframe();
 
             //simulation.visualize_collisions(projViewUniform.projection, projViewUniform.view);
 
