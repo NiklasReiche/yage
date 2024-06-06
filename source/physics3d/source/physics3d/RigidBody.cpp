@@ -27,8 +27,10 @@ namespace physics3d
 
     void RigidBody::update_bounding_volume()
     {
+        if (!m_bounding_volume.has_value())
+            return;
+
         std::visit(utils::overload{
-                [](BNoCollider&) {},
                 [this](BSphere& sphere) {
                     sphere.center = m_position + m_bounding_volume_offset;
                 },
@@ -40,7 +42,7 @@ namespace physics3d
                     box.center = m_position + m_bounding_volume_offset;
                     box.orientation = m_orientation;
                 },
-        }, m_bounding_volume);
+        }, m_bounding_volume.value());
     }
 
     gml::Vec3d RigidBody::position() const

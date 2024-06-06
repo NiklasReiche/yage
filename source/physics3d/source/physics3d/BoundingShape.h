@@ -10,13 +10,6 @@
 namespace physics3d
 {
     /**
-     * Represents a non-existent collider.
-     */
-    struct BNoCollider
-    {
-    };
-
-    /**
      * Represents a bounding sphere.
      */
     struct BSphere
@@ -55,7 +48,7 @@ namespace physics3d
         // TODO: normals can also be precomputed
     };
 
-    using BoundingVolume = std::variant<BNoCollider, BSphere, BPlane, BOrientedBox>;
+    using BoundingVolume = std::variant<BSphere, BPlane, BOrientedBox>;
 
     /**
      * Implements collision detection between the various bounding volume types.
@@ -63,19 +56,6 @@ namespace physics3d
     class CollisionVisitor
     {
     public:
-        std::optional<ContactManifold> operator()(const BNoCollider& a, const BNoCollider& b);
-
-        std::optional<ContactManifold> operator()(const BNoCollider& a, const BSphere& b);
-
-        std::optional<ContactManifold> operator()(const BNoCollider& a, const BPlane& b);
-
-        std::optional<ContactManifold> operator()(const BNoCollider&, const BOrientedBox&)
-        {
-            return {}; // TODO
-        }
-
-        std::optional<ContactManifold> operator()(const BSphere& a, const BNoCollider& b);
-
         std::optional<ContactManifold> operator()(const BSphere& a, const BSphere& b);
 
         std::optional<ContactManifold> operator()(const BSphere& a, const BPlane& b);
@@ -87,16 +67,10 @@ namespace physics3d
 
         std::optional<ContactManifold> operator()(const BPlane& a, const BSphere& b);
 
-        std::optional<ContactManifold> operator()(const BPlane& a, const BNoCollider& b);
-
         std::optional<ContactManifold> operator()(const BPlane& a, const BPlane& b);
 
         std::optional<ContactManifold> operator()(const BPlane&, const BOrientedBox&)
         {
-            return {}; // TODO
-        }
-
-        std::optional<ContactManifold> operator()(const BOrientedBox&, const BNoCollider&){
             return {}; // TODO
         }
 

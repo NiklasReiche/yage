@@ -71,7 +71,7 @@ namespace physics3d
 
         InertiaShape m_inertia_shape;
 
-        BoundingVolume m_bounding_volume;
+        std::optional<BoundingVolume> m_bounding_volume;
         gml::Vec3d m_bounding_volume_offset;
 
         bool m_should_destroy{};

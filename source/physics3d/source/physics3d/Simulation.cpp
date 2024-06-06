@@ -373,10 +373,17 @@ namespace physics3d
         // collision detection narrow phase
         for (std::size_t i = 0; i < bodies.size() - 1; ++i) {
             auto& rb_a = bodies.at(i);
+            if (!rb_a->m_bounding_volume.has_value())
+                continue;
+
             for (std::size_t j = i + 1; j < bodies.size(); ++j) {
                 auto& rb_b = bodies.at(j);
+                if (!rb_b->m_bounding_volume.has_value())
+                    continue;
 
-                auto result = std::visit(m_collision_visitor, rb_a->m_bounding_volume, rb_b->m_bounding_volume);
+                std::optional<ContactManifold> result = std::visit(m_collision_visitor,
+                                                                   rb_a->m_bounding_volume.value(),
+                                                                   rb_b->m_bounding_volume.value());
                 if (result.has_value()) {
                     ContactManifold& manifold = result.value();
                     for (ContactPoint& contact: manifold.contacts) {
