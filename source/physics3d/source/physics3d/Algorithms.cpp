@@ -56,13 +56,14 @@ physics3d::sat_3d(std::span<gml::Vec3d> vertices_a, std::span<gml::Vec3d> vertic
             double penetration = b_max - a_min;
             if (penetration < min_penetration) {
                 min_penetration = penetration;
-                min_penetration_axis = -axis;
+                min_penetration_axis = axis;
             }
         } else {
             // no overlap, we found a separating axis
             return {};
         }
     }
+    // TODO: wrong axis one frame after edge-face collision
 
     // adjust the length to be equal to the penetration distance
     return {min_penetration * gml::normalize(min_penetration_axis)};

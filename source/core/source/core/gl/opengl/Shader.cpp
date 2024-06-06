@@ -77,6 +77,15 @@ namespace opengl
 		lockContextPtr()->bindShader(program);
 		glUniform3f(uniformLocations.at(name), value.x(), value.y(), value.z());
 	}
+
+    void Shader::setUniform(const std::string& name, gml::Vec4f value)
+    {
+        if (!hasUniform(name))
+            throw std::invalid_argument("unknown uniform '" + name + "'");
+
+        lockContextPtr()->bindShader(program);
+        glUniform4f(uniformLocations.at(name), value.x(), value.y(), value.z(), value.w());
+    }
 	
 	void Shader::setUniform(const std::string& name, const gml::Mat4f value)
 	{

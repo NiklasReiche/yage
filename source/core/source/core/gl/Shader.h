@@ -28,6 +28,7 @@ namespace gl
 		virtual void setUniform(const std::string& name, bool value) = 0;
 		virtual void setUniform(const std::string& name, float value) = 0;
 		virtual void setUniform(const std::string& name, gml::Vec3f value) = 0;
+        virtual void setUniform(const std::string& name, gml::Vec4f value) = 0;
 		virtual void setUniform(const std::string& name, gml::Mat4f value) = 0;
 
 		virtual void linkUniformBlock(const IUniformBlock& uniformBlock) = 0;

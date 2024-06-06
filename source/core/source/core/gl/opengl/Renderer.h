@@ -47,6 +47,9 @@ namespace opengl
 		void disableWireframe() override;
 		void setWireframe(bool value) override;
 
+        void enablePointSize() override;
+        void disablePointSize() override;
+
 	private:
 		gml::Vec4f clearColor = gml::Vec4f(0, 0, 0, 1);
 

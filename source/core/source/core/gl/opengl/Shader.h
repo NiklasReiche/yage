@@ -22,6 +22,7 @@ namespace opengl
 		void setUniform(const std::string& name, bool value) override;
 		void setUniform(const std::string& name, float value) override;
 		void setUniform(const std::string& name, gml::Vec3f value) override;
+        void setUniform(const std::string& name, gml::Vec4f value) override;
 		void setUniform(const std::string& name, gml::Mat4f value) override;
 
 		void linkUniformBlock(const gl::IUniformBlock& uniformBlock) override;

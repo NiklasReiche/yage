@@ -90,7 +90,7 @@ public:
         }
         if (code == input::KeyEvent::Code::KEY_RIGHT && (action == input::KeyEvent::Action::PRESS ||
                                                          action == input::KeyEvent::Action::REPEAT)) {
-            sim->update(1. / 60);
+            sim->update_staggered(1. / 60);
         }
         if (code == input::KeyEvent::Code::KEY_SPACE && action == input::KeyEvent::Action::PRESS) {
             toggle_simulation();

@@ -188,4 +188,14 @@ namespace opengl
 	{
 		lockContextPtr()->bindTexture(static_cast<GLenum>(texture.target), texture.id, unit);
 	}
+
+    void Renderer::enablePointSize()
+    {
+        glEnable(GL_PROGRAM_POINT_SIZE);
+    }
+
+    void Renderer::disablePointSize()
+    {
+        glDisable(GL_PROGRAM_POINT_SIZE);
+    }
 }

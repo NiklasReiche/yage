@@ -37,8 +37,8 @@ namespace physics3d
                     plane.normal = m_orientation * plane.original_normal;
                 },
                 [this](BOrientedBox& box) {
+                    box.center = m_position + m_bounding_volume_offset;
                     box.orientation = m_orientation;
-                    box.center = m_position;
                 },
         }, m_bounding_volume);
     }

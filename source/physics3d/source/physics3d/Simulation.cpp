@@ -1,8 +1,24 @@
 #include "Simulation.h"
 #include <gml/quaternion.h>
+#include "shaders.h"
+#include <core/gl/color.h>
 
 namespace physics3d
 {
+    Simulation::Simulation(gl::IContext& context)
+    {
+        m_point_shader = context.getShaderCreator()->createShader(shaders::PointShader::vert,
+                                                                  shaders::PointShader::frag,
+                                                                  shaders::PointShader::geom);
+
+        m_empty_drawable = context.getDrawableCreator()->createDrawable(std::vector<float>{},
+                                                        std::vector<unsigned int>{},
+                                                        {},
+                                                        gl::VertexFormat::INTERLEAVED);
+
+        m_renderer = context.getRenderer();
+    }
+
     gml::Matd<12, 12> Simulation::inverse_mass_matrix(RigidBody& a, RigidBody& b)
     {
         // TODO: instead of this sparse matrix multiplication, use the direct formula for the effective mass matrix
@@ -90,114 +106,18 @@ namespace physics3d
 
     void Simulation::update(double dt)
     {
-        std::vector<std::size_t> indices_to_delete;
+        integrate_forces(dt);
+        detect_collisions(dt);
+        resolve_collisions(dt);
+        integrate_positions(dt);
+    }
 
-        for (std::size_t i = 0; i < bodies.size(); ++i) {
-            auto& rb = bodies.at(i);
-
-            if (rb->m_should_destroy) {
-                indices_to_delete.push_back(i);
-                continue;
-            }
-
-            // external forces
-            if (rb->m_inertia_shape.inverse_mass() > 0) {
-                rb->m_velocity += m_external_acceleration * dt;
-            }
-
-            // linear component
-            rb->m_velocity += rb->m_inertia_shape.inverse_mass() * rb->m_force * dt;
-
-            // angular component
-            rb->m_angular_velocity +=
-                    rb->m_inertia_shape.inverse_inertia_tensor() * rb->m_torque * dt;
-        }
-
-        // erase bodies marked for deletion
-        std::ptrdiff_t n_deleted = 0;
-        for (std::size_t i : indices_to_delete) {
-            bodies.erase(bodies.begin() + static_cast<std::ptrdiff_t>(i) - n_deleted);
-            n_deleted++;
-        }
-
-        m_penetration_constraints.clear();
-        m_friction_constraints.clear();
-        m_rolling_friction_constraints.clear();
-
-        // collision detection narrow phase
-        for (std::size_t i = 0; i < bodies.size() - 1; ++i) {
-            auto& rb_a = bodies.at(i);
-            for (std::size_t j = i + 1; j < bodies.size(); ++j) {
-                auto& rb_b = bodies.at(j);
-
-                auto result = std::visit(m_collision_visitor, rb_a->m_bounding_volume, rb_b->m_bounding_volume);
-                if (result.has_value()) {
-                    ContactManifold& manifold = result.value();
-                    for (auto& contact: manifold.contacts) {
-                        gml::Vec3d v_abs_p_a = rb_a->m_velocity + gml::cross(rb_a->m_angular_velocity, contact.r_a);
-                        gml::Vec3d v_abs_p_b = rb_b->m_velocity + gml::cross(rb_b->m_angular_velocity, contact.r_b);
-                        contact.rel_v = v_abs_p_b - v_abs_p_a;
-                        contact.rel_v_n = gml::dot(contact.rel_v, manifold.normal);
-
-                        // Gram-Schmidt method using the relative velocity as the initial vector for the projection
-                        // don't normalize tangent here, since it might be zero-length
-                        manifold.tangent_1 = contact.rel_v - manifold.normal * gml::dot(contact.rel_v, manifold.normal);
-                        if (gml::sqrLength(manifold.tangent_1) < 0.0000001) {
-                            // tangent is parallel to n, so we need another approach
-                            std::tie(manifold.tangent_1, manifold.tangent_2) = tangent_plane(manifold.normal);
-                        } else {
-                            manifold.tangent_1.normalize();
-                            // normalization not necessary, since tangent and normal are already normalized
-                            manifold.tangent_2 = gml::cross(manifold.tangent_1, manifold.normal);
-                        }
-
-                        m_penetration_constraints.push_back(
-                                prepare_penetration_constraint(*rb_a, *rb_b, manifold, contact, dt));
-
-                        auto [cf_0, cf_1] = prepare_friction_constraints(*rb_a, *rb_b, manifold, contact);
-                        m_friction_constraints.push_back(cf_0);
-                        m_friction_constraints.push_back(cf_1);
-
-                        auto [crf_0, crf_1, crf_2] = prepare_rolling_friction_constraints(*rb_a, *rb_b, manifold);
-                        m_rolling_friction_constraints.push_back(crf_0);
-                        m_rolling_friction_constraints.push_back(crf_1);
-                        m_rolling_friction_constraints.push_back(crf_2);
-                    }
-                }
-            }
-        }
-
-        // once all constraints are created, we can construct the dependencies
-        for (std::size_t i = 0; i < m_friction_constraints.size(); ++i) {
-            m_friction_constraints.at(i).dependent_constraint = {&m_penetration_constraints.at(i / 2)};
-        }
-
-        for (int i = 0; i < m_solver_iterations; ++i) {
-            // don't interleave constraints, since the friction impulse depends on the normal impulse
-            for (auto& constraint: m_penetration_constraints) {
-                resolve_penetration_constraint(constraint);
-            }
-            for (auto& constraint: m_friction_constraints) {
-                resolve_friction_constraint(constraint);
-            }
-            for (auto& constraint: m_rolling_friction_constraints) {
-                resolve_rolling_friction_constraint(constraint);
-            }
-        }
-
-        // integrate position and orientation after collision impulses are applied
-        for (auto& rigidBody: bodies) {
-            // linear component
-            rigidBody->m_position += rigidBody->m_velocity * dt;
-            rigidBody->m_force = gml::Vec3d();
-
-            // angular component
-            rigidBody->m_orientation += 0.5 * gml::Quatd(rigidBody->m_angular_velocity) * rigidBody->m_orientation * dt;
-            rigidBody->m_orientation.normalize();
-            rigidBody->m_torque = gml::Vec3d();
-
-            rigidBody->update_bounding_volume();
-        }
+    void Simulation::update_staggered(double dt)
+    {
+        resolve_collisions(dt);
+        integrate_positions(dt);
+        integrate_forces(dt);
+        detect_collisions(dt);
     }
 
     void Simulation::enable_gravity()
@@ -388,5 +308,151 @@ namespace physics3d
         // TODO: can we do something more physically accurate?
         auto delta_impulse = friction_coefficient * delta_lambda * constraint.j_t;
         apply_impulse(constraint, delta_impulse);
+    }
+
+    void Simulation::visualize(const gml::Mat4d& projection, const gml::Mat4d& view)
+    {
+        if (m_renderer == nullptr){
+            throw std::runtime_error("Calling visualize but no context provided");
+        }
+
+        m_renderer->enablePointSize();
+        m_renderer->useShader(*m_point_shader);
+        m_point_shader->setUniform("projection", projection);
+        m_point_shader->setUniform("view", view);
+        m_point_shader->setUniform("size", 10.0f);
+
+        for (const ContactPoint& contact_point : m_contact_points) {
+            m_point_shader->setUniform("point", contact_point.p_a);
+            m_point_shader->setUniform("color", gl::toVec3(gl::Color::GREEN));
+            m_renderer->draw(*m_empty_drawable);
+            m_point_shader->setUniform("point", contact_point.p_b);
+            m_point_shader->setUniform("color", gl::toVec3(gl::Color::BLUE));
+            m_renderer->draw(*m_empty_drawable);
+        }
+    }
+
+    void Simulation::integrate_forces(double dt)
+    {
+        std::vector<std::size_t> indices_to_delete;
+
+        for (std::size_t i = 0; i < bodies.size(); ++i) {
+            auto& rb = bodies.at(i);
+
+            if (rb->m_should_destroy) {
+                indices_to_delete.push_back(i);
+                continue;
+            }
+
+            // external forces
+            if (rb->m_inertia_shape.inverse_mass() > 0) {
+                rb->m_velocity += m_external_acceleration * dt;
+            }
+
+            // linear component
+            rb->m_velocity += rb->m_inertia_shape.inverse_mass() * rb->m_force * dt;
+
+            // angular component
+            rb->m_angular_velocity +=
+                    rb->m_inertia_shape.inverse_inertia_tensor() * rb->m_torque * dt;
+        }
+
+        // erase bodies marked for deletion
+        std::ptrdiff_t n_deleted = 0;
+        for (std::size_t i: indices_to_delete) {
+            bodies.erase(bodies.begin() + static_cast<std::ptrdiff_t>(i) - n_deleted);
+            n_deleted++;
+        }
+    }
+
+    void Simulation::integrate_positions(double dt)
+    {
+        for (auto& rigidBody: bodies) {
+            // linear component
+            rigidBody->m_position += rigidBody->m_velocity * dt;
+            rigidBody->m_force = gml::Vec3d();
+
+            // angular component
+            rigidBody->m_orientation += 0.5 * gml::Quatd(rigidBody->m_angular_velocity) * rigidBody->m_orientation * dt;
+            rigidBody->m_orientation.normalize();
+            rigidBody->m_torque = gml::Vec3d();
+
+            rigidBody->update_bounding_volume();
+        }
+    }
+
+    void Simulation::detect_collisions(double dt)
+    {
+        m_penetration_constraints.clear();
+        m_friction_constraints.clear();
+        m_rolling_friction_constraints.clear();
+
+        m_contact_points.clear();
+
+        // collision detection narrow phase
+        for (std::size_t i = 0; i < bodies.size() - 1; ++i) {
+            auto& rb_a = bodies.at(i);
+            for (std::size_t j = i + 1; j < bodies.size(); ++j) {
+                auto& rb_b = bodies.at(j);
+
+                auto result = std::visit(m_collision_visitor, rb_a->m_bounding_volume, rb_b->m_bounding_volume);
+                if (result.has_value()) {
+                    ContactManifold& manifold = result.value();
+                    for (ContactPoint& contact: manifold.contacts) {
+                        gml::Vec3d v_abs_p_a = rb_a->m_velocity + gml::cross(rb_a->m_angular_velocity, contact.r_a);
+                        gml::Vec3d v_abs_p_b = rb_b->m_velocity + gml::cross(rb_b->m_angular_velocity, contact.r_b);
+                        contact.rel_v = v_abs_p_b - v_abs_p_a;
+                        contact.rel_v_n = gml::dot(contact.rel_v, manifold.normal);
+
+                        // Gram-Schmidt method using the relative velocity as the initial vector for the projection
+                        // don't normalize tangent here, since it might be zero-length
+                        manifold.tangent_1 = contact.rel_v - manifold.normal * gml::dot(contact.rel_v, manifold.normal);
+                        if (gml::sqrLength(manifold.tangent_1) < 0.0000001) {
+                            // tangent is parallel to n, so we need another approach
+                            std::tie(manifold.tangent_1, manifold.tangent_2) = tangent_plane(manifold.normal);
+                        } else {
+                            manifold.tangent_1.normalize();
+                            // normalization not necessary, since tangent and normal are already normalized
+                            manifold.tangent_2 = gml::cross(manifold.tangent_1, manifold.normal);
+                        }
+
+                        m_penetration_constraints.push_back(
+                                prepare_penetration_constraint(*rb_a, *rb_b, manifold, contact, dt));
+
+                        auto [cf_0, cf_1] = prepare_friction_constraints(*rb_a, *rb_b, manifold, contact);
+                        m_friction_constraints.push_back(cf_0);
+                        m_friction_constraints.push_back(cf_1);
+
+                        auto [crf_0, crf_1, crf_2] = prepare_rolling_friction_constraints(*rb_a, *rb_b, manifold);
+                        m_rolling_friction_constraints.push_back(crf_0);
+                        m_rolling_friction_constraints.push_back(crf_1);
+                        m_rolling_friction_constraints.push_back(crf_2);
+
+                        m_contact_points.push_back(contact);
+                    }
+                }
+            }
+        }
+
+        // once all constraints are created, we can construct the dependencies
+        for (std::size_t i = 0; i < m_friction_constraints.size(); ++i) {
+            m_friction_constraints.at(i).dependent_constraint = {&m_penetration_constraints.at(i / 2)};
+        }
+    }
+
+    void Simulation::resolve_collisions(double)
+    {
+        for (int i = 0; i < m_solver_iterations; ++i) {
+            // don't interleave constraints, since the friction impulse depends on the normal impulse
+            for (auto& constraint: m_penetration_constraints) {
+                resolve_penetration_constraint(constraint);
+            }
+            for (auto& constraint: m_friction_constraints) {
+                resolve_friction_constraint(constraint);
+            }
+            for (auto& constraint: m_rolling_friction_constraints) {
+                resolve_rolling_friction_constraint(constraint);
+            }
+        }
     }
 }

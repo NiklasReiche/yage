@@ -54,6 +54,9 @@ namespace gl
 		virtual void disableWireframe() = 0;
 		virtual void setWireframe(bool value) = 0;
 
+        virtual void enablePointSize() = 0;
+        virtual void disablePointSize() = 0;
+
 	protected:
 		IRenderer() = default;
 		IRenderer(const IRenderer& other) = default;
