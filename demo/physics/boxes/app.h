@@ -105,7 +105,7 @@ public:
 
         constexpr const double dt = 1. / 60.;
         window->getTimeStep();
-
+        double accumulator = 0.0;
         while (!window->shouldDestroy()) {
             double frame_time = window->getTimeStep();
 
@@ -114,13 +114,14 @@ public:
             inputListener.applyUpdate();
 
             if (simulate) {
-                while (frame_time >= 0.0) {
+                accumulator += frame_time;
+                while (accumulator >= dt) {
                     if (visualize) {
-                        simulation.update_staggered(1.0 / 60);
+                        simulation.update_staggered(dt);
                     } else {
-                        simulation.update(1. / 60.);
+                        simulation.update(dt);
                     }
-                    frame_time -= dt;
+                    accumulator -= dt;
                 }
             }
 
