@@ -16,24 +16,6 @@ namespace physics3d
         return gml::dot(p_b - p_a, -n);
     }
 
-    std::vector<gml::Vec3d> construct_vertices(const colliders::OrientedBox& box)
-    {
-        std::vector<gml::Vec3d> vertices{
-                gml::Vec3d(-box.half_size.x(), -box.half_size.y(), -box.half_size.z()),
-                gml::Vec3d(box.half_size.x(), -box.half_size.y(), -box.half_size.z()),
-                gml::Vec3d(box.half_size.x(), box.half_size.y(), -box.half_size.z()),
-                gml::Vec3d(-box.half_size.x(), box.half_size.y(), -box.half_size.z()),
-                gml::Vec3d(-box.half_size.x(), -box.half_size.y(), box.half_size.z()),
-                gml::Vec3d(box.half_size.x(), -box.half_size.y(), box.half_size.z()),
-                gml::Vec3d(box.half_size.x(), box.half_size.y(), box.half_size.z()),
-                gml::Vec3d(-box.half_size.x(), box.half_size.y(), box.half_size.z()),
-        };
-        for (gml::Vec3d& vertex: vertices) {
-            vertex = box.orientation * vertex + box.center;
-        }
-        return vertices;
-    }
-
     std::optional<ContactManifold> CollisionVisitor::operator()(const colliders::Sphere& a, const colliders::Sphere& b)
     {
         auto ab = b.center - a.center;
@@ -165,11 +147,8 @@ namespace physics3d
         ContactManifold manifold;
         manifold.normal = dist > 0 ? a.normal : -a.normal;
 
-        // TODO: these can be precomputed
-        std::vector<gml::Vec3d> vertices_b = construct_vertices(b);
-
         std::vector<std::tuple<gml::Vec3d, double>> contacts_with_depth =
-                clip_discard(geometry::Plane{.support = a.support, .normal = -manifold.normal}, vertices_b);
+                clip_discard(geometry::Plane{.support = a.support, .normal = -manifold.normal}, b.oriented_vertices);
 
         if (contacts_with_depth.empty())
             return {};
@@ -239,11 +218,8 @@ namespace physics3d
         ContactManifold manifold;
         manifold.normal = dist > 0 ? -b.normal : b.normal;
 
-        // TODO: these can be precomputed
-        std::vector<gml::Vec3d> vertices_a = construct_vertices(a);
-
         std::vector<std::tuple<gml::Vec3d, double>> contacts_with_depth =
-                clip_discard(geometry::Plane{.support = b.support, .normal = manifold.normal}, vertices_a);
+                clip_discard(geometry::Plane{.support = b.support, .normal = manifold.normal}, a.oriented_vertices);
 
         if (contacts_with_depth.empty())
             return {};
@@ -277,22 +253,9 @@ namespace physics3d
          * 4-------------5       z
          */
 
-        // TODO: these can be precomputed
-        std::vector<gml::Vec3d> vertices_a = construct_vertices(a);
-        std::vector<gml::Vec3d> vertices_b = construct_vertices(b);
-        std::vector<gml::Vec3d> normals_a{
-                gml::normalize(gml::cross(vertices_a[1] - vertices_a[0], vertices_a[3] - vertices_a[0])),
-                gml::normalize(gml::cross(vertices_a[4] - vertices_a[0], vertices_a[3] - vertices_a[0])),
-                gml::normalize(gml::cross(vertices_a[4] - vertices_a[0], vertices_a[1] - vertices_a[0]))
-        };
-        std::vector<gml::Vec3d> normals_b{
-                gml::normalize(gml::cross(vertices_b[1] - vertices_b[0], vertices_b[3] - vertices_b[0])),
-                gml::normalize(gml::cross(vertices_b[4] - vertices_b[0], vertices_b[3] - vertices_b[0])),
-                gml::normalize(gml::cross(vertices_b[4] - vertices_b[0], vertices_b[1] - vertices_b[0])),
-        };
-
         // get the minimum translation vector with the SAT
-        std::optional<gml::Vec3d> maybe_mtv = sat_3d(vertices_a, vertices_b, normals_a, normals_b);
+        std::optional<gml::Vec3d> maybe_mtv = sat_3d(a.oriented_vertices, b.oriented_vertices,
+                                                     a.oriented_face_normals, b.oriented_face_normals);
         if (!maybe_mtv.has_value()) {
             return {};
         }
@@ -301,9 +264,9 @@ namespace physics3d
         manifold.normal = gml::normalize(maybe_mtv.value());
 
         const auto [face_a, face_a_normal] =
-                most_perpendicular_cube_face(manifold.normal, vertices_a);
+                most_perpendicular_cube_face(manifold.normal, a.oriented_vertices);
         const auto [face_b, face_b_normal] =
-                most_perpendicular_cube_face(-manifold.normal, vertices_b);
+                most_perpendicular_cube_face(-manifold.normal, b.oriented_vertices);
 
         geometry::Rectangle reference, incident;
         bool flipped = false;

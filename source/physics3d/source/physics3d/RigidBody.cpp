@@ -41,6 +41,7 @@ namespace physics3d
                 [this](colliders::OrientedBox& box) {
                     box.center = m_position + m_collider_offset;
                     box.orientation = m_orientation;
+                    box.update_computed_values();
                 },
         }, m_collider.value());
     }

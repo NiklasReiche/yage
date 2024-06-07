@@ -2,8 +2,8 @@
 #include "Algorithms.h"
 
 std::optional<gml::Vec3d>
-physics3d::sat_3d(std::span<gml::Vec3d> vertices_a, std::span<gml::Vec3d> vertices_b,
-                  std::span<gml::Vec3d> normals_a, std::span<gml::Vec3d> normals_b)
+physics3d::sat_3d(std::span<const gml::Vec3d> vertices_a, std::span<const gml::Vec3d> vertices_b,
+                  std::span<const gml::Vec3d> normals_a, std::span<const gml::Vec3d> normals_b)
 {
     std::vector<gml::Vec3d> axes;
     axes.reserve(normals_a.size() + normals_b.size() + normals_a.size() * normals_b.size());
@@ -77,7 +77,7 @@ physics3d::intersection(const gml::Vec3d& support, const gml::Vec3d& normal, con
 }
 
 std::vector<gml::Vec3d>
-physics3d::clip_sutherland_hodgman(std::span<geometry::Plane> clipping_planes, std::span<gml::Vec3d> polygon)
+physics3d::clip_sutherland_hodgman(std::span<geometry::Plane> clipping_planes, std::span<const gml::Vec3d> polygon)
 {
     std::vector<gml::Vec3d> output;
     output.insert(output.end(), polygon.begin(), polygon.end());
@@ -106,7 +106,7 @@ physics3d::clip_sutherland_hodgman(std::span<geometry::Plane> clipping_planes, s
 }
 
 std::vector<std::tuple<gml::Vec3d, double>>
-physics3d::clip_discard(const geometry::Plane& clipping_plane, std::span<gml::Vec3d> points)
+physics3d::clip_discard(const geometry::Plane& clipping_plane, std::span<const gml::Vec3d> points)
 {
     std::vector<std::tuple<gml::Vec3d, double>> result;
     result.reserve(points.size());
@@ -120,7 +120,7 @@ physics3d::clip_discard(const geometry::Plane& clipping_plane, std::span<gml::Ve
 }
 
 std::tuple<physics3d::geometry::Rectangle, gml::Vec3d>
-physics3d::most_perpendicular_cube_face(const gml::Vec3d& n, std::span<gml::Vec3d> vertices)
+physics3d::most_perpendicular_cube_face(const gml::Vec3d& n, std::span<const gml::Vec3d> vertices)
 {
     // encodes the 3 adjacent faces (4 vertex indices and one normal index) for each vertex
     // note that the normal is expressed by the vertex opposite the corner in the (negative) normal direction
