@@ -103,16 +103,25 @@ public:
                                                                      {},
                                                                      gl::VertexFormat::INTERLEAVED);
 
+        constexpr const double dt = 1. / 60.;
+        window->getTimeStep();
+        double accumulator = 0.0;
         while (!window->shouldDestroy()) {
+            double frame_time = window->getTimeStep();
+
             baseRenderer->clear();
 
             inputListener.applyUpdate();
 
             if (simulate) {
-                if (visualize) {
-                    simulation.update_staggered(1.0 / 60);
-                } else {
-                    simulation.update(1. / 60.);
+                accumulator += frame_time;
+                while (accumulator >= dt) {
+                    if (visualize) {
+                        simulation.update_staggered(dt);
+                    } else {
+                        simulation.update(dt);
+                    }
+                    accumulator -= dt;
                 }
             }
 
@@ -150,7 +159,7 @@ private:
     const double billiard_ball_radius = 0.03;
     const double billiard_ball_mass = 0.17;
 
-    std::shared_ptr<platform::IWindow> window;
+    std::shared_ptr<platform::desktop::GlfwWindow> window;
     std::shared_ptr<gl::IContext> glContext;
     MovementListener inputListener;
 
