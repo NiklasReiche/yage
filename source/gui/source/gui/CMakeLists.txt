@@ -20,8 +20,8 @@ target_sources(yage_gui
         widgets/frame.cpp
         widgets/label.h
         widgets/label.cpp
-        widgets/ListBox.h
-        widgets/ListBox.cpp
+        widgets/listBox.h
+        widgets/listBox.cpp
 
         animation.h
         animation.cpp

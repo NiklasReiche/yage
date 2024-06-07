@@ -16,7 +16,7 @@ int main()
 	    0.0f, 0.5f, 0.0f, 0.0f, 1.0f,
 	};
 	const std::array<unsigned int, 3> indices = { 0, 1, 2 };
-	auto triangle = context->getDrawableCreator()->createDrawable(vertices, indices, { 2, 3 }, gl::VertexFormat::INTERLEAVED);
+	auto triangle = context->getDrawableCreator()->createDrawable(vertices, indices, std::vector<unsigned int>{ 2, 3 }, gl::VertexFormat::INTERLEAVED);
 
 	auto fileReader = platform::desktop::FileReader();
 	const std::string vertexCode = fileReader.

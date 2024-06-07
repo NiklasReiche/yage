@@ -1,7 +1,9 @@
 #pragma once
 
 #include <span>
+#include <vector>
 #include <optional>
+#include <tuple>
 
 #include <gml/vector.h>
 

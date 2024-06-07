@@ -9,8 +9,7 @@ cmake_policy(SET CMP0076 NEW)
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(CMAKE_EXE_LINKER_FLAGS "-static")
-
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 ######################
 # Global options     #

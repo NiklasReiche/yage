@@ -14,11 +14,11 @@ namespace gl3d
 
     void DirectionalLight::update_uniforms(gl::IShader& shader, std::size_t i)
     {
-        shader.setUniform(ShaderSnippets::DIR_LIGHTS_NAME + "[" + utils::toString(i) + "]." +
-                          ShaderSnippets::DIR_LIGHT_DIRECTION_NAME,
+        shader.setUniform(std::string(ShaderSnippets::DIR_LIGHTS_NAME) + "[" + utils::toString(i) + "]." +
+                          std::string(ShaderSnippets::DIR_LIGHT_DIRECTION_NAME),
                           direction);
-        shader.setUniform(ShaderSnippets::DIR_LIGHTS_NAME + "[" + utils::toString(i) + "]." +
-                          ShaderSnippets::LIGHT_COLOR_NAME,
+        shader.setUniform(std::string(ShaderSnippets::DIR_LIGHTS_NAME) + "[" + utils::toString(i) + "]." +
+                          std::string(ShaderSnippets::LIGHT_COLOR_NAME),
                           color);
     }
 
@@ -34,11 +34,11 @@ namespace gl3d
 
     void PointLight::update_uniforms(gl::IShader& shader, std::size_t i)
     {
-        shader.setUniform(ShaderSnippets::POINT_LIGHTS_NAME + "[" + utils::toString(i) + "]." +
-                          ShaderSnippets::POINT_LIGHT_POSITION_NAME,
+        shader.setUniform(std::string(ShaderSnippets::POINT_LIGHTS_NAME) + "[" + utils::toString(i) + "]." +
+                          std::string(ShaderSnippets::POINT_LIGHT_POSITION_NAME),
                           position);
-        shader.setUniform(ShaderSnippets::POINT_LIGHTS_NAME + "[" + utils::toString(i) + "]." +
-                          ShaderSnippets::LIGHT_COLOR_NAME,
+        shader.setUniform(std::string(ShaderSnippets::POINT_LIGHTS_NAME) + "[" + utils::toString(i) + "]." +
+                          std::string(ShaderSnippets::LIGHT_COLOR_NAME),
                           color);
     }
 

@@ -51,12 +51,12 @@ namespace gl3d
                 auto shader = sub_mesh->material().shader();
 
                 // TODO: lights should probably not be uniforms, but rather UBOs or SSBOs
-                shader->setUniform(gl3d::ShaderSnippets::DIR_LIGHTS_AMOUNT_NAME,
+                shader->setUniform(std::string(ShaderSnippets::DIR_LIGHTS_AMOUNT_NAME),
                                    static_cast<int>(uniformValues.dir_lights.size()));
                 for (std::size_t i = 0; i < uniformValues.dir_lights.size(); ++i) {
                     uniformValues.dir_lights[i]->update_uniforms(*shader, i);
                 }
-                shader->setUniform(gl3d::ShaderSnippets::POINT_LIGHTS_AMOUNT_NAME,
+                shader->setUniform(std::string(ShaderSnippets::POINT_LIGHTS_AMOUNT_NAME),
                                    static_cast<int>(uniformValues.point_lights.size()));
                 for (std::size_t i = 0; i < uniformValues.point_lights.size(); ++i) {
                     uniformValues.point_lights[i]->update_uniforms(*shader, i);
