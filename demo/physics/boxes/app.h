@@ -16,6 +16,7 @@
 #include "MovementListener.h"
 #include "ProjectionView.h"
 #include "gl3d/shaders.h"
+#include <chrono>
 
 class App
 {
@@ -102,16 +103,24 @@ public:
 
         load_ground();
 
+        constexpr const double dt = 1. / 60.;
+        window->getTimeStep();
+
         while (!window->shouldDestroy()) {
+            double frame_time = window->getTimeStep();
+
             baseRenderer->clear();
 
             inputListener.applyUpdate();
 
             if (simulate) {
-                if (visualize) {
-                    simulation.update_staggered(1.0 / 60);
-                } else {
-                    simulation.update(1. / 60.);
+                while (frame_time >= 0.0) {
+                    if (visualize) {
+                        simulation.update_staggered(1.0 / 60);
+                    } else {
+                        simulation.update(1. / 60.);
+                    }
+                    frame_time -= dt;
                 }
             }
 
@@ -151,7 +160,7 @@ private:
     const gml::Vec3d box_offset = gml::Vec3d(0, 1.2, 0);
     const int box_length = 2;
 
-    std::shared_ptr<platform::IWindow> window;
+    std::shared_ptr<platform::desktop::GlfwWindow> window;
     std::shared_ptr<gl::IContext> glContext;
     MovementListener inputListener;
 
