@@ -79,15 +79,17 @@ public:
         auto ground = load_ground(gml::Vec3d(0));
 
         load_barrier(gml::Vec3d(1, 0, 0),
-                     gml::quaternion::eulerAngle<double>(-std::numbers::pi_v<double> / 2, 0, 0));
+                     gml::quaternion::eulerAngle<double>(-std::numbers::pi_v<double> / 2, 0, 0),
+                     gml::Vec3d(0.5, 1.0, 1.0));
 
-        load_barrier(gml::Vec3d(0, 0, 0.6),
+        load_barrier(gml::Vec3d(0, 0, 0.5),
                      gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double>, 0, 0));
 
-        load_barrier(gml::Vec3d(0, 0, -0.6), gml::Quatd());
+        load_barrier(gml::Vec3d(0, 0, -0.5), gml::Quatd());
 
         load_barrier(gml::Vec3d(-1, 0, 0),
-                     gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double> / 2, 0, 0));
+                     gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double> / 2, 0, 0),
+                     gml::Vec3d(0.5, 1.0, 1.0));
 
         load_balls(gml::Vec3d(0.35, ground->position().y() + billiard_ball_radius + 0.00001, 0));
 
@@ -220,7 +222,7 @@ private:
         return rb;
     }
 
-    void load_balls(const gml::Vec3d offset)
+    void load_balls(const gml::Vec3d& offset)
     {
         const double epsilon = 0.00000001;
         const double height =
@@ -237,7 +239,7 @@ private:
     }
 
     std::shared_ptr<physics3d::RigidBody>
-    load_barrier(const gml::Vec3d& position, const gml::Quatd& orientation)
+    load_barrier(const gml::Vec3d& position, const gml::Quatd& orientation, const gml::Vec3d& scale = gml::Vec3d(1))
     {
         if (!barrier_mesh) {
             barrier_mesh = gl3d::resources::gltf_read_meshes(platform::desktop::FileReader(),
@@ -257,6 +259,7 @@ private:
 
         auto& scene_barrier = scene->create_object("barrier");
         scene_barrier.mesh = barrier_mesh;
+        scene_barrier.local_transform = gml::matrix::scale(scale);
         objects.emplace_back(scene_barrier, rb_barrier);
 
         return rb_barrier;
@@ -281,6 +284,7 @@ private:
 
         auto& scene_ground = scene->create_object("ground");
         scene_ground.mesh = ground_mesh;
+        scene_ground.local_transform = gml::matrix::scale(1.0, 1.0, 0.5);
 
         objects.emplace_back(scene_ground, rb_ground);
 
