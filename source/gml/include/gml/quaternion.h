@@ -39,7 +39,7 @@ namespace gml
 
 	/**
 	 * @brief Represents a generic quaternion.
-	 * 
+	 *
 	 * @tparam T The type of the quaternion's components.
 	 */
 	template<typename T>
@@ -58,7 +58,7 @@ namespace gml
 
 		/**
 		 * @brief Initializes the given values.
-		 * 
+		 *
 		 * @param w The quaternion's w component.
 		 * @param x The quaternion's x component.
 		 * @param y The quaternion's y component.
@@ -71,7 +71,7 @@ namespace gml
 
 		/**
 		 * @brief Constructs a pure quaternion from a vector.
-		 * 
+		 *
 		 * @param v The vector to construct from.
 		 */
 		constexpr explicit Quaternion(const Vec3 <T>& v)
@@ -81,7 +81,7 @@ namespace gml
 
 		/**
 		 * @brief Normalizes this quaternion.
-		 * 
+		 *
 		 * @return A reference to this quaternion.
 		 */
 		constexpr Quaternion<T>& normalize()
@@ -95,7 +95,7 @@ namespace gml
 
 		/**
 		 * @brief Conjugates this quaternion.
-		 * 
+		 *
 		 * @return A reference to this quaternion.
 		 */
 		constexpr Quaternion<T>& conjugate()
@@ -108,7 +108,7 @@ namespace gml
 
 		/**
 		 * @brief Extracts the Forward vector of the rotation expressed by this quaternion.
-		 * 
+		 *
 		 * @return the Forward vector
 		 */
 		[[nodiscard]]
@@ -121,7 +121,7 @@ namespace gml
 
 		/**
 		 * @brief Extracts the Right vector of the rotation expressed by this quaternion.
-		 * 
+		 *
 		 * @return the Right vector
 		 */
 		[[nodiscard]]
@@ -134,7 +134,7 @@ namespace gml
 
 		/**
 		 * @brief Extracts the Up vector of the rotation expressed by this quaternion.
-		 * 
+		 *
 		 * @return the Up vector
 		 */
 		[[nodiscard]]
@@ -147,7 +147,7 @@ namespace gml
 
 		/**
 		 * @brief Extracts the pitch of the rotation expressed by this quaternion.
-		 * 
+		 *
 		 * @return the pitch in radians
 		 */
 		[[nodiscard]]
@@ -270,10 +270,10 @@ namespace gml
     template<typename T>
     constexpr gml::Vec3<T> operator*(const Quaternion<T>& lhs, const Vec3<T>& rhs)
     {
-        // TODO: simplify
-        Quaternion<T> p(0, rhs.x(), rhs.y(), rhs.z());
-        p = lhs * p * gml::conjugate(lhs);
-        return gml::Vec3<T>(p.x, p.y, p.z);
+        gml::Vec3<T> u(lhs.x, lhs.y, lhs.z);
+        return 2 * gml::dot(u, rhs) * u
+               + (lhs.w * lhs.w - gml::dot(u, u)) * rhs
+               + 2 * lhs.w * gml::cross(u, rhs);
     }
 
 	template<typename T, typename T2>
