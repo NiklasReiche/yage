@@ -31,8 +31,8 @@ public:
 
         camera = std::make_shared<gl3d::Camera>(
                 gl3d::Camera(gml::Vec3f(25.0f, 25.0f, 25.0f),
-                             gml::quaternion::eulerAngle<double>(gml::toRad(225.), 0, 0) *
-                             gml::quaternion::eulerAngle<double>(0, 0, gml::toRad(30.))));
+                             gml::quaternion::eulerAngle<double>(gml::to_rad(225.), 0, 0) *
+                             gml::quaternion::eulerAngle<double>(0, 0, gml::to_rad(30.))));
 
         baseRenderer = glContext->getRenderer();
         baseRenderer->setClearColor(0x008080FFu);
@@ -87,7 +87,7 @@ public:
     {
         double height = box_stack * (box_length + 0.5);
         load_cube("models/box.glb", box_offset + gml::Vec3d(0, height, 0),
-                  gml::quaternion::eulerAngle<double>(0.0, gml::toRad(10.0), gml::toRad(30.0)));
+                  gml::quaternion::eulerAngle<double>(0.0, gml::to_rad(10.0), gml::to_rad(30.0)));
         box_stack++;
     }
 
@@ -266,8 +266,8 @@ private:
         light2.light = lightRes2;
         light2.local_transform =
                 gml::matrix::fromQuaternion<double>(
-                        gml::quaternion::eulerAngle<double>(gml::toRad(200.), 0, 0) *
-                        gml::quaternion::eulerAngle<double>(0, 0, gml::toRad(60.))
+                        gml::quaternion::eulerAngle<double>(gml::to_rad(200.), 0, 0) *
+                        gml::quaternion::eulerAngle<double>(0, 0, gml::to_rad(60.))
                 );
 
     }

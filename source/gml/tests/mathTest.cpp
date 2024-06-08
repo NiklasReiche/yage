@@ -10,51 +10,51 @@ TEST_CASE("RadDegConversion")
 {
 	auto pi_f = pi_v<float>;
 
-	SECTION("toRad") {
+	SECTION("to_rad") {
 		SECTION("zero") {
-			CHECK(toRad(0.0) == 0.0);
+			CHECK(to_rad(0.0) == 0.0);
 
-			CHECK(toRad(0.0f) == 0.0f);
+			CHECK(to_rad(0.0f) == 0.0f);
 		}
 		
 		SECTION("PI") {
-			CHECK(toRad(180.0) == Catch::Approx(pi));
-			CHECK(toRad(360.0) == Catch::Approx(2 * pi));
-			CHECK(toRad(540.0) == Catch::Approx(3 * pi));
+			CHECK(to_rad(180.0) == Catch::Approx(pi));
+			CHECK(to_rad(360.0) == Catch::Approx(2 * pi));
+			CHECK(to_rad(540.0) == Catch::Approx(3 * pi));
 
-			CHECK(toRad(180.0f) == Catch::Approx(pi_f));
-			CHECK(toRad(360.0f) == Catch::Approx(2 * pi_f));
-			CHECK(toRad(540.0f) == Catch::Approx(3 * pi_f));
+			CHECK(to_rad(180.0f) == Catch::Approx(pi_f));
+			CHECK(to_rad(360.0f) == Catch::Approx(2 * pi_f));
+			CHECK(to_rad(540.0f) == Catch::Approx(3 * pi_f));
 		}
 		
 		SECTION("negative") {
-			CHECK(toRad(-180.0) == Catch::Approx(-pi));
+			CHECK(to_rad(-180.0) == Catch::Approx(-pi));
 
-			CHECK(toRad(-180.0f) == Catch::Approx(-pi_f));
+			CHECK(to_rad(-180.0f) == Catch::Approx(-pi_f));
 		}
 	}
 
-	SECTION("toDeg") {
+	SECTION("to_deg") {
 		SECTION("zero") {
-			CHECK(toDeg(0.0) == 0.0);
+			CHECK(to_deg(0.0) == 0.0);
 
-			CHECK(toDeg(0.0f) == 0.0f);
+			CHECK(to_deg(0.0f) == 0.0f);
 		}
 
 		SECTION("PI") {
-			CHECK(toDeg(pi) == Catch::Approx(180.0));
-			CHECK(toDeg(2 * pi) == Catch::Approx(360.0));
-			CHECK(toDeg(3 * pi) == Catch::Approx(540.0));
+			CHECK(to_deg(pi) == Catch::Approx(180.0));
+			CHECK(to_deg(2 * pi) == Catch::Approx(360.0));
+			CHECK(to_deg(3 * pi) == Catch::Approx(540.0));
 
-			CHECK(toDeg(pi_f) == Catch::Approx(180.0f));
-			CHECK(toDeg(2 * pi_f) == Catch::Approx(360.0f));
-			CHECK(toDeg(3 * pi_f) == Catch::Approx(540.0f));
+			CHECK(to_deg(pi_f) == Catch::Approx(180.0f));
+			CHECK(to_deg(2 * pi_f) == Catch::Approx(360.0f));
+			CHECK(to_deg(3 * pi_f) == Catch::Approx(540.0f));
 		}
 
 		SECTION("negative") {
-			CHECK(toDeg(-pi) == Catch::Approx(-180.0));
+			CHECK(to_deg(-pi) == Catch::Approx(-180.0));
 
-			CHECK(toDeg(-pi_f) == Catch::Approx(-180.0f));
+			CHECK(to_deg(-pi_f) == Catch::Approx(-180.0f));
 		}
 	}
 }

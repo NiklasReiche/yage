@@ -10,6 +10,9 @@ target_link_libraries(yage_gml_test
 		Catch2::Catch2WithMain
 	)
 
+target_compile_options(yage_gml_test
+		PRIVATE -fdiagnostics-color=always -Wall -Wextra -Werror)
+
 add_test(
 	NAME yage_gml_CTest
 	COMMAND yage_gml_test

@@ -124,7 +124,7 @@ int main(int argc, char *argv[], char *[])
         textShader->setUniform("projection",
                                projection *
                                gml::matrix::translate<float>(700, yPos + 100, -1000) *
-                               gml::matrix::axisAngle(gml::Vec3f(0, 1, 1), gml::toRad((float)((step) % 360))) *
+                               gml::matrix::axisAngle(gml::Vec3f(0, 1, 1), gml::to_rad((float) ((step) % 360))) *
                                gml::matrix::translate<float>(-250, -20, 0)
                                );
         step++;

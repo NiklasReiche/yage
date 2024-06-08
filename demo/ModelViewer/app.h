@@ -64,7 +64,7 @@ public:
         light->color = gml::Vec3f(5, 5, 5);
         auto& light_node = scene->create_object("light");
         light_node.local_transform = gml::matrix::fromQuaternion<double>(
-                gml::quaternion::eulerAngle<double>(gml::toRad(180.0), gml::toRad(0.0), gml::toRad(45.0)));
+                gml::quaternion::eulerAngle<double>(gml::to_rad(180.0), gml::to_rad(0.0), gml::to_rad(45.0)));
         light_node.light = light;
 
         inputListener = MovementListener(window, camera);

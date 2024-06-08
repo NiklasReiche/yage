@@ -30,8 +30,8 @@ public:
 
         camera = std::make_shared<gl3d::Camera>(
                 gl3d::Camera(gml::Vec3f(0.0f, 2.0f, 2.0f),
-                             gml::quaternion::eulerAngle<double>(gml::toRad(180.), 0, 0) *
-                             gml::quaternion::eulerAngle<double>(0, 0, gml::toRad(45.))));
+                             gml::quaternion::eulerAngle<double>(gml::to_rad(180.), 0, 0) *
+                             gml::quaternion::eulerAngle<double>(0, 0, gml::to_rad(45.))));
 
         baseRenderer = glContext->getRenderer();
         baseRenderer->setClearColor(0x008080FFu);

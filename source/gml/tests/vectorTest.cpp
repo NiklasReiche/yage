@@ -289,14 +289,14 @@ TEST_CASE("VectorBase test")
 			const Vec2d vec1(1, 0);
 			const Vec2d vec2(1, 1);
 
-			CHECK(Catch::Approx(toRad(45.0)) == angle(vec1, vec2));
+			CHECK(Catch::Approx(to_rad(45.0)) == angle(vec1, vec2));
 		}
 
 		SECTION("Angle_3D") {
 			const Vec3d vec1(1, 0, 0);
 			const Vec3d vec2(1, 1, 0);
 
-			CHECK(Catch::Approx(toRad(45.0)) == angle(vec1, vec2));
+			CHECK(Catch::Approx(to_rad(45.0)) == angle(vec1, vec2));
 		}
 
 		SECTION("Angle_DivisionByZero") {

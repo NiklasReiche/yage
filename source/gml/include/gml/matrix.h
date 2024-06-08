@@ -825,7 +825,7 @@ namespace gml::matrix
 	Mat4<T> perspective(const double fov, const double aspect, const double near, const double far)
 	{
 		Mat4<T> result = matrix::Id<T, 4>;
-		const double top = near * std::tan(toRad(fov / 2));
+		const double top = near * std::tan(to_rad(fov / 2));
 		const double bottom = 0 - top;
 		const double right = top * aspect;
 		const double left = 0 - right;

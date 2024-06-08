@@ -21,8 +21,8 @@ void MovementListener::onMousePosEvent(const input::MousePosEvent& event)
         gml::Vec2d dist = mouse.pos - gml::Vec2f(x, y);
         gml::Vec2d angle = dist * mouse.sensitivity;
 
-        gml::Quatd q_yaw = gml::quaternion::eulerAngle<double>(gml::toRad(angle.x()), 0.0, 0.0);
-        gml::Quatd q_pitch = gml::quaternion::eulerAngle<double>(0.0, 0.0, -gml::toRad(angle.y()));
+        gml::Quatd q_yaw = gml::quaternion::eulerAngle<double>(gml::to_rad(angle.x()), 0.0, 0.0);
+        gml::Quatd q_pitch = gml::quaternion::eulerAngle<double>(0.0, 0.0, -gml::to_rad(angle.y()));
         gml::Quatd rotation = gml::normalize(q_yaw * camera->getRotation() * q_pitch);
         camera->rotateTo(rotation);
     }

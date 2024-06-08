@@ -46,17 +46,17 @@ namespace gl3d
 	}
 	void Camera::rotateYaw(double degree)
 	{
-		m_rotation = this->m_rotation * gml::quaternion::eulerAngle<double>(gml::toRad(degree), 0, 0);
+		m_rotation = this->m_rotation * gml::quaternion::eulerAngle<double>(gml::to_rad(degree), 0, 0);
 		m_rotation = gml::normalize(this->m_rotation);
 	}
 	void Camera::rotatePitch(double degree)
 	{
-		m_rotation = this->m_rotation * gml::quaternion::eulerAngle<double>(0, 0, gml::toRad(-degree));
+		m_rotation = this->m_rotation * gml::quaternion::eulerAngle<double>(0, 0, gml::to_rad(-degree));
 		m_rotation = gml::normalize(this->m_rotation);
 	}
 	void Camera::rotateRoll(double degree)
 	{
-		m_rotation = this->m_rotation * gml::quaternion::eulerAngle<double>(0, gml::toRad(degree), 0);
+		m_rotation = this->m_rotation * gml::quaternion::eulerAngle<double>(0, gml::to_rad(degree), 0);
 		m_rotation = gml::normalize(this->m_rotation);
 	}
 
