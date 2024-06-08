@@ -13,7 +13,7 @@ namespace gml_test
 		{
 		}
 
-		ComplexD(double a, double b)
+		ComplexD(const double a, const double b)
 			: real(a), imaginary(b)
 		{
 		}
@@ -36,7 +36,7 @@ namespace gml_test
 		{
 		}
 
-		ComplexF& operator=(ComplexD& other)
+		ComplexF& operator=(const ComplexD& other)
 		{
 			this->real = static_cast<float>(other.real);
 			this->imaginary = static_cast<float>(other.imaginary);
