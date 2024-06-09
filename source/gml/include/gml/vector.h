@@ -90,6 +90,14 @@ namespace gml
         {
         }
 
+        template<typename... Args> requires (std::same_as<T, Args> && ...) && (Size > 4)
+        constexpr explicit Vector(Args... args)
+        {
+            static_assert(sizeof...(args) == Size);
+            int i = 0;
+            ((m_elements[i++] = args), ...);
+        }
+
         /**
          * Initializes the components from a continuous memory block.
          *
@@ -97,18 +105,18 @@ namespace gml
          */
         constexpr explicit Vector(std::span<T, Size> data)
         {
-            std::copy(data.begin(), data.end(), m_elements.begin());
+            std::ranges::copy(data, m_elements.begin());
         }
 
         /**
          * Casts this vector to a vector of a different component type.
          */
-        template<typename T2>
-        constexpr explicit operator Vector<T2, Size>() const
+        template<typename T_>
+        constexpr explicit operator Vector<T_, Size>() const
         {
-            Vector<T2, Size> result;
+            Vector<T_, Size> result;
             for (std::size_t i = 0; i < Size; ++i) {
-                result(i) = static_cast<T2>(m_elements[i]);
+                result(i) = static_cast<T_>(m_elements[i]);
             }
             return result;
         }
@@ -284,11 +292,11 @@ namespace gml
         */
         std::array<T, Size> m_elements;
 
-        template<typename T2, std::size_t Size2>
-        friend constexpr bool operator==(const Vector<T2, Size2>&, const Vector<T2, Size2>&);
+        template<typename T_, std::size_t Size_>
+        friend constexpr bool operator==(const Vector<T_, Size_>&, const Vector<T_, Size_>&);
 
-        template<typename T2, std::size_t Size2>
-        friend constexpr bool operator!=(const Vector<T2, Size2>&, const Vector<T2, Size2>&);
+        template<typename T_, std::size_t Size_>
+        friend constexpr bool operator!=(const Vector<T_, Size_>&, const Vector<T_, Size_>&);
     };
 
     template<typename T, std::size_t Size>

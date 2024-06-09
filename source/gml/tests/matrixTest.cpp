@@ -65,21 +65,6 @@ TEST_CASE("MatrixBase test")
 			CHECK(8 == mat(1, 2));
 		}
 
-		SECTION("Constructor_InitializerList2D") {
-			const Matrix<int, 2, 3> mat{
-				{ 3, 5, 2 },
-				{ 6, 3, 8 }
-			};
-
-			CHECK(3 == mat(0, 0));
-			CHECK(5 == mat(0, 1));
-			CHECK(2 == mat(0, 2));
-
-			CHECK(6 == mat(1, 0));
-			CHECK(3 == mat(1, 1));
-			CHECK(8 == mat(1, 2));
-		}
-
 		SECTION("Constructor_Copy") {
 			const Matrix<int, 2, 3> initial{
 				3, 5, 2,
@@ -98,12 +83,12 @@ TEST_CASE("MatrixBase test")
 		}
 
 		SECTION("Constructor_Conversion") {
-			const Matrix<float, 2, 3> initial{
+			const Matrix<float, 2, 3> initial {
 				3.0f, 5.0f, 2.0f,
 				6.0f, 3.0f, 8.0f
 			};
 
-			const Matrix<double, 2, 3> mat = initial;
+			const Matrix<double, 2, 3> mat = static_cast<Matrix<double, 2, 3>>(initial);
 
 			CHECK(3.0 == mat(0, 0));
 			CHECK(5.0 == mat(0, 1));
@@ -117,62 +102,62 @@ TEST_CASE("MatrixBase test")
 
 	SECTION("Operators") {
 		SECTION("Operator_Add") {
-			const Matrix<int, 2, 3> lhs = {
-				{ 1, 3, 0 },
-				{ 3, 6, 1 }};
+			const Matrix<int, 2, 3> lhs {
+				 1, 3, 0 ,
+				 3, 6, 1 };
 
-			const Matrix<int, 2, 3> rhs = {
-				{ -1, 2, 0 },
-				{ 3,  7, 4 }};
+			const Matrix<int, 2, 3> rhs {
+				 -1, 2, 0 ,
+				 3,  7, 4 };
 
-			const Matrix<int, 2, 3> expected = {
-				{ 0, 5,  0 },
-				{ 6, 13, 5 }};
+			const Matrix<int, 2, 3> expected {
+				 0, 5,  0 ,
+				 6, 13, 5 };
 
 			CHECK(expected == lhs + rhs);
 		}
 
 		SECTION("Operator_Subtract") {
-			const Matrix<int, 2, 3> lhs = {
-				{ 1, 3, 0 },
-				{ 3, 6, 1 }};
+			const Matrix<int, 2, 3> lhs {
+				 1, 3, 0 ,
+				 3, 6, 1 };
 
-			const Matrix<int, 2, 3> rhs = {
-				{ -1, 2, 0 },
-				{ 3,  7, 4 }};
+			const Matrix<int, 2, 3> rhs {
+				 -1, 2, 0 ,
+				 3,  7, 4 };
 
-			const Matrix<int, 2, 3> expected = {
-				{ 2, 1,  0 },
-				{ 0, -1, -3 }};
+			const Matrix<int, 2, 3> expected {
+				 2, 1,  0 ,
+				 0, -1, -3 };
 
 			CHECK(expected == lhs - rhs);
 		}
 
 		SECTION("Operator_Multiply") {
-			const Matrix<int, 2, 3> lhs = {
-				{ 1, 3, 0 },
-				{ 3, 6, 1 }};
+			const Matrix<int, 2, 3> lhs {
+				 1, 3, 0 ,
+				 3, 6, 1 };
 
-			const Matrix<int, 3, 4> rhs = {
-				{ -1, 2, 0, 1 },
-				{ -1, 2, 0, 4 },
-				{ 3,  7, 4, 2 }};
+			const Matrix<int, 3, 4> rhs {
+				-1, 2, 0, 1 ,
+				 -1, 2, 0, 4 ,
+				 3,  7, 4, 2 };
 
-			const Matrix<int, 2, 4> expected = {
-				{ -4, 8,  0, 13 },
-				{ -6, 25, 4, 29 }};
+			const Matrix<int, 2, 4> expected  {
+				 -4, 8,  0, 13 ,
+				 -6, 25, 4, 29 };
 
 			CHECK(expected == lhs * rhs);
 		}
 
 		SECTION("Operator_Divide") {
-			const Matrix<int, 2, 3> lhs = {
-				{ 2, 6,  0 },
-				{ 6, 12, 2 }};
+			const Matrix<int, 2, 3> lhs {
+				 2, 6,  0 ,
+				 6, 12, 2 };
 
-			const Matrix<int, 2, 3> expected = {
-				{ 1, 3, 0 },
-				{ 3, 6, 1 }};
+			const Matrix<int, 2, 3> expected {
+				 1, 3, 0,
+				 3, 6, 1 };
 
 			CHECK(expected == lhs / 2);
 		}
@@ -255,8 +240,8 @@ TEST_CASE("MatrixBase test")
 
 		SECTION("Det_2x2") {
 			const Matrix<double, 2, 2> mat{
-				1, 2,
-				3, 4
+				1., 2.,
+				3., 4.
 			};
 
 			CHECK(-2 == det(mat));
@@ -264,20 +249,20 @@ TEST_CASE("MatrixBase test")
 
 		SECTION("Det_3x3") {
 			const Matrix<double, 3, 3> mat{
-				2, -1, 0,
-				-1, 2, -1,
-				0, -1, 2
+				2., -1., 0.,
+				-1., 2., -1.,
+				0., -1., 2.
 			};
 
 			CHECK(4 == det(mat));
 		}
 
 		SECTION("Det_HigherDimension") {
-			const Matrix<float, 4, 4> mat = {
-				{ 0,  1,  3,   2 },
-				{ 2,  -1, -9,  -2 },
-				{ 1,  7,  2,   9 },
-				{ -1, 6,  -11, 4 }
+			const Matrix<float, 4, 4> mat {
+				 0.f,  1.f,  3.f,   2.f ,
+				 2.f,  -1.f, -9.f,  -2.f ,
+				 1.f,  7.f,  2.f,   9.f ,
+				 -1.f, 6.f,  -11.f, 4.f
 			};
 
 			CHECK(64 == det(mat));
@@ -296,15 +281,15 @@ TEST_CASE("MatrixBase test")
 
 	SECTION("transpose") {
 		SECTION("Transpose_NonQuadratic") {
-			const Matrix<int, 2, 3> mat = {
-				{ 2, 3,  0 },
-				{ 6, 18, 2 }
+			const Matrix<int, 2, 3> mat {
+				 2, 3,  0 ,
+				 6, 18, 2
 			};
 
-			const Matrix<int, 3, 2> expected = {
-				{ 2, 6 },
-				{ 3, 18 },
-				{ 0, 2 }
+			const Matrix<int, 3, 2> expected {
+				 2, 6 ,
+				 3, 18 ,
+				 0, 2
 			};
 
 			CHECK(expected == transpose(mat));
@@ -332,12 +317,12 @@ TEST_CASE("MatrixBase test")
 	SECTION("Inverse") {
 		SECTION("Inverse_2x2") {
 			const Matrix<double, 2, 2> mat{
-				1, 2,
-				3, 4
+				1., 2.,
+				3., 4.
 			};
 
 			const Matrix<double, 2, 2> inv{
-				-2, 1,
+				-2., 1.,
 				1.5, -0.5
 			};
 
@@ -348,9 +333,9 @@ TEST_CASE("MatrixBase test")
 
 		SECTION("Inverse_3x3") {
 			const Matrix<double, 3, 3> mat{
-				2, -1, 0,
-				-1, 2, -1,
-				0, -1, 2
+				2., -1., 0.,
+				-1., 2., -1.,
+				0., -1., 2.
 			};
 
 			const Matrix<double, 3, 3> inv{
@@ -366,17 +351,17 @@ TEST_CASE("MatrixBase test")
 
 		SECTION("Inverse_higherDimension") {
 			const Matrix<double, 4, 4> mat{
-				{ 4,  1,  3,   2 },
-				{ 2,  -1, -9,  -2 },
-				{ 1,  7,  2,   9 },
-				{ -1, 6,  -11, 4 }
+				 4.,  1.,  3.,   2. ,
+				 2.,  -1., -9.,  -2. ,
+				 1.,  7.,  2.,   9. ,
+				 -1., 6.,  -11., 4.
 			};
 
 			const Matrix<double, 4, 4> inv{
-				{ 163 / 588.0, 1 / 84.0,   -4 / 49.0,  5 / 98.0 },
-				{ 349 / 588.0, -53 / 84.0, -26 / 49.0, 57 / 98.0 },
-				{ 65 / 588.0,  -13 / 84.0, -4 / 49.0,  5 / 98.0 },
-				{ -76 / 147.0, 11 / 21.0,  27 / 49.0,  -23 / 49.0 }
+				 163 / 588.0, 1 / 84.0,   -4 / 49.0,  5 / 98.0 ,
+				 349 / 588.0, -53 / 84.0, -26 / 49.0, 57 / 98.0 ,
+				 65 / 588.0,  -13 / 84.0, -4 / 49.0,  5 / 98.0 ,
+				 -76 / 147.0, 11 / 21.0,  27 / 49.0,  -23 / 49.0
 			};
 
 			auto expect_eq = [](const Matrix<double, 4, 4>& a, const Matrix<double, 4, 4>& b)
@@ -396,21 +381,21 @@ TEST_CASE("MatrixBase test")
 
 	SECTION("extract scaling component") {
 		const Mat4d mat = Mat4d{
-			2, 0, 0, 5,
-			0, 5, 0, 1,
-			0, 0, 10, 8,
-			0, 0, 0, 1 };
+			2., 0., 0., 5.,
+			0., 5., 0., 1.,
+			0., 0., 10., 8.,
+			0., 0., 0., 1. };
 
-		CHECK(mat.getScale() == Vec3<double>(2, 5, 10));
+		CHECK(mat.scale() == Vec3<double>(2, 5, 10));
 	}
 
 	SECTION("extract translation component") {
 		const Mat4d mat = Mat4d{
-			2, 3, 1, 5,
-			-4, 5, 5, 1,
-			9, 4, 10, 8,
-			0, 0, 0, 1 };
+			2., 3., 1., 5.,
+			-4., 5., 5., 1.,
+			9., 4., 10., 8.,
+			0., 0., 0., 1. };
 
-		CHECK(mat.getTranslation() == Vec3<double>(5, 1, 8));
+		CHECK(mat.translation() == Vec3<double>(5, 1, 8));
 	}
 }
