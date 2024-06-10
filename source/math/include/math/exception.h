@@ -2,13 +2,13 @@
 
 #include <exception>
 
-namespace gml
+namespace yage::math
 {
-	class DivideByZeroException : public std::exception
+	class DivideByZeroException final : public std::exception
 	{
 	};
 
-	class InvalidDimensionException : public std::exception
+	class InvalidDimensionException final : public std::exception
 	{
 	};
 }

@@ -9,7 +9,7 @@
 #include "constraints.h"
 #include "maths.h"
 
-namespace gml
+namespace yage::math
 {
     template<typename T, std::size_t Size> requires StrictlyPositive<Size>
     class Vector;
@@ -469,7 +469,7 @@ namespace gml
     }
 }
 
-namespace gml::vector
+namespace yage::math::vector
 {
     template<typename T>
     constexpr Vec3<T> worldForward()

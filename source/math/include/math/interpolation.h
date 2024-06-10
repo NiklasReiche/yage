@@ -1,6 +1,6 @@
 #pragma once
 
-namespace gml
+namespace yage::math
 {
 	/**
 	 * Linearly interpolates between two points.

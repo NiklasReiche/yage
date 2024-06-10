@@ -10,7 +10,7 @@
 #include "vector.h"
 #include "quaternion.h"
 
-namespace gml
+namespace yage::math
 {
     template<typename T>
     class Quaternion;
@@ -572,7 +572,7 @@ namespace gml
         }
 
         Matrix<T, N, N> mat = matrix;
-        Matrix<T, N, N> inv = gml::matrix::Id<T, N>;
+        Matrix<T, N, N> inv = matrix::Id<T, N>;
 
         auto pivotSearch = [&mat](std::size_t i_min) {
             std::size_t i_max = i_min;
@@ -661,7 +661,7 @@ namespace gml
     }
 }
 
-namespace gml::matrix
+namespace yage::math::matrix
 {
     /**
      * Constructs a square diagonal matrix.
@@ -757,7 +757,7 @@ namespace gml::matrix
     template<typename T>
     Mat4<T> axisAngle(const Vec3<T>& axis, const double angle)
     {
-        Vec3<T> a = gml::normalize(axis);
+        Vec3<T> a = normalize(axis);
         const T& x = a.x();
         const T& y = a.y();
         const T& z = a.z();

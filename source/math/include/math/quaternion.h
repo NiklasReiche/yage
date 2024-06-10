@@ -5,7 +5,7 @@
 
 #include "vector.h"
 
-namespace gml
+namespace yage::math
 {
     template<typename T, std::size_t M, std::size_t N> requires StrictlyPositive<M> && StrictlyPositive<N>
     class Matrix;
@@ -181,9 +181,9 @@ namespace gml
         [[nodiscard]]
         constexpr Vec3<T> forward_direction() const
         {
-            Quaternion q = gml::normalize(*this);
-            Quaternion result = q * Quaternion(vector::worldForward<T>()) * gml::conjugate(q);
-            return gml::normalize(Vec3<T>(result.m_x, result.m_y, result.m_z));
+            Quaternion q = normalize(*this);
+            Quaternion result = q * Quaternion(vector::worldForward<T>()) * conjugate(q);
+            return normalize(Vec3<T>(result.m_x, result.m_y, result.m_z));
         }
 
         /**
@@ -194,9 +194,9 @@ namespace gml
         [[nodiscard]]
         constexpr Vec3<T> right_direction() const
         {
-            Quaternion q = gml::normalize(*this);
-            Quaternion result = q * Quaternion(vector::worldRight<T>()) * gml::conjugate(q);
-            return gml::normalize(Vec3<T>(result.m_x, result.m_y, result.m_z));
+            Quaternion q = normalize(*this);
+            Quaternion result = q * Quaternion(vector::worldRight<T>()) * conjugate(q);
+            return normalize(Vec3<T>(result.m_x, result.m_y, result.m_z));
         }
 
         /**
@@ -207,9 +207,9 @@ namespace gml
         [[nodiscard]]
         constexpr Vec3<T> up_direction() const
         {
-            Quaternion q = gml::normalize(*this);
-            Quaternion result = q * Quaternion(vector::worldUp<T>()) * gml::conjugate(q);
-            return gml::normalize(Vec3<T>(result.m_x, result.m_y, result.m_z));
+            Quaternion q = normalize(*this);
+            Quaternion result = q * Quaternion(vector::worldUp<T>()) * conjugate(q);
+            return normalize(Vec3<T>(result.m_x, result.m_y, result.m_z));
         }
 
         /**
@@ -337,9 +337,9 @@ namespace gml
     constexpr Vec3<T> operator*(const Quaternion<T>& lhs, const Vec3<T>& rhs)
     {
         Vec3<T> u(lhs.x(), lhs.y(), lhs.z());
-        return 2 * gml::dot(u, rhs) * u
-               + (lhs.w() * lhs.w() - gml::dot(u, u)) * rhs
-               + 2 * lhs.w() * gml::cross(u, rhs);
+        return 2 * dot(u, rhs) * u
+               + (lhs.w() * lhs.w() - dot(u, u)) * rhs
+               + 2 * lhs.w() * cross(u, rhs);
     }
 
     /**
@@ -413,7 +413,7 @@ namespace gml
     }
 }
 
-namespace gml::quaternion
+namespace yage::math::quaternion
 {
     /**
      * Constructs a quaternion from an axis-angle representation.
@@ -426,7 +426,7 @@ namespace gml::quaternion
     [[nodiscard]]
     constexpr Quaternion<T> axis_angle(const Vec3<T>& axis, const T angle)
     {
-        const Vec3<T> a = gml::normalize(axis);
+        const Vec3<T> a = normalize(axis);
         const T s = std::sin(angle / 2);
 
         return Quaternion<T>(std::cos(angle / 2), a.x() * s, a.y() * s, a.z() * s);

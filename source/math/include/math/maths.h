@@ -3,7 +3,7 @@
 #include <cmath>
 #include <numbers>
 
-namespace gml
+namespace yage::math
 {
     namespace detail
     {
