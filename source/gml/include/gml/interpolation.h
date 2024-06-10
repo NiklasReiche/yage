@@ -3,7 +3,7 @@
 namespace gml
 {
 	/**
-	 * @brief Linearly interpolates between two points.
+	 * Linearly interpolates between two points.
 	 *
 	 * @tparam T The type of the points.
 	 * @param start The start point of the interpolation.
@@ -12,7 +12,7 @@ namespace gml
 	 * @return The interpolated value between start and end.
 	 */
 	template<typename T>
-	inline T lerp(const T& start, const T& end, double delta)
+	T lerp(const T& start, const T& end, double delta)
 	{
 		if (delta <= 0)
 			return start;

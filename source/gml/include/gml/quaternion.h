@@ -76,48 +76,72 @@ namespace gml
         {
         }
 
+        /**
+         * @return A reference to the w-component.
+         */
         [[nodiscard]]
         constexpr T& w()
         {
             return m_w;
         }
 
+        /**
+         * @return A const reference to the w-component.
+         */
         [[nodiscard]]
         constexpr const T& w() const
         {
             return m_w;
         }
 
+        /**
+         * @return A reference to the x-component.
+         */
         [[nodiscard]]
         constexpr T& x()
         {
             return m_x;
         }
 
+        /**
+         * @return A const reference to the x-component.
+         */
         [[nodiscard]]
         constexpr const T& x() const
         {
             return m_x;
         }
 
+        /**
+         * @return A reference to the y-component.
+         */
         [[nodiscard]]
         constexpr T& y()
         {
             return m_y;
         }
 
+        /**
+         * @return A const reference to the y-component.
+         */
         [[nodiscard]]
         constexpr const T& y() const
         {
             return m_y;
         }
 
+        /**
+         * @return A reference to the z-component.
+         */
         [[nodiscard]]
         constexpr T& z()
         {
             return m_z;
         }
 
+        /**
+         * @return A constreference to the z-component.
+         */
         [[nodiscard]]
         constexpr const T& z() const
         {
@@ -195,7 +219,7 @@ namespace gml
         constexpr T pitch() const requires std::floating_point<T>
         {
             const T unit = length_sqr(*this);
-            if (const double test = m_x * m_y + m_z * m_w;
+            if (const T test = m_x * m_y + m_z * m_w;
                 test > 0.499 * unit || test < -0.499 * unit) {
                 return 0; // singularity at north and south pole
             }
@@ -343,6 +367,7 @@ namespace gml
      * @return The quaternion's length squared.
      */
     template<typename T>
+    [[nodiscard]]
     constexpr T length_sqr(const Quaternion<T>& q)
     {
         return q.x() * q.x() + q.y() * q.y() + q.z() * q.z() + q.w() * q.w();
@@ -355,6 +380,7 @@ namespace gml
      * @return The quaternion's length.
      */
     template<std::floating_point T>
+    [[nodiscard]]
     constexpr T length(const Quaternion<T>& q)
     {
         return std::sqrt(length_sqr(q));
@@ -367,6 +393,7 @@ namespace gml
      * @return A normalized copy of the quaternion.
      */
     template<std::floating_point T>
+    [[nodiscard]]
     constexpr Quaternion<T> normalize(Quaternion<T> q)
     {
         return q.normalize();
@@ -379,6 +406,7 @@ namespace gml
      * @return A conjugate copy of the quaternion.
      */
     template<typename T>
+    [[nodiscard]]
     constexpr Quaternion<T> conjugate(Quaternion<T> q)
     {
         return q.conjugate();
@@ -395,6 +423,7 @@ namespace gml::quaternion
      * @return A quaternion representing the same rotation as the given axis-angle.
      */
     template<std::floating_point T>
+    [[nodiscard]]
     constexpr Quaternion<T> axis_angle(const Vec3<T>& axis, const T angle)
     {
         const Vec3<T> a = gml::normalize(axis);
@@ -412,6 +441,7 @@ namespace gml::quaternion
      * @return A quaternion representing the same rotation as the given euler angles.
      */
     template<std::floating_point T>
+    [[nodiscard]]
     constexpr Quaternion<T> euler_angle(const T yaw, const T roll, const T pitch)
     {
         const T cy = std::cos(yaw / 2.);
@@ -435,6 +465,7 @@ namespace gml::quaternion
      * @return A quaternion representing the same rotation as the given matrix.
      */
     template<std::floating_point T>
+    [[nodiscard]]
     constexpr Quaternion<T> from_matrix(const Mat3<T>& matrix)
     {
         const T tr = trace(matrix);

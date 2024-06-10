@@ -38,11 +38,25 @@ TEST_CASE("VectorBase test")
             }
         }
 
-        SECTION("InitializerList") {
-            Vector<float, 3> vector{2.0f, -1.5f, 0.0f};
+        SECTION("variadic argument list") {
+            Vector<float, 6> vector(2.0f, -1.5f, 0.0f, 1.f, 2.f, 3.f);
             CHECK(2.0f == vector(0));
             CHECK(-1.5f == vector(1));
             CHECK(0.0f == vector(2));
+            CHECK(1.0f == vector(3));
+            CHECK(2.0f == vector(4));
+            CHECK(3.0f == vector(5));
+        }
+
+        SECTION("span") {
+            std::array data{2.0f, -1.5f, 0.0f, 1.f, 2.f, 3.f};
+            Vector<float, 6> vector(data);
+            CHECK(2.0f == vector(0));
+            CHECK(-1.5f == vector(1));
+            CHECK(0.0f == vector(2));
+            CHECK(1.0f == vector(3));
+            CHECK(2.0f == vector(4));
+            CHECK(3.0f == vector(5));
         }
 
         SECTION("Copy") {
@@ -225,7 +239,7 @@ TEST_CASE("VectorBase test")
         SECTION("division") {
             Vec3d vec(2, 1, 3);
 
-            CHECK(Vec3d(1, 0.5, 1.5) == vec / 2);
+            CHECK(Vec3d(1, 0.5, 1.5) == vec / 2.);
 
             SECTION("division assignment") {
                 vec /= 2;

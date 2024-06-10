@@ -4,6 +4,7 @@
 #include <cassert>
 #include <ostream>
 #include <span>
+#include <algorithm>
 
 #include "constraints.h"
 #include "maths.h"
@@ -44,11 +45,11 @@ namespace gml
     using Vec4f = Vec4<float>;
     using Vec4d = Vec4<double>;
 
-    template<typename T, std::size_t Size>
-    constexpr double length(const Vector<T, Size>& vector);
+    template<std::floating_point T, std::size_t Size>
+    constexpr T length(const Vector<T, Size>& vector);
 
     /**
-     * @brief Represents a generic n-dimensional vector.
+     * Represents a generic n-dimensional vector.
      *
      * @tparam T The type of the vector's components.
      * @tparam Size The vector's dimension.
@@ -58,7 +59,7 @@ namespace gml
     {
     public:
         /**
-         * @brief Value-initializes all vector components.
+         * Value-initializes all vector components.
          */
         constexpr Vector()
             : m_elements{}
@@ -66,7 +67,7 @@ namespace gml
         }
 
         /**
-         * @brief Initializes all vector components with a given value.
+         * Initializes all vector components with the same value.
          *
          * @param value The initializing value.
          */
@@ -167,48 +168,72 @@ namespace gml
             return m_elements.data();
         }
 
+        /**
+         * @return A reference to the x-component.
+         */
         [[nodiscard]]
         constexpr T& x() requires (Size >= 1 && Size <= 4)
         {
             return m_elements[0];
         }
 
+        /**
+         * @return A const reference to the x-component.
+         */
         [[nodiscard]]
         constexpr const T& x() const requires (Size >= 1 && Size <= 4)
         {
             return m_elements[0];
         }
 
+        /**
+         * @return A reference to the y-component.
+         */
         [[nodiscard]]
         constexpr T& y() requires (Size >= 2 && Size <= 4)
         {
             return m_elements[1];
         }
 
+        /**
+         * @return A const reference to the x-component.
+         */
         [[nodiscard]]
         constexpr const T& y() const requires (Size >= 2 && Size <= 4)
         {
             return m_elements[1];
         }
 
+        /**
+         * @return A reference to the z-component.
+         */
         [[nodiscard]]
         constexpr T& z() requires (Size >= 3 && Size <= 4)
         {
             return m_elements[2];
         }
 
+        /**
+         * @return A cost reference to the z-component.
+         */
         [[nodiscard]]
         constexpr const T& z() const requires (Size >= 3 && Size <= 4)
         {
             return m_elements[2];
         }
 
+        /**
+         * @return A reference to the w-component.
+         */
         [[nodiscard]]
         constexpr T& w() requires (Size == 4)
         {
             return m_elements[3];
         }
 
+        /**
+         * @return A const reference to the w-component.
+         */
         [[nodiscard]]
         constexpr const T& w() const requires (Size == 4)
         {
@@ -216,7 +241,8 @@ namespace gml
         }
 
         /**
-         * @brief Normalizes this vector in-place. Results in undefined behaviour if called on the null vector.
+         * Normalizes this vector in-place.
+         * Results in undefined behaviour if called on the null vector.
          */
         constexpr Vector& normalize()
         {
@@ -271,11 +297,7 @@ namespace gml
         }
 
         /**
-         * Component-wise scalar division. Results in undefined behaviour if right is zero.
-         *
-         * @tparam T2 The scalar's type.
-         * @param right The scalar by which to divide this vector.
-         * @return This vector.
+         * Component-wise scalar division. Results in undefined behaviour if the given scalar is zero.
          */
         constexpr Vector& operator/=(const T& right)
         {
@@ -310,44 +332,65 @@ namespace gml
         return os;
     }
 
+    /**
+     * Component-wise comparison.
+     */
     template<typename T, std::size_t Size>
     constexpr bool operator==(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs)
     {
         return lhs.m_elements == rhs.m_elements;
     }
 
+    /**
+     * Component-wise comparison.
+     */
     template<typename T, std::size_t Size>
     constexpr bool operator!=(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs)
     {
         return lhs.m_elements != rhs.m_elements;
     }
 
+    /**
+     * Component-wise addition.
+     */
     template<typename T, std::size_t Size>
     constexpr Vector<T, Size> operator+(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs)
     {
         return Vector<T, Size>(lhs) += rhs;
     }
 
+    /**
+     * Component-wise subtraction.
+     */
     template<typename T, std::size_t Size>
     constexpr Vector<T, Size> operator-(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs)
     {
         return Vector<T, Size>(lhs) -= rhs;
     }
 
+    /**
+     * Scalar multiplication.
+     */
     template<typename T, std::size_t Size>
-    constexpr Vector<T, Size> operator*(const double lhs, const Vector<T, Size>& rhs)
+    constexpr Vector<T, Size> operator*(const T lhs, const Vector<T, Size>& rhs)
     {
         return Vector<T, Size>(rhs) *= lhs;
     }
 
+    /**
+     * Scalar multiplication.
+     */
     template<typename T, std::size_t Size>
-    constexpr Vector<T, Size> operator*(const Vector<T, Size>& lhs, const double rhs)
+    constexpr Vector<T, Size> operator*(const Vector<T, Size>& lhs, const T rhs)
     {
         return Vector<T, Size>(lhs) *= rhs;
     }
 
+    /**
+     * Scalar division.
+     */
     template<typename T, std::size_t Size>
-    constexpr Vector<T, Size> operator/(const Vector<T, Size>& lhs, const double rhs)
+    constexpr Vector<T, Size> operator/(const Vector<T, Size>& lhs, const T rhs)
     {
         return Vector<T, Size>(lhs) /= rhs;
     }
@@ -384,7 +427,7 @@ namespace gml
      */
     template<typename T, std::size_t Size>
     [[nodiscard]]
-    constexpr double length_sqr(const Vector<T, Size>& vector)
+    constexpr T length_sqr(const Vector<T, Size>& vector)
     {
         return dot(vector, vector);
     }
@@ -392,9 +435,9 @@ namespace gml
     /**
      * @return The euclidean length of the given vector.
      */
-    template<typename T, std::size_t Size>
+    template<std::floating_point T, std::size_t Size>
     [[nodiscard]]
-    constexpr double length(const Vector<T, Size>& vector)
+    constexpr T length(const Vector<T, Size>& vector)
     {
         return std::sqrt(length_sqr(vector));
     }
@@ -403,11 +446,11 @@ namespace gml
      * Creates a normalized copy of the given vector.
      * Results in undefined behaviour if called with the null vector.
      */
-    template<typename T, std::size_t Size>
+    template<std::floating_point T, std::size_t Size>
     [[nodiscard]]
     constexpr Vector<T, Size> normalize(const Vector<T, Size>& vector)
     {
-        const double len = length(vector);
+        const T len = length(vector);
         assert(len != 0);
         return vector / length(vector);
     }
@@ -416,11 +459,11 @@ namespace gml
      * Calculates the angle in radians between two given vectors.
      * Results in undefined behaviour if passed the null vector
      */
-    template<typename T, std::size_t Size>
+    template<std::floating_point T, std::size_t Size>
     [[nodiscard]]
-    constexpr double angle_rad(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs)
+    constexpr T angle_rad(const Vector<T, Size>& lhs, const Vector<T, Size>& rhs)
     {
-        const double lengths = length(lhs) * length(rhs);
+        const T lengths = length(lhs) * length(rhs);
         assert(lengths != 0);
         return std::acos(dot(lhs, rhs) / lengths);
     }
@@ -443,6 +486,6 @@ namespace gml::vector
     template<typename T>
     constexpr Vec3<T> worldRight()
     {
-        return Vec3<T>(-1, 0, 0); // TODO
+        return Vec3<T>(-1, 0, 0); // TODO:
     }
 }

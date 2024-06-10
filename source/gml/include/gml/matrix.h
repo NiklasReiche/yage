@@ -75,6 +75,9 @@ namespace gml
             m_elements.fill(value);
         }
 
+        /**
+         * Initializes the matrix components from a variadic argument list.
+         */
         template<typename... Args> requires (std::same_as<T, Args> && ...) && (M * N > 1)
         constexpr explicit Matrix(Args... args)
         {
@@ -309,37 +312,52 @@ namespace gml
         return os;
     }
 
+    /**
+     * Component-wise comparison.
+     */
     template<typename T, std::size_t M, std::size_t N>
     constexpr bool operator==(const Matrix<T, M, N>& left, const Matrix<T, M, N>& right)
     {
         return left.m_elements == right.m_elements;
     }
 
+    /**
+     * Component-wise comparison.
+     */
     template<typename T, std::size_t M, std::size_t N>
     constexpr bool operator!=(const Matrix<T, M, N>& left, const Matrix<T, M, N>& right)
     {
         return left.m_elements != right.m_elements;
     }
 
+    /**
+     * Component-wise addition.
+     */
     template<typename T, std::size_t M, std::size_t N>
     constexpr Matrix<T, M, N> operator+(const Matrix<T, M, N>& left, const Matrix<T, M, N>& right)
     {
         return Matrix<T, M, N>(left) += right;
     }
 
+    /**
+     * Component-wise subtraction.
+     */
     template<typename T, std::size_t M, std::size_t N>
     constexpr Matrix<T, M, N> operator-(const Matrix<T, M, N>& left, const Matrix<T, M, N>& right)
     {
         return Matrix<T, M, N>(left) -= right;
     }
 
+    /**
+     * Standard matrix multiplication.
+     */
     template<typename T, std::size_t M, std::size_t N, std::size_t P>
     constexpr Matrix<T, M, P> operator*(const Matrix<T, M, N>& left, const Matrix<T, N, P>& right)
     {
         Matrix<T, M, P> result(0);
         for (std::size_t i = 0; i < M; ++i) {
             for (std::size_t k = 0; k < N; ++k) {
-                for (std::size_t j = 0; j < P; ++j){
+                for (std::size_t j = 0; j < P; ++j){ // loops switched for cache locality
                     result(i, j) += left(i, k) * right(k, j);
                 }
             }
@@ -347,18 +365,27 @@ namespace gml
         return result;
     }
 
+    /**
+     * Scalar multiplication.
+     */
     template<typename T, std::size_t M, std::size_t N>
     constexpr Matrix<T, M, N> operator*(const T& left, const Matrix<T, M, N>& right)
     {
         return Matrix<T, M, N>(right) *= left;
     }
 
+    /**
+     * Scalar multiplication.
+     */
     template<typename T, std::size_t M, std::size_t N>
     constexpr Matrix<T, M, N> operator*(const Matrix<T, M, N>& left, const T& right)
     {
         return Matrix<T, M, N>(left) *= right;
     }
 
+    /**
+     * Standard matrix-vector multiplication.
+     */
     template<typename T, std::size_t M, std::size_t N>
     constexpr Vector<T, M> operator*(const Matrix<T, M, N>& left, const Vector<T, N>& right)
     {
@@ -371,6 +398,9 @@ namespace gml
         return result;
     }
 
+    /**
+     * Scalar division.
+     */
     template<typename T, std::size_t M, std::size_t N>
     constexpr Matrix<T, M, N> operator/(const Matrix<T, M, N>& left, const T& right)
     {
@@ -445,11 +475,12 @@ namespace gml
      */
     template<typename T, std::size_t N>
     [[nodiscard]]
-    constexpr double det(const Matrix<T, N, N>& matrix)
+    constexpr T det(const Matrix<T, N, N>& matrix)
     {
-        double result = 0;
+        T result = 0;
         for (std::size_t i = 0; i < N; ++i) {
-            result += std::pow(-1, i + 1) * matrix(1, i) * det(reduce(matrix, 1, i));
+            const T coeff = (i + 1) % 2 == 0 ? 1 : -1;
+            result += coeff * matrix(1, i) * det(reduce(matrix, 1, i));
         }
         return result;
     }
@@ -459,7 +490,7 @@ namespace gml
      */
     template<typename T>
     [[nodiscard]]
-    constexpr double det(const Matrix<T, 1, 1>& matrix)
+    constexpr T det(const Matrix<T, 1, 1>& matrix)
     {
         return matrix(0, 0);
     }
@@ -469,7 +500,7 @@ namespace gml
      */
     template<typename T>
     [[nodiscard]]
-    constexpr double det(const Matrix<T, 2, 2>& matrix)
+    constexpr T det(const Matrix<T, 2, 2>& matrix)
     {
         return matrix(0, 0) * matrix(1, 1) - matrix(0, 1) * matrix(1, 0);
     }
@@ -479,7 +510,7 @@ namespace gml
      */
     template<typename T>
     [[nodiscard]]
-    constexpr double det(const Matrix<T, 3, 3>& matrix)
+    constexpr T det(const Matrix<T, 3, 3>& matrix)
     {
         return matrix(0, 0) * matrix(1, 1) * matrix(2, 2) +
                matrix(0, 1) * matrix(1, 2) * matrix(2, 0) +
@@ -494,9 +525,9 @@ namespace gml
      */
     template<typename T, std::size_t N>
     [[nodiscard]]
-    constexpr double trace(const Matrix<T, N, N>& matrix)
+    constexpr T trace(const Matrix<T, N, N>& matrix)
     {
-        double trace = 0;
+        T trace = 0;
         for (std::size_t i = 0; i < N; ++i) {
             trace += matrix(i, i);
         }
@@ -523,12 +554,10 @@ namespace gml
     }
 
     /**
-     * @brief Calculates the inverse of a square matrix.
+     * Calculates the inverse of a square matrix.
      *
      * Uses the Gauss-Jordan Elimination algorithm. If the matrix is not invertible an exception is thrown.
      *
-     * @tparam T The type of the matrix's components.
-     * @tparam N The number of rows or columns of the matrix.
      * @param matrix The matrix for which to calculate the inverse.
      * @return The matrix's inverse matrix.
      *
@@ -636,7 +665,8 @@ namespace gml::matrix
 {
     /**
      * Constructs a square diagonal matrix.
-     * @param init values of the diagonal elements
+     *
+     * @param init The values of the diagonal elements.
      */
     template<typename T, std::size_t M>
         requires StrictlyPositive<M>
@@ -650,12 +680,12 @@ namespace gml::matrix
     }
 
     /**
-     * @brief Constructs a translation matrix.
+     * Constructs a translation matrix.
      *
-     * @param x the x component
-     * @param y the y component
-     * @param z the z component
-     * @return the translation matrix
+     * @param x The x component.
+     * @param y The y component.
+     * @param z The z component.
+     * @return The translation matrix.
     */
     template<typename T>
     Mat4<T> translate(const T& x, const T& y, const T& z)
@@ -668,10 +698,10 @@ namespace gml::matrix
     }
 
     /**
-     * @brief Constructs a translation matrix from a vector.
+     * Constructs a translation matrix from a vector.
      *
-     * @param translation the translation vector
-     * @return the translation matrix
+     * @param translation The translation vector.
+     * @return The translation matrix.
      */
     template<typename T>
     Mat4<T> translate(const Vec3<T>& translation)
@@ -684,15 +714,15 @@ namespace gml::matrix
     }
 
     /**
-     * @brief Constructs a scaling matrix.
+     * Constructs a scaling matrix.
      *
-     * @param x the x component
-     * @param y the y component
-     * @param z the z component
-     * @return the scaling matrix
+     * @param x The x component.
+     * @param y The y component.
+     * @param z The z component.
+     * @return The scaling matrix.
      */
     template<typename T>
-    Mat4<T> scale(const T& x, const T& y, const T& z)
+    Mat4<T> scale(T x, T y, T z)
     {
         Mat4<T> result = matrix::Id<T, 4>;
         result(0, 0) = x;
@@ -702,10 +732,10 @@ namespace gml::matrix
     }
 
     /**
-     * @brief Constructs a scaling matrix from a vector.
+     * Constructs a scaling matrix from a vector.
      *
-     * @param value the scaling vector
-     * @return the scaling matrix
+     * @param value The scaling vector.
+     * @return The scaling matrix.
      */
     template<typename T>
     Mat4<T> scale(const Vec3<T>& value)
@@ -718,12 +748,11 @@ namespace gml::matrix
     }
 
     /**
-     * @brief Constructs a rotation matrix from an axis angle
-     * representation.
+     * Constructs a rotation matrix from an axis-angle representation.
      *
-     * @param axis the rotation axis
-     * @param angle the angle in radians
-     * @return the rotation matrix
+     * @param axis The rotation axis.
+     * @param angle The rotation angle around the rotation axis in radians.
+     * @return The rotation matrix.
      */
     template<typename T>
     Mat4<T> axisAngle(const Vec3<T>& axis, const double angle)
@@ -753,22 +782,22 @@ namespace gml::matrix
 
 
     /**
-     * @brief Constructs a perspective projection matrix.
+     * Constructs a perspective projection matrix.
      *
-     * @param fov the field of view in degrees
-     * @param aspect the aspect ration
-     * @param near the near plane
-     * @param far the far plane
-     * @return the projection matrix
+     * @param fov The field of view in degrees.
+     * @param aspect The aspect ratio.
+     * @param near The near plane.
+     * @param far The far plane.
+     * @return the projection matrix.
      */
-    template<typename T>
-    Mat4<T> perspective(const double fov, const double aspect, const double near, const double far)
+    template<std::floating_point T>
+    Mat4<T> perspective(const T fov, const T aspect, const T near, const T far)
     {
         Mat4<T> result = matrix::Id<T, 4>;
-        const double top = near * std::tan(to_rad(fov / 2));
-        const double bottom = 0 - top;
-        const double right = top * aspect;
-        const double left = 0 - right;
+        const T top = near * std::tan(to_rad(fov / 2));
+        const T bottom = 0 - top;
+        const T right = top * aspect;
+        const T left = 0 - right;
         result(0, 0) = 2 * near / (right - left);
         result(0, 2) = (right + left) / (right - left);
         result(1, 1) = 2 * near / (top - bottom);
@@ -781,21 +810,21 @@ namespace gml::matrix
     }
 
     /**
-     * @brief Constructs an orthographic projection matrix.
+     * Constructs an orthographic projection matrix.
      *
-     * @param left the left plane
-     * @param right the right plane
-     * @param bottom the bottom plane
-     * @param top the top plane
-     * @param near the near plane
-     * @param far the far plane
-     * @return the projection matrix
+     * @param left The left plane.
+     * @param right The right plane.
+     * @param bottom The bottom plane.
+     * @param top The top plane.
+     * @param near The near plane.
+     * @param far The far plane.
+     * @return The projection matrix.
      */
-    template<typename T>
+    template<std::floating_point T>
     Mat4<T> orthographic(
-        const double left, const double right,
-        const double bottom, const double top,
-        const double near, const double far)
+        const T left, const T right,
+        const T bottom, const T top,
+        const T near, const T far)
     {
         Mat4<T> result = matrix::Id<T, 4>;
         result(0, 0) = 2 / (right - left);
@@ -809,15 +838,15 @@ namespace gml::matrix
     }
 
     /**
-     * @brief Constructs a lookAt view matrix.
+     * Constructs a Look-At view matrix.
      *
-     * @param pos the camera position
-     * @param target the view target position
-     * @param up the camera up vector
-     * @return the view matrix
+     * @param pos The camera position.
+     * @param target The view target position.
+     * @param up The camera up vector.
+     * @return The view matrix.
      */
     template<typename T>
-    Mat4<T> lookAt(const Vec3<T>& pos, const Vec3<T>& target, const Vec3<T>& up)
+    Mat4<T> look_at(const Vec3<T>& pos, const Vec3<T>& target, const Vec3<T>& up)
     {
         Vec3<T> direction = normalize(pos - target);
         Vec3<T> right = normalize(cross(up, direction));
@@ -831,14 +860,15 @@ namespace gml::matrix
     }
 
     /**
-	 * @brief Constructs a lookAt view matrix.
+	 * Constructs a Look-At view matrix where the camera's up vector aligns with the direction world's up vector, i.e.
+	 * the camera cannot roll around its view direction.
 	 *
-	 * @param pos the camera position
-	 * @param target the view target position
-	 * @return the view matrix
+	 * @param pos The camera position.
+	 * @param target The view target position.
+	 * @return The view matrix.
 	 */
     template<typename T>
-    Mat4<T> lookAt(const Vec3<T>& pos, const Vec3<T>& target)
+    Mat4<T> look_at(const Vec3<T>& pos, const Vec3<T>& target)
     {
         Vec3<T> direction = normalize(pos - target);
         Vec3<T> right = normalize(cross(vector::worldUp<T>(), direction));
@@ -853,28 +883,27 @@ namespace gml::matrix
     }
 
     /**
-     * @brief Constructs a rotation matrix from a quaternion
-     * representation.
+     * Constructs a rotation matrix from a quaternion.
      *
-     * @return the rotation matrix
+     * @return A matrix that represents the same rotation as the given quaternion.
      */
     template<typename T>
-    constexpr Mat4<T> fromQuaternion(const Quaternion<T>& quaternion)
+    constexpr Mat4<T> from_quaternion(const Quaternion<T>& quaternion)
     {
         const Quaternion<T> q = normalize(quaternion);
 
         Mat4<T> result = matrix::Id<T, 4>;
-        result(0, 0) = 1 - 2 * q.y * q.y - 2 * q.z * q.z;
-        result(0, 1) = 2 * q.x * q.y - 2 * q.z * q.w;
-        result(0, 2) = 2 * q.x * q.z + 2 * q.y * q.w;
+        result(0, 0) = 1 - 2 * q.y() * q.y() - 2 * q.z() * q.z();
+        result(0, 1) = 2 * q.x() * q.y() - 2 * q.z() * q.w();
+        result(0, 2) = 2 * q.x() * q.z() + 2 * q.y() * q.w();
 
-        result(1, 0) = 2 * q.x * q.y + 2 * q.z * q.w;
-        result(1, 1) = 1 - 2 * q.x * q.x - 2 * q.z * q.z;
-        result(1, 2) = 2 * q.y * q.z - 2 * q.x * q.w;
+        result(1, 0) = 2 * q.x() * q.y() + 2 * q.z() * q.w();
+        result(1, 1) = 1 - 2 * q.x() * q.x() - 2 * q.z() * q.z();
+        result(1, 2) = 2 * q.y() * q.z() - 2 * q.x() * q.w();
 
-        result(2, 0) = 2 * q.x * q.z - 2 * q.y * q.w;
-        result(2, 1) = 2 * q.y * q.z + 2 * q.x * q.w;
-        result(2, 2) = 1 - 2 * q.x * q.x - 2 * q.y * q.y;
+        result(2, 0) = 2 * q.x() * q.z() - 2 * q.y() * q.w();
+        result(2, 1) = 2 * q.y() * q.z() + 2 * q.x() * q.w();
+        result(2, 2) = 1 - 2 * q.x() * q.x() - 2 * q.y() * q.y();
         return result;
     }
 
