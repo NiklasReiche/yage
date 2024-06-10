@@ -469,7 +469,7 @@ namespace yage::math::quaternion
     constexpr Quaternion<T> from_matrix(const Mat3<T>& matrix)
     {
         const T tr = trace(matrix);
-        Mat3<T>& m = matrix;
+        const Mat3<T>& m = matrix;
         Quaternion<T> q;
         if (tr > 0) {
             const T s = std::sqrt(tr + 1) * 2;

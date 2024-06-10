@@ -76,12 +76,12 @@ namespace yage::math
         }
 
         /**
-         * Initializes the matrix components from a variadic argument list.
+         * Initializes the matrix components from the given component values.
          */
-        template<typename... Args> requires (std::same_as<T, Args> && ...) && (M * N > 1)
+        template<typename... Args>
+        requires (std::convertible_to<Args, T> && ...) && (M * N > 1) && (sizeof...(Args) == M * N)
         constexpr explicit Matrix(Args... args)
         {
-            static_assert(sizeof...(args) == M * N);
             int i = 0;
             ((m_elements[i++] = args), ...);
         }
@@ -266,11 +266,11 @@ namespace yage::math
         */
         constexpr Matrix<T, 3, 3> rotation() const requires (N == 4 && M == 4)
         {
-            const Vector<T, 3> scale = scale();
+            const Vector<T, 3> scaling = scale();
             return Matrix<T, 3, 3>{
-                (*this)(0, 0) / scale.x(), (*this)(0, 1) / scale.y(), (*this)(0, 2) / scale.z(),
-                (*this)(1, 0) / scale.x(), (*this)(1, 1) / scale.y(), (*this)(1, 2) / scale.z(),
-                (*this)(2, 0) / scale.x(), (*this)(2, 1) / scale.y(), (*this)(2, 2) / scale.z()
+                (*this)(0, 0) / scaling.x(), (*this)(0, 1) / scaling.y(), (*this)(0, 2) / scaling.z(),
+                (*this)(1, 0) / scaling.x(), (*this)(1, 1) / scaling.y(), (*this)(1, 2) / scaling.z(),
+                (*this)(2, 0) / scaling.x(), (*this)(2, 1) / scaling.y(), (*this)(2, 2) / scaling.z()
             };
         }
 
@@ -845,17 +845,17 @@ namespace yage::math::matrix
      * @param up The camera up vector.
      * @return The view matrix.
      */
-    template<typename T>
+    template<std::floating_point T>
     Mat4<T> look_at(const Vec3<T>& pos, const Vec3<T>& target, const Vec3<T>& up)
     {
         Vec3<T> direction = normalize(pos - target);
         Vec3<T> right = normalize(cross(up, direction));
-        Mat4<T> mat1 = {
-            {right.x(), right.y(), right.z(), 0},
-            {up.x(), up.y(), up.z(), 0},
-            {direction.x(), direction.y(), direction.z(), 0},
-            {0, 0, 0, 1}
-        };
+        Mat4<T> mat1 (
+            right.x(), right.y(), right.z(), 0.f,
+            up.x(), up.y(), up.z(), 0.f,
+            direction.x(), direction.y(), direction.z(), 0.f,
+            0.f, 0.f, 0.f, 1.f
+        );
         return mat1 * translate<T>(-pos.x(), -pos.y(), -pos.z());
     }
 
@@ -867,18 +867,18 @@ namespace yage::math::matrix
 	 * @param target The view target position.
 	 * @return The view matrix.
 	 */
-    template<typename T>
+    template<std::floating_point T>
     Mat4<T> look_at(const Vec3<T>& pos, const Vec3<T>& target)
     {
         Vec3<T> direction = normalize(pos - target);
         Vec3<T> right = normalize(cross(vector::worldUp<T>(), direction));
         Vec3<T> up = normalize(cross(direction, right));
-        Mat4<T> mat1 = {
-            {right.x(), right.y(), right.z(), 0},
-            {up.x(), up.y(), up.z(), 0},
-            {direction.x(), direction.y(), direction.z(), 0},
-            {0, 0, 0, 1}
-        };
+        Mat4<T> mat1 (
+            right.x(), right.y(), right.z(), 0.f,
+            up.x(), up.y(), up.z(), 0.f,
+            direction.x(), direction.y(), direction.z(), 0.f,
+            0.f, 0.f, 0.f, 1.f
+        );
         return mat1 * translate<T>(-pos.x(), -pos.y(), -pos.z());
     }
 

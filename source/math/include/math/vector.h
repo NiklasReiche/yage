@@ -76,25 +76,37 @@ namespace yage::math
             m_elements.fill(value);
         }
 
+        /**
+         * Initializes the vector components from the given component values.
+         */
         constexpr Vector(T x, T y) requires (Size == 2)
             : m_elements{x, y}
         {
         }
 
+        /**
+         * Initializes the vector components from the given component values.
+         */
         constexpr Vector(T x, T y, T z) requires (Size == 3)
             : m_elements{x, y, z}
         {
         }
 
+        /**
+         * Initializes the vector components from the given component values.
+         */
         constexpr Vector(T x, T y, T z, T w) requires (Size == 4)
             : m_elements{x, y, z, w}
         {
         }
 
-        template<typename... Args> requires (std::same_as<T, Args> && ...) && (Size > 4)
+        /**
+         * Initializes the vector components from the given component values.
+         */
+        template<typename... Args>
+        requires (std::same_as<T, Args> && ...) && (Size > 4) && (sizeof...(Args) == Size)
         constexpr explicit Vector(Args... args)
         {
-            static_assert(sizeof...(args) == Size);
             int i = 0;
             ((m_elements[i++] = args), ...);
         }
