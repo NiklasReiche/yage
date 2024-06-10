@@ -1,6 +1,6 @@
 #include <catch2/catch_all.hpp>
 
-#include <gml/matrix.h>
+#include <math/matrix.h>
 
 using namespace gml;
 

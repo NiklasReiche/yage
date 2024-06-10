@@ -1,7 +1,7 @@
 #include <catch2/catch_all.hpp>
 
-#include <gml/maths.h>
-#include <gml/vector.h>
+#include <math/maths.h>
+#include <math/vector.h>
 
 #include "complex.h"
 

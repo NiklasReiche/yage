@@ -1,5 +1,5 @@
-target_sources(yage_gml INTERFACE
-        gml.h
+target_sources(yage_math INTERFACE
+        math.h
         constraints.h
         exception.h
         maths.h

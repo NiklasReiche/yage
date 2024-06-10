@@ -1,7 +1,7 @@
 #include <catch2/catch_all.hpp>
 
-#include <gml/maths.h>
-#include <gml/interpolation.h>
+#include <math/maths.h>
+#include <math/interpolation.h>
 
 using namespace gml;
 using namespace std::numbers;

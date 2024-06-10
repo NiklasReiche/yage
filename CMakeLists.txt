@@ -54,8 +54,8 @@ set(CMAKE_CXX_FLAGS_OLD "${CMAKE_CXX_FLAGS}")
 add_subdirectory(external)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_OLD}")
 
+add_subdirectory(source/math)
 add_subdirectory(source/utils)
-add_subdirectory(source/gml)
 add_subdirectory(source/core)
 add_subdirectory(source/resource)
 
