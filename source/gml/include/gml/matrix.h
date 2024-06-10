@@ -877,4 +877,6 @@ namespace gml::matrix
         result(2, 2) = 1 - 2 * q.x * q.x - 2 * q.y * q.y;
         return result;
     }
+
+    // TODO: euler_angle()
 }
