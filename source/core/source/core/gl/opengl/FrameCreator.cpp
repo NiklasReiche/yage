@@ -6,7 +6,7 @@
 
 #include "utils/NotImplementedException.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	std::unique_ptr<gl::IFrame> FrameCreator::createFrame(
 		const int width,

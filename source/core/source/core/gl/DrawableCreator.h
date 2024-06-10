@@ -8,7 +8,7 @@
 #include "VertexArray.h"
 #include "Drawable.h"
 
-namespace gl
+namespace yage::gl
 {
 	enum class VertexFormat
 	{

@@ -7,7 +7,7 @@
 #include "OpenGlObject.h"
 #include "GlEnum.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	class VertexBuffer : public gl::VertexBuffer, public OpenGlObject, public std::enable_shared_from_this<VertexBuffer>
 	{

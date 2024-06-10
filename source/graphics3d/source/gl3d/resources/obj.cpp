@@ -2,12 +2,14 @@
 #include <vector>
 #include <map>
 #include <tuple>
-#include <gml/vector.h>
+#include <math/vector.h>
 #include <utils/strings.h>
 #include <utils/NotImplementedException.h>
 
 namespace
 {
+	using namespace yage;
+
 	std::map<std::string, gl3d::Material> readMtl(const platform::IFileReader& fileReader, const std::string& filename)
 	{
 		auto file = fileReader.openTextFile(filename, platform::IFile::AccessMode::READ);
@@ -29,15 +31,15 @@ namespace
 			} else if (type == "Ka") {
 				float x, y, z;
 				line >> x >> y >> z;
-                material.add_uniform("ambient", gml::Vec3f(x, y, z));
+                material.add_uniform("ambient", math::Vec3f(x, y, z));
 			} else if (type == "Kd") {
 				float x, y, z;
 				line >> x >> y >> z;
-                material.add_uniform("diffuse", gml::Vec3f(x, y, z));
+                material.add_uniform("diffuse", math::Vec3f(x, y, z));
 			} else if (type == "Ks") {
 				float x, y, z;
 				line >> x >> y >> z;
-                material.add_uniform("specular", gml::Vec3f(x, y, z));
+                material.add_uniform("specular", math::Vec3f(x, y, z));
 			} else if (type == "Ns") {
 				float s;
 				line >> s;
@@ -53,7 +55,7 @@ namespace
 	}
 }
 
-namespace gl3d::resources
+namespace yage::gl3d::resources
 {
 	std::tuple<std::unique_ptr<gl::IDrawable>, gl3d::Material>
 	readObj(const platform::IFileReader& fileReader, const std::string& filename, gl::IDrawableCreator& drawableCreator)
@@ -67,9 +69,9 @@ namespace gl3d::resources
 		std::map<std::string, Material> materials;
 		Material material;
 
-		std::vector<gml::Vec3f> vertices;
-		std::vector<gml::Vec2f> texCoords;
-		std::vector<gml::Vec3f> normals;
+		std::vector<math::Vec3f> vertices;
+		std::vector<math::Vec2f> texCoords;
+		std::vector<math::Vec3f> normals;
 		std::vector<float> vertexData;
 
 		while (!file->eof()) {

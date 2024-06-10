@@ -3,7 +3,7 @@
 #include <span>
 #include <vector>
 
-namespace gl
+namespace yage::gl
 {
 	/**
 	 * @brief Interface for objects that can be rendered.

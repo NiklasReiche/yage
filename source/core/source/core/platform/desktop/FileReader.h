@@ -4,7 +4,7 @@
 
 #include <core/platform/IFileReader.h>
 
-namespace platform::desktop
+namespace yage::platform::desktop
 {
 	class FileReader : public IFileReader
 	{

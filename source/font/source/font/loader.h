@@ -8,7 +8,7 @@
 #include "core/platform/IFileReader.h"
 #include "core/platform/IBinaryFile.h"
 
-namespace font
+namespace yage::font
 {
     class FontFileLoader : public res::Loader<Font, std::string>
 	{

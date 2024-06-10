@@ -4,7 +4,7 @@
 
 #include "File.h"
 
-namespace platform::desktop
+namespace yage::platform::desktop
 {
 	class TextFile : public File, public ITextFile
 	{

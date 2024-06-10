@@ -1,13 +1,13 @@
 #include "sceneNode.h"
 
-namespace gl3d
+namespace yage::gl3d
 {
-	SceneNode::SceneNode(const std::string_view& name, const gml::Mat4d& transform)
+	SceneNode::SceneNode(const std::string_view& name, const math::Mat4d& transform)
 		: local_transform(transform), m_name(name)
 	{
 	}
 
-	void SceneNode::apply_transform(const gml::Mat4d& parent_transform)
+	void SceneNode::apply_transform(const math::Mat4d& parent_transform)
 	{
         m_world_transform = parent_transform * local_transform;
 	}
@@ -17,7 +17,7 @@ namespace gl3d
 		return m_name;
 	}
 
-    gml::Mat4d SceneNode::world_transform() const
+    math::Mat4d SceneNode::world_transform() const
     {
         return m_world_transform;
     }

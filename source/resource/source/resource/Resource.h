@@ -4,7 +4,7 @@
 #include <memory>
 #include <utility>
 
-namespace res
+namespace yage::res
 {
     template<typename ResourceType>
     class Store;
@@ -27,7 +27,7 @@ namespace res
 
 #include "Store.h"
 
-namespace res
+namespace yage::res
 {
     template<typename ResourceType>
     Resource<ResourceType>::Resource(std::size_t key, Store<ResourceType>* store) : key(key), store(store)

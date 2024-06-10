@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace gl3d
+namespace yage::gl3d
 {
     struct ShaderSnippets
     {

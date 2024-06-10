@@ -4,7 +4,7 @@
 
 #include "Context.h"
 
-namespace opengl
+namespace yage::opengl
 {
     Texture2D::~Texture2D()
     {

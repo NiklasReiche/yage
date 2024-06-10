@@ -1,6 +1,6 @@
 #include "File.h"
 
-namespace platform::desktop
+namespace yage::platform::desktop
 {
 	File::File(const std::string & filename, FileType type, const IFile::AccessMode mode)
 		: filename(filename), mode(mode)

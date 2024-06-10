@@ -2,7 +2,7 @@
 
 #include <physics3d/BoundingShape.h>
 
-using namespace physics3d;
+using namespace yage::physics3d;
 using namespace gml;
 
 TEST_CASE("RadDegConversion")

@@ -2,12 +2,12 @@
 
 #include <string>
 
-#include <gml/vector.h>
-#include <gml/matrix.h>
+#include <math/vector.h>
+#include <math/matrix.h>
 
 #include "IUniformBlock.h"
 
-namespace gl
+namespace yage::gl
 {
 	class IShader
 	{
@@ -27,9 +27,9 @@ namespace gl
 		virtual void setUniform(const std::string& name, int value) = 0;
 		virtual void setUniform(const std::string& name, bool value) = 0;
 		virtual void setUniform(const std::string& name, float value) = 0;
-		virtual void setUniform(const std::string& name, gml::Vec3f value) = 0;
-        virtual void setUniform(const std::string& name, gml::Vec4f value) = 0;
-		virtual void setUniform(const std::string& name, gml::Mat4f value) = 0;
+		virtual void setUniform(const std::string& name, math::Vec3f value) = 0;
+        virtual void setUniform(const std::string& name, math::Vec4f value) = 0;
+		virtual void setUniform(const std::string& name, math::Mat4f value) = 0;
 
 		virtual void linkUniformBlock(const IUniformBlock& uniformBlock) = 0;
 

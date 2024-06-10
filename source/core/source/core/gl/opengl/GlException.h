@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace opengl
+namespace yage::opengl
 {
 	enum GlErrorCodes {
 		GLFW_ERROR,

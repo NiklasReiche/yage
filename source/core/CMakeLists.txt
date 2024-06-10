@@ -6,7 +6,7 @@ target_compile_options(yage_core
 	PRIVATE -fdiagnostics-color=always -Wall -Wextra)
 
 target_link_libraries(yage_core
-	PUBLIC yage_gml yage_utils glfw glad tfd)
+	PUBLIC yage_math yage_utils glfw glad tfd)
 
 target_include_directories(yage_core
 	PUBLIC source)

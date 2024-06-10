@@ -4,6 +4,8 @@
 #include <core/gl/color.h>
 #include <core/platform/desktop/FileReader.h>
 
+using namespace yage;
+
 int main()
 {
 	std::shared_ptr<platform::IWindow> window = std::make_shared<platform::desktop::GlfwWindow>(500, 500, "Simple Window");

@@ -7,7 +7,7 @@
 #include "Cubemap.h"
 #include "TextureParams.h"
 
-namespace gl
+namespace yage::gl
 {
 	class ITextureCreator
 	{

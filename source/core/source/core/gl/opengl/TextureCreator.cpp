@@ -4,7 +4,7 @@
 #include "Cubemap.h"
 #include "Texture2D.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	std::unique_ptr<gl::ITexture2D>
 	TextureCreator::createTexture2D(

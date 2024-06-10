@@ -5,7 +5,7 @@
 #include "MouseWheelEvent.h"
 #include "CharEvent.h"
 
-namespace input
+namespace yage::input
 {
 	class InputListener
 	{

@@ -1,7 +1,7 @@
 #include "UniformBuffer.h"
 #include "Context.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	UniformBuffer::~UniformBuffer()
 	{

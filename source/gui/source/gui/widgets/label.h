@@ -4,7 +4,7 @@
 
 #include "widget.h"
 
-namespace gui
+namespace yage::gui
 {
     enum class TextAlignmentY
     {
@@ -47,7 +47,7 @@ namespace gui
         void update_geometry() override;
 
         [[nodiscard]]
-        gml::Vec2f preferred_size() const override;
+        math::Vec2f preferred_size() const override;
 
         [[nodiscard]]
         font::Text* text() const override;

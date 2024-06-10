@@ -1,7 +1,7 @@
 #include "Drawable.h"
 #include "Context.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	Drawable::Drawable(Drawable&& other) noexcept
 	{

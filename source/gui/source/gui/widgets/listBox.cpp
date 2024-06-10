@@ -1,6 +1,6 @@
 #include "listBox.h"
 
-namespace gui
+namespace yage::gui
 {
     ListBox::ListBox(Widget* parent, Master* master, const ListBoxTemplate& widget_template)
             : Widget(parent, master, widget_template.base),
@@ -47,12 +47,12 @@ namespace gui
 
         float offset_primary_axis = 0;
         for (auto& child: m_children) {
-            gml::Vec2f child_pref_size = child->preferred_size();
-            gml::Vec2f child_min_size = child->min_size();
-            gml::Vec2f child_size(0.0f);
+            math::Vec2f child_pref_size = child->preferred_size();
+            math::Vec2f child_min_size = child->min_size();
+            math::Vec2f child_size(0.0f);
 
             child->override_anchor({.position = AnchorPosition::TOP_LEFT});
-            gml::Vec2f child_offset(0);
+            math::Vec2f child_offset(0);
             child_offset(axis_first) = offset_primary_axis;
             child->set_absolute_offset(child_offset);
 
@@ -101,19 +101,19 @@ namespace gui
         }
     }
 
-    gml::Vec2f ListBox::preferred_size() const
+    math::Vec2f ListBox::preferred_size() const
     {
-        gml::Vec2f inner_size(0);
+        math::Vec2f inner_size(0);
         inner_size(primary_axis()) = pref_size_primary_axis();
         inner_size(secondary_axis()) = pref_size_secondary_axis();
 
-        gml::Vec2f spacing(0);
+        math::Vec2f spacing(0);
         spacing(primary_axis()) = required_spacing();
 
         return inner_size +
-               gml::Vec2f(m_template.border.thickness * 2) +
-               gml::Vec2f(m_template.padding(0), m_template.padding(1)) +
-               gml::Vec2f(m_template.padding(2), m_template.padding(3)) +
+               math::Vec2f(m_template.border.thickness * 2) +
+               math::Vec2f(m_template.padding(0), m_template.padding(1)) +
+               math::Vec2f(m_template.padding(2), m_template.padding(3)) +
                spacing;
     }
 

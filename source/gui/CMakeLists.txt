@@ -6,7 +6,7 @@ target_compile_options(yage_gui
         PRIVATE -fdiagnostics-color=always)
 
 target_link_libraries(yage_gui
-        PUBLIC yage_core yage_gml yage_image yage_font)
+        PUBLIC yage_core yage_math yage_image yage_font)
 
 target_include_directories(yage_gui
         PUBLIC source)

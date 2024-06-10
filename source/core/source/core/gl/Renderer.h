@@ -6,7 +6,7 @@
 #include "Texture2D.h"
 #include "Cubemap.h"
 
-namespace gl
+namespace yage::gl
 {
 	class IRenderer
 	{

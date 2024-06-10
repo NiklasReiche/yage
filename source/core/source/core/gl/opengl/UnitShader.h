@@ -5,7 +5,7 @@
 
 #include "GlEnum.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	struct UnitShaderTemplate
 	{

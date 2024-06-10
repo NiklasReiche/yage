@@ -4,6 +4,8 @@
 #include <image/img.h>
 #include <core/platform/desktop/FileReader.h>
 
+using namespace yage;
+
 int main(int argc, char* argv[], char*[])
 {
 	if (argc < 2) {
@@ -29,7 +31,7 @@ int main(int argc, char* argv[], char*[])
 		1.0f, 1.0f, 1.0f, 1.0f,    // Top Right
 	};
 	const std::array<unsigned int, 6> indices = { 0, 1, 2, 2, 3, 0 };
-	auto quad = context->getDrawableCreator()->createDrawable(vertices, indices, { 2, 2 }, gl::VertexFormat::INTERLEAVED);
+	auto quad = context->getDrawableCreator()->createDrawable(vertices, indices, std::vector<unsigned int>{ 2, 2 }, gl::VertexFormat::INTERLEAVED);
 
 
 	auto texture = context->getTextureCreator()->

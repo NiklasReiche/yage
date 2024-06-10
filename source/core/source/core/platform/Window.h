@@ -6,7 +6,7 @@
 #include <core/input/InputListener.h>
 #include "IFileReader.h"
 
-namespace platform
+namespace yage::platform
 {
 	class IWindow;
 	typedef std::shared_ptr<IWindow> Window;

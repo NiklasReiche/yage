@@ -4,7 +4,7 @@
 
 #include "IFile.h"
 
-namespace platform
+namespace yage::platform
 {
 	class ITextFile : public virtual IFile
 	{

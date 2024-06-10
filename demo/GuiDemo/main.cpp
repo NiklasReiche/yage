@@ -5,6 +5,8 @@
 #include <gui/gui.h>
 #include "core/platform/desktop/GlfwWindow.h"
 
+using namespace yage;
+
 class GuiTest
 {
 private:
@@ -58,9 +60,9 @@ public:
                         .geometry = {
                                 .anchor = {
                                         .position = gui::AnchorPosition::TOP_LEFT,
-                                        .offset = gml::Vec2f(10, 40),
+                                        .offset = math::Vec2f(10, 40),
                                 },
-                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                         },
                         .border = {.thickness = 1},
                 },
@@ -79,7 +81,7 @@ public:
         auto* designFrame = v_list_1->create_widget<gui::ListBox>(gui::ListBoxTemplate{
                 .base = {
                         .geometry = {
-                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                         },
                         .padding = {5, 5, 5, 5},
                 },
@@ -138,7 +140,7 @@ public:
                         .geometry = {
                                 .anchor = {
                                         .position = gui::AnchorPosition::TOP_LEFT,
-                                        .offset = gml::Vec2f(10, 40 + v_list_1->actual_size().y() + 50),
+                                        .offset = math::Vec2f(10, 40 + v_list_1->actual_size().y() + 50),
                                 },
                                 .size_hint = {gui::SizeHint::FIT_CHILDREN, gui::SizeHint::FIT_CHILDREN},
                         },
@@ -195,7 +197,7 @@ public:
         auto hListFrame = v_list_2->create_widget<gui::ListBox>(gui::ListBoxTemplate{
                 .base = {
                         .geometry = {
-                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                         },
                         .padding = {6, 2, 6, 2},
                 },
@@ -231,7 +233,7 @@ public:
                         .geometry = {
                                 .anchor = {
                                         .position = gui::AnchorPosition::TOP_LEFT,
-                                        .offset = gml::Vec2<float>(10 + v_list_1->actual_size().x() + 50, 40),
+                                        .offset = math::Vec2<float>(10 + v_list_1->actual_size().x() + 50, 40),
                                 },
                         },
                         .border = {
@@ -279,20 +281,20 @@ public:
 
 
         animation_1 = h_list->create_animation<gui::MoveAnimation>(h_list->offset(),
-                                                                   h_list->offset() + gml::Vec2<float>(200, 0),
+                                                                   h_list->offset() + math::Vec2<float>(200, 0),
                                                                    2);
         animation_1->setOnAnimationStop([this] { onAnimation1stop(); });
-        animation_2 = h_list->create_animation<gui::MoveAnimation>(h_list->offset() + gml::Vec2<float>(200, 0),
+        animation_2 = h_list->create_animation<gui::MoveAnimation>(h_list->offset() + math::Vec2<float>(200, 0),
                                                                    h_list->offset(), 2);
         animation_2->setOnAnimationStop([this] { onAnimation2stop(); });
 
         animation_3 = testLabel->create_animation<gui::SizeAnimation>(testLabel->actual_size(),
                                                                       testLabel->actual_size() +
-                                                                      gml::Vec2<float>(50, 25),
+                                                                      math::Vec2<float>(50, 25),
                                                                       2);
         animation_3->setOnAnimationStop([this] { onAnimation3stop(); });
         animation_4 = testLabel->create_animation<gui::SizeAnimation>(testLabel->actual_size() +
-                                                                      gml::Vec2<float>(50, 25),
+                                                                      math::Vec2<float>(50, 25),
                                                                       testLabel->actual_size(), 2);
         animation_4->setOnAnimationStop([this] { onAnimation4stop(); });
 
@@ -306,10 +308,10 @@ public:
                         .geometry = {
                                 .anchor = {
                                         .position = gui::AnchorPosition::TOP_LEFT,
-                                        .offset = gml::Vec2<float>(10 + v_list_2->actual_size().x() + 50,
+                                        .offset = math::Vec2<float>(10 + v_list_2->actual_size().x() + 50,
                                                                    40 + v_list_1->actual_size().y() + 50),
                                 },
-                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                         },
                         .border = {.thickness = 1},
                 },
@@ -327,7 +329,7 @@ public:
         auto h_list_buttons = frame_4->create_widget<gui::ListBox>(gui::ListBoxTemplate{
                 .base = {
                         .geometry = {
-                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                         },
                         .padding = {5, 5, 5, 5},
                 },
@@ -338,7 +340,7 @@ public:
         frame_clicks = h_list_buttons->create_widget<gui::ListBox>(gui::ListBoxTemplate{
                 .base = {
                         .geometry = {
-                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                         },
                 },
                 .orientation = gui::ListBoxTemplate::HORIZONTAL,
@@ -377,7 +379,7 @@ public:
         frame_check = h_list_buttons->create_widget<gui::ListBox>(gui::ListBoxTemplate{
                 .base = {
                         .geometry = {
-                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                         },
                         .color = gl::Color::TRANSPARENT
                 },
@@ -415,7 +417,7 @@ public:
         frame_radio = h_list_buttons->create_widget<gui::ListBox>(gui::ListBoxTemplate{
                 .base = {
                         .geometry = {
-                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                         },
                         .color = gl::Color::TRANSPARENT
                 },
@@ -433,7 +435,7 @@ public:
         auto frame_radio_2 = frame_radio->create_widget<gui::ListBox>(gui::ListBoxTemplate{
                 .base = {
                         .geometry = {
-                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                         },
                         .color = gl::Color::TRANSPARENT
                 },
@@ -442,7 +444,7 @@ public:
         auto radio_group_box = frame_radio_2->create_widget<gui::ListBox>(gui::ListBoxTemplate{
                 .base = {
                         .geometry = {
-                                .size_hint = gml::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
+                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                         },
                         .color = gl::Color::TRANSPARENT
                 },
@@ -530,7 +532,7 @@ public:
 
         auto entryFrame = master.create_widget<gui::ListBox>(gui::ListBoxTemplate{
                 .base = {
-                        .geometry = {.anchor = {.offset = gml::Vec2<float>(
+                        .geometry = {.anchor = {.offset = math::Vec2<float>(
                                 10 + v_list_2->actual_size().x() + 50 + frame_4->actual_size().x() + 50,
                                 40 + v_list_1->actual_size().y() + 50),}},
                         .border = {.thickness = 1}

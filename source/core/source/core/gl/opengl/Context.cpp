@@ -14,7 +14,7 @@
 #include "TextureCreator.h"
 
 // TODO: we need to set the gl state to unbound when destroying resources
-namespace opengl
+namespace yage::opengl
 {
 	void APIENTRY onGlError(
 	    const GLenum, const GLenum, const GLuint id, const GLenum severity,
@@ -269,7 +269,7 @@ namespace opengl
 	}
 }// namespace gl3
 
-namespace gl
+namespace yage::gl
 {
 	std::shared_ptr<IContext> createContext(const std::weak_ptr<platform::IWindow>& window)
 	{

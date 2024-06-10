@@ -16,7 +16,7 @@
 
 class GLFWwindow;
 
-namespace platform::desktop
+namespace yage::platform::desktop
 {
 	class GlfwWindow final : public IWindow, public std::enable_shared_from_this<GlfwWindow>
 	{

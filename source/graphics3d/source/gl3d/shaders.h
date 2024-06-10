@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace gl3d::shaders
+namespace yage::gl3d::shaders
 {
 	struct PbrNormalMappingShader
 	{

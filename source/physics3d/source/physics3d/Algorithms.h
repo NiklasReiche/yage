@@ -5,9 +5,9 @@
 #include <optional>
 #include <tuple>
 
-#include <gml/vector.h>
+#include <math/vector.h>
 
-namespace physics3d
+namespace yage::physics3d
 {
     namespace geometry
     {
@@ -19,14 +19,14 @@ namespace physics3d
             /*
              * Any point on the plane.
              */
-            gml::Vec3d support;
+            math::Vec3d support;
             /**
              * Plane normal. Whether to consider it pointing inwards or outwards is up to the user.
              */
-            gml::Vec3d normal;
+            math::Vec3d normal;
         };
 
-        using Rectangle = std::array<gml::Vec3d, 4>;
+        using Rectangle = std::array<math::Vec3d, 4>;
     }
 
     /**
@@ -38,10 +38,10 @@ namespace physics3d
      * @return The minimum translation vector (MTV) between bodies A and B or empty if a separating axis is found.
      * The MTV's magnitude is equal to the overlap between bodies A and B. The MTV points away from A.
      */
-    std::optional<gml::Vec3d> sat_3d(std::span<const gml::Vec3d> vertices_a,
-                                     std::span<const gml::Vec3d> vertices_b,
-                                     std::span<const gml::Vec3d> normals_a,
-                                     std::span<const gml::Vec3d> normals_b);
+    std::optional<math::Vec3d> sat_3d(std::span<const math::Vec3d> vertices_a,
+                                     std::span<const math::Vec3d> vertices_b,
+                                     std::span<const math::Vec3d> normals_a,
+                                     std::span<const math::Vec3d> normals_b);
 
     /**
      * Returns the intersection of a non-parallel line and plane. Crashes if the line is parallel to the plane.
@@ -51,8 +51,8 @@ namespace physics3d
      * @param l1 Another point on the line.
      * @return The point of intersection.
      */
-    gml::Vec3d intersection(const gml::Vec3d& support, const gml::Vec3d& normal,
-                            const gml::Vec3d& l0, const gml::Vec3d& l1);
+    math::Vec3d intersection(const math::Vec3d& support, const math::Vec3d& normal,
+                            const math::Vec3d& l0, const math::Vec3d& l1);
 
     /**
      * Performs Sutherland-Hodgman clipping of a polygon against a clipping plane.
@@ -60,8 +60,8 @@ namespace physics3d
      * @param polygon Vertices of the polygon to clip, in line-strip order.
      * @return Vertices of the clipped polygon in line-strip order.
      */
-    std::vector<gml::Vec3d>
-    clip_sutherland_hodgman(std::span<geometry::Plane> clipping_planes, std::span<const gml::Vec3d> polygon);
+    std::vector<math::Vec3d>
+    clip_sutherland_hodgman(std::span<geometry::Plane> clipping_planes, std::span<const math::Vec3d> polygon);
 
     /**
      * Clips a set of points against a plane by discarding clipped points without intersection replacement.
@@ -69,8 +69,8 @@ namespace physics3d
      * @param points Points to clip in any order.
      * @return Pairs of remaining points and their (positive) penetration depths w.r.t. to the clipping plane.
      */
-    std::vector<std::tuple<gml::Vec3d, double>>
-    clip_discard(const geometry::Plane& clipping_plane, std::span<const gml::Vec3d> points);
+    std::vector<std::tuple<math::Vec3d, double>>
+    clip_discard(const geometry::Plane& clipping_plane, std::span<const math::Vec3d> points);
 
     /**
      * Finds the face of a cube such that the face normal is the most perpendicular to a given vector.
@@ -88,6 +88,6 @@ namespace physics3d
      *
      * @return The most perpendicular face along with its face normal, pointing outwards.
      */
-    std::tuple<geometry::Rectangle, gml::Vec3d>
-    most_perpendicular_cube_face(const gml::Vec3d& n, std::span<const gml::Vec3d> vertices);
+    std::tuple<geometry::Rectangle, math::Vec3d>
+    most_perpendicular_cube_face(const math::Vec3d& n, std::span<const math::Vec3d> vertices);
 }

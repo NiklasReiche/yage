@@ -4,7 +4,7 @@
 
 #include "BaseObject.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	class FrameCreator final : public BaseObject, public gl::IFrameCreator
 	{

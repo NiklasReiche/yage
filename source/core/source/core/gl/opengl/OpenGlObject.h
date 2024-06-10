@@ -3,7 +3,7 @@
 #include "BaseObject.h"
 #include "OpenGL.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	class OpenGlObject : public BaseObject
 	{

@@ -3,7 +3,7 @@
 #include "image/img.h"
 #include "core/platform/desktop/FileReader.h"
 
-namespace font
+namespace yage::font
 {
     /*****************************************
     **			FreeType Loader 			**
@@ -80,8 +80,8 @@ namespace font
         const int nColumns = std::ceil(std::sqrt(nCharacters));
 
         std::map<Codepoint, img::Image> sdfMap;
-        gml::Vec2i atlasSize;
-        gml::Vec2i rowSize;
+        math::Vec2i atlasSize;
+        math::Vec2i rowSize;
         int column = 0;
         int count = 0;
         // traverse characters and append them to the atlas grid from left to right and top to bottom (i.e. row-major)
@@ -90,7 +90,7 @@ namespace font
             auto bitmap = load_bitmap(ft, face, c);
             // the spread is given in target resolution pixels, so we need to upscale it here
             auto sdf = generate_sdf(bitmap, spread * scaleFactor);
-            sdfMap[c] = downscale(sdf, gml::Vec2i(sdf.getWidth() / scaleFactor,
+            sdfMap[c] = downscale(sdf, math::Vec2i(sdf.getWidth() / scaleFactor,
                                                   sdf.getHeight() / scaleFactor));
 
             rowSize.x() += sdfMap[c].getWidth() + 2 * padding;
@@ -102,7 +102,7 @@ namespace font
             {
                 atlasSize.x() = std::max(atlasSize.x(), rowSize.x());
                 atlasSize.y() += rowSize.y();
-                rowSize = gml::Vec2i();
+                rowSize = math::Vec2i();
                 column = 0;
             }
 
@@ -126,8 +126,8 @@ namespace font
 
         std::map<Codepoint, Character> characters;
         GlyphMetrics maxGlyph;
-        gml::Vec2i offset;
-        rowSize = gml::Vec2i();
+        math::Vec2i offset;
+        rowSize = math::Vec2i();
         column = 0;
         // traverse characters again and use same packing algorithm as above to get correct texture coordinates
         for (Codepoint c: charCodes)
@@ -137,7 +137,7 @@ namespace font
             // compute glyph metrics
             characters[c] = Character{
                 .glyph = load_glyph_metrics_and_update_max(ft, face, c, maxGlyph),
-                .texCoords = relative_texture_metrics(sdf, offset + gml::Vec2i(padding), atlasSize)
+                .texCoords = relative_texture_metrics(sdf, offset + math::Vec2i(padding), atlasSize)
             };
 
             // add sdf to texture atlas
@@ -146,20 +146,20 @@ namespace font
             textureAtlas->setSubImage(subArea, {sdf.data(), sdf.getSize()});
 
             // advance offsets
-            offset += gml::Vec2i(sdf.getWidth() + 2 * padding, 0);
+            offset += math::Vec2i(sdf.getWidth() + 2 * padding, 0);
             rowSize.y() = std::max(rowSize.y(), sdf.getHeight() + 2 * padding);
 
             column++;
             // switch to new row
             if (column > nColumns)
             {
-                offset = gml::Vec2i(0, offset.y() + rowSize.y());
-                rowSize = gml::Vec2i();
+                offset = math::Vec2i(0, offset.y() + rowSize.y());
+                rowSize = math::Vec2i();
                 column = 0;
             }
         }
 
-        const gml::Vec2f spreadInTexCoords = {
+        const math::Vec2f spreadInTexCoords = {
                 (float) spread / (float) atlasSize.x(),
                 (float) spread / (float) atlasSize.y()
         };
@@ -195,9 +195,9 @@ namespace font
         FT_GlyphSlot glyph = ft.load_glyph(face, c, FT_GLYPH_LOAD_FLAG::UNSCALED);
 
         GlyphMetrics metrics{
-                .size = gml::Vec2f((float) glyph->metrics.width,
+                .size = math::Vec2f((float) glyph->metrics.width,
                                    (float) glyph->metrics.height),
-                .bearing = gml::Vec2f((float) glyph->metrics.horiBearingX,
+                .bearing = math::Vec2f((float) glyph->metrics.horiBearingX,
                                       (float) glyph->metrics.horiBearingY),
                 .advance = (float) glyph->metrics.horiAdvance
         };
@@ -212,7 +212,7 @@ namespace font
     }
 
     TexMetrics
-    FontConverter::relative_texture_metrics(const img::Image &characterBitmap, gml::Vec2i offset, gml::Vec2i atlasSize)
+    FontConverter::relative_texture_metrics(const img::Image &characterBitmap, math::Vec2i offset, math::Vec2i atlasSize)
     {
         TexMetrics metrics;
         metrics.left = (float) offset.x() / (float) atlasSize.x();
@@ -228,14 +228,14 @@ namespace font
         // Padding around the input bitmap must be at least equal to spread, so we don't cut off edges and corners.
         // We add a small padding around the sdf to reduce interference when sampling the atlas for text rendering.
         const int bitmapPadding = spread;
-        const gml::Vec2i sdfSize(bitmap.getWidth() + 2 * bitmapPadding, bitmap.getHeight() + 2 * bitmapPadding);
+        const math::Vec2i sdfSize(bitmap.getWidth() + 2 * bitmapPadding, bitmap.getHeight() + 2 * bitmapPadding);
         img::Image sdf(sdfSize.x(), sdfSize.y(), 1);
 
         // squared distance is sufficient for comparisons
         const double maxDistanceSqr = spread * spread;
         const double maxDistance = spread;
         // iterate through pixels
-        gml::Vec2i p;
+        math::Vec2i p;
         for (p.y() = 0; p.y() < sdfSize.y(); p.y()++)
         {
             for (p.x() = 0; p.x() < sdfSize.x(); p.x()++)
@@ -246,14 +246,14 @@ namespace font
                 // We use a rectangle around this circle for simplicity. Pixels within this search area but outside
                 // the circle (i.e. the corners) will have an actual distance larger than the max distance (i.e. the
                 // radius), and so will be assigned the max distance in the end.
-                const gml::Vec2i searchAreaStart(std::max(0, p.x() - spread),
+                const math::Vec2i searchAreaStart(std::max(0, p.x() - spread),
                                                  std::max(0, p.y() - spread));
-                const gml::Vec2i searchAreaEnd(std::min(sdfSize.x(), p.x() + spread),
+                const math::Vec2i searchAreaEnd(std::min(sdfSize.x(), p.x() + spread),
                                                std::min(sdfSize.y(), p.y() + spread));
 
                 // iterate through search area around pixel, tracking the minimal distance to an opposite color pixel
                 auto minDistanceSqr = maxDistanceSqr;
-                gml::Vec2i neighbour;
+                math::Vec2i neighbour;
                 for (neighbour.y() = searchAreaStart.y(); neighbour.y() < searchAreaEnd.y(); neighbour.y()++)
                 {
                     for (neighbour.x() = searchAreaStart.x(); neighbour.x() < searchAreaEnd.x(); neighbour.x()++)
@@ -267,7 +267,7 @@ namespace font
                         }
 
                         // squared distance is sufficient for comparisons
-                        const double distanceSqr = gml::sqrLength(neighbour - p);
+                        const double distanceSqr = math::length_sqr(neighbour - p);
                         if (distanceSqr < minDistanceSqr)
                         {
                             minDistanceSqr = distanceSqr;
@@ -282,9 +282,9 @@ namespace font
                 {
                     minDistance *= -1;
                 }
-                sdf(p.y(), p.x(), 0) = (unsigned char) gml::normalize(minDistance,
+                sdf(p.y(), p.x(), 0) = (unsigned char) math::normalize(minDistance,
                                                                       -maxDistance, maxDistance,
-                                                                      0, 255);
+                                                                      0., 255.);
             }
         }
 
@@ -299,7 +299,7 @@ namespace font
             return bitmap(y - padding, x - padding, 0);
     }
 
-    img::Image FontConverter::downscale(const img::Image &image, gml::Vec2i targetResolution)
+    img::Image FontConverter::downscale(const img::Image &image, math::Vec2i targetResolution)
     {
         // load image into texture
         std::unique_ptr<gl::ITexture2D> texture = glContext->getTextureCreator()
@@ -332,7 +332,7 @@ namespace font
                                    const std::vector<Codepoint> &charCodes,
                                    const img::Image &atlas, GlyphMetrics maxGlyph,
                                    const std::map<Codepoint, Character> &characters,
-                                   gml::Vec2f spreadInTexCoords, const FT_Face & face)
+                                   math::Vec2f spreadInTexCoords, const FT_Face & face)
     {
         FontFile fontFile;
 

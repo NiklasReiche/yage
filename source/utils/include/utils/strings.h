@@ -6,7 +6,7 @@
 #include <locale>
 #include <codecvt>
 
-namespace utils
+namespace yage::utils
 {
 	template<typename T>
 	std::string toString(T param)

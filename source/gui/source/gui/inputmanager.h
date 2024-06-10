@@ -4,7 +4,7 @@
 
 #include "widgets/widget.h"
 
-namespace gui
+namespace yage::gui
 {
     class InputManager final : public input::InputListener
     {
@@ -50,7 +50,7 @@ namespace gui
          * @param pos Cursor position at which to search for a hit.
          * @return The found widget or nullptr if none was found.
          */
-        static Widget* search_selected(Widget* widget, gml::Vec2f pos);
+        static Widget* search_selected(Widget* widget, math::Vec2f pos);
 
         void on_mouse_left_press();
 

@@ -6,7 +6,7 @@
 
 #include "material.h"
 
-namespace gl3d
+namespace yage::gl3d
 {
     // TODO: these could be modelled as simple structs
 

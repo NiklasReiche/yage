@@ -5,7 +5,7 @@
 #include "Frame.h"
 #include "TextureParams.h"
 
-namespace gl
+namespace yage::gl
 {
 	class IFrameCreator
 	{

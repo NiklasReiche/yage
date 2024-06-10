@@ -11,8 +11,8 @@ namespace yage::math
 	 * @param delta The interpolant clamped to [0,1].
 	 * @return The interpolated value between start and end.
 	 */
-	template<typename T>
-	T lerp(const T& start, const T& end, double delta)
+	template<typename T, std::floating_point T_>
+	T lerp(const T& start, const T& end, T_ delta)
 	{
 		if (delta <= 0)
 			return start;

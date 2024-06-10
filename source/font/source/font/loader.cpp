@@ -3,7 +3,7 @@
 #include <core/platform/IFileReader.h>
 #include <core/platform/IFile.h>
 
-namespace font
+namespace yage::font
 {
     FontFileLoader::FontFileLoader(const std::shared_ptr<gl::ITextureCreator>& textureCreator,
                                    const std::shared_ptr<platform::IFileReader>& fileReader) noexcept

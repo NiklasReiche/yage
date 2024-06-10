@@ -5,7 +5,7 @@
 #include "widget.h"
 
 
-namespace gui
+namespace yage::gui
 {
     /**
      * A simple widget that can be used as a frame around other widgets. Uses default layout rules and offers no

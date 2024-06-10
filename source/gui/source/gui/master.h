@@ -12,7 +12,7 @@
 #include "widgets/root.h"
 #include "animation.h"
 
-namespace gui
+namespace yage::gui
 {
     /**
      * Provides an interface for the individual components of the gui system.

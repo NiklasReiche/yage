@@ -1,7 +1,7 @@
 #include "skybox.h"
 #include <image/imageReader.h>
 
-namespace gl3d
+namespace yage::gl3d
 {
 	Skybox SkyboxLoader::loadSkybox(std::array<std::string, 6> paths, float boxSize, int textureSize)
 	{

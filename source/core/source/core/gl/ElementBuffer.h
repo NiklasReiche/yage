@@ -1,6 +1,6 @@
 #pragma once
 
-namespace gl
+namespace yage::gl
 {
 	class ElementBuffer
 	{

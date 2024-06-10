@@ -4,7 +4,7 @@
 
 #include "Texture2D.h"
 
-namespace gl
+namespace yage::gl
 {
 	class IFrame
 	{

@@ -5,7 +5,7 @@
 #include "core/platform/IFileReader.h"
 #include "core/platform/desktop/FileReader.h"
 #include "core/gl/Context.h"
-#include "gml/gml.h"
+#include "math/math.h"
 #include "gl3d/camera.h"
 #include "gl3d/sceneRenderer.h"
 #include "gl3d/resources/obj.h"
@@ -17,6 +17,8 @@
 #include "ProjectionView.h"
 #include "gl3d/shaders.h"
 #include <chrono>
+
+using namespace yage;
 
 class App
 {
@@ -30,9 +32,9 @@ public:
         simulation.enable_gravity();
 
         camera = std::make_shared<gl3d::Camera>(
-                gl3d::Camera(gml::Vec3f(25.0f, 25.0f, 25.0f),
-                             gml::quaternion::eulerAngle<double>(gml::to_rad(225.), 0, 0) *
-                             gml::quaternion::eulerAngle<double>(0, 0, gml::to_rad(30.))));
+                gl3d::Camera(math::Vec3d(25.0, 25.0, 25.0),
+                             math::quaternion::euler_angle<double>(math::to_rad(225.), 0, 0) *
+                             math::quaternion::euler_angle<double>(0, 0, math::to_rad(30.))));
 
         baseRenderer = glContext->getRenderer();
         baseRenderer->setClearColor(0x008080FFu);
@@ -60,7 +62,7 @@ public:
         csShader->linkUniformBlock(*ubo);
 
         projViewUniform = ProjectionView(ubo);
-        projViewUniform.projection = gml::matrix::perspective<float>(45.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
+        projViewUniform.projection = math::matrix::perspective<float>(45.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
         projViewUniform.syncProjection();
 
         scene = std::make_shared<gl3d::SceneGroup>("world");
@@ -73,21 +75,21 @@ public:
     void add_box()
     {
         double height = box_stack * (box_length + 0.5);
-        load_cube("models/box.glb", box_offset + gml::Vec3d(0, height, 0));
+        load_cube("models/box.glb", box_offset + math::Vec3d(0, height, 0));
         box_stack++;
     }
 
     void throw_box()
     {
-        auto rb = load_cube("models/box.glb", box_offset + gml::Vec3d(-20, 10, 0));
-        rb->apply_force(gml::Vec3d(800, 1000, 0), rb->position() + gml::Vec3d(0.2, 0, 0.1));
+        auto rb = load_cube("models/box.glb", box_offset + math::Vec3d(-20, 10, 0));
+        rb->apply_force(math::Vec3d(800, 1000, 0), rb->position() + math::Vec3d(0.2, 0, 0.1));
     }
 
     void add_box_rotated()
     {
         double height = box_stack * (box_length + 0.5);
-        load_cube("models/box.glb", box_offset + gml::Vec3d(0, height, 0),
-                  gml::quaternion::eulerAngle<double>(0.0, gml::to_rad(10.0), gml::to_rad(30.0)));
+        load_cube("models/box.glb", box_offset + math::Vec3d(0, height, 0),
+                  math::quaternion::euler_angle<double>(0.0, math::to_rad(10.0), math::to_rad(30.0)));
         box_stack++;
     }
 
@@ -127,11 +129,11 @@ public:
 
             updateSceneGraph();
 
-            projViewUniform.view = camera->getViewMatrix();
+            projViewUniform.view = static_cast<math::Mat4f>(camera->getViewMatrix());
             projViewUniform.syncView();
 
-            pbrShaderNormalMapping->setUniform("camPos", camera->getPosition());
-            pbrShader->setUniform("camPos", camera->getPosition());
+            pbrShaderNormalMapping->setUniform("camPos", static_cast<math::Vec3f>(camera->getPosition()));
+            pbrShader->setUniform("camPos", static_cast<math::Vec3f>(camera->getPosition()));
 
             if (visualize) {
                 baseRenderer->useShader(*csShader);
@@ -141,7 +143,7 @@ public:
                 renderer->renderGraph(scene);
                 baseRenderer->disableWireframe();
 
-                simulation.visualize_collisions(projViewUniform.projection, projViewUniform.view);
+                simulation.visualize_collisions(static_cast<math::Mat4d>(projViewUniform.projection), static_cast<math::Mat4d>(projViewUniform.view));
             } else {
                 renderer->renderGraph(scene);
             }
@@ -158,7 +160,7 @@ public:
 private:
     int box_stack = 0;
     int box_mass = 1;
-    const gml::Vec3d box_offset = gml::Vec3d(0, 1.2, 0);
+    const math::Vec3d box_offset = math::Vec3d(0, 1.2, 0);
     const int box_length = 2;
 
     std::shared_ptr<platform::desktop::GlfwWindow> window;
@@ -195,14 +197,14 @@ private:
     void updateSceneGraph()
     {
         for (auto& [object, rb]: objects) {
-            object.get().local_transform = gml::matrix::translate(rb->position()) *
-                                           gml::matrix::fromQuaternion(rb->orientation()) *
-                                           gml::matrix::scale(object.get().local_transform.getScale());
+            object.get().local_transform = math::matrix::translate(rb->position()) *
+                                           math::matrix::from_quaternion(rb->orientation()) *
+                                           math::matrix::scale(object.get().local_transform.scale());
         }
     }
 
     std::shared_ptr<physics3d::RigidBody>
-    load_cube(const std::string& filename, gml::Vec3d position, gml::Quatd orientation = gml::Quatd())
+    load_cube(const std::string& filename, math::Vec3d position, math::Quatd orientation = math::Quatd())
     {
         if (!cube_mesh) {
             cube_mesh = gl3d::resources::gltf_read_meshes(platform::desktop::FileReader(),
@@ -217,7 +219,7 @@ private:
         auto rb = simulation.create_rigid_body(
                 physics3d::InertiaShape::cube(2, box_mass),
                 physics3d::colliders::OrientedBox{
-                        .half_size = gml::Vec3d(1, 1, 1),
+                        .half_size = math::Vec3d(1, 1, 1),
                 },
                 cube_material,
                 position,
@@ -243,8 +245,8 @@ private:
                         .original_normal = {0, -1, 0},
                 },
                 ground_material,
-                gml::Vec3d(0),
-                gml::Quatd());
+                math::Vec3d(0),
+                math::Quatd());
 
         objects.emplace_back(scene_object, rb);
     }
@@ -252,22 +254,22 @@ private:
     void setup_lights()
     {
         auto lightRes = std::make_shared<gl3d::PointLight>();
-        lightRes->color = gml::Vec3f(100);
+        lightRes->color = math::Vec3f(100);
 
         auto& light = scene->create_object("light");
         light.light = lightRes;
         light.local_transform =
-                gml::matrix::translate(-10, 10, -10);
+                math::matrix::translate<double>(-10, 10, -10);
 
         auto lightRes2 = std::make_shared<gl3d::DirectionalLight>();
-        lightRes2->color = gml::Vec3f(3);
+        lightRes2->color = math::Vec3f(3);
 
         auto& light2 = scene->create_object("light");
         light2.light = lightRes2;
         light2.local_transform =
-                gml::matrix::fromQuaternion<double>(
-                        gml::quaternion::eulerAngle<double>(gml::to_rad(200.), 0, 0) *
-                        gml::quaternion::eulerAngle<double>(0, 0, gml::to_rad(60.))
+                math::matrix::from_quaternion<double>(
+                        math::quaternion::euler_angle<double>(math::to_rad(200.), 0, 0) *
+                        math::quaternion::euler_angle<double>(0, 0, math::to_rad(60.))
                 );
 
     }

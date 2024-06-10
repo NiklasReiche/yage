@@ -1,6 +1,6 @@
 #pragma once
 
-namespace res
+namespace yage::res
 {
     template<typename ResourceType, typename LocationType>
     class Loader

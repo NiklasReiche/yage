@@ -5,7 +5,7 @@
 
 #include <core/gl/graphics.h>
 
-namespace gl3d
+namespace yage::gl3d
 {
 	class Skybox
 	{

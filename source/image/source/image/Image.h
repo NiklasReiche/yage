@@ -8,7 +8,7 @@
 #include <core/gl/Texture2D.h>
 #include <core/gl/TextureCreator.h>
 
-namespace img
+namespace yage::img
 {
 	class Image
 	{

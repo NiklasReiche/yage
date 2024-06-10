@@ -3,7 +3,7 @@
 #include "formats/png_wrapper.h"
 #include <utils/strings.h>
 
-namespace img
+namespace yage::img
 {
 	Image readFromFile(platform::IBinaryFile& file, FORCE_CHANNELS forceChannels)
 	{

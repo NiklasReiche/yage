@@ -1,6 +1,6 @@
 #include "Image.h"
 
-namespace img
+namespace yage::img
 {
 	Image::Image(int width, int height, int channels)
 		: width(width), height(height), depth(channels)

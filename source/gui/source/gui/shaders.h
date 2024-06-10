@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace gui::shaders
+namespace yage::gui::shaders
 {
 	struct WidgetShader
 	{

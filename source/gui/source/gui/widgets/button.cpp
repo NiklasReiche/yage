@@ -1,6 +1,6 @@
 #include "button.h"
 
-namespace gui
+namespace yage::gui
 {
     PushButton::PushButton(Widget* parent, Master* master, const PushButtonTemplate& button_template)
             : Widget(parent, master, button_template.base), m_button_template(button_template)
@@ -8,8 +8,8 @@ namespace gui
         m_is_interactable = true;
 
         // TODO
-        if (m_template.geometry.preferred_size.value == gml::Vec2f(0.0f)) {
-            m_template.geometry.size_hint = gml::Vec2<SizeHint>(SizeHint::FIT_CHILDREN);
+        if (m_template.geometry.preferred_size.value == math::Vec2f(0.0f)) {
+            m_template.geometry.size_hint = math::Vec2<SizeHint>(SizeHint::FIT_CHILDREN);
         }
     }
 
@@ -62,8 +62,8 @@ namespace gui
         m_is_interactable = true;
 
         // TODO
-        if (m_template.geometry.preferred_size.value == gml::Vec2f(0.0f)) {
-            m_template.geometry.size_hint = gml::Vec2<SizeHint>(SizeHint::FIT_CHILDREN);
+        if (m_template.geometry.preferred_size.value == math::Vec2f(0.0f)) {
+            m_template.geometry.size_hint = math::Vec2<SizeHint>(SizeHint::FIT_CHILDREN);
         }
     }
 

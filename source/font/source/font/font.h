@@ -3,11 +3,11 @@
 #include <string>
 #include <unordered_map>
 
-#include <gml/gml.h>
+#include <math/math.h>
 #include <core/gl/Texture2D.h>
 #include <memory>
 
-namespace font
+namespace yage::font
 {
     /**
      * Represents Unicode code points.
@@ -23,13 +23,13 @@ namespace font
         /**
          * Size of the glyph's bounding box in pixel coordinates.
          */
-		gml::Vec2f size;
+		math::Vec2f size;
 
         /**
          * x: Vertical distance from the cursor position to the left edge of the glyph's bounding box in pixel coordinates.
          * y: Horizontal distance from the baseline to the top edge of the glyph's bounding box in pixel coordinates.
          */
-        gml::Vec2f bearing;
+        math::Vec2f bearing;
 
         /**
          * Distance that the cursor should increment after drawing this glyph in pixel coordinates.
@@ -63,7 +63,7 @@ namespace font
         /**
          * Spread of the sdf in texture coordinates.
          */
-        gml::Vec2f spreadInTexCoords;
+        math::Vec2f spreadInTexCoords;
 	};
 
 	struct Character
@@ -102,10 +102,10 @@ namespace font
          * @return Scaling factor to convert glyph metrics into pixel coordinates.
          */
         [[nodiscard]]
-        gml::Vec2f scaling(float ptSize, gml::Vec2i dpi) const
+        math::Vec2f scaling(float ptSize, math::Vec2i dpi) const
         {
             // 1 pt = 1/72 inch
-            const gml::Vec2f pixelsPerEM = static_cast<gml::Vec2f>(dpi) * ptSize / 72.f;
+            const math::Vec2f pixelsPerEM = static_cast<math::Vec2f>(dpi) * ptSize / 72.f;
             return pixelsPerEM / static_cast<float>(metrics.unitsPerEM);
         }
 	};

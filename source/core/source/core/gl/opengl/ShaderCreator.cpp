@@ -5,7 +5,7 @@
 #include "Shader.h"
 #include "UniformBuffer.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	void ShaderCreator::checkShaderCompilationError(const GLuint program, const ShaderType type)
 	{

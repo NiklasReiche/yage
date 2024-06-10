@@ -6,7 +6,7 @@
 #include <memory>
 #include <numeric>
 
-namespace opengl
+namespace yage::opengl
 {
     std::unique_ptr<gl::IDrawable>
     DrawableCreator::createDrawable(

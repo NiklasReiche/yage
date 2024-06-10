@@ -5,7 +5,7 @@
 
 #include "Loader.h"
 
-namespace res
+namespace yage::res
 {
     template<typename ResourceType>
     class Resource;
@@ -30,7 +30,7 @@ namespace res
 
 #include "Resource.h"
 
-namespace res
+namespace yage::res
 {
     template<typename ResourceType>
     ResourceType& Store<ResourceType>::getUnderlyingResource(std::size_t key)

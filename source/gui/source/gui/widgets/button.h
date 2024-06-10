@@ -11,7 +11,7 @@
 #include "label.h"
 #include "frame.h"
 
-namespace gui
+namespace yage::gui
 {
     struct PushButtonTemplate
     {

@@ -3,7 +3,7 @@
 #include <vector>
 #include <span>
 
-namespace gl
+namespace yage::gl
 {
 	class VertexBuffer
 	{

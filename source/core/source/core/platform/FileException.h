@@ -4,7 +4,7 @@
 #include <string>
 #include <utility>
 
-namespace platform
+namespace yage::platform
 {
 	class FileException : public std::runtime_error
 	{

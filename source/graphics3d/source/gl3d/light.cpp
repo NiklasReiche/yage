@@ -1,6 +1,6 @@
 #include "light.h"
 
-namespace gl3d
+namespace yage::gl3d
 {
     LightType Light::type()
     {
@@ -22,10 +22,10 @@ namespace gl3d
                           color);
     }
 
-    void DirectionalLight::update_from_transform(gml::Mat4d transform)
+    void DirectionalLight::update_from_transform(math::Mat4d transform)
     {
-        auto rotation = gml::quaternion::fromMatrix(transform.getRotation());
-        direction = rotation.getForward();
+        auto rotation = math::quaternion::from_matrix(transform.rotation());
+        direction = static_cast<math::Vec3f>(rotation.forward_direction());
     }
 
     DirectionalLight::DirectionalLight() : Light(LightType::DIRECTIONAL_LIGHT)
@@ -42,9 +42,9 @@ namespace gl3d
                           color);
     }
 
-    void PointLight::update_from_transform(gml::Mat4d transform)
+    void PointLight::update_from_transform(math::Mat4d transform)
     {
-        position = transform.getTranslation();
+        position = static_cast<math::Vec3f>(transform.translation());
     }
 
     PointLight::PointLight() : Light(LightType::POINT_LIGHT)

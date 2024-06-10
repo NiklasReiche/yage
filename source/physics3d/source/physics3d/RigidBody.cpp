@@ -1,14 +1,14 @@
 #include "RigidBody.h"
 #include <utils/utils.h>
 
-namespace physics3d
+namespace yage::physics3d
 {
     RigidBody::RigidBody(const InertiaShape& inertia_shape,
                          const Collider& bounding_volume,
                          const Material& material,
-                         const gml::Vec3d& position,
-                         const gml::Quatd& orientation,
-                         const gml::Vec3d& bounding_volume_offset)
+                         const math::Vec3d& position,
+                         const math::Quatd& orientation,
+                         const math::Vec3d& bounding_volume_offset)
             : material(material),
               m_position(position),
               m_orientation(orientation),
@@ -19,10 +19,10 @@ namespace physics3d
         update_collider();
     }
 
-    void RigidBody::apply_force(const gml::Vec3d& force, const gml::Vec3d& point)
+    void RigidBody::apply_force(const math::Vec3d& force, const math::Vec3d& point)
     {
         m_force += force;
-        m_torque += gml::cross(force, gml::Vec3d(point - m_position));
+        m_torque += math::cross(force, math::Vec3d(point - m_position));
     }
 
     void RigidBody::update_collider()
@@ -46,32 +46,32 @@ namespace physics3d
         }, m_collider.value());
     }
 
-    gml::Vec3d RigidBody::position() const
+    math::Vec3d RigidBody::position() const
     {
         return m_position;
     }
 
-    gml::Quatd RigidBody::orientation() const
+    math::Quatd RigidBody::orientation() const
     {
         return m_orientation;
     }
 
-    gml::Vec3d RigidBody::velocity() const
+    math::Vec3d RigidBody::velocity() const
     {
         return m_velocity;
     }
 
-    gml::Vec3d RigidBody::angular_velocity() const
+    math::Vec3d RigidBody::angular_velocity() const
     {
         return m_angular_velocity;
     }
 
-    gml::Vec3d RigidBody::force() const
+    math::Vec3d RigidBody::force() const
     {
         return m_force;
     }
 
-    gml::Vec3d RigidBody::torque() const
+    math::Vec3d RigidBody::torque() const
     {
         return m_torque;
     }

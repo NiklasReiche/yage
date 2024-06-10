@@ -7,7 +7,7 @@
 #include "OpenGlObject.h"
 #include "OpenGL.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	class Shader : public OpenGlObject, public gl::IShader, public std::enable_shared_from_this<Shader>
 	{
@@ -21,9 +21,9 @@ namespace opengl
 		void setUniform(const std::string& name, int value) override;
 		void setUniform(const std::string& name, bool value) override;
 		void setUniform(const std::string& name, float value) override;
-		void setUniform(const std::string& name, gml::Vec3f value) override;
-        void setUniform(const std::string& name, gml::Vec4f value) override;
-		void setUniform(const std::string& name, gml::Mat4f value) override;
+		void setUniform(const std::string& name, math::Vec3f value) override;
+        void setUniform(const std::string& name, math::Vec4f value) override;
+		void setUniform(const std::string& name, math::Mat4f value) override;
 
 		void linkUniformBlock(const gl::IUniformBlock& uniformBlock) override;
 

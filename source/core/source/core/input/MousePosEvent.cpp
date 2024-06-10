@@ -1,6 +1,6 @@
 #include "MousePosEvent.h"
 
-namespace input
+namespace yage::input
 {
 	MousePosEvent::MousePosEvent(const float xPos, const float yPos)
 		: Event(Type::MOUSE_POS_EVENT), xPos(xPos), yPos(yPos) {}

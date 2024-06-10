@@ -6,9 +6,9 @@
 
 TEST_CASE("Texture Test")
 {
-	std::shared_ptr<platform::IWindow> window = std::make_shared<platform::desktop::GlfwWindow>(100, 100);
-	std::shared_ptr<gl::IContext> context = gl::createContext(window);
-	std::shared_ptr<gl::ITextureCreator> tCreator = context->getTextureCreator();
+	std::shared_ptr<yage::platform::IWindow> window = std::make_shared<yage::platform::desktop::GlfwWindow>(100, 100);
+	std::shared_ptr<yage::gl::IContext> context = yage::gl::createContext(window);
+	std::shared_ptr<yage::gl::ITextureCreator> tCreator = context->getTextureCreator();
 
 	SECTION("Initialization") {
 		SECTION("with data") {
@@ -18,104 +18,104 @@ TEST_CASE("Texture Test")
 				1, 2, 3,    4, 7, 5 };
 
 			SECTION("without format conversion") {
-				std::shared_ptr<gl::ITexture2D> texture = tCreator->createTexture2D(2, 3, gl::ImageFormat::RGB, image);
+				std::shared_ptr<yage::gl::ITexture2D> texture = tCreator->createTexture2D(2, 3, yage::gl::ImageFormat::RGB, image);
 
 				CHECK(2 == texture->getWidth());
 				CHECK(3 == texture->getHeight());
 				CHECK(3 == texture->getChannels());
-				CHECK(gl::ImageFormat::RGB == texture->getFormat());
+				CHECK(yage::gl::ImageFormat::RGB == texture->getFormat());
 			}
 
 			SECTION("with format conversion") {
-				std::shared_ptr<gl::ITexture2D> texture = tCreator->createTexture2D(3, 3, gl::ImageFormat::RG, image);
+				std::shared_ptr<yage::gl::ITexture2D> texture = tCreator->createTexture2D(3, 3, yage::gl::ImageFormat::RG, image);
 
 				CHECK(3 == texture->getWidth());
 				CHECK(3 == texture->getHeight());
 				CHECK(2 == texture->getChannels());
-				CHECK(gl::ImageFormat::RG == texture->getFormat());
+				CHECK(yage::gl::ImageFormat::RG == texture->getFormat());
 			}
 		}
 
 		SECTION("without data") {
 			SECTION("without format conversion") {
-				std::shared_ptr<gl::ITexture2D> texture =
-					tCreator->createTexture2D(2, 3, gl::ImageFormat::RGB, std::vector<unsigned char>());
+				std::shared_ptr<yage::gl::ITexture2D> texture =
+					tCreator->createTexture2D(2, 3, yage::gl::ImageFormat::RGB, std::vector<unsigned char>());
 
 				CHECK(2 == texture->getWidth());
 				CHECK(3 == texture->getHeight());
 				CHECK(3 == texture->getChannels());
-				CHECK(gl::ImageFormat::RGB == texture->getFormat());
+				CHECK(yage::gl::ImageFormat::RGB == texture->getFormat());
 			}
 
 			SECTION("with format conversion") {
-				std::shared_ptr<gl::ITexture2D> texture =
-					tCreator->createTexture2D(2, 3, gl::ImageFormat::RGB, std::vector<unsigned char>(),
-					                          { gl::ImageFormat::RG, gl::RowAlignment::B_2 });
+				std::shared_ptr<yage::gl::ITexture2D> texture =
+					tCreator->createTexture2D(2, 3, yage::gl::ImageFormat::RGB, std::vector<unsigned char>(),
+					                          { yage::gl::ImageFormat::RG, yage::gl::RowAlignment::B_2 });
 
 				CHECK(2 == texture->getWidth());
 				CHECK(3 == texture->getHeight());
 				CHECK(3 == texture->getChannels());
-				CHECK(gl::ImageFormat::RGB == texture->getFormat());
+				CHECK(yage::gl::ImageFormat::RGB == texture->getFormat());
 			}
 		}
 
 		SECTION("wrong data size") {
 			SECTION("data too small") {
 				CHECK_THROWS_AS(
-					tCreator->createTexture2D(2, 3, gl::ImageFormat::RGB, std::vector<unsigned char>{ 1, 2, 3 }),
+					tCreator->createTexture2D(2, 3, yage::gl::ImageFormat::RGB, std::vector<unsigned char>{ 1, 2, 3 }),
 					std::invalid_argument);
 			}
 
 			SECTION("data too large") {
 				CHECK_THROWS_AS(
-					tCreator->createTexture2D(1, 2, gl::ImageFormat::R, std::vector<unsigned char>{ 1, 2, 3, 4 }),
+					tCreator->createTexture2D(1, 2, yage::gl::ImageFormat::R, std::vector<unsigned char>{ 1, 2, 3, 4 }),
 					std::invalid_argument);
 			}
 		}
 
 		SECTION("undefined format") {
 			CHECK_THROWS_AS(
-				tCreator->createTexture2D(2, 3, gl::ImageFormat::UNDEFINED, std::vector<unsigned char>()),
+				tCreator->createTexture2D(2, 3, yage::gl::ImageFormat::UNDEFINED, std::vector<unsigned char>()),
 				std::invalid_argument);
 		}
 
 		SECTION("non-positive dimensions") {
 			// width negative
 			CHECK_THROWS_AS(
-				tCreator->createTexture2D(-2, 3, gl::ImageFormat::RGBA, std::vector<unsigned char>()),
+				tCreator->createTexture2D(-2, 3, yage::gl::ImageFormat::RGBA, std::vector<unsigned char>()),
 				std::invalid_argument);
 
 			// height negative
 			CHECK_THROWS_AS(
-				tCreator->createTexture2D(2, -3, gl::ImageFormat::RGBA, std::vector<unsigned char>()),
+				tCreator->createTexture2D(2, -3, yage::gl::ImageFormat::RGBA, std::vector<unsigned char>()),
 				std::invalid_argument);
 
 			// width and height negative
 			CHECK_THROWS_AS(
-				tCreator->createTexture2D(-2, -3, gl::ImageFormat::RGBA, std::vector<unsigned char>()),
+				tCreator->createTexture2D(-2, -3, yage::gl::ImageFormat::RGBA, std::vector<unsigned char>()),
 				std::invalid_argument);
 
 			// width zero
 			CHECK_THROWS_AS(
-				tCreator->createTexture2D(0, 3, gl::ImageFormat::RGBA, std::vector<unsigned char>()),
+				tCreator->createTexture2D(0, 3, yage::gl::ImageFormat::RGBA, std::vector<unsigned char>()),
 				std::invalid_argument);
 
 			// height zero
 			CHECK_THROWS_AS(
-				tCreator->createTexture2D(2, 0, gl::ImageFormat::RGBA, std::vector<unsigned char>()),
+				tCreator->createTexture2D(2, 0, yage::gl::ImageFormat::RGBA, std::vector<unsigned char>()),
 				std::invalid_argument);
 
 			// width and height zero
 			CHECK_THROWS_AS(
-				tCreator->createTexture2D(0, 0, gl::ImageFormat::RGBA, std::vector<unsigned char>()),
+				tCreator->createTexture2D(0, 0, yage::gl::ImageFormat::RGBA, std::vector<unsigned char>()),
 				std::invalid_argument);
 		}
 	}
 
 	SECTION("set image") {
 		SECTION("set image") {
-			std::shared_ptr<gl::ITexture2D> texture =
-				tCreator->createTexture2D(2, 4, gl::ImageFormat::RGB, std::vector<unsigned char>());
+			std::shared_ptr<yage::gl::ITexture2D> texture =
+				tCreator->createTexture2D(2, 4, yage::gl::ImageFormat::RGB, std::vector<unsigned char>());
 
 			const std::vector<unsigned char> image = {
 				0, 0, 0, 1, 2, 1,
@@ -134,8 +134,8 @@ TEST_CASE("Texture Test")
 				10, 1, 2, 1, 6, 40,
 				1, 2, 3, 4, 7, 5,
 				0, 5, 1, 8, 9, 3 };
-			std::shared_ptr<gl::ITexture2D> texture =
-				tCreator->createTexture2D(2, 4, gl::ImageFormat::RGB, image);
+			std::shared_ptr<yage::gl::ITexture2D> texture =
+				tCreator->createTexture2D(2, 4, yage::gl::ImageFormat::RGB, image);
 
 			const std::vector<unsigned char> subImage = {
 				0, 1, 3, 1, 4, 10,
@@ -159,8 +159,8 @@ TEST_CASE("Texture Test")
 			10, 1, 2, 1, 6, 40,
 			1, 2, 3, 4, 7, 5,
 			0, 5, 1, 8, 9, 3 };
-		std::shared_ptr<gl::ITexture2D> texture =
-			tCreator->createTexture2D(2, 4, gl::ImageFormat::RGB, image);
+		std::shared_ptr<yage::gl::ITexture2D> texture =
+			tCreator->createTexture2D(2, 4, yage::gl::ImageFormat::RGB, image);
 
 		texture->generateMipmaps();
 

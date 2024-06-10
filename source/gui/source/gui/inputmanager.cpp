@@ -1,6 +1,6 @@
 ﻿#include "inputmanager.h"
 
-namespace gui
+namespace yage::gui
 {
     InputManager::InputManager(Widget* root)
             : m_root_widget(root)
@@ -53,7 +53,7 @@ namespace gui
         }
     }
 
-    Widget* InputManager::search_selected(Widget* widget, gml::Vec2f pos)
+    Widget* InputManager::search_selected(Widget* widget, math::Vec2f pos)
     {
         if (pos.x() > widget->m_position_abs.x() && pos.x() < widget->m_position_abs.x() + widget->m_size_abs.x() &&
             pos.y() > widget->m_position_abs.y() && pos.y() < widget->m_position_abs.y() + widget->m_size_abs.y()) {

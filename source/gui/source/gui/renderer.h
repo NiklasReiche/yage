@@ -7,7 +7,7 @@
 
 #include "widgets/root.h"
 
-namespace gui
+namespace yage::gui
 {
 	class GuiRenderer
 	{

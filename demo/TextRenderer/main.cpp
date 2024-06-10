@@ -7,6 +7,8 @@
 #include "font/converter.h"
 #include "font/shaders.h"
 
+using namespace yage;
+
 int main(int argc, char *argv[], char *[])
 {
     if (argc < 2) {
@@ -77,7 +79,7 @@ int main(int argc, char *argv[], char *[])
 		renderer->clear();
 
         renderer->setViewport(0, 0, window->getPixelWidth(), window->getPixelHeight());
-        auto projection = gml::matrix::orthographic<float>(0, window->getPixelWidth(),
+        auto projection = math::matrix::orthographic<float>(0, window->getPixelWidth(),
                                                            window->getPixelHeight(), 0,
                                                            0.1, 10000);
 
@@ -91,41 +93,41 @@ int main(int argc, char *argv[], char *[])
         renderer->draw(text100.drawable());
         yPos += 150;
 
-        textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
+        textShader->setUniform("projection", projection * math::matrix::translate<float>(0, yPos, 0));
         textShader->setUniform("scale", 50.0f / 16.0f);
         renderer->draw(text50.drawable());
         yPos += 90;
 
-        textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
+        textShader->setUniform("projection", projection * math::matrix::translate<float>(0, yPos, 0));
         textShader->setUniform("scale", 24.0f / 16.0f);
         renderer->draw(text24.drawable());
         yPos += 50;
 
-        textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
+        textShader->setUniform("projection", projection * math::matrix::translate<float>(0, yPos, 0));
         textShader->setUniform("scale", 16.0f / 16.0f);
         renderer->draw(text16.drawable());
         yPos += 40;
 
-        textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
+        textShader->setUniform("projection", projection * math::matrix::translate<float>(0, yPos, 0));
         textShader->setUniform("scale", 12.0f / 16.0f);
         renderer->draw(text12.drawable());
         yPos += 30;
 
-        textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
+        textShader->setUniform("projection", projection * math::matrix::translate<float>(0, yPos, 0));
         textShader->setUniform("scale", 11.0f / 16.0f);
         renderer->draw(text11.drawable());
         yPos += 30;
 
-        textShader->setUniform("projection", projection * gml::matrix::translate<float>(0, yPos, 0));
+        textShader->setUniform("projection", projection * math::matrix::translate<float>(0, yPos, 0));
         textShader->setUniform("scale", 9.0f / 16.0f);
         renderer->draw(text9.drawable());
         yPos += 30;
 
         textShader->setUniform("projection",
                                projection *
-                               gml::matrix::translate<float>(700, yPos + 100, -1000) *
-                               gml::matrix::axisAngle(gml::Vec3f(0, 1, 1), gml::to_rad((float) ((step) % 360))) *
-                               gml::matrix::translate<float>(-250, -20, 0)
+                               math::matrix::translate<float>(700, yPos + 100, -1000) *
+                               math::matrix::axisAngle(math::Vec3f(0, 1, 1), math::to_rad((float) ((step) % 360))) *
+                               math::matrix::translate<float>(-250, -20, 0)
                                );
         step++;
         textShader->setUniform("scale", 16.0f / 16.0f);

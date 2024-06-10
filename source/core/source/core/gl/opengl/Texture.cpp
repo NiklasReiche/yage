@@ -2,7 +2,7 @@
 #include "Context.h"
 #include "Framebuffer.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	Texture::~Texture()
 	{

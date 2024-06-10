@@ -4,7 +4,7 @@
 #include "OpenGlObject.h"
 #include "OpenGL.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	class ElementBuffer final
 		: public gl::ElementBuffer, public OpenGlObject, public std::enable_shared_from_this<ElementBuffer>

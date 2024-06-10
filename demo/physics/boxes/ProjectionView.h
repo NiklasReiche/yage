@@ -3,13 +3,15 @@
 #include <memory>
 
 #include "core/gl/IUniformBlock.h"
-#include "gml/matrix.h"
+#include "math/matrix.h"
+
+using namespace yage;
 
 class ProjectionView
 {
 public:
-	gml::Mat4f projection;
-	gml::Mat4f view;
+	math::Mat4f projection;
+	math::Mat4f view;
 
 	ProjectionView() = default;
 	explicit ProjectionView(std::unique_ptr<gl::IUniformBlock>& uniformBlock);

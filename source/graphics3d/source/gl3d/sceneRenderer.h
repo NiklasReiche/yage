@@ -11,12 +11,12 @@
 #include "mesh.h"
 #include "light.h"
 
-namespace gl3d
+namespace yage::gl3d
 {
 	struct ShaderUniformValues
 	{
-		gml::Vec3d viewPos;
-		gml::Mat4d view;
+		math::Vec3d viewPos;
+		math::Mat4d view;
         std::vector<std::shared_ptr<Light>> dir_lights;
 		std::vector<std::shared_ptr<Light>> point_lights;
         std::shared_ptr<Camera> camera;

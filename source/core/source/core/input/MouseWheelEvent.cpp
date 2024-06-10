@@ -1,6 +1,6 @@
 #include "MouseWheelEvent.h"
 
-namespace input
+namespace yage::input
 {
 	MouseWheelEvent::MouseWheelEvent(const float xOffset, const float yOffset)
 		: Event(Type::MOUSE_WHEEL_EVENT), xOffset(xOffset), yOffset(yOffset) {}

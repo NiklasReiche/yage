@@ -9,7 +9,7 @@
 #include "widget.h"
 #include "label.h"
 
-namespace gui
+namespace yage::gui
 {
 	class TextCursor : public Widget
 	{

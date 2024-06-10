@@ -6,7 +6,7 @@
 #include <tuple>
 #include <functional>
 
-#include <gml/vector.h>
+#include <math/vector.h>
 #include <core/input/KeyEvent.h>
 #include <core/gl/color.h>
 #include <core/gl/graphics.h>
@@ -15,7 +15,7 @@
 #include "../texturemanager.h"
 #include "../animation.h"
 
-namespace gui
+namespace yage::gui
 {
     enum class SizeHint
     {
@@ -41,8 +41,8 @@ namespace gui
 
     struct Size
     {
-        gml::Vec2f value = gml::Vec2f(0);
-        gml::Vec2<ValueType> value_type = {ValueType::ABSOLUTE, ValueType::ABSOLUTE};
+        math::Vec2f value = math::Vec2f(0);
+        math::Vec2<ValueType> value_type = {ValueType::ABSOLUTE, ValueType::ABSOLUTE};
     };
 
     enum class AnchorPosition
@@ -64,12 +64,12 @@ namespace gui
         /**
          * Offset from the anchor position inside the parent widget, either in absolute or relative terms.
          */
-        gml::Vec2f offset = gml::Vec2f(0);
+        math::Vec2f offset = math::Vec2f(0);
 
         /**
          * Encodes whether the provided offset values are absolute or relative.
          */
-        gml::Vec2<ValueType> value_type = {ValueType::ABSOLUTE, ValueType::ABSOLUTE};
+        math::Vec2<ValueType> value_type = {ValueType::ABSOLUTE, ValueType::ABSOLUTE};
 
         bool operator==(const Anchor& rhs) const
         {
@@ -90,7 +90,7 @@ namespace gui
         Anchor anchor{};
         /** preferred size for layouts */
         Size preferred_size{};
-        gml::Vec2<SizeHint> size_hint = {SizeHint::FIT_CHILDREN, SizeHint::FIT_CHILDREN};
+        math::Vec2<SizeHint> size_hint = {SizeHint::FIT_CHILDREN, SizeHint::FIT_CHILDREN};
         /** minimal size for layouts */
         Size min_size{}; // TODO: does it make sense for this to be relative?
         /** maximum size for layouts */
@@ -122,7 +122,7 @@ namespace gui
         WidgetShadowTemplate shadow{};
         unsigned int color = gl::Color::TRANSPARENT;
         WidgetTextureTemplate texture{};
-        gml::Vec4f padding = gml::Vec4f(0);
+        math::Vec4f padding = math::Vec4f(0);
         //TODO: margin
     };
 
@@ -210,9 +210,9 @@ namespace gui
          */
         virtual void resize(Size size);
 
-        void set_actual_size(gml::Vec2f size);
+        void set_actual_size(math::Vec2f size);
 
-        void set_absolute_offset(gml::Vec2f offset);
+        void set_absolute_offset(math::Vec2f offset);
 
         void override_anchor(Anchor anchor);
 
@@ -220,34 +220,34 @@ namespace gui
          * @return The absolute minimum size of this widget.
          */
         [[nodiscard]]
-        virtual gml::Vec2f min_size() const;
+        virtual math::Vec2f min_size() const;
 
         /**
          * @return The absolute maximum size of this widget.
          */
         [[nodiscard]]
-        virtual gml::Vec2f max_size() const;
+        virtual math::Vec2f max_size() const;
 
         /**
          * @return The absolute preferred size of this widget.
          */
         [[nodiscard]]
-        virtual gml::Vec2f preferred_size() const;
+        virtual math::Vec2f preferred_size() const;
 
         [[nodiscard]]
-        virtual gml::Vec2<SizeHint> size_hint() const;
+        virtual math::Vec2<SizeHint> size_hint() const;
 
         /**
          * @return This widget's absolute offset from its parent. The reference point is dependent on the anchor position.
          */
         [[nodiscard]]
-        virtual gml::Vec2f offset() const;
+        virtual math::Vec2f offset() const;
 
         /**
          * @return The absolute size that this widget got assigned during the last layout pass.
          */
         [[nodiscard]]
-        gml::Vec2f actual_size() const;
+        math::Vec2f actual_size() const;
 
         /**
          * @return Whether this widget is hidden or visible.
@@ -308,15 +308,15 @@ namespace gui
         TextureAtlasView m_texture_atlas_view;
 
         /** absolute offset from parent widget */
-        gml::Vec2f m_offset_abs;
+        math::Vec2f m_offset_abs;
         /** absolute position of the outer top left edge */
-        gml::Vec2f m_position_abs;
+        math::Vec2f m_position_abs;
         /** absolute total size of the widget */
-        gml::Vec2f m_size_abs;
+        math::Vec2f m_size_abs;
         /** absolute position of the inner top left edge - equal to position for borderless widgets */
-        gml::Vec2f m_inner_position_abs;
+        math::Vec2f m_inner_position_abs;
         /** absolute size of the widget's interior space - equal to size for borderless widgets */
-        gml::Vec2f m_inner_size_abs;
+        math::Vec2f m_inner_size_abs;
 
         Widget(Widget* parent, Master* master, const WidgetTemplate& widget_template);
 

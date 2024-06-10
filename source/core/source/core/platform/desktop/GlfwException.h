@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace platform::desktop
+namespace yage::platform::desktop
 {
 	class GlfwException final : public std::runtime_error
 	{

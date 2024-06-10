@@ -1,6 +1,6 @@
 #include "Event.h"
 
-namespace input
+namespace yage::input
 {
 	Event::Event(const Type type) noexcept
 		: type(type) {}

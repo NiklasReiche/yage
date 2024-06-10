@@ -3,7 +3,7 @@
 #include <vector>
 #include <cstdint>
 
-namespace font
+namespace yage::font
 {
     // TODO: make binary file format writing & reading robust against struct alignment, so we have more freedom choosing data types
 

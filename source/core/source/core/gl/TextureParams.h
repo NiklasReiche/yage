@@ -2,7 +2,7 @@
 
 #include <span>
 
-namespace gl
+namespace yage::gl
 {
     enum class ImageFormat
     {

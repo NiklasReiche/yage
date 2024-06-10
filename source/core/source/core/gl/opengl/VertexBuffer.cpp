@@ -1,7 +1,7 @@
 #include "VertexBuffer.h"
 #include "Context.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	VertexBuffer::~VertexBuffer()
 	{

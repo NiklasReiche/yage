@@ -1,6 +1,6 @@
 #pragma once
 
-namespace utils
+namespace yage::utils
 {
     struct Point
     {

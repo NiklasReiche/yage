@@ -5,7 +5,7 @@
 #include <core/platform/IFileReader.h>
 #include <core/platform/desktop/FileReader.h>
 #include <core/gl/Context.h>
-#include <gml/gml.h>
+#include <math/math.h>
 #include <gl3d/camera.h>
 #include <gl3d/sceneRenderer.h>
 #include <gl3d/resources/obj.h>
@@ -14,6 +14,8 @@
 
 #include "MovementListener.h"
 #include "ProjectionView.h"
+
+using namespace yage;
 
 class App
 {
@@ -24,7 +26,7 @@ public:
         glContext = gl::createContext(window);
 
         camera = std::make_shared<gl3d::Camera>();
-        camera->lookAt(gml::Vec3d(5, 5, 5), gml::Vec3d(0, 0, 0));
+        camera->lookAt(math::Vec3d(5, 5, 5), math::Vec3d(0, 0, 0));
 
         baseRenderer = glContext->getRenderer();
         baseRenderer->enableDepthTest();
@@ -51,20 +53,20 @@ public:
         csShader->linkUniformBlock(*ubo);
 
         projViewUniform = ProjectionView(ubo);
-        projViewUniform.projection = gml::matrix::perspective<float>(90.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
+        projViewUniform.projection = math::matrix::perspective<float>(90.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
         projViewUniform.syncProjection();
-        projViewUniform.view = gml::matrix::lookAt<double>(gml::Vec3d(5, 5, 5), gml::Vec3d(0, 0, 0));
+        projViewUniform.view = math::matrix::look_at<float>(math::Vec3f(5, 5, 5), math::Vec3f(0, 0, 0));
         projViewUniform.syncView();
-        pbrShader->setUniform("camPos", gml::Vec3d(5, 5, 5));
-        pbrShaderNormalMapping->setUniform("camPos", gml::Vec3d(5, 5, 5));
+        pbrShader->setUniform("camPos", math::Vec3f(5, 5, 5));
+        pbrShaderNormalMapping->setUniform("camPos", math::Vec3f(5, 5, 5));
 
         scene = loadScene(filename);
 
         auto light = std::make_shared<gl3d::DirectionalLight>();
-        light->color = gml::Vec3f(5, 5, 5);
+        light->color = math::Vec3f(5, 5, 5);
         auto& light_node = scene->create_object("light");
-        light_node.local_transform = gml::matrix::fromQuaternion<double>(
-                gml::quaternion::eulerAngle<double>(gml::to_rad(180.0), gml::to_rad(0.0), gml::to_rad(45.0)));
+        light_node.local_transform = math::matrix::from_quaternion<double>(
+                math::quaternion::euler_angle<double>(math::to_rad(180.0), math::to_rad(0.0), math::to_rad(45.0)));
         light_node.light = light;
 
         inputListener = MovementListener(window, camera);
@@ -72,7 +74,7 @@ public:
         inputListener.pbrShader2 = pbrShaderNormalMapping;
         inputListener.m_projection_view = &projViewUniform;
         inputListener.world = scene;
-        inputListener.camPos = gml::Vec3f(5);
+        inputListener.camPos = math::Vec3f(5);
         window->attach(inputListener);
     }
 

@@ -6,7 +6,7 @@
 #include "OpenGL.h"
 #include "Texture2D.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	class Framebuffer final : public OpenGlObject, public gl::IFrame
 	{

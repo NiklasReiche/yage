@@ -1,6 +1,6 @@
 #pragma once
 
-namespace img
+namespace yage::img
 {
 	enum class FORCE_CHANNELS
 	{

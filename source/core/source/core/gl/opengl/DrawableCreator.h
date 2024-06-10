@@ -7,7 +7,7 @@
 #include "VertexBuffer.h"
 #include "VertexArray.h"
 
-namespace opengl
+namespace yage::opengl
 {
     class DrawableCreator final : public BaseObject, public gl::IDrawableCreator
     {

@@ -1,4 +1,4 @@
-namespace utils
+namespace yage::utils
 {
     /**
      * Inherits from multiple lambdas and exposes their operator(). Can be used to supply std::visit with in-place

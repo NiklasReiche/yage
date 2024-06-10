@@ -18,15 +18,15 @@ void MovementListener::onMousePosEvent(const input::MousePosEvent& event)
     float y = static_cast<const input::MousePosEvent&>(event).getYPos();
 
     if (mouse.isHidden) {
-        gml::Vec2d dist = mouse.pos - gml::Vec2f(x, y);
-        gml::Vec2d angle = dist * mouse.sensitivity;
+        math::Vec2f dist = mouse.pos - math::Vec2f(x, y);
+        math::Vec2f angle = dist * mouse.sensitivity;
 
-        gml::Quatd q_yaw = gml::quaternion::eulerAngle<double>(gml::to_rad(angle.x()), 0.0, 0.0);
-        gml::Quatd q_pitch = gml::quaternion::eulerAngle<double>(0.0, 0.0, -gml::to_rad(angle.y()));
-        gml::Quatd rotation = gml::normalize(q_yaw * camera->getRotation() * q_pitch);
+        math::Quatd q_yaw = math::quaternion::euler_angle<double>(math::to_rad(angle.x()), 0.0, 0.0);
+        math::Quatd q_pitch = math::quaternion::euler_angle<double>(0.0, 0.0, -math::to_rad(angle.y()));
+        math::Quatd rotation = math::normalize(q_yaw * camera->getRotation() * q_pitch);
         camera->rotateTo(rotation);
     }
-    mouse.pos = gml::Vec2f(x, y);
+    mouse.pos = math::Vec2f(x, y);
 }
 
 void MovementListener::applyUpdate()
@@ -72,7 +72,7 @@ void MovementListener::onKeyEvent(const input::KeyEvent& event)
     }
 
     if (code == input::KeyEvent::Code::KEY_ENTER && action == input::KeyEvent::Action::PRESS && ball != nullptr) {
-        ball->apply_force(gml::Vec3d(35, 0, 0), ball->position());
+        ball->apply_force(math::Vec3d(35, 0, 0), ball->position());
     }
 
     if (code == input::KeyEvent::Code::KEY_RIGHT && (action == input::KeyEvent::Action::PRESS ||

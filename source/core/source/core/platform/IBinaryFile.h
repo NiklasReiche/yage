@@ -5,7 +5,7 @@
 
 #include "IFile.h"
 
-namespace platform
+namespace yage::platform
 {
 	class IBinaryFile : public virtual IFile
 	{

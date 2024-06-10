@@ -6,7 +6,7 @@
 #include "VertexBuffer.h"
 #include "ElementBuffer.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	class VertexArray : public gl::VertexArray, public OpenGlObject
 	{

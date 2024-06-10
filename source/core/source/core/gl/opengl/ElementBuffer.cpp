@@ -1,7 +1,7 @@
 #include "ElementBuffer.h"
 #include "Context.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	ElementBuffer::~ElementBuffer()
 	{

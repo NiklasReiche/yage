@@ -6,7 +6,7 @@
 #include "Shader.h"
 #include "IUniformBlock.h"
 
-namespace gl
+namespace yage::gl
 {
 	class IShaderCreator
 	{

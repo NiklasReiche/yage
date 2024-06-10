@@ -9,7 +9,7 @@
 #include "OpenGL.h"
 #include "VertexArray.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	class Drawable final : public gl::IDrawable, std::enable_shared_from_this<Drawable>
 	{

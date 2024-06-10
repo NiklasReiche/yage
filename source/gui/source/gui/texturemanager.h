@@ -4,10 +4,10 @@
 #include <vector>
 
 #include <core/platform/Window.h>
-#include <gml/gml.h>
+#include <math/math.h>
 #include <image/image.h>
 
-namespace gui
+namespace yage::gui
 {
     class TextureAtlasStore;
 
@@ -17,8 +17,8 @@ namespace gui
     class TextureAtlasView
     {
     public:
-        TextureAtlasView(TextureAtlasStore* store, unsigned int index, const gml::Vec2f& coordinates_start,
-                         const gml::Vec2f& coordinates_end);
+        TextureAtlasView(TextureAtlasStore* store, unsigned int index, const math::Vec2f& coordinates_start,
+                         const math::Vec2f& coordinates_end);
 
         /**
          * @return Texture that this view references.
@@ -28,18 +28,18 @@ namespace gui
         /**
          * @return Texture coordinates of the upper left corner.
          */
-        gml::Vec2f coordinates_start();
+        math::Vec2f coordinates_start();
 
         /**
          * @return Texture coordinates of the bottom right corner.
          */
-        gml::Vec2f coordinates_end();
+        math::Vec2f coordinates_end();
 
     private:
         TextureAtlasStore* m_store;
         unsigned int m_index;
-        gml::Vec2f m_coordinates_start;
-        gml::Vec2f m_coordinates_end;
+        math::Vec2f m_coordinates_start;
+        math::Vec2f m_coordinates_end;
     };
 
     struct TextureAtlas
@@ -48,7 +48,7 @@ namespace gui
         /**
          * Encodes the position at which the next image should be inserted.
          */
-        gml::Vec2i cursor;
+        math::Vec2i cursor;
         /**
          * Keeps track of the height of the current line of images in the atlas.
          */

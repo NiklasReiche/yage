@@ -1,11 +1,11 @@
 #include "sceneRenderer.h"
 
-namespace gl3d
+namespace yage::gl3d
 {
     struct Geometry
     {
         std::shared_ptr<Mesh> mesh;
-        gml::Mat4d transform;
+        math::Mat4d transform;
     };
 
     SceneRenderer::SceneRenderer(std::shared_ptr<gl::IRenderer> renderer)
@@ -36,14 +36,14 @@ namespace gl3d
                 }
             }
             if (node.camera) {
-                node.camera->moveTo(transform.getTranslation());
-                node.camera->rotateTo(gml::quaternion::fromMatrix<double>(transform.getRotation()));
+                node.camera->moveTo(transform.translation());
+                node.camera->rotateTo(math::quaternion::from_matrix<double>(transform.rotation()));
             }
         };
 
         // TODO: use found camera from scene graph to set shader camPos, like we do with lights
 
-        root->apply(collectGeometry, gml::matrix::Id4d);
+        root->apply(collectGeometry, math::matrix::Id4d);
 
         // TODO: sort by shader
         for (auto& geometry: drawablesLoop) {
@@ -62,7 +62,7 @@ namespace gl3d
                     uniformValues.point_lights[i]->update_uniforms(*shader, i);
                 }
 
-                shader->setUniform("model", geometry.transform);
+                shader->setUniform("model", static_cast<math::Mat4f>(geometry.transform));
                 sub_mesh->material().update_shader_uniforms();
                 sub_mesh->material().bind_textures(*renderer);
 

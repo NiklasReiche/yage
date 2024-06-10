@@ -4,7 +4,7 @@
 #include "Texture.h"
 #include <vector>
 
-namespace opengl
+namespace yage::opengl
 {
 	class Texture2D final
 		: public Texture, public gl::ITexture2D, public std::enable_shared_from_this<Texture2D>

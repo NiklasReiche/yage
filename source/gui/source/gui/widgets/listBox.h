@@ -2,7 +2,7 @@
 
 #include "widget.h"
 
-namespace gui
+namespace yage::gui
 {
     struct ListBoxTemplate
     {
@@ -41,7 +41,7 @@ namespace gui
         void update_layout() override;
 
         [[nodiscard]]
-        gml::Vec2f preferred_size() const override;
+        math::Vec2f preferred_size() const override;
 
     private:
         ListBoxTemplate m_box_template;

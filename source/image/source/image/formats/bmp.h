@@ -12,7 +12,7 @@
 #include <image/Image.h>
 #include <image/enum.h>
 
-namespace img::bmp
+namespace yage::img::bmp
 {
 	enum class BMP_VERSION
 	{

@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace physics3d::shaders
+namespace yage::physics3d::shaders
 {
 	struct PointShader
 	{

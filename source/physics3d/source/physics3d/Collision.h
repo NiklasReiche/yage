@@ -2,10 +2,10 @@
 
 #include <vector>
 
-#include <gml/vector.h>
-#include <gml/matrix.h>
+#include <math/vector.h>
+#include <math/matrix.h>
 
-namespace physics3d
+namespace yage::physics3d
 {
     class RigidBody;
 
@@ -17,22 +17,22 @@ namespace physics3d
         /**
          * Relative offset of the contact point on object A from the center of object A.
          */
-        gml::Vec3d r_a;
+        math::Vec3d r_a;
 
         /**
          * World-space position of the contact point on object A.
          */
-        gml::Vec3d p_a;
+        math::Vec3d p_a;
 
         /**
          * Relative offset of the contact point on object B from the center of object B.
          */
-        gml::Vec3d r_b;
+        math::Vec3d r_b;
 
         /**
          * World-space position of the contact point on object B.
          */
-        gml::Vec3d p_b;
+        math::Vec3d p_b;
 
         /**
          * Penetration depth of the contact point along the contact normal.
@@ -42,7 +42,7 @@ namespace physics3d
         /**
          * Relative velocity from object A to B at the contact point.
          */
-        gml::Vec3d rel_v{};
+        math::Vec3d rel_v{};
 
         /**
          * Relative velocity from object A to B at the contact point along the contact normal.
@@ -63,17 +63,17 @@ namespace physics3d
         /**
          * Normalized contact normal vector from object A to B.
          */
-        gml::Vec3d normal;
+        math::Vec3d normal;
 
         /**
          * Normalized contact tangent vector spanning the contact plane.
          */
-        gml::Vec3d tangent_1;
+        math::Vec3d tangent_1;
 
         /**
          * Normalized contact tangent vector spanning the contact plane.
          */
-        gml::Vec3d tangent_2;
+        math::Vec3d tangent_2;
     };
 
     /**
@@ -84,17 +84,17 @@ namespace physics3d
         /**
          * The inverted mass matrix.
          */
-        const gml::Matd<12, 12> m_inv;
+        const math::Matd<12, 12> m_inv;
 
         /**
          * The Jacobian.
          */
-        const gml::Matd<1, 12> j;
+        const math::Matd<1, 12> j;
 
         /**
          * The transpose of the Jacobian.
          */
-        const gml::Matd<12, 1> j_t;
+        const math::Matd<12, 1> j_t;
 
         const double bias{};
 

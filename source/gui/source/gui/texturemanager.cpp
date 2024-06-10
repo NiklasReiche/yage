@@ -1,6 +1,6 @@
 #include "texturemanager.h"
 
-namespace gui
+namespace yage::gui
 {
     TextureAtlasStore::TextureAtlasStore(const std::shared_ptr<platform::IWindow>& platform,
                                          const std::shared_ptr<gl::ITextureCreator>& textureCreator)
@@ -35,7 +35,7 @@ namespace gui
             atlas = &textures.at(atlas_index);
         }
 
-        gml::Vec2f tex_coords_start(
+        math::Vec2f tex_coords_start(
                 (0.5f + static_cast<float>(atlas->cursor.x())) / static_cast<float>(atlas->texture->getWidth()),
                 (0.5f + static_cast<float>(atlas->cursor.y())) / static_cast<float>(atlas->texture->getHeight()));
 
@@ -45,7 +45,7 @@ namespace gui
         atlas->cursor.x() += image.getWidth();
         atlas->y_next_offset = std::max(atlas->y_next_offset, image.getHeight());
 
-        gml::Vec2f tex_coords_end(
+        math::Vec2f tex_coords_end(
                 (0.5f + static_cast<float>(atlas->cursor.x())) / static_cast<float>(atlas->texture->getWidth()),
                 (0.5f + static_cast<float>(atlas->cursor.y() + image.getHeight())) /
                 static_cast<float>(atlas->texture->getHeight()));
@@ -62,7 +62,7 @@ namespace gui
     TextureAtlasView TextureAtlasStore::transparent()
     {
         // the first pixel of the first atlas is reserved for transparency
-        auto coordinates = gml::Vec2f(0.5f / static_cast<float>(TEXTURE_SIZE), 0.5f / static_cast<float>(TEXTURE_SIZE));
+        auto coordinates = math::Vec2f(0.5f / static_cast<float>(TEXTURE_SIZE), 0.5f / static_cast<float>(TEXTURE_SIZE));
         return {this, 0, coordinates, coordinates};
     }
 
@@ -72,7 +72,7 @@ namespace gui
     }
 
     TextureAtlasView::TextureAtlasView(TextureAtlasStore* store, unsigned int index,
-                                       const gml::Vec2f& coordinates_start, const gml::Vec2f& coordinates_end)
+                                       const math::Vec2f& coordinates_start, const math::Vec2f& coordinates_end)
             : m_store(store), m_index(index), m_coordinates_start(coordinates_start),
               m_coordinates_end(coordinates_end)
     {
@@ -83,12 +83,12 @@ namespace gui
         return m_store->at(m_index);
     }
 
-    gml::Vec2f TextureAtlasView::coordinates_start()
+    math::Vec2f TextureAtlasView::coordinates_start()
     {
         return m_coordinates_start;
     }
 
-    gml::Vec2f TextureAtlasView::coordinates_end()
+    math::Vec2f TextureAtlasView::coordinates_end()
     {
         return m_coordinates_end;
     }

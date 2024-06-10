@@ -2,7 +2,7 @@
 
 #include <utility>
 
-namespace gui
+namespace yage::gui
 {
 	RootWidget::RootWidget(Master* master) : Widget(nullptr, master, {
         .color = gl::Color::TRANSPARENT

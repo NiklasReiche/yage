@@ -1,7 +1,7 @@
 #include "Cubemap.h"
 #include "Context.h"
 
-namespace opengl
+namespace yage::opengl
 {
     Cubemap::~Cubemap()
     {

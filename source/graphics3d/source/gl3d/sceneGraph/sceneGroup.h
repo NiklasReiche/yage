@@ -6,7 +6,7 @@
 #include "sceneNode.h"
 #include "sceneObject.h"
 
-namespace gl3d
+namespace yage::gl3d
 {
 	/**
 	 * Represents a composite node in a scene graph. Contains children and delegates all work to them.
@@ -14,9 +14,9 @@ namespace gl3d
 	class SceneGroup : public SceneNode
 	{
 	public:
-        explicit SceneGroup(const std::string_view& name, const gml::Mat4d& transform = gml::matrix::Id4d);
+        explicit SceneGroup(const std::string_view& name, const math::Mat4d& transform = math::matrix::Id4d);
 
-        void apply(const std::function<void(SceneObject&)>& f, const gml::Mat4d& parent_transform) override;
+        void apply(const std::function<void(SceneObject&)>& f, const math::Mat4d& parent_transform) override;
 
         /**
          * Creates a new group node as a child of this group node.

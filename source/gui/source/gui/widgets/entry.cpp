@@ -3,7 +3,7 @@
 #include <core/platform/Window.h>
 #include "../master.h"
 
-namespace gui
+namespace yage::gui
 {
     TextCursor::TextCursor(Widget* parent, Master* master, const WidgetTemplate& widget_template)
             : Widget(parent, master, widget_template)
@@ -13,7 +13,7 @@ namespace gui
     }
 
     CursorAnimation::CursorAnimation(Widget* widget, Master* master, double time)
-            : Animation(widget, master, gml::Vec2f(), gml::Vec2f(), time)
+            : Animation(widget, master, math::Vec2f(), math::Vec2f(), time)
     {
     }
 
@@ -42,7 +42,7 @@ namespace gui
 
         label = create_widget<Label>(LabelTemplate{
                 .base  {
-                        .padding = gml::Vec4f(0.0f),
+                        .padding = math::Vec4f(0.0f),
                 },
                 .text = entry_template.placeholder_text
         });
@@ -50,7 +50,7 @@ namespace gui
         cursor = create_widget<TextCursor>(WidgetTemplate{
                 .geometry = {
                         .preferred_size = {
-                                .value = gml::Vec2f(CURSOR_WIDTH, label->preferred_size().y())
+                                .value = math::Vec2f(CURSOR_WIDTH, label->preferred_size().y())
                         },
                 },
                 .color = m_entry_template.cursor_color,
@@ -58,7 +58,7 @@ namespace gui
         cursor_animation = cursor->create_animation<CursorAnimation>(0.5);
         cursor->hide();
 
-        if (m_template.geometry.preferred_size.value == gml::Vec2f(0.0f)) {
+        if (m_template.geometry.preferred_size.value == math::Vec2f(0.0f)) {
             m_template.geometry.size_hint.x() = SizeHint::FIT_CHILDREN;
             m_template.geometry.size_hint.y() = SizeHint::FIT_CHILDREN;
         }
@@ -66,7 +66,7 @@ namespace gui
 
     void TextEntry::move_cursor(std::size_t position)
     {
-        gml::Vec2f cursor_position;
+        math::Vec2f cursor_position;
         cursor_position.x() = label->offset().x() + (label->text() ? label->text()->relative_offset(position).x() : 0);
         cursor_position.y() = cursor->offset().y();
         cursor->set_anchor({

@@ -6,7 +6,7 @@
 #include <core/platform/FileException.h>
 #include <core/platform/IFile.h>
 
-namespace platform::desktop
+namespace yage::platform::desktop
 {
 	enum class FileType
 	{

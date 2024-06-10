@@ -8,7 +8,7 @@
 #include "Collision.h"
 #include "Visualizer.h"
 
-namespace physics3d
+namespace yage::physics3d
 {
     /**
      * Performs a discrete physics simulation on a set of rigid bodies. Implements a Sequential Impulses approach with
@@ -58,7 +58,7 @@ namespace physics3d
 
         void disable_gravity();
 
-        void visualize_collisions(const gml::Mat4d& projection, const gml::Mat4d& view);
+        void visualize_collisions(const math::Mat4d& projection, const math::Mat4d& view);
 
     private:
         /**
@@ -80,7 +80,7 @@ namespace physics3d
 
         std::vector<std::shared_ptr<RigidBody>> bodies;
         CollisionVisitor m_collision_visitor{};
-        gml::Vec3d m_external_acceleration{};
+        math::Vec3d m_external_acceleration{};
 
         std::vector<Constraint> m_penetration_constraints;
         std::vector<Constraint> m_friction_constraints;
@@ -102,7 +102,7 @@ namespace physics3d
 
         static double solve_constraint(Constraint& constraint);
 
-        static void apply_impulse(const Constraint& constraint, gml::Matd<12, 1> impulse);
+        static void apply_impulse(const Constraint& constraint, math::Matd<12, 1> impulse);
 
         Constraint
         prepare_penetration_constraint(RigidBody& rb_a, RigidBody& rb_b, const ContactManifold& manifold,
@@ -121,8 +121,8 @@ namespace physics3d
 
         static void resolve_rolling_friction_constraint(Constraint& constraint);
 
-        static gml::Matd<12, 12> inverse_mass_matrix(RigidBody& a, RigidBody& b);
+        static math::Matd<12, 12> inverse_mass_matrix(RigidBody& a, RigidBody& b);
 
-        static std::tuple<gml::Vec3d, gml::Vec3d> tangent_plane(const gml::Vec3d& n);
+        static std::tuple<math::Vec3d, math::Vec3d> tangent_plane(const math::Vec3d& n);
     };
 }

@@ -6,7 +6,7 @@
 
 #include "TextureParams.h"
 
-namespace gl
+namespace yage::gl
 {
 	/**
 	 * @brief Interface for two-dimensional textures.

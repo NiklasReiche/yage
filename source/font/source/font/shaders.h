@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace font::shaders
+namespace yage::font::shaders
 {
     struct TextShader
     {

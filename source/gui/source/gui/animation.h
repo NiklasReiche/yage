@@ -2,10 +2,10 @@
 
 #include <functional>
 
-#include <gml/vector.h>
-#include <gml/interpolation.h>
+#include <math/vector.h>
+#include <math/interpolation.h>
 
-namespace gui
+namespace yage::gui
 {
 	class Widget;
 	class Master;
@@ -20,13 +20,13 @@ namespace gui
 
 		double timeCurrent = 0.0;
 		double timeEnd;
-		gml::Vec2<float> beg;
-		gml::Vec2<float> goal;
+		math::Vec2<float> beg;
+		math::Vec2<float> goal;
 
 		bool isFinished = true;
 
 	public:
-		Animation(Widget* widget, Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time); // TODO make this friend
+		Animation(Widget* widget, Master* master, math::Vec2<float> beg, math::Vec2<float> goal, double time); // TODO make this friend
         virtual ~Animation() = default;
 
 		void start();
@@ -42,7 +42,7 @@ namespace gui
 	class MoveAnimation : public Animation
 	{
 	public:
-		MoveAnimation(Widget* widget, Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time);
+		MoveAnimation(Widget* widget, Master* master, math::Vec2<float> beg, math::Vec2<float> goal, double time);
 
 		void update(double dt) override;
 	};
@@ -50,7 +50,7 @@ namespace gui
 	class SizeAnimation : public Animation
 	{
 	public:
-		SizeAnimation(Widget* widget, Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time);
+		SizeAnimation(Widget* widget, Master* master, math::Vec2<float> beg, math::Vec2<float> goal, double time);
 
 		void update(double dt) override;
 	};

@@ -10,7 +10,7 @@
 #include "GlfwException.h"
 #include "FileReader.h"
 
-namespace platform::desktop
+namespace yage::platform::desktop
 {
 	GlfwWindow::GlfwWindow(int width, int height, const std::string& title)
 	{

@@ -2,7 +2,7 @@
 
 #include "Context.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	Framebuffer::~Framebuffer()
 	{

@@ -3,15 +3,17 @@
 #include <core/platform/Window.h>
 #include <core/platform/desktop/GlfwWindow.h>
 #include <core/gl/Context.h>
-#include <gml/gml.h>
+#include <math/math.h>
 #include <gl3d/camera.h>
 
 #include <utility>
 #include "ProjectionView.h"
 
+using namespace yage;
+
 struct Mouse
 {
-	gml::Vec2f pos;
+	math::Vec2f pos;
 	float sensitivity = 0.02f;
 	bool first = true;
     bool pressed = false;
@@ -24,7 +26,7 @@ public:
     std::shared_ptr<gl::IShader> pbrShader;
     std::shared_ptr<gl::IShader> pbrShader2;
     ProjectionView* m_projection_view;
-    gml::Vec3f camPos;
+    math::Vec3f camPos;
 
 	MovementListener() = default;
 
@@ -48,23 +50,23 @@ public:
 		float y = static_cast<const input::MousePosEvent&>(event).getYPos();
 
 		if (mouse.pressed) {
-			gml::Vec2f dist = mouse.pos - gml::Vec2f(x, y);
-			gml::Vec2f angle = dist * mouse.sensitivity;
+			math::Vec2f dist = mouse.pos - math::Vec2f(x, y);
+			math::Vec2f angle = dist * mouse.sensitivity;
 
-            auto x_axis = std::abs(camPos.z()) > std::abs(camPos.x()) ? gml::Vec3f(1, 0, 0) : gml::Vec3f(0, 0, 1);
+            auto x_axis = std::abs(camPos.z()) > std::abs(camPos.x()) ? math::Vec3f(1, 0, 0) : math::Vec3f(0, 0, 1);
 
             auto newPos =
-                    gml::matrix::axisAngle(gml::Vec3f(0, 1, 0), angle.x()) *
-                    gml::matrix::axisAngle(x_axis, angle.y()) *
-                    gml::Vec4f(camPos.x(), camPos.y(), camPos.z(), 1);
+                    math::matrix::axisAngle(math::Vec3f(0, 1, 0), angle.x()) *
+                    math::matrix::axisAngle(x_axis, angle.y()) *
+                    math::Vec4f(camPos.x(), camPos.y(), camPos.z(), 1);
             camPos = {newPos.x() / newPos.w(), newPos.y() / newPos.w(), newPos.z() / newPos.w()};
 
-            m_projection_view->view = gml::matrix::lookAt<double>(camPos, gml::Vec3d(0, 0, 0));
+            m_projection_view->view = math::matrix::look_at<float>(camPos, math::Vec3f(0, 0, 0));
             m_projection_view->syncView();
             pbrShader->setUniform("camPos", camPos);
             pbrShader2->setUniform("camPos", camPos);
 		}
-		mouse.pos = gml::Vec2f(x, y);
+		mouse.pos = math::Vec2f(x, y);
 	}
 
 	void onKeyEvent(const input::KeyEvent& event) override
@@ -90,7 +92,7 @@ public:
         } else {
             offset += 1;
         }
-        world->local_transform = world->local_transform * gml::matrix::scale<double>(offset, offset, offset);
+        world->local_transform = world->local_transform * math::matrix::scale<double>(offset, offset, offset);
     }
 
 	void applyUpdate()

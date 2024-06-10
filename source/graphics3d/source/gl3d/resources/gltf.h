@@ -8,7 +8,7 @@
 #include "../mesh.h"
 #include "../sceneGraph/sceneGroup.h"
 
-namespace gl3d::resources
+namespace yage::gl3d::resources
 {
     std::unique_ptr<gl3d::SceneGroup> gltf_read_scene(
             const platform::IFileReader& fileReader, const std::string& filename,

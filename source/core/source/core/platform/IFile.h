@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace platform
+namespace yage::platform
 {
 	class IFile
 	{

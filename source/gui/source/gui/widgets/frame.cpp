@@ -1,6 +1,6 @@
 ﻿#include "frame.h"
 
-namespace gui
+namespace yage::gui
 {
 	Frame::Frame(Widget * parent, Master* master, const WidgetTemplate& widget_template)
 		: Widget(parent, master, widget_template)

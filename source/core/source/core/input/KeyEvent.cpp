@@ -1,6 +1,6 @@
 #include "KeyEvent.h"
 
-namespace input 
+namespace yage::input
 {
 	KeyEvent::KeyEvent(const Code key, const Action action)
 		: Event(Type::KEY_EVENT), key(key), action(action) {}

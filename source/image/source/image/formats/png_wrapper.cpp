@@ -19,7 +19,7 @@ namespace
 	{
 		auto* png = (png_handles*)png_get_error_ptr(png_ptr);
 		png->free();
-		throw platform::FileException(platform::FileException::BAD_IO, error_msg, "");
+		throw yage::platform::FileException(yage::platform::FileException::BAD_IO, error_msg, "");
 	}
 
 	void user_warning_fn(png_structp, png_const_charp warning_msg)
@@ -29,11 +29,11 @@ namespace
 
 	void user_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 	{
-		platform::IBinaryFile& file = *(platform::IBinaryFile*)png_get_io_ptr(png_ptr);
+		yage::platform::IBinaryFile& file = *(yage::platform::IBinaryFile*)png_get_io_ptr(png_ptr);
 		file.read((void*)data, (size_t)length);
 	}
 
-	void checkSignature(platform::IBinaryFile& file)
+	void checkSignature(yage::platform::IBinaryFile& file)
 	{
 		const int PNG_SIG_SIZE = 8;
 
@@ -41,14 +41,14 @@ namespace
 		file.read(&signature[0], PNG_SIG_SIZE);
 
 		if (png_sig_cmp(&signature[0], 0, PNG_SIG_SIZE)) {
-			throw platform::FileReadException("file is not a png image", "");
+			throw yage::platform::FileReadException("file is not a png image", "");
 		}
 
-		file.seek(0, platform::IFile::SeekOffset::BEG);
+		file.seek(0, yage::platform::IFile::SeekOffset::BEG);
 	}
 }
 
-namespace img::png
+namespace yage::img::png
 {
 	Image read(platform::IBinaryFile& file, FORCE_CHANNELS forceChannel)
 	{

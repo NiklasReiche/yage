@@ -5,7 +5,7 @@
 #include "core/platform/IFileReader.h"
 #include "core/platform/desktop/FileReader.h"
 #include "core/gl/Context.h"
-#include "gml/gml.h"
+#include "math/math.h"
 #include "gl3d/camera.h"
 #include "gl3d/sceneRenderer.h"
 #include "gl3d/resources/obj.h"
@@ -16,6 +16,8 @@
 #include "MovementListener.h"
 #include "ProjectionView.h"
 #include "gl3d/shaders.h"
+
+using namespace yage;
 
 class App
 {
@@ -29,9 +31,9 @@ public:
         simulation.enable_gravity();
 
         camera = std::make_shared<gl3d::Camera>(
-                gl3d::Camera(gml::Vec3f(0.0f, 2.0f, 2.0f),
-                             gml::quaternion::eulerAngle<double>(gml::to_rad(180.), 0, 0) *
-                             gml::quaternion::eulerAngle<double>(0, 0, gml::to_rad(45.))));
+                gl3d::Camera(math::Vec3d(0.0, 2.0, 2.0),
+                             math::quaternion::euler_angle<double>(math::to_rad(180.), 0, 0) *
+                             math::quaternion::euler_angle<double>(0, 0, math::to_rad(45.))));
 
         baseRenderer = glContext->getRenderer();
         baseRenderer->setClearColor(0x008080FFu);
@@ -59,7 +61,7 @@ public:
         csShader->linkUniformBlock(*ubo);
 
         projViewUniform = ProjectionView(ubo);
-        projViewUniform.projection = gml::matrix::perspective<float>(45.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
+        projViewUniform.projection = math::matrix::perspective<float>(45.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
         projViewUniform.syncProjection();
 
         scene = std::make_shared<gl3d::SceneGroup>("world");
@@ -76,25 +78,25 @@ public:
         std::static_pointer_cast<platform::desktop::GlfwWindow>(window)->getTimeStep();
 
 
-        auto ground = load_ground(gml::Vec3d(0));
+        auto ground = load_ground(math::Vec3d(0));
 
-        load_barrier(gml::Vec3d(1, 0, 0),
-                     gml::quaternion::eulerAngle<double>(-std::numbers::pi_v<double> / 2, 0, 0),
-                     gml::Vec3d(0.5, 1.0, 1.0));
+        load_barrier(math::Vec3d(1, 0, 0),
+                     math::quaternion::euler_angle<double>(-std::numbers::pi_v<double> / 2, 0, 0),
+                     math::Vec3d(0.5, 1.0, 1.0));
 
-        load_barrier(gml::Vec3d(0, 0, 0.5),
-                     gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double>, 0, 0));
+        load_barrier(math::Vec3d(0, 0, 0.5),
+                     math::quaternion::euler_angle<double>(std::numbers::pi_v<double>, 0, 0));
 
-        load_barrier(gml::Vec3d(0, 0, -0.5), gml::Quatd());
+        load_barrier(math::Vec3d(0, 0, -0.5), math::Quatd());
 
-        load_barrier(gml::Vec3d(-1, 0, 0),
-                     gml::quaternion::eulerAngle<double>(std::numbers::pi_v<double> / 2, 0, 0),
-                     gml::Vec3d(0.5, 1.0, 1.0));
+        load_barrier(math::Vec3d(-1, 0, 0),
+                     math::quaternion::euler_angle<double>(std::numbers::pi_v<double> / 2, 0, 0),
+                     math::Vec3d(0.5, 1.0, 1.0));
 
-        load_balls(gml::Vec3d(0.35, ground->position().y() + billiard_ball_radius + 0.00001, 0));
+        load_balls(math::Vec3d(0.35, ground->position().y() + billiard_ball_radius + 0.00001, 0));
 
         auto ball = load_ball("models/old_billiard_ball.glb",
-                              gml::Vec3d(-0.5, ground->position().y() + billiard_ball_radius + 0.00001, 0));
+                              math::Vec3d(-0.5, ground->position().y() + billiard_ball_radius + 0.00001, 0));
         inputListener.ball = ball.get();
 
 
@@ -127,11 +129,11 @@ public:
 
             updateSceneGraph();
 
-            projViewUniform.view = camera->getViewMatrix();
+            projViewUniform.view = static_cast<math::Mat4f>(camera->getViewMatrix());
             projViewUniform.syncView();
 
-            pbrShaderNormalMapping->setUniform("camPos", camera->getPosition());
-            pbrShader->setUniform("camPos", camera->getPosition());
+            pbrShaderNormalMapping->setUniform("camPos", static_cast<math::Vec3f>(camera->getPosition()));
+            pbrShader->setUniform("camPos", static_cast<math::Vec3f>(camera->getPosition()));
 
             if (visualize) {
                 baseRenderer->useShader(*csShader);
@@ -141,7 +143,7 @@ public:
                 renderer->renderGraph(scene);
                 baseRenderer->disableWireframe();
 
-                simulation.visualize_collisions(projViewUniform.projection, projViewUniform.view);
+                simulation.visualize_collisions(static_cast<math::Mat4d>(projViewUniform.projection), static_cast<math::Mat4d>(projViewUniform.view));
             } else {
                 renderer->renderGraph(scene);
             }
@@ -197,14 +199,14 @@ private:
     void updateSceneGraph()
     {
         for (auto& [object, rb]: objects) {
-            object.get().local_transform = gml::matrix::translate(rb->position()) *
-                                           gml::matrix::fromQuaternion(rb->orientation()) *
-                                           gml::matrix::scale(object.get().local_transform.getScale());
+            object.get().local_transform = math::matrix::translate(rb->position()) *
+                                           math::matrix::from_quaternion(rb->orientation()) *
+                                           math::matrix::scale(object.get().local_transform.scale());
         }
     }
 
     std::shared_ptr<physics3d::RigidBody>
-    load_ball(const std::string& filename, gml::Vec3d position)
+    load_ball(const std::string& filename, math::Vec3d position)
     {
         if (!ball_mesh) {
             ball_mesh = gl3d::resources::gltf_read_meshes(platform::desktop::FileReader(),
@@ -214,7 +216,7 @@ private:
         }
 
         auto& scene_object = scene->create_object("ball");
-        scene_object.local_transform = gml::matrix::scale<double>(gml::Vec3d(billiard_ball_radius));
+        scene_object.local_transform = math::matrix::scale<double>(math::Vec3d(billiard_ball_radius));
         scene_object.mesh = ball_mesh;
 
         auto rb = simulation.create_rigid_body(
@@ -224,14 +226,14 @@ private:
                 },
                 billiard_ball_material,
                 position,
-                gml::quaternion::fromMatrix(
-                        gml::matrix::axisAngle(gml::Vec3d(0, 0, 1), std::numbers::pi_v<double> / 2).getRotation()));
+                math::quaternion::from_matrix(
+                        math::matrix::axisAngle(math::Vec3d(0, 0, 1), std::numbers::pi_v<double> / 2).rotation()));
 
         objects.emplace_back(scene_object, rb);
         return rb;
     }
 
-    void load_balls(const gml::Vec3d& offset)
+    void load_balls(const math::Vec3d& offset)
     {
         const double epsilon = 0.00000001;
         const double height =
@@ -239,7 +241,7 @@ private:
         for (int i = 0; i < 5; ++i) {
             for (int j = 0; j < i + 1; ++j) {
                 load_ball("models/old_billiard_ball.glb",
-                          offset + gml::Vec3d(
+                          offset + math::Vec3d(
                                   i * height + epsilon * i,
                                   0,
                                   -(i * billiard_ball_radius * 2) / 2.0 + j * billiard_ball_radius * 2 + j * epsilon));
@@ -248,7 +250,7 @@ private:
     }
 
     std::shared_ptr<physics3d::RigidBody>
-    load_barrier(const gml::Vec3d& position, const gml::Quatd& orientation, const gml::Vec3d& scale = gml::Vec3d(1))
+    load_barrier(const math::Vec3d& position, const math::Quatd& orientation, const math::Vec3d& scale = math::Vec3d(1))
     {
         if (!barrier_mesh) {
             barrier_mesh = gl3d::resources::gltf_read_meshes(platform::desktop::FileReader(),
@@ -268,14 +270,14 @@ private:
 
         auto& scene_barrier = scene->create_object("barrier");
         scene_barrier.mesh = barrier_mesh;
-        scene_barrier.local_transform = gml::matrix::scale(scale);
+        scene_barrier.local_transform = math::matrix::scale(scale);
         objects.emplace_back(scene_barrier, rb_barrier);
 
         return rb_barrier;
     }
 
     std::shared_ptr<physics3d::RigidBody>
-    load_ground(const gml::Vec3d& position)
+    load_ground(const math::Vec3d& position)
     {
         auto ground_mesh = gl3d::resources::gltf_read_meshes(platform::desktop::FileReader(),
                                                              "models/ground.glb", *glContext->getDrawableCreator(),
@@ -289,11 +291,11 @@ private:
                 },
                 billiard_table_material,
                 position,
-                gml::Quatd());
+                math::Quatd());
 
         auto& scene_ground = scene->create_object("ground");
         scene_ground.mesh = ground_mesh;
-        scene_ground.local_transform = gml::matrix::scale(1.0, 1.0, 0.5);
+        scene_ground.local_transform = math::matrix::scale(1.0, 1.0, 0.5);
 
         objects.emplace_back(scene_ground, rb_ground);
 
@@ -303,10 +305,10 @@ private:
     void setup_lights()
     {
         auto lightRes = std::make_shared<gl3d::PointLight>();
-        lightRes->color = gml::Vec3f(30);
+        lightRes->color = math::Vec3f(30);
 
         auto& light = scene->create_object("light");
         light.light = lightRes;
-        light.local_transform = gml::matrix::translate(gml::Vec3d(0, 3, 0));
+        light.local_transform = math::matrix::translate(math::Vec3d(0, 3, 0));
     }
 };

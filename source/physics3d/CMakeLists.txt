@@ -6,7 +6,7 @@ target_compile_options(yage_physics3d
 	PRIVATE -fdiagnostics-color=always -Wall -Wextra -Werror)
 
 target_link_libraries(yage_physics3d
-	PUBLIC yage_core yage_gml yage_utils)
+	PUBLIC yage_core yage_math yage_utils)
 
 target_include_directories(yage_physics3d
 	PUBLIC source)

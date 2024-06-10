@@ -2,7 +2,7 @@
 #include "shaders.h"
 #include <font/shaders.h>
 
-namespace gui
+namespace yage::gui
 {
 	/*************************************************
 	** Basic Gui Renderer
@@ -17,13 +17,13 @@ namespace gui
         widget_shader = shader_creator->createShader(shaders::WidgetShader::vert, shaders::WidgetShader::frag);
         text_shader = shader_creator->createShader(font::shaders::TextShader::vert, font::shaders::TextShader::frag);
 
-		gml::Mat4d projection = gml::matrix::orthographic<float>(0.0, (float)viewport.width, (float)viewport.height, 0.0, 0.1, 100.0);
+		math::Mat4f projection = math::matrix::orthographic<float>(0.0, (float)viewport.width, (float)viewport.height, 0.0, 0.1, 100.0);
 		widget_shader->setUniform("projection", projection);
 		widget_shader->setUniform("texture", 0);
 		text_shader->setUniform("projection", projection);
         text_shader->setUniform("scale", 16.0f / 16.0f); // TODO: based on text size
 
-		//clearColor = gml::Vec4<float>(1, 1, 1, 1);
+		//clearColor = math::Vec4<float>(1, 1, 1, 1);
 	}
     
     void GuiRenderer::render(RootWidget& root)

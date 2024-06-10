@@ -27,7 +27,7 @@ namespace gles2
 		void setUniform(std::string name, int value);
 		void setUniform(std::string name, bool value);
 		void setUniform(std::string name, float value);
-		void setUniform(std::string name, gml::Vec3<float> value);
-		void setUniform(std::string name, gml::Matrix4D<float> value);
+		void setUniform(std::string name, math::Vec3<float> value);
+		void setUniform(std::string name, math::Matrix4D<float> value);
 	};
 }

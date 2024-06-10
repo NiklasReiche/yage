@@ -7,7 +7,7 @@
 #include "../camera.h"
 #include "../light.h"
 
-namespace gl3d
+namespace yage::gl3d
 {
 	/**
 	 * Represents a leaf node in a scene graph. Does not have children, but can reference a mesh, a light, and a camera.
@@ -19,8 +19,8 @@ namespace gl3d
         std::shared_ptr<Light> light = nullptr;
         std::shared_ptr<Camera> camera = nullptr;
 
-        explicit SceneObject(const std::string& name, gml::Mat4d transform = gml::matrix::Id4d);
+        explicit SceneObject(const std::string& name, math::Mat4d transform = math::matrix::Id4d);
 
-        void apply(const std::function<void(SceneObject&)>& f, const gml::Mat4d& parent_transform) override;
+        void apply(const std::function<void(SceneObject&)>& f, const math::Mat4d& parent_transform) override;
     };
 }

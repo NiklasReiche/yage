@@ -10,7 +10,7 @@
 #include "Texture2D.h"
 #include "UnitShader.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	void Renderer::enableDepthTest()
 	{

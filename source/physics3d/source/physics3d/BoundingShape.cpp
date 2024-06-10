@@ -4,27 +4,27 @@
 #include "Collision.h"
 #include "Algorithms.h"
 
-namespace physics3d
+namespace yage::physics3d
 {
     /**
      * @return Positive penetration depth along the contact normal n.
      */
-    double penetration_distance(const gml::Vec3d& p_a, const gml::Vec3d& p_b, gml::Vec3d n)
+    double penetration_distance(const math::Vec3d& p_a, const math::Vec3d& p_b, math::Vec3d n)
     {
         // since p_a lies within b and p_b lies within a and n is from a to b, we have to project onto the negated
         // normal to get a positive penetration depth
-        return gml::dot(p_b - p_a, -n);
+        return math::dot(p_b - p_a, -n);
     }
 
     std::optional<ContactManifold> CollisionVisitor::operator()(const colliders::Sphere& a, const colliders::Sphere& b)
     {
         auto ab = b.center - a.center;
-        if (gml::sqrLength(ab) > (a.radius + b.radius) * (a.radius + b.radius)) {
+        if (math::length_sqr(ab) > (a.radius + b.radius) * (a.radius + b.radius)) {
             return {};
         }
 
         ContactManifold manifold;
-        manifold.normal = gml::normalize(b.center - a.center);
+        manifold.normal = math::normalize(b.center - a.center);
 
         ContactPoint contact;
         contact.r_a = manifold.normal * a.radius;
@@ -44,7 +44,7 @@ namespace physics3d
         // This can be solved by continuous collision detection or by incorporating the relative velocity here.
 
         // dist is positive if the circle collides on the outer side and negative otherwise (b.normal points outward)
-        auto dist = gml::dot(a.center - b.support, b.normal);
+        auto dist = math::dot(a.center - b.support, b.normal);
         auto abs_dist = std::abs(dist);
         if (abs_dist > a.radius) {
             return {};
@@ -68,23 +68,23 @@ namespace physics3d
     CollisionVisitor::operator()(const colliders::Sphere& a, const colliders::OrientedBox& b)
     {
         // transform the sphere's center into the local space of the box
-        gml::Vec3d center = gml::conjugate(b.orientation) * (a.center - b.center);
+        math::Vec3d center = math::conjugate(b.orientation) * (a.center - b.center);
         // find the closest point on the box to the sphere's center in the box's local space
-        gml::Vec3d point;
+        math::Vec3d point;
         point.x() = std::max(-b.half_size.x(), std::min(b.half_size.x(), center.x()));
         point.y() = std::max(-b.half_size.y(), std::min(b.half_size.y(), center.y()));
         point.z() = std::max(-b.half_size.z(), std::min(b.half_size.z(), center.z()));
         // transform point to world space
         point = b.orientation * point + b.center;
 
-        gml::Vec3d offset = point - a.center;
-        double offset_length = gml::length(offset);
+        math::Vec3d offset = point - a.center;
+        double offset_length = math::length(offset);
         if (offset_length > a.radius) {
             return {};
         }
 
         ContactManifold manifold;
-        manifold.normal = gml::normalize(offset);
+        manifold.normal = math::normalize(offset);
 
         ContactPoint contact;
         contact.depth = a.radius - offset_length;
@@ -104,7 +104,7 @@ namespace physics3d
         // This can be solved by continuous collision detection or by incorporating the relative velocity here.
 
         // dist is positive if the circle collides on the outer side and negative otherwise (b.normal points outward)
-        auto dist = gml::dot(b.center - a.support, a.normal);
+        auto dist = math::dot(b.center - a.support, a.normal);
         auto abs_dist = std::abs(dist);
         if (abs_dist > b.radius) {
             return {};
@@ -143,11 +143,11 @@ namespace physics3d
          */
 
         // dist is positive if the box collides on the outer side and negative otherwise (b.normal points outward)
-        auto dist = gml::dot(b.center - a.support, a.normal);
+        auto dist = math::dot(b.center - a.support, a.normal);
         ContactManifold manifold;
         manifold.normal = dist > 0 ? a.normal : -a.normal;
 
-        std::vector<std::tuple<gml::Vec3d, double>> contacts_with_depth =
+        std::vector<std::tuple<math::Vec3d, double>> contacts_with_depth =
                 clip_discard(geometry::Plane{.support = a.support, .normal = -manifold.normal}, b.oriented_vertices);
 
         if (contacts_with_depth.empty())
@@ -171,23 +171,23 @@ namespace physics3d
     CollisionVisitor::operator()(const colliders::OrientedBox& a, const colliders::Sphere& b)
     {
         // transform the sphere's center into the local space of the box
-        gml::Vec3d center = gml::conjugate(a.orientation) * (b.center - a.center);
+        math::Vec3d center = math::conjugate(a.orientation) * (b.center - a.center);
         // find the closest point on the box to the sphere's center in the box's local space
-        gml::Vec3d point;
+        math::Vec3d point;
         point.x() = std::max(-a.half_size.x(), std::min(a.half_size.x(), center.x()));
         point.y() = std::max(-a.half_size.y(), std::min(a.half_size.y(), center.y()));
         point.z() = std::max(-a.half_size.z(), std::min(a.half_size.z(), center.z()));
         // transform point to world space
         point = a.orientation * point + a.center;
 
-        gml::Vec3d offset = point - b.center;
-        double offset_length = gml::length(offset);
+        math::Vec3d offset = point - b.center;
+        double offset_length = math::length(offset);
         if (offset_length > b.radius) {
             return {};
         }
 
         ContactManifold manifold;
-        manifold.normal = -gml::normalize(offset);
+        manifold.normal = -math::normalize(offset);
 
         ContactPoint contact;
         contact.depth = b.radius - offset_length;
@@ -214,11 +214,11 @@ namespace physics3d
          */
 
         // dist is positive if the circle collides on the outer side and negative otherwise (b.normal points outward)
-        auto dist = gml::dot(a.center - b.support, b.normal);
+        auto dist = math::dot(a.center - b.support, b.normal);
         ContactManifold manifold;
         manifold.normal = dist > 0 ? -b.normal : b.normal;
 
-        std::vector<std::tuple<gml::Vec3d, double>> contacts_with_depth =
+        std::vector<std::tuple<math::Vec3d, double>> contacts_with_depth =
                 clip_discard(geometry::Plane{.support = b.support, .normal = manifold.normal}, a.oriented_vertices);
 
         if (contacts_with_depth.empty())
@@ -254,14 +254,14 @@ namespace physics3d
          */
 
         // get the minimum translation vector with the SAT
-        std::optional<gml::Vec3d> maybe_mtv = sat_3d(a.oriented_vertices, b.oriented_vertices,
+        std::optional<math::Vec3d> maybe_mtv = sat_3d(a.oriented_vertices, b.oriented_vertices,
                                                      a.oriented_face_normals, b.oriented_face_normals);
         if (!maybe_mtv.has_value()) {
             return {};
         }
 
         ContactManifold manifold;
-        manifold.normal = gml::normalize(maybe_mtv.value());
+        manifold.normal = math::normalize(maybe_mtv.value());
 
         const auto [face_a, face_a_normal] =
                 most_perpendicular_cube_face(manifold.normal, a.oriented_vertices);
@@ -271,7 +271,7 @@ namespace physics3d
         geometry::Rectangle reference, incident;
         bool flipped = false;
         // choose the more perpendicular face as the reference face
-        if (gml::dot(face_a_normal, manifold.normal) > gml::dot(face_b_normal, -manifold.normal)) {
+        if (math::dot(face_a_normal, manifold.normal) > math::dot(face_b_normal, -manifold.normal)) {
             reference = face_a;
             incident = face_b;
         } else {
@@ -279,17 +279,17 @@ namespace physics3d
             incident = face_a;
             flipped = true;
         }
-        std::vector<gml::Vec3d> contact_points = {incident[0], incident[1], incident[2], incident[3]};
+        std::vector<math::Vec3d> contact_points = {incident[0], incident[1], incident[2], incident[3]};
         // Sutherland-Hodgman clip against the 4 adjacent faces
         std::array<geometry::Plane, 4> clipping_planes = {
-                geometry::Plane{.support = reference[0], .normal = gml::normalize(reference[1] - reference[0])},
-                geometry::Plane{.support = reference[1], .normal = gml::normalize(reference[2] - reference[1])},
-                geometry::Plane{.support = reference[2], .normal = gml::normalize(reference[3] - reference[2])},
-                geometry::Plane{.support = reference[3], .normal = gml::normalize(reference[0] - reference[3])},
+                geometry::Plane{.support = reference[0], .normal = math::normalize(reference[1] - reference[0])},
+                geometry::Plane{.support = reference[1], .normal = math::normalize(reference[2] - reference[1])},
+                geometry::Plane{.support = reference[2], .normal = math::normalize(reference[3] - reference[2])},
+                geometry::Plane{.support = reference[3], .normal = math::normalize(reference[0] - reference[3])},
         };
         contact_points = clip_sutherland_hodgman(clipping_planes, contact_points);
         // clip and discard against reference face
-        std::vector<std::tuple<gml::Vec3d, double>> contacts_with_depth = clip_discard(
+        std::vector<std::tuple<math::Vec3d, double>> contacts_with_depth = clip_discard(
                 geometry::Plane{
                         .support = reference[0],
                         .normal = flipped ? manifold.normal : -manifold.normal

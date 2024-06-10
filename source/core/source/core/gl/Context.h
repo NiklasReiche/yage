@@ -8,12 +8,12 @@
 #include "DrawableCreator.h"
 #include "FrameCreator.h"
 
-namespace platform
+namespace yage::platform
 {
 	class IWindow;
 }
 
-namespace gl
+namespace yage::gl
 {
 	class IContext
 	{

@@ -1,7 +1,7 @@
 #include "VertexArray.h"
 #include "Context.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	VertexArray::~VertexArray()
 	{

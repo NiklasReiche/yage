@@ -4,7 +4,7 @@
 #include "OpenGL.h"
 #include "../TextureParams.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	enum class InternalFormat
 	{

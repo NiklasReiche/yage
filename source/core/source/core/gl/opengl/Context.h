@@ -11,12 +11,12 @@
 #include "VertexBuffer.h"
 
 
-namespace platform
+namespace yage::platform
 {
 	class IWindow;
 }
 
-namespace opengl
+namespace yage::opengl
 {
 	void onGlError(
 		GLenum source, GLenum type, GLuint id, GLenum severity, 

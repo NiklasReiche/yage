@@ -2,14 +2,14 @@
 
 #include <utility>
 
-namespace gl3d
+namespace yage::gl3d
 {
 	void Material::add_uniform(const std::string& name, std::shared_ptr<gl::ITexture2D> tex)
 	{
         m_textures[name] = std::move(tex);
 	}
 
-	void Material::add_uniform(const std::string& name, gml::Vec3f value)
+	void Material::add_uniform(const std::string& name, math::Vec3f value)
 	{
         m_vec3Values[name] = value;
 	}

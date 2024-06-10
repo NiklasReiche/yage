@@ -6,16 +6,16 @@
 
 #include <utility>
 
-namespace gui
+namespace yage::gui
 {
     Widget::Widget(Widget* parent, Master* master, const WidgetTemplate& widget_template)
             : m_master(master), m_parent(parent), m_template(widget_template),
               m_texture_atlas_view(load_texture(widget_template.texture))
     {
-        m_inner_position_abs = m_position_abs + gml::Vec2f(m_template.border.thickness);
-        m_inner_size_abs = m_size_abs - gml::Vec2f(m_template.border.thickness * 2.0f) -
-                           gml::Vec2f(m_template.padding(0), m_template.padding(1)) -
-                           gml::Vec2f(m_template.padding(2), m_template.padding(3));
+        m_inner_position_abs = m_position_abs + math::Vec2f(m_template.border.thickness);
+        m_inner_size_abs = m_size_abs - math::Vec2f(m_template.border.thickness * 2.0f) -
+                           math::Vec2f(m_template.padding(0), m_template.padding(1)) -
+                           math::Vec2f(m_template.padding(2), m_template.padding(3));
 
         std::vector<unsigned int> indices = construct_indices();
         std::vector<float> vertices = construct_vertices(m_texture_atlas_view);
@@ -135,8 +135,8 @@ namespace gui
     {
         std::vector<float> vertices;
 
-        gml::Vec4<float> color = gl::toVec4(m_template.color);
-        gml::Vec4<float> border_color = gl::toVec4(m_template.border.color);
+        math::Vec4<float> color = gl::toVec4(m_template.color);
+        math::Vec4<float> border_color = gl::toVec4(m_template.border.color);
         float shadow_hardness = m_template.shadow.hardness;
 
         if (m_template.shadow.offset != 0) {
@@ -275,7 +275,7 @@ namespace gui
 
     void Widget::update_geometry()
     {
-        gml::Vec2f last_position = m_position_abs;
+        math::Vec2f last_position = m_position_abs;
 
         if (m_parent != nullptr) {
             switch (m_template.geometry.anchor.position) {
@@ -311,8 +311,8 @@ namespace gui
                     break;
             }
 
-            m_inner_position_abs = m_position_abs + gml::Vec2f((float) m_template.border.thickness) +
-                                   gml::Vec2f(m_template.padding(0), m_template.padding(1));
+            m_inner_position_abs = m_position_abs + math::Vec2f((float) m_template.border.thickness) +
+                                   math::Vec2f(m_template.padding(0), m_template.padding(1));
         }
 
         if (last_position != m_position_abs) {
@@ -324,13 +324,13 @@ namespace gui
         update_vertices();
     }
 
-    void Widget::set_actual_size(gml::Vec2f size)
+    void Widget::set_actual_size(math::Vec2f size)
     {
         if (m_size_abs != size) {
             m_size_abs = size;
-            m_inner_size_abs = size - gml::Vec2f(m_template.border.thickness * 2.0f) -
-                               gml::Vec2f(m_template.padding(0), m_template.padding(1)) -
-                               gml::Vec2f(m_template.padding(2), m_template.padding(3));
+            m_inner_size_abs = size - math::Vec2f(m_template.border.thickness * 2.0f) -
+                               math::Vec2f(m_template.padding(0), m_template.padding(1)) -
+                               math::Vec2f(m_template.padding(2), m_template.padding(3));
             update_geometry();
         }
     }
@@ -343,7 +343,7 @@ namespace gui
         }
     }
 
-    void Widget::set_absolute_offset(gml::Vec2f offset)
+    void Widget::set_absolute_offset(math::Vec2f offset)
     {
         if (m_offset_abs != offset) {
             m_offset_abs = offset;
@@ -390,9 +390,9 @@ namespace gui
         return *m_drawable;
     }
 
-    gml::Vec2f Widget::offset() const
+    math::Vec2f Widget::offset() const
     {
-        gml::Vec2f offset = m_template.geometry.anchor.offset;
+        math::Vec2f offset = m_template.geometry.anchor.offset;
         if (m_template.geometry.anchor.value_type.x() == ValueType::RELATIVE_TO_PARENT) {
             offset.x() = to_absolute_x(offset.x());
         }
@@ -402,10 +402,10 @@ namespace gui
         return offset;
     }
 
-    gml::Vec2f Widget::preferred_size() const
+    math::Vec2f Widget::preferred_size() const
     {
         // TODO: it might be worth it to save these calculations for memoization
-        gml::Vec2f size = m_template.geometry.preferred_size.value;
+        math::Vec2f size = m_template.geometry.preferred_size.value;
 
         if (m_template.geometry.size_hint.x() == SizeHint::FIT_CHILDREN) {
             // default behaviour is that children are positioned on top of each other
@@ -430,14 +430,14 @@ namespace gui
         }
 
         // TODO: should this incorporate shadow?
-        return size + gml::Vec2f(2 * m_template.border.thickness) +
-               gml::Vec2f(m_template.padding(0), m_template.padding(1)) +
-               gml::Vec2f(m_template.padding(2), m_template.padding(3));
+        return size + math::Vec2f(2 * m_template.border.thickness) +
+               math::Vec2f(m_template.padding(0), m_template.padding(1)) +
+               math::Vec2f(m_template.padding(2), m_template.padding(3));
     }
 
-    gml::Vec2f Widget::min_size() const
+    math::Vec2f Widget::min_size() const
     {
-        gml::Vec2f size = m_template.geometry.min_size.value;
+        math::Vec2f size = m_template.geometry.min_size.value;
         if (m_template.geometry.min_size.value_type.x() == ValueType::RELATIVE_TO_PARENT) {
             size.x() = to_absolute_x(size.x());
         }
@@ -447,9 +447,9 @@ namespace gui
         return size;
     }
 
-    gml::Vec2f Widget::max_size() const
+    math::Vec2f Widget::max_size() const
     {
-        gml::Vec2f size = m_template.geometry.max_size.value;
+        math::Vec2f size = m_template.geometry.max_size.value;
         if (m_template.geometry.max_size.value_type.x() == ValueType::RELATIVE_TO_PARENT) {
             size.x() = to_absolute_x(size.x());
         }
@@ -524,12 +524,12 @@ namespace gui
     {
     }
 
-    gml::Vec2f Widget::actual_size() const
+    math::Vec2f Widget::actual_size() const
     {
         return m_size_abs;
     }
 
-    gml::Vec2<SizeHint> Widget::size_hint() const
+    math::Vec2<SizeHint> Widget::size_hint() const
     {
         return m_template.geometry.size_hint;
     }

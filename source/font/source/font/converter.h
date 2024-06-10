@@ -19,7 +19,7 @@
 
 // TODO: handle grapheme clusters
 
-namespace font
+namespace yage::font
 {
     enum class FT_GLYPH_LOAD_FLAG : FT_Int32
     {
@@ -97,15 +97,15 @@ namespace font
         static unsigned char padded_value(const img::Image &bitmap, int y, int x, int padding);
 
         static TexMetrics
-        relative_texture_metrics(const img::Image &characterBitmap, gml::Vec2i offset, gml::Vec2i atlasSize);
+        relative_texture_metrics(const img::Image &characterBitmap, math::Vec2i offset, math::Vec2i atlasSize);
 
-        img::Image downscale(const img::Image &image, gml::Vec2i targetResolution);
+        img::Image downscale(const img::Image &image, math::Vec2i targetResolution);
 
         static void write_font_file(const std::string &filename, int unitsPerEM,
                                     const std::vector<Codepoint> &charCodes,
                                     const img::Image &atlas,
                                     GlyphMetrics maxGlyph, const std::map<Codepoint, Character> &characters,
-                                    gml::Vec2f spreadInTexCoords, const FT_Face &face);
+                                    math::Vec2f spreadInTexCoords, const FT_Face &face);
 
         static unsigned char right_get_bit(unsigned char c, unsigned int n);
 

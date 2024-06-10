@@ -1,6 +1,6 @@
 #include "OpenGlObject.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	bool operator==(const OpenGlObject& left, const OpenGlObject& right)
 	{

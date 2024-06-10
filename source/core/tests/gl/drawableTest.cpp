@@ -7,28 +7,28 @@
 
 TEST_CASE("Drawable Test")
 {
-	std::shared_ptr<platform::IWindow> window = std::make_shared<platform::desktop::GlfwWindow>(100, 100);
-	std::shared_ptr<gl::IContext> context = gl::createContext(window);
-	std::shared_ptr<gl::IDrawableCreator> dCreator = context->getDrawableCreator();
+	std::shared_ptr<yage::platform::IWindow> window = std::make_shared<yage::platform::desktop::GlfwWindow>(100, 100);
+	std::shared_ptr<yage::gl::IContext> context = yage::gl::createContext(window);
+	std::shared_ptr<yage::gl::IDrawableCreator> dCreator = context->getDrawableCreator();
 
 	SECTION("DrawableInitializationEmpty") {
-		std::shared_ptr<gl::IDrawable> drawable =
-			dCreator->createDrawable({ }, { 1 }, gl::VertexFormat::BATCHED);
+		std::shared_ptr<yage::gl::IDrawable> drawable =
+			dCreator->createDrawable({ }, { 1 }, yage::gl::VertexFormat::BATCHED);
 
 		CHECK(drawable->isEmpty());
 	}
 
 	SECTION("DrawableInitializationWithData") {
 		const std::vector<float> vertices = { 1.0f, 0.0f, -1.0, 2.5 };
-		std::shared_ptr<gl::IDrawable> drawable =
-			dCreator->createDrawable(vertices, { 1 }, gl::VertexFormat::BATCHED);
+		std::shared_ptr<yage::gl::IDrawable> drawable =
+			dCreator->createDrawable(vertices, { 1 }, yage::gl::VertexFormat::BATCHED);
 
 		CHECK(!drawable->isEmpty());
 	}
 
 	SECTION("DrawableGetSetData") {
-		std::shared_ptr<gl::IDrawable> drawable =
-			dCreator->createDrawable({ }, { 1 }, gl::VertexFormat::BATCHED);
+		std::shared_ptr<yage::gl::IDrawable> drawable =
+			dCreator->createDrawable({ }, { 1 }, yage::gl::VertexFormat::BATCHED);
 
 		CHECK(drawable->isEmpty());
 

@@ -3,7 +3,7 @@
 #include "../Cubemap.h"
 #include "Texture.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	class Cubemap : public Texture, public gl::ICubemap, public std::enable_shared_from_this<Cubemap>
 	{

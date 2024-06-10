@@ -5,7 +5,7 @@
 #include <core/gl/Drawable.h>
 #include <core/gl/color.h>
 
-namespace physics3d
+namespace yage::physics3d
 {
     /**
      * Can draw geometric primitives like points and vectors to visualize various aspects of the physics simulation.
@@ -17,14 +17,14 @@ namespace physics3d
     public:
         struct Vector
         {
-            gml::Vec3d support;
-            gml::Vec3d direction;
+            math::Vec3d support;
+            math::Vec3d direction;
         };
 
         /**
          * Holds the point primitives to draw.
          */
-        std::vector<std::tuple<gml::Vec3d, gl::Color_t>> points;
+        std::vector<std::tuple<math::Vec3d, gl::Color_t>> points;
 
         /**
          * Holds the vector primitives to draw.
@@ -38,7 +38,7 @@ namespace physics3d
         /**
          * Draws all held primitives.
          */
-        void draw(const gml::Mat4d& projection, const gml::Mat4d& view);
+        void draw(const math::Mat4d& projection, const math::Mat4d& view);
 
     private:
         std::shared_ptr<gl::IShader> m_point_shader;

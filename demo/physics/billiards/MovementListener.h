@@ -3,7 +3,7 @@
 #include "core/platform/Window.h"
 #include "core/platform/desktop/GlfwWindow.h"
 #include "core/gl/Context.h"
-#include "gml/gml.h"
+#include "math/math.h"
 #include "gl3d/camera.h"
 #include "physics3d/RigidBody.h"
 #include "physics3d/Simulation.h"
@@ -11,9 +11,11 @@
 #include <map>
 #include <utility>
 
+using namespace yage;
+
 struct Mouse
 {
-    gml::Vec2f pos;
+    math::Vec2f pos;
     float sensitivity = 0.5f;
     bool isHidden = false;
     bool first = true;

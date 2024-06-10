@@ -5,7 +5,7 @@
 #include "../Renderer.h"
 #include "Texture.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	class Context;
 	
@@ -51,7 +51,7 @@ namespace opengl
         void disablePointSize() override;
 
 	private:
-		gml::Vec4f clearColor = gml::Vec4f(0, 0, 0, 1);
+		math::Vec4f clearColor = math::Vec4f(0, 0, 0, 1);
 
         std::unique_ptr<gl::IDrawable> unitDrawable;
         std::unique_ptr<gl::IShader> unitShader;

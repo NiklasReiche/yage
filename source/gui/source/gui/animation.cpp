@@ -2,9 +2,9 @@
 #include "widgets/widget.h"
 #include "master.h"
 
-namespace gui
+namespace yage::gui
 {
-	Animation::Animation(Widget* widget, Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time)
+	Animation::Animation(Widget* widget, Master* master, math::Vec2<float> beg, math::Vec2<float> goal, double time)
 		: master(master), widget(widget), timeEnd(time), beg(beg), goal(goal) {}
 
 	void Animation::setOnAnimationStop(std::function<void()> callback)
@@ -41,7 +41,7 @@ namespace gui
 	}
 
 
-	MoveAnimation::MoveAnimation(Widget* widget, Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time)
+	MoveAnimation::MoveAnimation(Widget* widget, Master* master, math::Vec2<float> beg, math::Vec2<float> goal, double time)
 		: Animation(widget, master, beg, goal, time) {}
 
 	void MoveAnimation::update(double dt)
@@ -50,7 +50,7 @@ namespace gui
 			if (timeCurrent < timeEnd) {
 				timeCurrent += dt;
 				float time = (float)(timeCurrent / timeEnd);
-				widget->set_anchor({.offset = gml::lerp<gml::Vec2<float>>(beg, goal, time)}); // TODO
+				widget->set_anchor({.offset = math::lerp<math::Vec2<float>>(beg, goal, time)}); // TODO
 			}
 			else {
 				stop();
@@ -58,7 +58,7 @@ namespace gui
 		}
 	}
 
-	SizeAnimation::SizeAnimation(Widget* widget, Master* master, gml::Vec2<float> beg, gml::Vec2<float> goal, double time)
+	SizeAnimation::SizeAnimation(Widget* widget, Master* master, math::Vec2<float> beg, math::Vec2<float> goal, double time)
 		: Animation(widget, master, beg, goal, time) {}
 
 	void SizeAnimation::update(double dt)
@@ -68,7 +68,7 @@ namespace gui
 				timeCurrent += dt;
 				float time = (float)(timeCurrent / timeEnd);
 				widget->resize({
-                    .value = gml::lerp<gml::Vec2f>(beg, goal, time)}); // TODO
+                    .value = math::lerp<math::Vec2f>(beg, goal, time)}); // TODO
 			}
 			else {
 				stop();

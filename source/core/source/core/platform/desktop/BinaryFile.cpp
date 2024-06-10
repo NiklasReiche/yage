@@ -1,7 +1,7 @@
 #include "BinaryFile.h"
 #include <core/platform/FileException.h>
 
-namespace platform::desktop
+namespace yage::platform::desktop
 {
 	BinaryFile::BinaryFile(const std::string& filename, AccessMode mode)
 		: File(filename, FileType::BINARY, mode)

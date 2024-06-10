@@ -2,7 +2,7 @@
 
 #include "Event.h"
 
-namespace input
+namespace yage::input
 {
 	class MousePosEvent final : public Event
 	{

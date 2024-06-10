@@ -7,7 +7,7 @@
 #include "BaseObject.h"
 #include "GlException.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	class ShaderCreator final : public BaseObject, public gl::IShaderCreator
 	{

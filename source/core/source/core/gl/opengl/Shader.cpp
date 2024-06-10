@@ -3,7 +3,7 @@
 #include "Context.h"
 #include "UniformBuffer.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	Shader::~Shader()
 	{
@@ -69,7 +69,7 @@ namespace opengl
 		glUniform1f(uniformLocations.at(name), value);
 	}
 	
-	void Shader::setUniform(const std::string& name, const gml::Vec3f value)
+	void Shader::setUniform(const std::string& name, const math::Vec3f value)
 	{
 		if (!hasUniform(name))
             throw std::invalid_argument("unknown uniform '" + name + "'");
@@ -78,7 +78,7 @@ namespace opengl
 		glUniform3f(uniformLocations.at(name), value.x(), value.y(), value.z());
 	}
 
-    void Shader::setUniform(const std::string& name, gml::Vec4f value)
+    void Shader::setUniform(const std::string& name, math::Vec4f value)
     {
         if (!hasUniform(name))
             throw std::invalid_argument("unknown uniform '" + name + "'");
@@ -87,7 +87,7 @@ namespace opengl
         glUniform4f(uniformLocations.at(name), value.x(), value.y(), value.z(), value.w());
     }
 	
-	void Shader::setUniform(const std::string& name, const gml::Mat4f value)
+	void Shader::setUniform(const std::string& name, const math::Mat4f value)
 	{
 		if (!hasUniform(name)) 
 			throw std::invalid_argument("unknown uniform '" + name + "'");

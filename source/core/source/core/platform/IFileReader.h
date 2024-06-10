@@ -6,7 +6,7 @@
 #include "IBinaryFile.h"
 #include "ITextFile.h"
 
-namespace platform
+namespace yage::platform
 {
 	class IFileReader
 	{

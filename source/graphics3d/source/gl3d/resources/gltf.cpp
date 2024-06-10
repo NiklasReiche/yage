@@ -4,14 +4,14 @@
 #include "gl3d/sceneGraph/sceneGroup.h"
 #include <vector>
 #include <utils/strings.h>
-#include <gml/vector.h>
+#include <math/vector.h>
 
 #include <utils/NotImplementedException.h>
 
 #include <tiny_gltf.h>
 #include <numeric>
 
-namespace gl3d::resources
+namespace yage::gl3d::resources
 {
     gl::TextureWrapper convert_wrapper(int wrap)
     {
@@ -115,7 +115,7 @@ namespace gl3d::resources
                   const std::shared_ptr<gl::ITexture2D>& full_texture)
     {
         auto gl3d_material = std::make_shared<Material>();
-        gl3d_material->add_uniform("albedo", gml::Vec3f(
+        gl3d_material->add_uniform("albedo", math::Vec3f(
                 static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[0]),
                 static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[1]),
                 static_cast<float>(material.pbrMetallicRoughness.baseColorFactor[2])));
@@ -235,21 +235,21 @@ namespace gl3d::resources
 
     std::unique_ptr<SceneGroup> read_node(tinygltf::Node& node, const std::vector<std::shared_ptr<gl3d::Mesh>>& meshes)
     {
-        gml::Mat4d transform;
+        math::Mat4d transform;
         if (node.matrix.size() == 16) {
-            transform = gml::transpose(gml::Mat4d(std::span<double, 16>{node.matrix.begin(), node.matrix.end()}));
+            transform = math::transpose(math::Mat4d(std::span<double, 16>{node.matrix.begin(), node.matrix.end()}));
         } else {
-            transform = gml::matrix::Id4d;
+            transform = math::matrix::Id4d;
             if (node.scale.size() == 3) {
-                transform *= gml::matrix::scale(node.scale.at(0), node.scale.at(1), node.scale.at(2));
+                transform *= math::matrix::scale(node.scale.at(0), node.scale.at(1), node.scale.at(2));
             }
             if (node.rotation.size() == 4) {
-                transform *= gml::matrix::fromQuaternion(
-                        gml::Quatd(node.rotation.at(0), node.rotation.at(1),
+                transform *= math::matrix::from_quaternion(
+                        math::Quatd(node.rotation.at(0), node.rotation.at(1),
                                    node.rotation.at(2), node.rotation.at(3)));
             }
             if (node.translation.size() == 3) {
-                transform *= gml::matrix::translate(node.translation.at(0), node.translation.at(1),
+                transform *= math::matrix::translate(node.translation.at(0), node.translation.at(1),
                                                     node.translation.at(2));
             }
         }

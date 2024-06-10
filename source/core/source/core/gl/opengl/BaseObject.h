@@ -3,7 +3,7 @@
 #include <memory>
 #include <stdexcept>
 
-namespace opengl
+namespace yage::opengl
 {
 	class Context;
 

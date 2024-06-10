@@ -1,6 +1,6 @@
 #include "mesh.h"
 
-namespace gl3d
+namespace yage::gl3d
 {
     SubMesh::SubMesh(std::shared_ptr<gl::IDrawable> m_drawable, const std::shared_ptr<Material>& m_material)
             : m_drawable(std::move(m_drawable)), m_material(m_material)

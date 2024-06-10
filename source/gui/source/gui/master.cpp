@@ -1,6 +1,6 @@
 #include "master.h"
 
-namespace gui
+namespace yage::gui
 {
     Master::Master(const std::shared_ptr<platform::IWindow>& window, const std::shared_ptr<gl::IContext>& glContext)
             : m_window(window), m_gl_context(glContext),
@@ -10,7 +10,7 @@ namespace gui
                                      gl::IRenderer::Viewport{0, 0, window->getWidth(), window->getHeight()})),
               m_root(this)
     {
-        m_root.set_actual_size(gml::Vec2<float>((float) window->getWidth(), (float) window->getHeight()));
+        m_root.set_actual_size(math::Vec2<float>((float) window->getWidth(), (float) window->getHeight()));
 
         window->attach(m_input_manager);
     }

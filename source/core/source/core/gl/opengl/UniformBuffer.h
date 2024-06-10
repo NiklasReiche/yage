@@ -3,7 +3,7 @@
 #include "OpenGlObject.h"
 #include "../IUniformBlock.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	class UniformBuffer final : public OpenGlObject, public gl::IUniformBlock, std::enable_shared_from_this<UniformBuffer>
 	{

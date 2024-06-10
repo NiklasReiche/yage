@@ -3,9 +3,9 @@
 #include <functional>
 #include <string>
 
-#include <gml/matrix.h>
+#include <math/matrix.h>
 
-namespace gl3d
+namespace yage::gl3d
 {
 	class SceneObject;
 
@@ -17,7 +17,7 @@ namespace gl3d
 	{
 	public:
         /** This node's transformation matrix in local space. */
-        gml::Mat4d local_transform;
+        math::Mat4d local_transform;
 
         virtual ~SceneNode() = default;
 
@@ -27,12 +27,12 @@ namespace gl3d
          * @param f A function that gets invoked for any leaf. The argument is the visited leaf.
          * @param parent_transform The matrix that transforms from the parents local space to world space.
          */
-        virtual void apply(const std::function<void(SceneObject&)>& f, const gml::Mat4d& parent_transform) = 0;
+        virtual void apply(const std::function<void(SceneObject&)>& f, const math::Mat4d& parent_transform) = 0;
 
         /**
          * @return This node's current transformation matrix for mapping from local to world space.
          */
-        [[nodiscard]] gml::Mat4d world_transform() const;
+        [[nodiscard]] math::Mat4d world_transform() const;
 
         /**
          * @return This node's name.
@@ -40,12 +40,12 @@ namespace gl3d
         [[nodiscard]] std::string_view name() const;
 
     protected:
-        SceneNode(const std::string_view& name, const gml::Mat4d& transform);
+        SceneNode(const std::string_view& name, const math::Mat4d& transform);
 
         /**
          * Updates this node's world transform by applying a parents accumulated world transform matrix.
          */
-        void apply_transform(const gml::Mat4d& parent_transform);
+        void apply_transform(const math::Mat4d& parent_transform);
 
     private:
         /**
@@ -56,6 +56,6 @@ namespace gl3d
         /**
          * The matrix that transforms from this node's local space to world space.
          */
-        gml::Mat4d m_world_transform;
+        math::Mat4d m_world_transform;
 	};
 }

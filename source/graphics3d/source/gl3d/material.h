@@ -6,7 +6,7 @@
 
 #include <core/gl/graphics.h>
 
-namespace gl3d
+namespace yage::gl3d
 {
 	/**
 	 * @brief Represents a material as used by a shader program.
@@ -31,7 +31,7 @@ namespace gl3d
 		 * @param name the shader uniform's name
 		 * @param value the value to be set
 		 */
-		void add_uniform(const std::string& name, gml::Vec3f value);
+		void add_uniform(const std::string& name, math::Vec3f value);
 
 		/**
 		 * @brief Adds a float value to be used as a shader float uniform.
@@ -78,7 +78,7 @@ namespace gl3d
 	private:
 		std::shared_ptr<gl::IShader> m_shader;
 		std::map<std::string, std::shared_ptr<gl::ITexture2D>> m_textures;
-		std::unordered_map<std::string, gml::Vec3f> m_vec3Values;
+		std::unordered_map<std::string, math::Vec3f> m_vec3Values;
 		std::unordered_map<std::string, float> m_fValues;
 		std::unordered_map<std::string, int> m_iValues;
 	};

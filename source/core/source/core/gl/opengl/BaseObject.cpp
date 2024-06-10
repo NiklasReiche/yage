@@ -1,6 +1,6 @@
 #include "BaseObject.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	BaseObject::BaseObject(std::weak_ptr<Context> contextPtr)
 	: contextPtr (std::move(contextPtr))

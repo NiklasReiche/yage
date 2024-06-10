@@ -2,9 +2,9 @@
 
 #include <cstdint>
 
-#include <gml/vector.h>
+#include <math/vector.h>
 
-namespace gl
+namespace yage::gl
 {
     typedef uint32_t Color_t;
 
@@ -70,7 +70,7 @@ namespace gl
 		color = (alpha) | (b << 8) | (g << 16) | (r << 24);
 	}
 
-	inline gml::Vec3f toVec3(Color_t color)
+	inline math::Vec3f toVec3(Color_t color)
 	{
 		return {
             static_cast<float>((color >> 24) & 0xff) / 255.0f,
@@ -79,7 +79,7 @@ namespace gl
         };
 	}
 
-	inline gml::Vec4f toVec4(Color_t color)
+	inline math::Vec4f toVec4(Color_t color)
 	{
 		return {
             static_cast<float>((color >> 24) & 0xff) / 255.0f,

@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <codecvt>
 
-namespace font
+namespace yage::font
 {
     Text::Text(const std::shared_ptr<gl::IDrawableCreator>& drawable_creator,
                const std::u32string& text,
@@ -23,7 +23,7 @@ namespace font
 
     std::vector<float> Text::construct_vertices()
     {
-        m_dimensions = gml::Vec2f(0.0f);
+        m_dimensions = math::Vec2f(0.0f);
         std::vector<float> vertices;
 
         m_data_offset_coords = 0;
@@ -196,46 +196,46 @@ namespace font
         return m_text;
     }
 
-    gml::Vec2f Text::max_font_dimensions()
+    math::Vec2f Text::max_font_dimensions()
     {
         auto& font = m_font_resource.get();
         const auto scale = font.scaling(m_font_size, m_dpi);
 
-        gml::Vec2f dimensions;
+        math::Vec2f dimensions;
         dimensions.x() = font.maxGlyph.size.x() * scale.x();
         dimensions.y() = (font.maxGlyph.size.y() + (font.maxGlyph.size.y() - font.maxGlyph.bearing.y())) * scale.y();
 
         return dimensions;
     }
 
-    gml::Vec3f Text::offset(std::size_t i)
+    math::Vec3f Text::offset(std::size_t i)
     {
         return char_offset(i, m_offset);
     }
 
-    gml::Vec3f Text::relative_offset(std::size_t i)
+    math::Vec3f Text::relative_offset(std::size_t i)
     {
-        return char_offset(i, gml::Vec3f(0));
+        return char_offset(i, math::Vec3f(0));
     }
 
-    gml::Vec2<float> Text::dimensions() const
+    math::Vec2<float> Text::dimensions() const
     {
         return m_dimensions;
     }
 
-    gml::Vec4<float> Text::color() const
+    math::Vec4<float> Text::color() const
     {
         return m_color;
     }
 
-    void Text::update_offset(gml::Vec3f offset)
+    void Text::update_offset(math::Vec3f offset)
     {
         m_offset = offset;
         std::vector<float> vertices = construct_vertex_coords();
         m_drawable->setSubData(m_data_offset_coords, vertices);
     }
 
-    void Text::update_offset(gml::Vec2f offset)
+    void Text::update_offset(math::Vec2f offset)
     {
         m_offset.x() = offset.x();
         m_offset.y() = offset.y();
@@ -249,7 +249,7 @@ namespace font
         m_drawable->setSubData(m_data_offset_colors, vertices);
     }
 
-    void Text::update_size(float pt_size, gml::Vec2i dpi)
+    void Text::update_size(float pt_size, math::Vec2i dpi)
     {
         m_font_size = pt_size;
         m_dpi = dpi;
@@ -257,12 +257,12 @@ namespace font
         m_drawable->setSubData(m_data_offset_coords, vertices);
     }
 
-    gml::Vec3f Text::char_offset(std::size_t i, gml::Vec3f initial)
+    math::Vec3f Text::char_offset(std::size_t i, math::Vec3f initial)
     {
         auto& font = m_font_resource.get();
         const auto scale = font.scaling(m_font_size, m_dpi);
 
-        gml::Vec3f offset = initial;
+        math::Vec3f offset = initial;
         auto max_char_index = std::min(i, m_text.length());
         for (std::size_t j = 0; j < max_char_index; ++j) {
             const Character& ch = font.characters.at(m_text[j]); // TODO: handle unknown characters

@@ -5,7 +5,7 @@
 #include "GlEnum.h"
 #include "OpenGlObject.h"
 
-namespace opengl
+namespace yage::opengl
 {
 	class Texture : public OpenGlObject
 	{

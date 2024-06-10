@@ -2,7 +2,7 @@
 #include <core/platform/FileException.h>
 #include <cmath>
 
-namespace img::bmp
+namespace yage::img::bmp
 {
 	/*****************************************
 	**			8/24-bit Conversion			**

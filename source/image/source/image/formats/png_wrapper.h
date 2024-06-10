@@ -4,7 +4,7 @@
 #include <image/Image.h>
 #include <image/enum.h>
 
-namespace img::png
+namespace yage::img::png
 {
 	Image read(platform::IBinaryFile& file, FORCE_CHANNELS forceChannel = FORCE_CHANNELS::AUTO);
 }

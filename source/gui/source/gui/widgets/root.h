@@ -2,7 +2,7 @@
 
 #include "widget.h"
 
-namespace gui
+namespace yage::gui
 {
 	class RootWidget : public Widget
 	{
