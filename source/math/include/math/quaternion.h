@@ -181,9 +181,9 @@ namespace yage::math
         [[nodiscard]]
         constexpr Vec3<T> forward_direction() const
         {
-            Quaternion q = normalize(*this);
-            Quaternion result = q * Quaternion(vector::worldForward<T>()) * conjugate(q);
-            return normalize(Vec3<T>(result.m_x, result.m_y, result.m_z));
+            Quaternion q = math::normalize(*this);
+            Quaternion result = q * Quaternion(vector::worldForward<T>()) * math::conjugate(q);
+            return math::normalize(Vec3<T>(result.m_x, result.m_y, result.m_z));
         }
 
         /**
@@ -194,9 +194,9 @@ namespace yage::math
         [[nodiscard]]
         constexpr Vec3<T> right_direction() const
         {
-            Quaternion q = normalize(*this);
-            Quaternion result = q * Quaternion(vector::worldRight<T>()) * conjugate(q);
-            return normalize(Vec3<T>(result.m_x, result.m_y, result.m_z));
+            Quaternion q = math::normalize(*this);
+            Quaternion result = q * Quaternion(vector::worldRight<T>()) * math::conjugate(q);
+            return math::normalize(Vec3<T>(result.m_x, result.m_y, result.m_z));
         }
 
         /**
@@ -207,9 +207,9 @@ namespace yage::math
         [[nodiscard]]
         constexpr Vec3<T> up_direction() const
         {
-            Quaternion q = normalize(*this);
-            Quaternion result = q * Quaternion(vector::worldUp<T>()) * conjugate(q);
-            return normalize(Vec3<T>(result.m_x, result.m_y, result.m_z));
+            Quaternion q = math::normalize(*this);
+            Quaternion result = q * Quaternion(vector::worldUp<T>()) * math::conjugate(q);
+            return math::normalize(Vec3<T>(result.m_x, result.m_y, result.m_z));
         }
 
         /**
