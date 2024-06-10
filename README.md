@@ -1,6 +1,10 @@
 # Yet Another Game Engine
 A C++ game engine / Work-in-progress
 
+- [Overview](#overview)
+- [Subsystems](#subsystems)
+- [Demos](#demos)
+
 ## Overview
 The goal of this project is to implement a 3D game engine from scratch (within reason, I'm happy to use libraries for stuff like window creation or reading PNG files). I don't expect to use this for developing any actual games but rather treat it as a learning experience for graphics programming and C++ in general.
 
@@ -29,13 +33,14 @@ Provides a framework for building simple hierarchical GUIs with some preliminary
 TODO: add screenshots
 
 ### Physics simulation:
-![New Project](https://github.com/NiklasReiche/yage/assets/29310846/33ae2170-e69c-4650-bbad-0cdec81dcc04)
+><img src="https://github.com/NiklasReiche/yage/assets/29310846/1ebf9a9b-798e-47d6-a557-2867246a8b43" width=500>
+><img src="https://github.com/NiklasReiche/yage/assets/29310846/e590be89-d954-4dc8-bcd7-3b4a178a326d" width=500>
 
 ### GUI showcase:
 >![gui_demo_WolSdPGhhf](https://github.com/NiklasReiche/yage/assets/29310846/2a8c30e1-f8b3-4e37-9a8d-a6393054becd)
 
 ### Text renderer:
->![text_renderer_ZNWA41Qhvw](https://github.com/NiklasReiche/yage/assets/29310846/ea7f4650-f3eb-466a-896e-8f0691aa0f96)
+><img src="https://github.com/NiklasReiche/yage/assets/29310846/ea7f4650-f3eb-466a-896e-8f0691aa0f96" width=500>
 
 ## Dependencies
 - Catch2 for writing unit tests
