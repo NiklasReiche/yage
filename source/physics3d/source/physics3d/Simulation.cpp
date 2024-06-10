@@ -12,7 +12,7 @@ namespace yage::physics3d
         m_visualizer = std::make_unique<Visualizer>(std::move(visualizer));
     }
 
-    math::Matd<12, 12> Simulation::inverse_mass_matrix(RigidBody& a, RigidBody& b)
+    math::Matd<12, 12> Simulation::inverse_mass_matrix(const RigidBody& a, const RigidBody& b)
     {
         // TODO: instead of this sparse matrix multiplication, use the direct formula for the effective mass matrix
         math::Matd<12, 12> m_inv;
@@ -78,12 +78,12 @@ namespace yage::physics3d
         return {u1, u2};
     }
 
-    double Simulation::solve_constraint(Constraint& constraint)
+    double Simulation::solve_constraint(const Constraint& constraint)
     {
         auto& a = constraint.rb_a;
         auto& b = constraint.rb_b;
 
-        math::Matd<12, 1> q_pre{
+        const math::Matd<12, 1> q_pre{
                 a.m_velocity.x(), a.m_velocity.y(), a.m_velocity.z(),
                 b.m_velocity.x(), b.m_velocity.y(), b.m_velocity.z(),
                 a.m_angular_velocity.x(), a.m_angular_velocity.y(), a.m_angular_velocity.z(),
@@ -92,12 +92,12 @@ namespace yage::physics3d
 
         math::Matd<1, 1> nominator = -(constraint.j * q_pre + math::Matd<1, 1>(constraint.bias));
         math::Matd<1, 1> denominator = constraint.j * constraint.m_inv * constraint.j_t;
-        double delta_lambda = nominator(0, 0) / denominator(0, 0);
+        const double delta_lambda = nominator(0, 0) / denominator(0, 0);
 
         return delta_lambda;
     }
 
-    void Simulation::update(double dt)
+    void Simulation::update(const double dt)
     {
         remove_destroyed_bodies();
         integrate_forces(dt);
@@ -107,7 +107,7 @@ namespace yage::physics3d
         clear_forces();
     }
 
-    void Simulation::update_staggered(double dt)
+    void Simulation::update_staggered(const double dt)
     {
         remove_destroyed_bodies();
         resolve_collisions(dt);
@@ -130,11 +130,11 @@ namespace yage::physics3d
 
     Constraint
     Simulation::prepare_penetration_constraint(RigidBody& rb_a, RigidBody& rb_b, const ContactManifold& manifold,
-                                               const ContactPoint& contact, double dt) const
+                                               const ContactPoint& contact, const double dt) const
     {
-        math::Vec3d temp_1 = math::cross(contact.r_a, manifold.normal);
-        math::Vec3d temp_2 = math::cross(contact.r_b, manifold.normal);
-        math::Matd<1, 12> j{
+        math::Vec3d temp_1 = cross(contact.r_a, manifold.normal);
+        math::Vec3d temp_2 = cross(contact.r_b, manifold.normal);
+        const math::Matd<1, 12> j{
                 -manifold.normal.x(), -manifold.normal.y(), -manifold.normal.z(),
                 manifold.normal.x(), manifold.normal.y(), manifold.normal.z(),
                 -temp_1.x(), -temp_1.y(), -temp_1.z(),
@@ -150,7 +150,7 @@ namespace yage::physics3d
         return {
                 .m_inv = inverse_mass_matrix(rb_a, rb_b),
                 .j = j,
-                .j_t = math::transpose(j),
+                .j_t = transpose(j),
                 // don't add the biases, since the baumgarte bias is already satisfied if there's enough restitution
                 .bias = std::min(baumgarte_bias, restitution_bias),
                 .rb_a = rb_a,
@@ -163,9 +163,9 @@ namespace yage::physics3d
                                              const ContactPoint& contact)
     {
         // friction along first tangent
-        math::Vec3d temp_1 = math::cross(contact.r_a, manifold.tangent_1);
-        math::Vec3d temp_2 = math::cross(contact.r_b, manifold.tangent_1);
-        math::Matd<1, 12> j_1{
+        math::Vec3d temp_1 = cross(contact.r_a, manifold.tangent_1);
+        math::Vec3d temp_2 = cross(contact.r_b, manifold.tangent_1);
+        const math::Matd<1, 12> j_1{
                 -manifold.tangent_1.x(), -manifold.tangent_1.y(), -manifold.tangent_1.z(),
                 manifold.tangent_1.x(), manifold.tangent_1.y(), manifold.tangent_1.z(),
                 -temp_1.x(), -temp_1.y(), -temp_1.z(),
@@ -173,28 +173,28 @@ namespace yage::physics3d
         };
 
         // friction along second tangent
-        temp_1 = math::cross(contact.r_a, manifold.tangent_2);
-        temp_2 = math::cross(contact.r_b, manifold.tangent_2);
-        math::Matd<1, 12> j_2{
+        temp_1 = cross(contact.r_a, manifold.tangent_2);
+        temp_2 = cross(contact.r_b, manifold.tangent_2);
+        const math::Matd<1, 12> j_2{
                 -manifold.tangent_2.x(), -manifold.tangent_2.y(), -manifold.tangent_2.z(),
                 manifold.tangent_2.x(), manifold.tangent_2.y(), manifold.tangent_2.z(),
                 -temp_1.x(), -temp_1.y(), -temp_1.z(),
                 temp_2.x(), temp_2.y(), temp_2.z(),
         };
 
-        auto m_inv = inverse_mass_matrix(rb_a, rb_b);
+        const auto m_inv = inverse_mass_matrix(rb_a, rb_b);
         return {
                 {
                         .m_inv = m_inv,
                         .j = j_1,
-                        .j_t = math::transpose(j_1),
+                        .j_t = transpose(j_1),
                         .rb_a = rb_a,
                         .rb_b = rb_b,
                 },
                 {
                         .m_inv = m_inv,
                         .j = j_2,
-                        .j_t = math::transpose(j_2),
+                        .j_t = transpose(j_2),
                         .rb_a = rb_a,
                         .rb_b = rb_b,
                 }
@@ -204,54 +204,54 @@ namespace yage::physics3d
     std::tuple<Constraint, Constraint, Constraint>
     Simulation::prepare_rolling_friction_constraints(RigidBody& rb_a, RigidBody& rb_b, const ContactManifold& manifold)
     {
-        math::Matd<1, 12> j_0{
+        const math::Matd<1, 12> j_0{
                 0, 0, 0,
                 0, 0, 0,
                 -manifold.normal.x(), -manifold.normal.y(), -manifold.normal.z(),
                 manifold.normal.x(), manifold.normal.y(), manifold.normal.z(),
         };
 
-        math::Matd<1, 12> j_1{
+        const math::Matd<1, 12> j_1{
                 0, 0, 0,
                 0, 0, 0,
                 -manifold.tangent_1.x(), -manifold.tangent_1.y(), -manifold.tangent_1.z(),
                 manifold.tangent_1.x(), manifold.tangent_1.y(), manifold.tangent_1.z(),
         };
 
-        math::Matd<1, 12> j_2{
+        const math::Matd<1, 12> j_2{
                 0, 0, 0,
                 0, 0, 0,
                 -manifold.tangent_2.x(), -manifold.tangent_2.y(), -manifold.tangent_2.z(),
                 manifold.tangent_2.x(), manifold.tangent_2.y(), manifold.tangent_2.z(),
         };
 
-        auto m_inv = inverse_mass_matrix(rb_a, rb_b);
+        const auto m_inv = inverse_mass_matrix(rb_a, rb_b);
         return {
                 {
                         .m_inv = m_inv,
                         .j = j_0,
-                        .j_t = math::transpose(j_0),
+                        .j_t = transpose(j_0),
                         .rb_a = rb_a,
                         .rb_b = rb_b,
                 },
                 {
                         .m_inv = m_inv,
                         .j = j_1,
-                        .j_t = math::transpose(j_1),
+                        .j_t = transpose(j_1),
                         .rb_a = rb_a,
                         .rb_b = rb_b,
                 },
                 {
                         .m_inv = m_inv,
                         .j = j_2,
-                        .j_t = math::transpose(j_2),
+                        .j_t = transpose(j_2),
                         .rb_a = rb_a,
                         .rb_b = rb_b,
                 }
         };
     }
 
-    void Simulation::apply_impulse(const Constraint& constraint, math::Matd<12, 1> impulse)
+    void Simulation::apply_impulse(const Constraint& constraint, const math::Matd<12, 1>& impulse)
     {
         auto delta_q = constraint.m_inv * impulse;
         constraint.rb_a.m_velocity += {delta_q(0, 0), delta_q(1, 0), delta_q(2, 0)};
@@ -263,33 +263,33 @@ namespace yage::physics3d
     void Simulation::resolve_penetration_constraint(Constraint& constraint)
     {
         // accumulate impulses
-        double old_lambda = constraint.accumulated_lambda;
+        const double old_lambda = constraint.accumulated_lambda;
         double delta_lambda = solve_constraint(constraint);
         // clamp to prevent objects pulling together for negative lambdas
         constraint.accumulated_lambda = std::max(0.0, constraint.accumulated_lambda + delta_lambda);
         // restore delta lambda after clamping
         delta_lambda = constraint.accumulated_lambda - old_lambda;
-        auto delta_impulse = delta_lambda * constraint.j_t;
+        const auto delta_impulse = delta_lambda * constraint.j_t;
         apply_impulse(constraint, delta_impulse);
     }
 
     void Simulation::resolve_friction_constraint(Constraint& constraint)
     {
         // accumulate impulses
-        double old_lambda = constraint.accumulated_lambda;
+        const double old_lambda = constraint.accumulated_lambda;
         double delta_lambda = solve_constraint(constraint);
         // clamp with accumulated normal impulse for the Coulomb friction model
         const double friction_coefficient =
                 constraint.rb_a.material.kinetic_friction *
                 constraint.rb_b.material.kinetic_friction;
-        double lambda_n = constraint.dependent_constraint.value()->accumulated_lambda;
+        const double lambda_n = constraint.dependent_constraint.value()->accumulated_lambda;
         constraint.accumulated_lambda = math::clamp(
                 constraint.accumulated_lambda + delta_lambda,
                 -friction_coefficient * lambda_n,
                 friction_coefficient * lambda_n);
         // restore delta lambda after clamping
         delta_lambda = constraint.accumulated_lambda - old_lambda;
-        auto delta_impulse = delta_lambda * constraint.j_t;
+        const auto delta_impulse = delta_lambda * constraint.j_t;
         apply_impulse(constraint, delta_impulse);
     }
 
@@ -297,27 +297,27 @@ namespace yage::physics3d
     {
         solve_constraint(constraint);
         // accumulate impulses TODO: is clamping necessary?
-        double delta_lambda = solve_constraint(constraint);
+        const double delta_lambda = solve_constraint(constraint);
         constraint.accumulated_lambda += delta_lambda;
 
         const double friction_coefficient =
                 constraint.rb_a.material.rolling_friction *
                 constraint.rb_b.material.rolling_friction;
         // TODO: can we do something more physically accurate?
-        auto delta_impulse = friction_coefficient * delta_lambda * constraint.j_t;
+        const auto delta_impulse = friction_coefficient * delta_lambda * constraint.j_t;
         apply_impulse(constraint, delta_impulse);
     }
 
-    void Simulation::visualize_collisions(const math::Mat4d& projection, const math::Mat4d& view)
+    void Simulation::visualize_collisions(const math::Mat4d& projection, const math::Mat4d& view) const
     {
         if (m_visualizer) {
             m_visualizer->draw(projection, view);
         }
     }
 
-    void Simulation::integrate_forces(double dt)
+    void Simulation::integrate_forces(const double dt)
     {
-        for (auto& rb : bodies) {
+        for (const std::shared_ptr<RigidBody>& rb : bodies) {
             // external forces
             if (rb->m_inertia_shape.inverse_mass() > 0) {
                 rb->m_velocity += m_external_acceleration * dt;
@@ -332,21 +332,21 @@ namespace yage::physics3d
         }
     }
 
-    void Simulation::integrate_positions(double dt)
+    void Simulation::integrate_positions(const double dt)
     {
-        for (auto& rigidBody: bodies) {
+        for (const std::shared_ptr<RigidBody>& rb: bodies) {
             // linear component
-            rigidBody->m_position += rigidBody->m_velocity * dt;
+            rb->m_position += rb->m_velocity * dt;
 
             // angular component
-            rigidBody->m_orientation += 0.5 * math::Quatd(rigidBody->m_angular_velocity) * rigidBody->m_orientation * dt;
-            rigidBody->m_orientation.normalize();
+            rb->m_orientation += 0.5 * math::Quatd(rb->m_angular_velocity) * rb->m_orientation * dt;
+            rb->m_orientation.normalize();
 
-            rigidBody->update_collider();
+            rb->update_collider();
         }
     }
 
-    void Simulation::detect_collisions(double dt)
+    void Simulation::detect_collisions(const double dt)
     {
         m_penetration_constraints.clear();
         m_friction_constraints.clear();
@@ -422,13 +422,13 @@ namespace yage::physics3d
     {
         for (int i = 0; i < m_solver_iterations; ++i) {
             // don't interleave constraints, since the friction impulse depends on the normal impulse
-            for (auto& constraint: m_penetration_constraints) {
+            for (Constraint& constraint: m_penetration_constraints) {
                 resolve_penetration_constraint(constraint);
             }
-            for (auto& constraint: m_friction_constraints) {
+            for (Constraint& constraint: m_friction_constraints) {
                 resolve_friction_constraint(constraint);
             }
-            for (auto& constraint: m_rolling_friction_constraints) {
+            for (Constraint& constraint: m_rolling_friction_constraints) {
                 resolve_rolling_friction_constraint(constraint);
             }
         }
@@ -446,7 +446,7 @@ namespace yage::physics3d
 
         // erase bodies marked for deletion
         std::ptrdiff_t n_deleted = 0;
-        for (std::size_t i: indices_to_delete) {
+        for (const std::size_t i: indices_to_delete) {
             bodies.erase(bodies.begin() + static_cast<std::ptrdiff_t>(i) - n_deleted);
             n_deleted++;
         }
@@ -454,7 +454,7 @@ namespace yage::physics3d
 
     void Simulation::clear_forces()
     {
-        for (auto& rb : bodies) {
+        for (const std::shared_ptr<RigidBody>& rb : bodies) {
             rb->m_force = math::Vec3d();
             rb->m_torque = math::Vec3d();
         }

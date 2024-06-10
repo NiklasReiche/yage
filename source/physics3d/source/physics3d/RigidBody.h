@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include <math/vector.h>
 #include <math/quaternion.h>
 

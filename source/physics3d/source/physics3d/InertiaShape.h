@@ -36,7 +36,7 @@ namespace yage::physics3d
         static InertiaShape cuboid(double width, double height, double depth, double mass);
 
     private:
-        InertiaShape(double inverse_mass, math::Mat3d inverse_inertia_tensor);
+        InertiaShape(double inverse_mass, const math::Mat3d& inverse_inertia_tensor);
 
         double m_inverse_mass = 1;
         math::Mat3d m_inverse_inertia_tensor;

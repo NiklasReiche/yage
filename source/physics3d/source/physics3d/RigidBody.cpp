@@ -6,12 +6,12 @@ namespace yage::physics3d
     RigidBody::RigidBody(const InertiaShape& inertia_shape,
                          const Collider& bounding_volume,
                          const Material& material,
-                         const math::Vec3d& position,
-                         const math::Quatd& orientation,
+                         const math::Vec3d& initial_position,
+                         const math::Quatd& initial_orientation,
                          const math::Vec3d& bounding_volume_offset)
             : material(material),
-              m_position(position),
-              m_orientation(orientation),
+              m_position(initial_position),
+              m_orientation(initial_orientation),
               m_inertia_shape(inertia_shape),
               m_collider(bounding_volume),
               m_collider_offset(bounding_volume_offset)
@@ -22,7 +22,7 @@ namespace yage::physics3d
     void RigidBody::apply_force(const math::Vec3d& force, const math::Vec3d& point)
     {
         m_force += force;
-        m_torque += math::cross(force, math::Vec3d(point - m_position));
+        m_torque += cross(force, math::Vec3d(point - m_position));
     }
 
     void RigidBody::update_collider()

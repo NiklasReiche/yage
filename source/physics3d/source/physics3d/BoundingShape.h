@@ -72,13 +72,13 @@ namespace yage::physics3d
                 oriented_vertices[7] =
                         orientation * math::Vec3d(-half_size.x(), half_size.y(), half_size.z()) + center;
 
-                oriented_face_normals[0] = math::normalize(math::cross(
+                oriented_face_normals[0] = normalize(cross(
                         oriented_vertices[1] - oriented_vertices[0],
                         oriented_vertices[3] - oriented_vertices[0]));
-                oriented_face_normals[1] = math::normalize(math::cross(
+                oriented_face_normals[1] = normalize(cross(
                         oriented_vertices[4] - oriented_vertices[0],
                         oriented_vertices[3] - oriented_vertices[0]));
-                oriented_face_normals[2] = math::normalize(math::cross(
+                oriented_face_normals[2] = normalize(cross(
                         oriented_vertices[4] - oriented_vertices[0],
                         oriented_vertices[1] - oriented_vertices[0]));
             }
@@ -93,22 +93,22 @@ namespace yage::physics3d
     class CollisionVisitor
     {
     public:
-        std::optional<ContactManifold> operator()(const colliders::Sphere& a, const colliders::Sphere& b);
+        std::optional<ContactManifold> operator()(const colliders::Sphere& a, const colliders::Sphere& b) const;
 
-        std::optional<ContactManifold> operator()(const colliders::Sphere& a, const colliders::OrientedPlane& b);
+        std::optional<ContactManifold> operator()(const colliders::Sphere& a, const colliders::OrientedPlane& b) const;
 
-        std::optional<ContactManifold> operator()(const colliders::Sphere&, const colliders::OrientedBox&);
+        std::optional<ContactManifold> operator()(const colliders::Sphere&, const colliders::OrientedBox&) const;
 
-        std::optional<ContactManifold> operator()(const colliders::OrientedPlane& a, const colliders::Sphere& b);
+        std::optional<ContactManifold> operator()(const colliders::OrientedPlane& a, const colliders::Sphere& b) const;
 
-        std::optional<ContactManifold> operator()(const colliders::OrientedPlane& a, const colliders::OrientedPlane& b);
+        std::optional<ContactManifold> operator()(const colliders::OrientedPlane& a, const colliders::OrientedPlane& b) const;
 
-        std::optional<ContactManifold> operator()(const colliders::OrientedPlane&, const colliders::OrientedBox&);
+        std::optional<ContactManifold> operator()(const colliders::OrientedPlane&, const colliders::OrientedBox&) const;
 
-        std::optional<ContactManifold> operator()(const colliders::OrientedBox&, const colliders::Sphere&);
+        std::optional<ContactManifold> operator()(const colliders::OrientedBox&, const colliders::Sphere&) const;
 
-        std::optional<ContactManifold> operator()(const colliders::OrientedBox&, const colliders::OrientedPlane&);
+        std::optional<ContactManifold> operator()(const colliders::OrientedBox&, const colliders::OrientedPlane&) const;
 
-        std::optional<ContactManifold> operator()(const colliders::OrientedBox& a, const colliders::OrientedBox& b);
+        std::optional<ContactManifold> operator()(const colliders::OrientedBox& a, const colliders::OrientedBox& b) const;
     };
 }

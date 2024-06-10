@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <map>
 #include "BoundingShape.h"
 #include "Collision.h"
 #include "Algorithms.h"
@@ -9,22 +8,22 @@ namespace yage::physics3d
     /**
      * @return Positive penetration depth along the contact normal n.
      */
-    double penetration_distance(const math::Vec3d& p_a, const math::Vec3d& p_b, math::Vec3d n)
+    double penetration_distance(const math::Vec3d& p_a, const math::Vec3d& p_b, const math::Vec3d& n)
     {
         // since p_a lies within b and p_b lies within a and n is from a to b, we have to project onto the negated
         // normal to get a positive penetration depth
-        return math::dot(p_b - p_a, -n);
+        return dot(p_b - p_a, -n);
     }
 
-    std::optional<ContactManifold> CollisionVisitor::operator()(const colliders::Sphere& a, const colliders::Sphere& b)
+    std::optional<ContactManifold> CollisionVisitor::operator()(const colliders::Sphere& a, const colliders::Sphere& b) const
     {
-        auto ab = b.center - a.center;
-        if (math::length_sqr(ab) > (a.radius + b.radius) * (a.radius + b.radius)) {
+        const math::Vec3d ab = b.center - a.center;
+        if (length_sqr(ab) > (a.radius + b.radius) * (a.radius + b.radius)) {
             return {};
         }
 
         ContactManifold manifold;
-        manifold.normal = math::normalize(b.center - a.center);
+        manifold.normal = normalize(b.center - a.center);
 
         ContactPoint contact;
         contact.r_a = manifold.normal * a.radius;
@@ -37,15 +36,15 @@ namespace yage::physics3d
         return {manifold};
     }
 
-    std::optional<ContactManifold> CollisionVisitor::operator()(const colliders::Sphere& a, const colliders::OrientedPlane& b)
+    std::optional<ContactManifold> CollisionVisitor::operator()(const colliders::Sphere& a, const colliders::OrientedPlane& b) const
     {
         // The direction of the collision is determined by which side of the plane has more overlap with the sphere,
         // which means that if the sphere's center overshoots the plane, the direction is the wrong way around.
         // This can be solved by continuous collision detection or by incorporating the relative velocity here.
 
         // dist is positive if the circle collides on the outer side and negative otherwise (b.normal points outward)
-        auto dist = math::dot(a.center - b.support, b.normal);
-        auto abs_dist = std::abs(dist);
+        const double dist = dot(a.center - b.support, b.normal);
+        const double abs_dist = std::abs(dist);
         if (abs_dist > a.radius) {
             return {};
         }
@@ -65,10 +64,10 @@ namespace yage::physics3d
     }
 
     std::optional<ContactManifold>
-    CollisionVisitor::operator()(const colliders::Sphere& a, const colliders::OrientedBox& b)
+    CollisionVisitor::operator()(const colliders::Sphere& a, const colliders::OrientedBox& b) const
     {
         // transform the sphere's center into the local space of the box
-        math::Vec3d center = math::conjugate(b.orientation) * (a.center - b.center);
+        const math::Vec3d center = conjugate(b.orientation) * (a.center - b.center);
         // find the closest point on the box to the sphere's center in the box's local space
         math::Vec3d point;
         point.x() = std::max(-b.half_size.x(), std::min(b.half_size.x(), center.x()));
@@ -77,14 +76,14 @@ namespace yage::physics3d
         // transform point to world space
         point = b.orientation * point + b.center;
 
-        math::Vec3d offset = point - a.center;
-        double offset_length = math::length(offset);
+        const math::Vec3d offset = point - a.center;
+        const double offset_length = length(offset);
         if (offset_length > a.radius) {
             return {};
         }
 
         ContactManifold manifold;
-        manifold.normal = math::normalize(offset);
+        manifold.normal = normalize(offset);
 
         ContactPoint contact;
         contact.depth = a.radius - offset_length;
@@ -97,15 +96,15 @@ namespace yage::physics3d
         return {manifold};
     }
 
-    std::optional<ContactManifold> CollisionVisitor::operator()(const colliders::OrientedPlane& a, const colliders::Sphere& b)
+    std::optional<ContactManifold> CollisionVisitor::operator()(const colliders::OrientedPlane& a, const colliders::Sphere& b) const
     {
         // The direction of the collision is determined by which side of the plane has more overlap with the sphere,
         // which means that if the sphere's center overshoots the plane, the direction is the wrong way around.
         // This can be solved by continuous collision detection or by incorporating the relative velocity here.
 
         // dist is positive if the circle collides on the outer side and negative otherwise (b.normal points outward)
-        auto dist = math::dot(b.center - a.support, a.normal);
-        auto abs_dist = std::abs(dist);
+        const double dist = dot(b.center - a.support, a.normal);
+        const double abs_dist = std::abs(dist);
         if (abs_dist > b.radius) {
             return {};
         }
@@ -124,13 +123,13 @@ namespace yage::physics3d
         return {manifold};
     }
 
-    std::optional<ContactManifold> CollisionVisitor::operator()(const colliders::OrientedPlane&, const colliders::OrientedPlane&)
+    std::optional<ContactManifold> CollisionVisitor::operator()(const colliders::OrientedPlane&, const colliders::OrientedPlane&) const
     {
         return {}; // planes should probably not collide with themselves, since they are infinite
     }
 
     std::optional<ContactManifold>
-    CollisionVisitor::operator()(const colliders::OrientedPlane& a, const colliders::OrientedBox& b)
+    CollisionVisitor::operator()(const colliders::OrientedPlane& a, const colliders::OrientedBox& b) const
     {
         // The direction of the collision is determined by which side of the plane has more overlap with the box,
         // which means that if the sphere's center overshoots the plane, the direction is the wrong way around.
@@ -143,7 +142,7 @@ namespace yage::physics3d
          */
 
         // dist is positive if the box collides on the outer side and negative otherwise (b.normal points outward)
-        auto dist = math::dot(b.center - a.support, a.normal);
+        const double dist = dot(b.center - a.support, a.normal);
         ContactManifold manifold;
         manifold.normal = dist > 0 ? a.normal : -a.normal;
 
@@ -168,10 +167,10 @@ namespace yage::physics3d
     }
 
     std::optional<ContactManifold>
-    CollisionVisitor::operator()(const colliders::OrientedBox& a, const colliders::Sphere& b)
+    CollisionVisitor::operator()(const colliders::OrientedBox& a, const colliders::Sphere& b) const
     {
         // transform the sphere's center into the local space of the box
-        math::Vec3d center = math::conjugate(a.orientation) * (b.center - a.center);
+        const math::Vec3d center = conjugate(a.orientation) * (b.center - a.center);
         // find the closest point on the box to the sphere's center in the box's local space
         math::Vec3d point;
         point.x() = std::max(-a.half_size.x(), std::min(a.half_size.x(), center.x()));
@@ -180,14 +179,14 @@ namespace yage::physics3d
         // transform point to world space
         point = a.orientation * point + a.center;
 
-        math::Vec3d offset = point - b.center;
-        double offset_length = math::length(offset);
+        const math::Vec3d offset = point - b.center;
+        const double offset_length = length(offset);
         if (offset_length > b.radius) {
             return {};
         }
 
         ContactManifold manifold;
-        manifold.normal = -math::normalize(offset);
+        manifold.normal = -normalize(offset);
 
         ContactPoint contact;
         contact.depth = b.radius - offset_length;
@@ -201,7 +200,7 @@ namespace yage::physics3d
     }
 
     std::optional<ContactManifold>
-    CollisionVisitor::operator()(const colliders::OrientedBox& a, const colliders::OrientedPlane& b)
+    CollisionVisitor::operator()(const colliders::OrientedBox& a, const colliders::OrientedPlane& b) const
     {
         // The direction of the collision is determined by which side of the plane has more overlap with the box,
         // which means that if the sphere's center overshoots the plane, the direction is the wrong way around.
@@ -214,7 +213,7 @@ namespace yage::physics3d
          */
 
         // dist is positive if the circle collides on the outer side and negative otherwise (b.normal points outward)
-        auto dist = math::dot(a.center - b.support, b.normal);
+        const double dist = dot(a.center - b.support, b.normal);
         ContactManifold manifold;
         manifold.normal = dist > 0 ? -b.normal : b.normal;
 
@@ -239,7 +238,7 @@ namespace yage::physics3d
     }
 
     std::optional<ContactManifold>
-    CollisionVisitor::operator()(const colliders::OrientedBox& a, const colliders::OrientedBox& b)
+    CollisionVisitor::operator()(const colliders::OrientedBox& a, const colliders::OrientedBox& b) const
     {
         /* Encoding convention for box vertices:
          *    3-------------2
@@ -254,14 +253,14 @@ namespace yage::physics3d
          */
 
         // get the minimum translation vector with the SAT
-        std::optional<math::Vec3d> maybe_mtv = sat_3d(a.oriented_vertices, b.oriented_vertices,
-                                                     a.oriented_face_normals, b.oriented_face_normals);
+        const std::optional<math::Vec3d> maybe_mtv = sat_3d(a.oriented_vertices, b.oriented_vertices,
+                                                            a.oriented_face_normals, b.oriented_face_normals);
         if (!maybe_mtv.has_value()) {
             return {};
         }
 
         ContactManifold manifold;
-        manifold.normal = math::normalize(maybe_mtv.value());
+        manifold.normal = normalize(maybe_mtv.value());
 
         const auto [face_a, face_a_normal] =
                 most_perpendicular_cube_face(manifold.normal, a.oriented_vertices);
@@ -271,7 +270,7 @@ namespace yage::physics3d
         geometry::Rectangle reference, incident;
         bool flipped = false;
         // choose the more perpendicular face as the reference face
-        if (math::dot(face_a_normal, manifold.normal) > math::dot(face_b_normal, -manifold.normal)) {
+        if (dot(face_a_normal, manifold.normal) > dot(face_b_normal, -manifold.normal)) {
             reference = face_a;
             incident = face_b;
         } else {
@@ -282,10 +281,10 @@ namespace yage::physics3d
         std::vector<math::Vec3d> contact_points = {incident[0], incident[1], incident[2], incident[3]};
         // Sutherland-Hodgman clip against the 4 adjacent faces
         std::array<geometry::Plane, 4> clipping_planes = {
-                geometry::Plane{.support = reference[0], .normal = math::normalize(reference[1] - reference[0])},
-                geometry::Plane{.support = reference[1], .normal = math::normalize(reference[2] - reference[1])},
-                geometry::Plane{.support = reference[2], .normal = math::normalize(reference[3] - reference[2])},
-                geometry::Plane{.support = reference[3], .normal = math::normalize(reference[0] - reference[3])},
+                geometry::Plane{.support = reference[0], .normal = normalize(reference[1] - reference[0])},
+                geometry::Plane{.support = reference[1], .normal = normalize(reference[2] - reference[1])},
+                geometry::Plane{.support = reference[2], .normal = normalize(reference[3] - reference[2])},
+                geometry::Plane{.support = reference[3], .normal = normalize(reference[0] - reference[3])},
         };
         contact_points = clip_sutherland_hodgman(clipping_planes, contact_points);
         // clip and discard against reference face
