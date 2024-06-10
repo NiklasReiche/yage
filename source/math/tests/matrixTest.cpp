@@ -2,7 +2,7 @@
 
 #include <math/matrix.h>
 
-using namespace gml;
+using namespace yage::math;
 
 TEST_CASE("MatrixBase test")
 {
@@ -165,7 +165,7 @@ TEST_CASE("MatrixBase test")
 
 	SECTION("Identity") {
 		SECTION("generic") {
-			const Matrix<int, 2, 2> id = gml::matrix::Id<int, 2>;
+			const Matrix<int, 2, 2> id = yage::math::matrix::Id<int, 2>;
 
 			CHECK(id(0, 0) == 1);
 			CHECK(id(0, 1) == 0);
@@ -175,13 +175,13 @@ TEST_CASE("MatrixBase test")
 		}
 
 		SECTION("1x1") {
-			const Matrix<int, 1, 1> id = gml::matrix::Id1<int>;
+			const Matrix<int, 1, 1> id = yage::math::matrix::Id1<int>;
 
 			CHECK(id(0, 0) == 1);
 		}
 
 		SECTION("2x2") {
-			const Mat2i id = gml::matrix::Id2<int>;
+			const Mat2i id = yage::math::matrix::Id2<int>;
 
 			CHECK(id(0, 0) == 1);
 			CHECK(id(0, 1) == 0);
@@ -191,7 +191,7 @@ TEST_CASE("MatrixBase test")
 		}
 
 		SECTION("3x3") {
-			const Mat3i id = gml::matrix::Id3<int>;
+			const Mat3i id = yage::math::matrix::Id3<int>;
 
 			CHECK(id(0, 0) == 1);
 			CHECK(id(0, 1) == 0);
@@ -207,7 +207,7 @@ TEST_CASE("MatrixBase test")
 		}
 
 		SECTION("4x4") {
-			const Mat4i id = gml::matrix::Id4<int>;
+			const Mat4i id = yage::math::matrix::Id4<int>;
 
 			CHECK(id(0, 0) == 1);
 			CHECK(id(0, 1) == 0);

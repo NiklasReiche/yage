@@ -3,7 +3,7 @@
 #include <math/maths.h>
 #include <math/interpolation.h>
 
-using namespace gml;
+using namespace yage::math;
 using namespace std::numbers;
 
 TEST_CASE("RadDegConversion")

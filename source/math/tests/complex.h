@@ -1,46 +1,43 @@
 #pragma once
 
-namespace gml_test
+class ComplexD
 {
-	class ComplexD
+public:
+	double real;
+	double imaginary;
+
+	ComplexD()
+		: real(0), imaginary(0)
 	{
-	public:
-		double real;
-		double imaginary;
+	}
 
-		ComplexD()
-			: real(0), imaginary(0)
-		{
-		}
-
-		ComplexD(const double a, const double b)
-			: real(a), imaginary(b)
-		{
-		}
-	};
-
-	class ComplexF
+	ComplexD(const double a, const double b)
+		: real(a), imaginary(b)
 	{
-	public:
-		float real;
-		float imaginary;
+	}
+};
 
-		ComplexF()
-			: real(0), imaginary(0)
-		{
-		}
+class ComplexF
+{
+public:
+	float real;
+	float imaginary;
 
-		ComplexF(const ComplexD& other)
-			: real(static_cast<float>(other.real)),
-			  imaginary(static_cast<float>(other.imaginary))
-		{
-		}
+	ComplexF()
+		: real(0), imaginary(0)
+	{
+	}
 
-		ComplexF& operator=(const ComplexD& other)
-		{
-			this->real = static_cast<float>(other.real);
-			this->imaginary = static_cast<float>(other.imaginary);
-			return *this;
-		}
-	};
-}
+	ComplexF(const ComplexD& other)
+		: real(static_cast<float>(other.real)),
+		  imaginary(static_cast<float>(other.imaginary))
+	{
+	}
+
+	ComplexF& operator=(const ComplexD& other)
+	{
+		this->real = static_cast<float>(other.real);
+		this->imaginary = static_cast<float>(other.imaginary);
+		return *this;
+	}
+};

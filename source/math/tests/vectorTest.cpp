@@ -3,10 +3,9 @@
 #include <math/maths.h>
 #include <math/vector.h>
 
-#include "complex.h"
+#include "./complex.h"
 
-using namespace gml;
-using namespace gml_test;
+using namespace yage::math;
 
 TEST_CASE("VectorBase test")
 {

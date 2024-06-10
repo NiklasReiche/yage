@@ -3,7 +3,7 @@
 #include <math/quaternion.h>
 #include <math/matrix.h>
 
-using namespace gml;
+using namespace yage::math;
 using namespace std::numbers;
 
 template<typename T>
