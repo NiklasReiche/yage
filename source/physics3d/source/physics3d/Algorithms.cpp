@@ -93,7 +93,7 @@ namespace yage::physics3d
             output.clear();
             for (std::size_t i = 0; i < input.size(); ++i) {
                 math::Vec3d current = input[i];
-                math::Vec3d previous = input[(i - 1) % 4];
+                math::Vec3d previous = input[(i - 1) % input.size()];
                 if (dot(current - support, normal) >= 0) {
                     // current is inside
                     if (dot(previous - support, normal) < 0) {
