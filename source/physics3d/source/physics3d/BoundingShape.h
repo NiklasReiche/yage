@@ -50,8 +50,8 @@ namespace yage::physics3d
             math::Vec3d center{};
             math::Quatd orientation{};
 
-            std::array<math::Vec3d, 8> oriented_vertices;
-            std::array<math::Vec3d, 3> oriented_face_normals;
+            std::array<math::Vec3d, 8> oriented_vertices{};
+            std::array<math::Vec3d, 3> oriented_face_normals{};
 
             void update_computed_values()
             {

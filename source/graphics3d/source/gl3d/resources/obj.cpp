@@ -10,7 +10,7 @@ namespace
 {
 	using namespace yage;
 
-	std::map<std::string, gl3d::Material> readMtl(const platform::IFileReader& fileReader, const std::string& filename)
+	[[maybe_unused]] std::map<std::string, gl3d::Material> readMtl(const platform::IFileReader& fileReader, const std::string& filename)
 	{
 		auto file = fileReader.openTextFile(filename, platform::IFile::AccessMode::READ);
 
@@ -57,9 +57,10 @@ namespace
 
 namespace yage::gl3d::resources
 {
-	std::tuple<std::unique_ptr<gl::IDrawable>, gl3d::Material>
-	readObj(const platform::IFileReader& fileReader, const std::string& filename, gl::IDrawableCreator& drawableCreator)
+	std::tuple<std::unique_ptr<gl::IDrawable>, Material>
+	readObj(const platform::IFileReader&, const std::string&, gl::IDrawableCreator&)
 	{
+#if 0
 		auto tmp = utils::strip(filename, "/");
 		tmp.pop_back();
 		std::string path = utils::join(tmp);
@@ -154,14 +155,9 @@ namespace yage::gl3d::resources
 				}
 			}
 		}
+		// TODO indexing
+#endif
 
         throw NotImplementedException();
-
-		// TODO indexing
-#if 0
-		auto drawable = drawableCreator.createDrawable(vertexData, std::span<unsigned int>{}, { 3, 3 }, gl::VertexFormat::INTERLEAVED);
-		return std::make_tuple<std::unique_ptr<gl::IDrawable>, gl3d::Material>(std::move(drawable),
-		                                                                       static_cast<Material&&>(material));
-#endif
 	}
 }

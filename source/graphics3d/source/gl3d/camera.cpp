@@ -60,7 +60,7 @@ namespace yage::gl3d
 		m_rotation = math::normalize(this->m_rotation);
 	}
 
-	void Camera::lookAt(math::Vec3d position, math::Vec3d target)
+	void Camera::lookAt(math::Vec3d, math::Vec3d)
 	{
         // TODO
 	}
