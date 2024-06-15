@@ -1,0 +1,65 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "debug-gcc",
+      "displayName": "Debug (GCC)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/debug-gcc",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "-Wall -Wextra -Werror -Wpedantic"
+      },
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "gcc"
+        }
+      }
+    },
+    {
+      "name": "release-gcc",
+      "displayName": "Release (GCC)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/release-gcc",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS": "-Wall -Wextra -Werror -Wpedantic"
+      },
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "gcc"
+        }
+      }
+    },
+    {
+      "name": "debug-msvc",
+      "displayName": "Debug (MSVC)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/debug-msvc",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "/W4"
+      },
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "msvc"
+        }
+      }
+    },
+    {
+      "name": "release-msvc",
+      "displayName": "Release (MSVC)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/release-msvc",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS": "/W4"
+      },
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "msvc"
+        }
+      }
+    }
+  ]
+}

@@ -8,9 +8,6 @@ target_link_libraries(yage_math_test
         PRIVATE yage_math Catch2::Catch2WithMain
 )
 
-target_compile_options(yage_math_test
-        PRIVATE -fdiagnostics-color=always -Wall -Wextra -Werror)
-
 add_test(
         NAME yage_math_CTest
         COMMAND yage_math_test

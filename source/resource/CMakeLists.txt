@@ -5,9 +5,6 @@ add_library(yage_resource INTERFACE
         source/resource/Resource.h
         source/resource/Loader.h)
 
-target_compile_options(yage_resource
-        INTERFACE -fdiagnostics-color=always -Wall -Wextra)
-
 target_include_directories(yage_resource
         INTERFACE source)
 

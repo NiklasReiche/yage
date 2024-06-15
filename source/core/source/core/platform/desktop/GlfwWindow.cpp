@@ -31,7 +31,7 @@ namespace yage::platform::desktop
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
-#ifdef DEBUG
+#ifndef NDEBUG
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 

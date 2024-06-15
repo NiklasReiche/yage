@@ -6,4 +6,6 @@ target_include_directories(yage_math INTERFACE include)
 
 add_subdirectory(include/math)
 
-add_subdirectory(tests)
+if (YAGE_BUILD_TESTS)
+    add_subdirectory(tests)
+endif ()
