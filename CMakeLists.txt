@@ -52,6 +52,8 @@ add_subdirectory(source/physics3d)
 add_subdirectory(source/font)
 add_subdirectory(source/gui)
 
+add_subdirectory(source/runtime)
+
 if (ANDROID)
     #add_subdirectory(source/tools/yageApp)
 elseif (WIN32 OR UNIX)

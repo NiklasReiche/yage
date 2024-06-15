@@ -38,6 +38,11 @@ namespace yage::platform
 		[[nodiscard]]
 		virtual double getTime() const = 0;
 
+		/**
+		 * @return The time since the last call to this method in seconds
+		 */
+		virtual double getTimeStep() = 0;
+
 		[[nodiscard]]
 		virtual int getWidth() const = 0;
 		[[nodiscard]]

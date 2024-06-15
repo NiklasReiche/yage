@@ -53,7 +53,7 @@ namespace yage::platform::desktop
 
 		[[nodiscard]] int getDpi() const override { return dpi; }
 		[[nodiscard]] double getTime() const override;
-		double getTimeStep();
+		double getTimeStep() override;
 
 		void log(const std::string& msg);
 		std::string openFileDialog(std::string defaultPath = "", std::vector<std::string> filterList = {}, std::string filterName = "");
