@@ -52,9 +52,9 @@ public:
         csShader = glContext->getShaderCreator()->createShader(csVertexShader, csFragmentShader, csGeometryShader);
 
         pbrShaderNormalMapping = glContext->getShaderCreator()->createShader(
-                gl3d::shaders::PbrNormalMappingShader::vert, gl3d::shaders::PbrNormalMappingShader::frag);
+                gl3d::shaders::PbrNormalMappingShader::get_vert(), gl3d::shaders::PbrNormalMappingShader::get_frag());
         pbrShader = glContext->getShaderCreator()->createShader(
-                gl3d::shaders::PbrShader::vert, gl3d::shaders::PbrShader::frag);
+                gl3d::shaders::PbrShader::get_vert(), gl3d::shaders::PbrShader::get_frag());
 
         auto ubo = glContext->getShaderCreator()->createUniformBlock("ProjectionView");
         pbrShaderNormalMapping->linkUniformBlock(*ubo);
