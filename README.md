@@ -2,16 +2,17 @@
 A C++ game engine / Work-in-progress
 
 - [Overview](#overview)
+- [Building](#building)
 - [Subsystems](#subsystems)
 - [Demos](#demos)
 
-# Building
+## Overview
+The goal of this project is to implement a 3D game engine from scratch (within reason, I'm happy to use libraries for stuff like window creation or reading PNG files). I don't expect to use this for developing any actual games but rather treat it as a learning experience for graphics programming and C++ in general.
+
+## Building
 All external dependencies except for the OpenGL libraries are automatically downloaded and built using CMake. If your system does not include an OpenGL library, you will have to install it system-wide. The build system includes CMake presets for GCC and MSVC compilers. Simply opening the folder in CLion should take care of the pipeline setup, given that you define toolchains with the names ```gcc```/```msvc``` and enable the desired imported profiles. Builds using Visual Studio are not tested or maintained but there probably is an equivalent workflow.
 
 The ```demo``` folder contains executable targets that showcase some aspects of the engine. To run an executable the working directory should be the corresponding demo folder. Running executables directly, i.e. outside of the IDE, may require copying the C++ standard libraries for the given compiler to the output directory.
-
-## Overview
-The goal of this project is to implement a 3D game engine from scratch (within reason, I'm happy to use libraries for stuff like window creation or reading PNG files). I don't expect to use this for developing any actual games but rather treat it as a learning experience for graphics programming and C++ in general.
 
 ## Subsystems
 The engine is built with a focus on modularity and thus includes various subsystems:
