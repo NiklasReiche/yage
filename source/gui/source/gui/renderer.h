@@ -14,8 +14,7 @@ namespace yage::gui
 	public:
 		GuiRenderer() = delete;
 
-		GuiRenderer(const std::shared_ptr<gl::IRenderer> &base_renderer,
-                    const std::shared_ptr<gl::IShaderCreator> &shader_creator,
+		GuiRenderer(const std::shared_ptr<gl::IContext>& context,
                     const gl::IRenderer::Viewport &viewport);
 
         /**
@@ -27,6 +26,7 @@ namespace yage::gui
 
 	private:
         std::shared_ptr<gl::IRenderer> base_renderer;
+		std::shared_ptr<gl::IFrame> frame_buffer;
         std::unique_ptr<gl::IShader> widget_shader;
         std::unique_ptr<gl::IShader> text_shader;
 

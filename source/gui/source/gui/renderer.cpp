@@ -8,12 +8,14 @@ namespace yage::gui
 	** Basic Gui Renderer
 	*************************************************/
 
-	GuiRenderer::GuiRenderer(const std::shared_ptr<gl::IRenderer> &base_renderer,
-                             const std::shared_ptr<gl::IShaderCreator> &shader_creator, const gl::IRenderer::Viewport &viewport)
-		: base_renderer(base_renderer)
+	GuiRenderer::GuiRenderer(const std::shared_ptr<gl::IContext>& context, const gl::IRenderer::Viewport &viewport)
+		: base_renderer(context->getRenderer())
 	{
 		base_renderer->setViewport(viewport);
 
+		frame_buffer = context->getFrameCreator()->createFrame(viewport.width, viewport.height, gl::ImageFormat::RGBA);
+
+	    auto shader_creator = context->getShaderCreator();
         widget_shader = shader_creator->createShader(shaders::WidgetShader::vert, shaders::WidgetShader::frag);
         text_shader = shader_creator->createShader(font::shaders::TextShader::vert, font::shaders::TextShader::frag);
 
@@ -21,9 +23,6 @@ namespace yage::gui
 		widget_shader->setUniform("projection", projection);
 		widget_shader->setUniform("texture", 0);
 		text_shader->setUniform("projection", projection);
-        text_shader->setUniform("scale", 16.0f / 16.0f); // TODO: based on text size
-
-		//clearColor = math::Vec4<float>(1, 1, 1, 1);
 	}
     
     void GuiRenderer::render(RootWidget& root)
@@ -32,9 +31,11 @@ namespace yage::gui
         std::vector<std::reference_wrapper<font::Text>> texts;
         collect_drawables(widgets, texts, root);
 
-        base_renderer->setClearColor(gl::Color::WHITE);
-        base_renderer->clear();
+		base_renderer->setRenderTarget(*frame_buffer);
         base_renderer->enableBlending();
+		base_renderer->disableDepthTest();
+	    base_renderer->setClearColor(gl::Color::TRANSPARENT);
+	    base_renderer->clear();
 
         base_renderer->useShader(*widget_shader);
         for (auto widget : widgets) {
@@ -44,11 +45,16 @@ namespace yage::gui
 
         base_renderer->useShader(*text_shader);
         for (auto text : texts) {
+            text_shader->setUniform("scale", text.get().font_size() / 16.0f); // TODO: move this calculation to font package
             base_renderer->bindTexture(text.get().texture(), 0);
             base_renderer->draw(text.get().drawable());
         }
 
+		base_renderer->setDefaultRenderTarget();
+		base_renderer->draw(*frame_buffer);
+
         base_renderer->disableBlending();
+		base_renderer->enableDepthTest();
     }
 
     void GuiRenderer::collect_drawables(std::vector<std::reference_wrapper<Widget>>& vector_widget,

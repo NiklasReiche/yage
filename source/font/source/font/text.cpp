@@ -257,6 +257,11 @@ namespace yage::font
         m_drawable->setSubData(m_data_offset_coords, vertices);
     }
 
+    float Text::font_size() const
+    {
+        return m_font_size;
+    }
+
     math::Vec3f Text::char_offset(std::size_t i, math::Vec3f initial)
     {
         auto& font = m_font_resource.get();

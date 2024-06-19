@@ -6,7 +6,7 @@ namespace yage::gui
             : m_window(window), m_gl_context(glContext),
               m_texture_manager(TextureAtlasStore(window, glContext->getTextureCreator())),
               m_input_manager(InputManager(&m_root)),
-              m_renderer(GuiRenderer(glContext->getRenderer(), glContext->getShaderCreator(),
+              m_renderer(GuiRenderer(glContext,
                                      gl::IRenderer::Viewport{0, 0, window->getWidth(), window->getHeight()})),
               m_root(this)
     {
@@ -25,7 +25,7 @@ namespace yage::gui
         }
         m_finished_animations.clear();
 
-        // copy animations, since an animation update may update the animation vector rough callbacks
+        // copy animations, since an animation update may update the animation vector through callbacks
         std::vector<Animation*> worklist = m_animations;
         for (auto& animation: worklist) {
             animation->update(dt);

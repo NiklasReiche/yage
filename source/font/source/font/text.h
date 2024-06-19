@@ -117,6 +117,11 @@ namespace yage::font
         math::Vec3f relative_offset(std::size_t i);
 
         /**
+         * @return Font size in pt of this text.
+         */
+        [[nodiscard]] float font_size() const;
+
+        /**
          * Reconstructs the text geometry at an updated 3D offset.
          * @param offset New offset to use.
          */
