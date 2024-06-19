@@ -26,13 +26,13 @@ namespace yage::opengl
 			int width,
 			int height,
 			gl::ImageFormat textureFormat,
-			const std::span<const std::span<const unsigned char>, 6> &data) override;
+			const std::array<std::vector<unsigned char>, 6>& data) override;
 
 		std::unique_ptr<gl::ICubemap> createCubemap(
 			int width,
 			int height,
 			gl::ImageFormat textureFormat,
-			const std::span<const std::span<const unsigned char>, 6> &data,
+			const std::array<std::vector<unsigned char>, 6>& data,
 			gl::PixelTransferParams params) override;
 
 	private:

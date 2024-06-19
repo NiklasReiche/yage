@@ -23,4 +23,10 @@ namespace yage::gl3d::shaders
 
         static std::string get_frag();
     };
+
+	struct SkyboxShader
+	{
+		static const std::string vert;
+		static const std::string frag;
+	};
 }

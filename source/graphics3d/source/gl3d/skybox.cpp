@@ -1,88 +1,86 @@
 #include "skybox.h"
-#include <image/imageReader.h>
+#include <image/img.h>
+#include <numeric>
+#include "shaders.h"
 
 namespace yage::gl3d
 {
-	Skybox SkyboxLoader::loadSkybox(std::array<std::string, 6> paths, float boxSize, int textureSize)
+	Skybox loadSkybox(const platform::IFileReader& file_reader, gl::IContext& context, std::span<std::string, 6> paths,
+	                  const float box_size, const int texture_size)
 	{
 		std::array<img::Image, 6> images;
 		std::array<std::vector<unsigned char>, 6> faces;
-		gl::Texture2D temp;
 		
 		for (unsigned int i = 0; i < paths.size(); ++i) {
-			if (paths.at(i).size() != 0) {
-				images[i] = img::ImageReader::readFile(paths[i], img::FORCE_CHANNELS::RGB);
+			if (!paths[i].empty()) {
+				auto file = file_reader.openBinaryFile(paths[i], platform::IFile::AccessMode::READ);
+				images[i] = readFromFile(*file, img::FORCE_CHANNELS::RGB);
 #if 0
 				if (images.at(i).getWidth() != textureSize || images.at(i).getHeight() != textureSize) {
-					temp = images.at(i).toTexture(glContext->newTextureCreator());
+					gl::Texture2D temp = images.at(i).toTexture(glContext->newTextureCreator());
 					temp->resize(textureSize, textureSize);
 					images[i] = img::ImageReader::readTexture(temp);
 				}
 #endif
-				faces[i] = std::vector<unsigned char>(images[i].getRawData(), images[i].getRawData()+images[i].getWidth()*images[i].getHeight()*images[i].getChannels());
+				faces[i] = std::vector<unsigned char>(images[i].data(), images[i].data() + images[i].getSize());
 			}
 			else {
 				faces[i] = std::vector<unsigned char>();
 			}
 		}
 
-		std::vector<GLfloat> skyboxVertices = {
-			-boxSize,  boxSize, -boxSize,
-			-boxSize, -boxSize, -boxSize,
-			boxSize, -boxSize, -boxSize,
-			boxSize, -boxSize, -boxSize,
-			boxSize,  boxSize, -boxSize,
-			-boxSize,  boxSize, -boxSize,
+		std::vector<float> skyboxVertices = {
+			-box_size,  box_size, -box_size,
+			-box_size, -box_size, -box_size,
+			box_size, -box_size, -box_size,
+			box_size, -box_size, -box_size,
+			box_size,  box_size, -box_size,
+			-box_size,  box_size, -box_size,
 
-			-boxSize, -boxSize,  boxSize,
-			-boxSize, -boxSize, -boxSize,
-			-boxSize,  boxSize, -boxSize,
-			-boxSize,  boxSize, -boxSize,
-			-boxSize,  boxSize,  boxSize,
-			-boxSize, -boxSize,  boxSize,
+			-box_size, -box_size,  box_size,
+			-box_size, -box_size, -box_size,
+			-box_size,  box_size, -box_size,
+			-box_size,  box_size, -box_size,
+			-box_size,  box_size,  box_size,
+			-box_size, -box_size,  box_size,
 
-			boxSize, -boxSize, -boxSize,
-			boxSize, -boxSize,  boxSize,
-			boxSize,  boxSize,  boxSize,
-			boxSize,  boxSize,  boxSize,
-			boxSize,  boxSize, -boxSize,
-			boxSize, -boxSize, -boxSize,
+			box_size, -box_size, -box_size,
+			box_size, -box_size,  box_size,
+			box_size,  box_size,  box_size,
+			box_size,  box_size,  box_size,
+			box_size,  box_size, -box_size,
+			box_size, -box_size, -box_size,
 
-			-boxSize, -boxSize,  boxSize,
-			-boxSize,  boxSize,  boxSize,
-			boxSize,  boxSize,  boxSize,
-			boxSize,  boxSize,  boxSize,
-			boxSize, -boxSize,  boxSize,
-			-boxSize, -boxSize,  boxSize,
+			-box_size, -box_size,  box_size,
+			-box_size,  box_size,  box_size,
+			box_size,  box_size,  box_size,
+			box_size,  box_size,  box_size,
+			box_size, -box_size,  box_size,
+			-box_size, -box_size,  box_size,
 
-			-boxSize,  boxSize, -boxSize,
-			boxSize,  boxSize, -boxSize,
-			boxSize,  boxSize,  boxSize,
-			boxSize,  boxSize,  boxSize,
-			-boxSize,  boxSize,  boxSize,
-			-boxSize,  boxSize, -boxSize,
+			-box_size,  box_size, -box_size,
+			box_size,  box_size, -box_size,
+			box_size,  box_size,  box_size,
+			box_size,  box_size,  box_size,
+			-box_size,  box_size,  box_size,
+			-box_size,  box_size, -box_size,
 
-			-boxSize, -boxSize, -boxSize,
-			-boxSize, -boxSize,  boxSize,
-			boxSize, -boxSize, -boxSize,
-			boxSize, -boxSize, -boxSize,
-			-boxSize, -boxSize,  boxSize,
-			boxSize, -boxSize,  boxSize
+			-box_size, -box_size, -box_size,
+			-box_size, -box_size,  box_size,
+			box_size, -box_size, -box_size,
+			box_size, -box_size, -box_size,
+			-box_size, -box_size,  box_size,
+			box_size, -box_size,  box_size
 		};
 
+		std::vector<unsigned int> indices;
+		indices.reserve(36);
+		std::iota(indices.begin(), indices.end(), 0);
+
 		Skybox skybox;
-		skybox.cubemap = glContext->getTextureCreator()->createCubemap(faces, textureSize, textureSize, gl::ImageFormat::RGB);
-		skybox.drawable = glContext->getDrawableCreator()->createDrawable(skyboxVertices, std::vector<int>{3}, gl::VertexFormat::BATCHED);
-
-		std::string vertexShader =
-#include "shaders/skyboxShader.vert"
-			;
-		std::string fragmentShader =
-#include "shaders/skyboxShader.frag"
-			;
-
-		skybox.shader = glContext->getShaderCreator()->createShader(vertexShader, fragmentShader);
-
+		skybox.cubemap = context.getTextureCreator()->createCubemap(texture_size, texture_size, gl::ImageFormat::RGB, faces);
+		skybox.drawable = context.getDrawableCreator()->createDrawable(skyboxVertices, indices, std::vector<unsigned int>{3}, gl::VertexFormat::BATCHED);
+		skybox.shader = context.getShaderCreator()->createShader(shaders::SkyboxShader::vert, shaders::SkyboxShader::frag);
 		return skybox;
 	}
 }

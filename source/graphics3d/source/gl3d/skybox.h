@@ -1,32 +1,18 @@
 #pragma once
 
-#include <array>
 #include <string>
 
 #include <core/gl/graphics.h>
+#include <core/platform/IFileReader.h>
 
 namespace yage::gl3d
 {
-	class Skybox
+	struct Skybox
 	{
-	private:
-		friend class SkyboxLoader;
-
-	public:
-		gl::Drawable drawable;
-		gl::Cubemap cubemap;
-		gl::Shader shader;
+		std::unique_ptr<gl::IDrawable> drawable;
+		std::unique_ptr<gl::ICubemap> cubemap;
+		std::unique_ptr<gl::IShader> shader;
 	};
 
-	class SkyboxLoader
-	{
-	private:
-		gl::Context glContext;
-
-	public:
-		SkyboxLoader(gl::Context glContext)
-			: glContext(glContext){}
-
-		Skybox loadSkybox(std::array<std::string, 6> dirpath, float boxSize, int textureSize);
-	};
+	Skybox load_skybox(platform::IFileReader& file_reader, gl::IContext& context, std::span<std::string, 6> paths, float box_size, int texture_size);
 }

@@ -84,9 +84,7 @@ namespace yage::gl
                 PixelTransferParams params) = 0;
 
 		/**
-		 * @brief Creates a new Cubemap texture.
-		 *
-		 *
+		 * Creates a new Cubemap texture.
 		 *
 		 * @param width Width of a single cubemap face texture.
 		 * @param height Height of a single cubemap face texture.
@@ -104,12 +102,10 @@ namespace yage::gl
 			int width,
 			int height,
 			ImageFormat textureFormat,
-			const std::span<const std::span<const unsigned char>, 6> &data) = 0;
+			const std::array<std::vector<unsigned char>, 6>& data) = 0;
 
 		/**
-		 * @brief Creates a new Cubemap texture.
-		 *
-		 *
+		 * Creates a new Cubemap texture.
 		 *
 		 * @param width Width of a single cubemap face texture.
 		 * @param height Height of a single cubemap face texture.
@@ -128,7 +124,7 @@ namespace yage::gl
 			int width,
 			int height,
 			ImageFormat textureFormat,
-			const std::span<const std::span<const unsigned char>, 6> &data,
+			const std::array<std::vector<unsigned char>, 6>& data,
 			PixelTransferParams params) = 0;
 
 	protected:

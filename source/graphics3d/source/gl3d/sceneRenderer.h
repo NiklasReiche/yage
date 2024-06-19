@@ -2,13 +2,11 @@
 
 #include <memory>
 
-#include <utils/strings.h>
 #include <core/gl/graphics.h>
+
 #include "sceneGraph/sceneNode.h"
 #include "sceneGraph/sceneGroup.h"
 #include "sceneGraph/sceneObject.h"
-#include "material.h"
-#include "mesh.h"
 #include "light.h"
 
 namespace yage::gl3d

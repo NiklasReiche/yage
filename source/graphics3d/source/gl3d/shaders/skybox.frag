@@ -1,5 +1,3 @@
-R"(
-
 #version 330 core
 
 in vec3 TexCoord;
@@ -12,5 +10,3 @@ uniform samplerCube skybox;
 void main(){
 	color = texture(skybox, TexCoord);
 }
-
-)"

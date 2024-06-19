@@ -85,7 +85,7 @@ namespace yage::opengl
 		int width,
 		int height,
 		gl::ImageFormat textureFormat,
-		const std::span<const std::span<const unsigned char>, 6> &data)
+		const std::array<std::vector<unsigned char>, 6>& data)
 	{
 		return createCubemap(width, height, textureFormat, data, { textureFormat, gl::RowAlignment::B_1 });
 	}
@@ -94,7 +94,7 @@ namespace yage::opengl
 		int width,
 		int height,
 		gl::ImageFormat textureFormat,
-		const std::span<const std::span<const unsigned char>, 6> &data,
+		const std::array<std::vector<unsigned char>, 6>& data,
 		gl::PixelTransferParams params)
 	{
 		if (width <= 0 || height <= 0)

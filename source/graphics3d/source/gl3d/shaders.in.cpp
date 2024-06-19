@@ -7,6 +7,9 @@ namespace yage::gl3d::shaders{
     const std::string PbrShader::vert = R"(@PBR_VERT@)";
     const std::string PbrShader::frag = R"(@PBR_FRAG@)";
 
+    const std::string SkyboxShader::vert = R"(@SKYBOX_VERT@)";
+    const std::string SkyboxShader::frag = R"(@SKYBOX_FRAG@)";
+
     std::string PbrNormalMappingShader::get_vert()
     {
         return vert;
