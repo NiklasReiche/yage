@@ -41,6 +41,8 @@ target_sources(yage_gl3d
 
         sceneRenderer.h
         sceneRenderer.cpp
+        ProjectionView.h
+        ProjectionView.cpp
 
         resources/obj.h
         resources/obj.cpp

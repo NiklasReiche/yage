@@ -2,8 +2,6 @@ add_executable(physics_billiards
 	"main.cpp"
 	"MovementListener.h"
 	"MovementListener.cpp"
-	"ProjectionView.h"
-	"ProjectionView.cpp"
 	"app.h" 
 )
 

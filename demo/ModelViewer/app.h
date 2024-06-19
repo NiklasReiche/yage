@@ -26,20 +26,19 @@ public:
         glContext = gl::createContext(window);
 
         camera = std::make_shared<gl3d::Camera>();
-        camera->look_at(math::Vec3d(5, 5, 5), math::Vec3d(0, 0, 0));
 
         baseRenderer = glContext->getRenderer();
         baseRenderer->enableDepthTest();
         baseRenderer->setViewport(0, 0, 1500, 900);
-        renderer = std::make_unique<gl3d::SceneRenderer>(baseRenderer);
+        renderer = std::make_unique<gl3d::SceneRenderer>(*glContext);
 
-        auto fileReader = platform::desktop::FileReader();
-        std::string csVertexShader = fileReader.openTextFile("assets/shaders/pointShader.vert",
-                                                             platform::IFile::AccessMode::READ)->readAll();
-        std::string csFragmentShader = fileReader.openTextFile("assets/shaders/pointShader.frag",
-                                                               platform::IFile::AccessMode::READ)->readAll();
-        std::string csGeometryShader = fileReader.openTextFile("assets/shaders/pointShader.geom",
-                                                               platform::IFile::AccessMode::READ)->readAll();
+        const auto fileReader = platform::desktop::FileReader();
+        const std::string csVertexShader = fileReader.openTextFile("assets/shaders/pointShader.vert",
+                                                                   platform::IFile::AccessMode::READ)->readAll();
+        const std::string csFragmentShader = fileReader.openTextFile("assets/shaders/pointShader.frag",
+                                                                     platform::IFile::AccessMode::READ)->readAll();
+        const std::string csGeometryShader = fileReader.openTextFile("assets/shaders/pointShader.geom",
+                                                                     platform::IFile::AccessMode::READ)->readAll();
         csShader = glContext->getShaderCreator()->createShader(csVertexShader, csFragmentShader, csGeometryShader);
 
         pbrShader = glContext->getShaderCreator()->createShader(gl3d::shaders::PbrShader::vert,
@@ -48,9 +47,7 @@ public:
                                                                 gl3d::shaders::PbrNormalMappingShader::frag);
 
         auto ubo = glContext->getShaderCreator()->createUniformBlock("ProjectionView");
-        pbrShader->linkUniformBlock(*ubo);
-        pbrShaderNormalMapping->linkUniformBlock(*ubo);
-        csShader->linkUniformBlock(*ubo);
+        csShader->linkUniformBlock(renderer->projection_view().ubo());
 
         projViewUniform = ProjectionView(ubo);
         projViewUniform.projection = math::matrix::perspective<float>(90.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
@@ -101,7 +98,7 @@ public:
 
             baseRenderer->useShader(*pbrShader);
 
-            renderer->render_graph(scene);
+            renderer->render_graph(scene, *camera);
 
             window->swapBuffers();
             window->pollEvents();

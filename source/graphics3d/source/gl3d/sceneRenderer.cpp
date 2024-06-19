@@ -9,12 +9,13 @@ namespace yage::gl3d
         math::Mat4d transform;
     };
 
-    SceneRenderer::SceneRenderer(std::shared_ptr<gl::IRenderer> renderer)
-            : m_renderer(std::move(renderer))
+    SceneRenderer::SceneRenderer(gl::IContext& context)
+        : m_renderer(context.getRenderer()),
+          m_projection_view(context.getShaderCreator()->createUniformBlock("ProjectionView"))
     {
     }
 
-    void SceneRenderer::render_graph(const std::shared_ptr<SceneNode>& root)
+    void SceneRenderer::render_graph(const std::shared_ptr<SceneNode>& root, const Camera& target_camera)
     {
         std::vector<Geometry> drawablesLoop;
         m_uniform_values.point_lights.clear();
@@ -46,10 +47,16 @@ namespace yage::gl3d
 
         root->apply(collectGeometry, math::matrix::Id4d);
 
+        m_projection_view.view = static_cast<math::Mat4f>(target_camera.view_matrix());
+        m_projection_view.sync();
+
         // TODO: sort by shader
         for (auto& [mesh, transform]: drawablesLoop) {
             for (const auto& sub_mesh: mesh->sub_meshes()) {
                 auto shader = sub_mesh->material().shader();
+
+                // TODO: don't do this every frame
+                shader->linkUniformBlock(m_projection_view.ubo());
 
                 // TODO: lights should probably not be uniforms, but rather UBOs or SSBOs
                 shader->setUniform(std::string(ShaderSnippets::DIR_LIGHTS_AMOUNT_NAME),
@@ -63,6 +70,11 @@ namespace yage::gl3d
                     m_uniform_values.point_lights[i]->update_uniforms(*shader, i);
                 }
 
+                if (shader->hasUniform("camPos"))
+                {
+                    shader->setUniform("camPos", static_cast<math::Vec3f>(target_camera.position()));
+                }
+
                 shader->setUniform("model", static_cast<math::Mat4f>(transform));
                 sub_mesh->material().update_shader_uniforms();
                 sub_mesh->material().bind_textures(*m_renderer);
@@ -70,5 +82,25 @@ namespace yage::gl3d
                 m_renderer->draw(sub_mesh->drawable());
             }
         }
+    }
+
+    math::Mat4f& SceneRenderer::projection()
+    {
+        return m_projection_view.projection;
+    }
+
+    math::Mat4f& SceneRenderer::view()
+    {
+        return m_projection_view.view;
+    }
+
+    const ProjectionView& SceneRenderer::projection_view()
+    {
+        return m_projection_view;
+    }
+
+    gl::IRenderer& SceneRenderer::base_renderer()
+    {
+        return *m_renderer;
     }
 }
