@@ -13,6 +13,7 @@
 #include <gl3d/shaders.h>
 
 #include "MovementListener.h"
+#include <gui/gui.h>
 
 using namespace yage;
 
@@ -64,6 +65,39 @@ public:
         inputListener.pbrShader2 = pbrShaderNormalMapping;
         inputListener.world = scene;
         window->attach(inputListener);
+
+        font::FontFileLoader fontLoader(glContext->getTextureCreator(), window->getFileReader());
+        font = fontStore.loadResource(fontLoader, std::string("assets/fonts/OpenSans-Regular.font"));
+
+        gui = std::make_unique<gui::Master>(window, glContext);
+        auto frame = gui->create_widget<gui::ListBox>(gui::ListBoxTemplate{
+            .base = {
+                .geometry = {
+                    .size_hint = math::Vec2(gui::SizeHint::FIT_CHILDREN),
+                },
+                .color = gl::Color::WHITE,
+                .padding = {2, 2, 2, 2},
+            },
+            .orientation = gui::ListBoxTemplate::VERTICAL,
+        });
+        frame->create_widget<gui::Label>(gui::LabelTemplate{
+            .text = {
+                .text = U"Controls:",
+                .font = font.value(),
+            },
+        });
+        frame->create_widget<gui::Label>(gui::LabelTemplate{
+            .text = {
+                .text = U"Zoom in/out: scroll mouse",
+                .font = font.value(),
+            },
+        });
+        frame->create_widget<gui::Label>(gui::LabelTemplate{
+            .text = {
+                .text = U"Pan: left-click + drag mouse",
+                .font = font.value(),
+            },
+        });
     }
 
 
@@ -91,6 +125,9 @@ public:
 
             renderer->render_graph(scene, *camera);
 
+            gui->update(1/60.);
+            gui->render();
+
             window->swapBuffers();
             window->pollEvents();
         }
@@ -107,6 +144,9 @@ private:
     std::shared_ptr<gl3d::Camera> camera;
     std::shared_ptr<gl::IRenderer> baseRenderer;
     std::unique_ptr<gl3d::SceneRenderer> renderer;
+    res::Store<font::Font> fontStore;
+    std::optional<res::Resource<font::Font>> font;
+    std::unique_ptr<gui::Master> gui;
 
     std::shared_ptr<gl3d::SceneGroup> scene;
 

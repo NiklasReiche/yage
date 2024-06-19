@@ -5,7 +5,7 @@ add_executable(model_viewer
 )
 
 target_link_libraries(model_viewer
-	PUBLIC yage_core yage_gl3d
+	PUBLIC yage_core yage_gl3d yage_gui
 )
 
 add_custom_command(TARGET model_viewer POST_BUILD
