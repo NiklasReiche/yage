@@ -3,11 +3,11 @@
 
 namespace yage
 {
-    Engine::Engine(std::unique_ptr<Application> application, int width, int height, const std::string& title)
-        : m_application(std::move(application)),
-          m_window(std::make_unique<platform::desktop::GlfwWindow>(width, height, title)),
-          m_physics(physics3d::Visualizer())
+    Engine::Engine(int width, int height, const std::string& title)
+        : physics(physics3d::Visualizer()),
+          m_window(std::make_unique<platform::desktop::GlfwWindow>(width, height, title))
     {
+        m_gl_context = gl::createContext(m_window);
     }
 
     void Engine::run()
@@ -25,16 +25,17 @@ namespace yage
                 while (accumulator >= dt) {
                     m_application->pre_physics_update();
                     if (enable_physics_visualization) {
-                        m_physics.update_staggered(dt);
+                        physics.update_staggered(dt);
                     } else {
-                        m_physics.update(dt);
+                        physics.update(dt);
                     }
                     accumulator -= dt;
                 }
             }
 
+            m_scene_renderer->base_renderer().clear();
             m_application->pre_render_update();
-            m_scene_renderer->render_graph(scene);
+            m_scene_renderer->render_graph(scene, render_camera);
 
             m_window->swapBuffers();
             m_window->pollEvents();
