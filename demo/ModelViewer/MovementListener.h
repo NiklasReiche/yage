@@ -7,7 +7,6 @@
 #include <gl3d/camera.h>
 
 #include <utility>
-#include "ProjectionView.h"
 
 using namespace yage;
 
@@ -25,8 +24,6 @@ public:
     std::shared_ptr<gl3d::SceneNode> world;
     std::shared_ptr<gl::IShader> pbrShader;
     std::shared_ptr<gl::IShader> pbrShader2;
-    ProjectionView* m_projection_view;
-    math::Vec3f camPos;
 
 	MovementListener() = default;
 
@@ -53,6 +50,7 @@ public:
 			math::Vec2f dist = mouse.pos - math::Vec2f(x, y);
 			math::Vec2f angle = dist * mouse.sensitivity;
 
+			math::Vec3f camPos = static_cast<math::Vec3f>(camera->position());
             auto x_axis = std::abs(camPos.z()) > std::abs(camPos.x()) ? math::Vec3f(1, 0, 0) : math::Vec3f(0, 0, 1);
 
             auto newPos =
@@ -61,10 +59,7 @@ public:
                     math::Vec4f(camPos.x(), camPos.y(), camPos.z(), 1);
             camPos = {newPos.x() / newPos.w(), newPos.y() / newPos.w(), newPos.z() / newPos.w()};
 
-            m_projection_view->view = math::matrix::look_at<float>(camPos, math::Vec3f(0, 0, 0));
-            m_projection_view->syncView();
-            pbrShader->setUniform("camPos", camPos);
-            pbrShader2->setUniform("camPos", camPos);
+            camera->look_at(static_cast<math::Vec3d>(camPos), math::Vec3d(0.0));
 		}
 		mouse.pos = math::Vec2f(x, y);
 	}

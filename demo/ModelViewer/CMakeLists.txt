@@ -1,8 +1,6 @@
 add_executable(model_viewer
 	"main.cpp"
 	"MovementListener.h"
-	"ProjectionView.h"
-	"ProjectionView.cpp"
 	"app.h" 
 )
 

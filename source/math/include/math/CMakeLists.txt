@@ -7,4 +7,5 @@ target_sources(yage_math INTERFACE
         quaternion.h
         vector.h
         matrix.h
+        generators.h
 )

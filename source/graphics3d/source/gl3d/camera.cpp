@@ -70,9 +70,15 @@ namespace yage::gl3d
 		m_rotation = normalize(m_rotation);
 	}
 
+	void Camera::look_at(const math::Vec3d& position, const math::Vec3d& target)
+	{
+		m_position = position;
+		m_rotation = math::quaternion::look_at(position, target);
+	}
+
 	math::Mat4d Camera::view_matrix() const
 	{
-		return math::matrix::look_at<double>(m_position, m_position + m_rotation.forward_direction(), m_rotation.up_direction());
+		return math::matrix::from_quaternion(m_rotation) * math::matrix::translate(-m_position);
 	}
 
 	math::Vec3d Camera::position() const

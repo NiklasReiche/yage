@@ -33,6 +33,8 @@ namespace yage::gl3d
 
         void rotate_roll(double degree);
 
+        void look_at(const math::Vec3d& position, const math::Vec3d& target);
+
         [[nodiscard]] math::Mat4d view_matrix() const;
 
         [[nodiscard]] math::Vec3d position() const;

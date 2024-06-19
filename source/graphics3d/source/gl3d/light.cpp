@@ -1,6 +1,7 @@
 #include "light.h"
 #include "shaderSnippets.h"
 #include <utils/strings.h>
+#include <math/generators.h>
 
 namespace yage::gl3d
 {

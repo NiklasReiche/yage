@@ -13,7 +13,6 @@
 #include <gl3d/shaders.h>
 
 #include "MovementListener.h"
-#include "ProjectionView.h"
 
 using namespace yage;
 
@@ -26,6 +25,7 @@ public:
         glContext = gl::createContext(window);
 
         camera = std::make_shared<gl3d::Camera>();
+        camera->look_at(math::Vec3d(5, 5, 5), math::Vec3d(0, 0, 0));
 
         baseRenderer = glContext->getRenderer();
         baseRenderer->enableDepthTest();
@@ -46,16 +46,9 @@ public:
         pbrShaderNormalMapping = glContext->getShaderCreator()->createShader(gl3d::shaders::PbrNormalMappingShader::vert,
                                                                 gl3d::shaders::PbrNormalMappingShader::frag);
 
-        auto ubo = glContext->getShaderCreator()->createUniformBlock("ProjectionView");
         csShader->linkUniformBlock(renderer->projection_view().ubo());
 
-        projViewUniform = ProjectionView(ubo);
-        projViewUniform.projection = math::matrix::perspective<float>(90.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
-        projViewUniform.syncProjection();
-        projViewUniform.view = math::matrix::look_at<float>(math::Vec3f(5, 5, 5), math::Vec3f(0, 0, 0));
-        projViewUniform.syncView();
-        pbrShader->setUniform("camPos", math::Vec3f(5, 5, 5));
-        pbrShaderNormalMapping->setUniform("camPos", math::Vec3f(5, 5, 5));
+        renderer->projection() = math::matrix::perspective<float>(90.0f, 1500.0f / 900.0f, 0.1f, 1000.0f);
 
         scene = loadScene(filename);
 
@@ -69,9 +62,7 @@ public:
         inputListener = MovementListener(window, camera);
         inputListener.pbrShader = pbrShader;
         inputListener.pbrShader2 = pbrShaderNormalMapping;
-        inputListener.m_projection_view = &projViewUniform;
         inputListener.world = scene;
-        inputListener.camPos = math::Vec3f(5);
         window->attach(inputListener);
     }
 
@@ -109,8 +100,6 @@ private:
     std::shared_ptr<platform::IWindow> window;
     std::shared_ptr<gl::IContext> glContext;
     MovementListener inputListener;
-
-    ProjectionView projViewUniform;
 
     std::shared_ptr<gl::IShader> csShader;
     std::shared_ptr<gl::IShader> pbrShader;
