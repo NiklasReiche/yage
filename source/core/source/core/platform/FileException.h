@@ -19,11 +19,11 @@ namespace yage::platform
 		};
 
 		explicit FileException(const ErrorCode code, const std::string& msg = "", std::string filename = "")
-			: std::runtime_error(msg), code(code), filename(std::move(filename))
+			: std::runtime_error("cannot open file: " + filename + "(" + msg + ")"), code(code), m_filename(std::move(filename))
 		{ }
 
 		explicit FileException(std::string filename = "")
-			: std::runtime_error(""), code(ErrorCode::UNKNOWN), filename(std::move(filename))
+			: std::runtime_error("cannot open file: " + filename), code(ErrorCode::UNKNOWN), m_filename(std::move(filename))
 		{ }
 
 		[[nodiscard]]
@@ -35,12 +35,12 @@ namespace yage::platform
 		[[nodiscard]]
 		std::string file() const
 		{
-			return filename;
+			return m_filename;
 		}
 
 	private:
 		ErrorCode code;
-		std::string filename;
+		std::string m_filename;
 	};
 
 	class FileOpenException : public FileException
