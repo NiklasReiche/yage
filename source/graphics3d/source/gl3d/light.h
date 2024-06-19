@@ -2,9 +2,6 @@
 
 #include <math/vector.h>
 #include <core/gl/Shader.h>
-#include <utils/strings.h>
-
-#include "shaderSnippets.h"
 
 namespace yage::gl3d
 {
@@ -21,11 +18,11 @@ namespace yage::gl3d
 
         virtual ~Light() = default;
 
-        virtual void update_from_transform(math::Mat4d transform) = 0;
+        virtual void update_from_transform(const math::Mat4d& transform) = 0;
 
         virtual void update_uniforms(gl::IShader& shader, std::size_t i) = 0;
 
-        LightType type();
+        [[nodiscard]] LightType type() const;
 
     protected:
         explicit Light(LightType type);
@@ -34,7 +31,7 @@ namespace yage::gl3d
         LightType m_type;
     };
 
-    class DirectionalLight : public Light
+    class DirectionalLight final : public Light
     {
     public:
         math::Vec3f direction;
@@ -43,10 +40,10 @@ namespace yage::gl3d
 
         void update_uniforms(gl::IShader& shader, std::size_t i) override;
 
-        void update_from_transform(math::Mat4d transform) override;
+        void update_from_transform(const math::Mat4d& transform) override;
     };
 
-    class PointLight : public Light
+    class PointLight final : public Light
     {
     public:
         math::Vec3f position;
@@ -55,6 +52,6 @@ namespace yage::gl3d
 
         void update_uniforms(gl::IShader& shader, std::size_t i) override;
 
-        void update_from_transform(math::Mat4d transform) override;
+        void update_from_transform(const math::Mat4d& transform) override;
     };
 }

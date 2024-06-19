@@ -12,7 +12,7 @@ namespace yage::gl3d
 	/**
 	 * Represents a leaf node in a scene graph. Does not have children, but can reference a mesh, a light, and a camera.
 	 */
-	class SceneObject : public SceneNode
+	class SceneObject final : public SceneNode
 	{
 	public:
         std::shared_ptr<Mesh> mesh = nullptr;

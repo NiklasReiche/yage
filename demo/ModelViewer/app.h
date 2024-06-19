@@ -26,7 +26,7 @@ public:
         glContext = gl::createContext(window);
 
         camera = std::make_shared<gl3d::Camera>();
-        camera->lookAt(math::Vec3d(5, 5, 5), math::Vec3d(0, 0, 0));
+        camera->look_at(math::Vec3d(5, 5, 5), math::Vec3d(0, 0, 0));
 
         baseRenderer = glContext->getRenderer();
         baseRenderer->enableDepthTest();
@@ -101,7 +101,7 @@ public:
 
             baseRenderer->useShader(*pbrShader);
 
-            renderer->renderGraph(scene);
+            renderer->render_graph(scene);
 
             window->swapBuffers();
             window->pollEvents();

@@ -6,74 +6,81 @@ namespace yage::gl3d
 		m_position = math::Vec3d(0.0);
 		m_rotation = math::Quatd();
 	}
-	Camera::Camera(const math::Vec3d& position, math::Quatd rotation) {
+
+	Camera::Camera(const math::Vec3d& position, const math::Quatd& rotation) {
 		m_position = position;
 		m_rotation = rotation;
 	}
 
-	void Camera::move(const math::Vec3d& vector)
+	void Camera::move_by(const math::Vec3d& vector)
 	{
 		m_position += vector;
 	}
-	void Camera::moveTo(math::Vec3d _position)
+
+	void Camera::move_to(const math::Vec3d& position)
 	{
-		m_position = _position;
+		m_position = position;
 	}
-	void Camera::moveForward(double amount)
+
+	void Camera::move_forward(const double amount)
 	{
 		m_position += m_rotation.forward_direction() * amount;
 	}
-	void Camera::moveBackward(double amount)
+
+	void Camera::move_backward(const double amount)
 	{
 		m_position -= m_rotation.forward_direction() * amount;
 	}
-	void Camera::moveLeft(double amount)
+
+	void Camera::move_left(const double amount)
 	{
 		m_position -= m_rotation.right_direction() * amount;
 	}
-	void Camera::moveRight(double amount)
+
+	void Camera::move_right(const double amount)
 	{
 		m_position += m_rotation.right_direction() * amount;
 	}
 
-	void Camera::rotate(math::Quatd quaternion)
+	void Camera::rotate_by(const math::Quatd& quaternion)
 	{
 		m_rotation *= quaternion;
 	}
-	void Camera::rotateTo(math::Quatd _rotation)
+
+	void Camera::rotate_to(const math::Quatd& rotation)
 	{
-		m_rotation = _rotation;
-	}
-	void Camera::rotateYaw(double degree)
-	{
-		m_rotation = this->m_rotation * math::quaternion::euler_angle<double>(math::to_rad(degree), 0, 0);
-		m_rotation = math::normalize(this->m_rotation);
-	}
-	void Camera::rotatePitch(double degree)
-	{
-		m_rotation = this->m_rotation * math::quaternion::euler_angle<double>(0, 0, math::to_rad(-degree));
-		m_rotation = math::normalize(this->m_rotation);
-	}
-	void Camera::rotateRoll(double degree)
-	{
-		m_rotation = this->m_rotation * math::quaternion::euler_angle<double>(0, math::to_rad(degree), 0);
-		m_rotation = math::normalize(this->m_rotation);
+		m_rotation = rotation;
 	}
 
-	void Camera::lookAt(math::Vec3d, math::Vec3d)
+	void Camera::rotate_yaw(const double degree)
 	{
-        // TODO
+		m_rotation = m_rotation * math::quaternion::euler_angle<double>(math::to_rad(degree), 0, 0);
+		m_rotation = normalize(m_rotation);
 	}
 
-	math::Mat4d Camera::getViewMatrix() const
+	void Camera::rotate_pitch(const double degree)
+	{
+		m_rotation = m_rotation * math::quaternion::euler_angle<double>(0, 0, math::to_rad(-degree));
+		m_rotation = normalize(m_rotation);
+	}
+
+	void Camera::rotate_roll(const double degree)
+	{
+		m_rotation = m_rotation * math::quaternion::euler_angle<double>(0, math::to_rad(degree), 0);
+		m_rotation = normalize(m_rotation);
+	}
+
+	math::Mat4d Camera::view_matrix() const
 	{
 		return math::matrix::look_at<double>(m_position, m_position + m_rotation.forward_direction(), m_rotation.up_direction());
 	}
-	math::Vec3d Camera::getPosition() const
+
+	math::Vec3d Camera::position() const
 	{
 		return m_position;
 	}
-	math::Quatd Camera::getRotation() const
+
+	math::Quatd Camera::rotation() const
 	{
 		return m_rotation;
 	}

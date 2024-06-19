@@ -98,16 +98,16 @@ public:
 	void applyUpdate()
 	{
 		if (keyStates[input::KeyEvent::Code::KEY_W]) {
-			camera->moveForward(speed);
+			camera->move_forward(speed);
 		}
 		if (keyStates[input::KeyEvent::Code::KEY_A]) {
-			camera->moveLeft(speed);
+			camera->move_left(speed);
 		}
 		if (keyStates[input::KeyEvent::Code::KEY_S]) {
-			camera->moveBackward(speed);
+			camera->move_backward(speed);
 		}
 		if (keyStates[input::KeyEvent::Code::KEY_D]) {
-			camera->moveRight(speed);
+			camera->move_right(speed);
 		}
 	}
 

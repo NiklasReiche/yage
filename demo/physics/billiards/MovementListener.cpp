@@ -23,8 +23,8 @@ void MovementListener::onMousePosEvent(const input::MousePosEvent& event)
 
         math::Quatd q_yaw = math::quaternion::euler_angle<double>(math::to_rad(angle.x()), 0.0, 0.0);
         math::Quatd q_pitch = math::quaternion::euler_angle<double>(0.0, 0.0, -math::to_rad(angle.y()));
-        math::Quatd rotation = math::normalize(q_yaw * camera->getRotation() * q_pitch);
-        camera->rotateTo(rotation);
+        math::Quatd rotation = math::normalize(q_yaw * camera->rotation() * q_pitch);
+        camera->rotate_to(rotation);
     }
     mouse.pos = math::Vec2f(x, y);
 }
@@ -32,16 +32,16 @@ void MovementListener::onMousePosEvent(const input::MousePosEvent& event)
 void MovementListener::applyUpdate()
 {
     if (keyStates[input::KeyEvent::Code::KEY_W]) {
-        camera->moveForward(speed);
+        camera->move_forward(speed);
     }
     if (keyStates[input::KeyEvent::Code::KEY_A]) {
-        camera->moveLeft(speed);
+        camera->move_left(speed);
     }
     if (keyStates[input::KeyEvent::Code::KEY_S]) {
-        camera->moveBackward(speed);
+        camera->move_backward(speed);
     }
     if (keyStates[input::KeyEvent::Code::KEY_D]) {
-        camera->moveRight(speed);
+        camera->move_right(speed);
     }
 }
 

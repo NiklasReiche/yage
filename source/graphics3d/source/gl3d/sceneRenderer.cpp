@@ -1,4 +1,5 @@
 #include "sceneRenderer.h"
+#include "shaderSnippets.h"
 
 namespace yage::gl3d
 {
@@ -9,15 +10,15 @@ namespace yage::gl3d
     };
 
     SceneRenderer::SceneRenderer(std::shared_ptr<gl::IRenderer> renderer)
-            : renderer(std::move(renderer))
+            : m_renderer(std::move(renderer))
     {
     }
 
-    void SceneRenderer::renderGraph(const std::shared_ptr<SceneNode>& root)
+    void SceneRenderer::render_graph(const std::shared_ptr<SceneNode>& root)
     {
         std::vector<Geometry> drawablesLoop;
-        uniformValues.point_lights.clear();
-        uniformValues.dir_lights.clear();
+        m_uniform_values.point_lights.clear();
+        m_uniform_values.dir_lights.clear();
 
         auto collectGeometry = [this, &drawablesLoop](SceneObject& node) {
             const auto& transform = node.world_transform();
@@ -28,16 +29,16 @@ namespace yage::gl3d
                 node.light->update_from_transform(transform);
                 switch (node.light->type()) {
                     case LightType::DIRECTIONAL_LIGHT:
-                        uniformValues.dir_lights.push_back(node.light);
+                        m_uniform_values.dir_lights.push_back(node.light);
                         break;
                     case LightType::POINT_LIGHT:
-                        uniformValues.point_lights.push_back(node.light);
+                        m_uniform_values.point_lights.push_back(node.light);
                         break;
                 }
             }
             if (node.camera) {
-                node.camera->moveTo(transform.translation());
-                node.camera->rotateTo(math::quaternion::from_matrix<double>(transform.rotation()));
+                node.camera->move_to(transform.translation());
+                node.camera->rotate_to(math::quaternion::from_matrix<double>(transform.rotation()));
             }
         };
 
@@ -46,27 +47,27 @@ namespace yage::gl3d
         root->apply(collectGeometry, math::matrix::Id4d);
 
         // TODO: sort by shader
-        for (auto& geometry: drawablesLoop) {
-            for (auto& sub_mesh: geometry.mesh->sub_meshes()) {
+        for (auto& [mesh, transform]: drawablesLoop) {
+            for (const auto& sub_mesh: mesh->sub_meshes()) {
                 auto shader = sub_mesh->material().shader();
 
                 // TODO: lights should probably not be uniforms, but rather UBOs or SSBOs
                 shader->setUniform(std::string(ShaderSnippets::DIR_LIGHTS_AMOUNT_NAME),
-                                   static_cast<int>(uniformValues.dir_lights.size()));
-                for (std::size_t i = 0; i < uniformValues.dir_lights.size(); ++i) {
-                    uniformValues.dir_lights[i]->update_uniforms(*shader, i);
+                                   static_cast<int>(m_uniform_values.dir_lights.size()));
+                for (std::size_t i = 0; i < m_uniform_values.dir_lights.size(); ++i) {
+                    m_uniform_values.dir_lights[i]->update_uniforms(*shader, i);
                 }
                 shader->setUniform(std::string(ShaderSnippets::POINT_LIGHTS_AMOUNT_NAME),
-                                   static_cast<int>(uniformValues.point_lights.size()));
-                for (std::size_t i = 0; i < uniformValues.point_lights.size(); ++i) {
-                    uniformValues.point_lights[i]->update_uniforms(*shader, i);
+                                   static_cast<int>(m_uniform_values.point_lights.size()));
+                for (std::size_t i = 0; i < m_uniform_values.point_lights.size(); ++i) {
+                    m_uniform_values.point_lights[i]->update_uniforms(*shader, i);
                 }
 
-                shader->setUniform("model", static_cast<math::Mat4f>(geometry.transform));
+                shader->setUniform("model", static_cast<math::Mat4f>(transform));
                 sub_mesh->material().update_shader_uniforms();
-                sub_mesh->material().bind_textures(*renderer);
+                sub_mesh->material().bind_textures(*m_renderer);
 
-                renderer->draw(sub_mesh->drawable());
+                m_renderer->draw(sub_mesh->drawable());
             }
         }
     }

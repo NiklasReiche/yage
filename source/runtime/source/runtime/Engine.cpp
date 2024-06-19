@@ -34,7 +34,7 @@ namespace yage
             }
 
             m_application->pre_render_update();
-            m_scene_renderer->renderGraph(scene);
+            m_scene_renderer->render_graph(scene);
 
             m_window->swapBuffers();
             m_window->pollEvents();

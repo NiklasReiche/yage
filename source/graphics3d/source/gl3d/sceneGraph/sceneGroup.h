@@ -11,7 +11,7 @@ namespace yage::gl3d
 	/**
 	 * Represents a composite node in a scene graph. Contains children and delegates all work to them.
 	 */
-	class SceneGroup : public SceneNode
+	class SceneGroup final : public SceneNode
 	{
 	public:
         explicit SceneGroup(const std::string_view& name, const math::Mat4d& transform = math::matrix::Id4d);
@@ -25,7 +25,7 @@ namespace yage::gl3d
          */
         SceneGroup& create_group(const auto&... args)
         {
-            auto ptr = std::unique_ptr<SceneGroup>(new SceneGroup(args...));
+            auto ptr = std::make_unique<SceneGroup>(args...);
             SceneGroup* raw_ptr = ptr.get();
             m_children.push_back(std::move(ptr));
             return *raw_ptr;
@@ -38,7 +38,7 @@ namespace yage::gl3d
          */
         SceneObject& create_object(const auto&... args)
         {
-            auto ptr = std::unique_ptr<SceneObject>(new SceneObject(args...));
+            auto ptr = std::make_unique<SceneObject>(args...);
             SceneObject* raw_ptr = ptr.get();
             m_children.push_back(std::move(ptr));
             return *raw_ptr;

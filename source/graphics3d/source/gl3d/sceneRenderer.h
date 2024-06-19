@@ -27,10 +27,10 @@ namespace yage::gl3d
 	public:
 		explicit SceneRenderer(std::shared_ptr<gl::IRenderer> renderer);
 
-		void renderGraph(const std::shared_ptr<SceneNode>& root);
+		void render_graph(const std::shared_ptr<SceneNode>& root);
 
 	private:
-		std::shared_ptr<gl::IRenderer> renderer;
-		ShaderUniformValues uniformValues;
+		std::shared_ptr<gl::IRenderer> m_renderer;
+		ShaderUniformValues m_uniform_values;
 	};
 }

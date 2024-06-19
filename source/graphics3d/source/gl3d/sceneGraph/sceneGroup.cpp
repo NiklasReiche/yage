@@ -11,7 +11,7 @@ namespace yage::gl3d
     void SceneGroup::apply(const std::function<void(SceneObject&)>& f, const math::Mat4d& parent_transform)
     {
         apply_transform(parent_transform);
-        for (auto& child : m_children) {
+        for (const auto& child : m_children) {
             child->apply(f, world_transform());
         }
     }

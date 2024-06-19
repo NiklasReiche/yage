@@ -129,23 +129,23 @@ public:
 
             updateSceneGraph();
 
-            projViewUniform.view = static_cast<math::Mat4f>(camera->getViewMatrix());
+            projViewUniform.view = static_cast<math::Mat4f>(camera->view_matrix());
             projViewUniform.syncView();
 
-            pbrShaderNormalMapping->setUniform("camPos", static_cast<math::Vec3f>(camera->getPosition()));
-            pbrShader->setUniform("camPos", static_cast<math::Vec3f>(camera->getPosition()));
+            pbrShaderNormalMapping->setUniform("camPos", static_cast<math::Vec3f>(camera->position()));
+            pbrShader->setUniform("camPos", static_cast<math::Vec3f>(camera->position()));
 
             if (visualize) {
                 baseRenderer->useShader(*csShader);
                 baseRenderer->draw(*point);
 
                 baseRenderer->enableWireframe();
-                renderer->renderGraph(scene);
+                renderer->render_graph(scene);
                 baseRenderer->disableWireframe();
 
                 simulation.visualize_collisions(static_cast<math::Mat4d>(projViewUniform.projection), static_cast<math::Mat4d>(projViewUniform.view));
             } else {
-                renderer->renderGraph(scene);
+                renderer->render_graph(scene);
             }
 
             window->swapBuffers();
