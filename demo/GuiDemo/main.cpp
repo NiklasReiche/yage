@@ -39,15 +39,14 @@ public:
 
     GuiTest(const std::shared_ptr<platform::IWindow>& platform, const std::shared_ptr<gl::IContext>& gl,
             res::Resource<font::Font> font)
-            : platform(platform), gl(gl), master(gui::Master(platform, gl))
+        : platform(platform), gl(gl), master(gui::Master(platform, gl))
     {
-
         gui::LabelTemplate fpslabelTemplate{
-                .text = gui::TextTemplate{
-                        .text = U" ",
-                        .font = font,
-                        .size = 14,
-                },
+            .text = gui::TextTemplate{
+                .text = U" ",
+                .font = font,
+                .size = 14,
+            },
         };
         fpsCounter = master.create_widget<gui::Label>(fpslabelTemplate);
 
@@ -56,78 +55,80 @@ public:
         // #############################################################################################################
 
         auto v_list_1 = master.create_widget<gui::ListBox>(gui::ListBoxTemplate{
-                .base = {
-                        .geometry = {
-                                .anchor = {
-                                        .position = gui::AnchorPosition::TOP_LEFT,
-                                        .offset = math::Vec2f(10, 40),
-                                },
-                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
-                        },
-                        .border = {.thickness = 1},
+            .base = {
+                .geometry = {
+                    .anchor = {
+                        .position = gui::AnchorPosition::TOP_LEFT,
+                        .offset = math::Vec2f(10, 40),
+                    },
+                    .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
-                .orientation = gui::ListBoxTemplate::VERTICAL,
+                .border = {.thickness = 1},
+            },
+            .orientation = gui::ListBoxTemplate::VERTICAL,
         });
         v_list_1->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {.color = gl::Color::LIGHT_BLUE,
-                        .padding = {5, 5, 5, 5}},
-                .text = {
-                        .text = U"Widget design options",
-                        .font = font,
-                        .size = 20,
-                },
+            .base = {
+                .color = gl::Color::LIGHT_BLUE,
+                .padding = {5, 5, 5, 5}
+            },
+            .text = {
+                .text = U"Widget design options",
+                .font = font,
+                .size = 20,
+            },
         });
 
         auto* designFrame = v_list_1->create_widget<gui::ListBox>(gui::ListBoxTemplate{
-                .base = {
-                        .geometry = {
-                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
-                        },
-                        .padding = {5, 5, 5, 5},
+            .base = {
+                .geometry = {
+                    .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
-                .orientation = gui::ListBoxTemplate::HORIZONTAL,
-                .spacing = 10.0f,
+                .padding = {5, 5, 5, 5},
+            },
+            .orientation = gui::ListBoxTemplate::HORIZONTAL,
+            .spacing = 10.0f,
         });
         designFrame->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {.padding = {2, 2, 2, 2}},
-                .text = {
-                        .text = U"flat",
-                        .font = font,
-                },
+            .base = {.padding = {2, 2, 2, 2}},
+            .text = {
+                .text = U"flat",
+                .font = font,
+            },
         });
         designFrame->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {
-                        .border = {.thickness = 1},
-                        .padding = {2, 2, 2, 2}
-                },
-                .text = {
-                        .text = U"border",
-                        .font = font,
-                },
+            .base = {
+                .border = {.thickness = 1},
+                .padding = {2, 2, 2, 2}
+            },
+            .text = {
+                .text = U"border",
+                .font = font,
+            },
         });
         designFrame->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {
-                        .shadow = {.offset = 3.0f, .hardness = 0.4f},
-                        .color = gl::Color::WHITE,
-                        .padding = {2, 2, 2, 2}
-                },
-                .text = {
-                        .text = U"shadow",
-                        .font = font,
-                },
+            .base = {
+                .shadow = {.offset = 3.0f, .hardness = 0.4f},
+                .color = gl::Color::WHITE,
+                .padding = {2, 2, 2, 2}
+            },
+            .text = {
+                .text = U"shadow",
+                .font = font,
+            },
         });
         designFrame->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {
-                        .texture = {
-                                .filename = "assets/texture.png"
-                        },
-                        .padding = {10, 4, 10, 4}
+            .base = {
+                .texture = {
+                    .filename = "assets/texture.png"
                 },
-                .text = {
-                        .text = U"texture",
-                        .font = font,
-                        .color = gl::Color::WHITE,
-                },
+                .padding = {10, 4, 10, 4}
+            },
+            .text = {
+                .text = U"texture",
+                .font = font,
+                .color = gl::Color::WHITE,
+            },
         });
 
 
@@ -136,91 +137,91 @@ public:
         // #############################################################################################################
 
         auto* v_list_2 = master.create_widget<gui::ListBox>(gui::ListBoxTemplate{
-                .base = {
-                        .geometry = {
-                                .anchor = {
-                                        .position = gui::AnchorPosition::TOP_LEFT,
-                                        .offset = math::Vec2f(10, 40 + v_list_1->actual_size().y() + 50),
-                                },
-                                .size_hint = {gui::SizeHint::FIT_CHILDREN, gui::SizeHint::FIT_CHILDREN},
-                        },
-                        .border = {.thickness = 1},
+            .base = {
+                .geometry = {
+                    .anchor = {
+                        .position = gui::AnchorPosition::TOP_LEFT,
+                        .offset = math::Vec2f(10, 40 + v_list_1->actual_size().y() + 50),
+                    },
+                    .size_hint = {gui::SizeHint::FIT_CHILDREN, gui::SizeHint::FIT_CHILDREN},
                 },
-                .orientation = gui::ListBoxTemplate::VERTICAL,
+                .border = {.thickness = 1},
+            },
+            .orientation = gui::ListBoxTemplate::VERTICAL,
         });
         v_list_2->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {.color = gl::Color::LIGHT_BLUE, .padding = {2, 2, 2, 2}},
-                .text = {
-                        .text = U"Widget layout options",
-                        .font = font,
-                        .size = 20,
-                },
+            .base = {.color = gl::Color::LIGHT_BLUE, .padding = {2, 2, 2, 2}},
+            .text = {
+                .text = U"Widget layout options",
+                .font = font,
+                .size = 20,
+            },
         });
         v_list_2->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {.padding = {2, 2, 2, 2}},
-                .text = {
-                        .text = U"Vertical list:",
-                        .font = font,
-                },
+            .base = {.padding = {2, 2, 2, 2}},
+            .text = {
+                .text = U"Vertical list:",
+                .font = font,
+            },
         });
 
         auto vListFrame = v_list_2->create_widget<gui::ListBox>(gui::ListBoxTemplate{
-                .base = {
-                        .geometry = {.size_hint = {gui::SizeHint::FIT_CHILDREN, gui::SizeHint::FIT_CHILDREN}},
-                        .padding = {6, 2, 6, 2},
-                },
-                .orientation = gui::ListBoxTemplate::VERTICAL,
-                .spacing = 2,
+            .base = {
+                .geometry = {.size_hint = {gui::SizeHint::FIT_CHILDREN, gui::SizeHint::FIT_CHILDREN}},
+                .padding = {6, 2, 6, 2},
+            },
+            .orientation = gui::ListBoxTemplate::VERTICAL,
+            .spacing = 2,
         });
         auto element_template = gui::LabelTemplate{
-                .base = {
-                        .border = {.thickness = 1},
-                        .padding = {2, 2, 2, 2}
-                },
-                .text = {
-                        .text = U"element",
-                        .font = font
-                }
+            .base = {
+                .border = {.thickness = 1},
+                .padding = {2, 2, 2, 2}
+            },
+            .text = {
+                .text = U"element",
+                .font = font
+            }
         };
         vListFrame->create_widget<gui::Label>(element_template);
         vListFrame->create_widget<gui::Label>(element_template);
         vListFrame->create_widget<gui::Label>(element_template);
 
         v_list_2->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {.padding = {2, 2, 2, 2}},
-                .text = {
-                        .text = U"Horizontal list:",
-                        .font = font,
-                }
+            .base = {.padding = {2, 2, 2, 2}},
+            .text = {
+                .text = U"Horizontal list:",
+                .font = font,
+            }
         });
 
         auto hListFrame = v_list_2->create_widget<gui::ListBox>(gui::ListBoxTemplate{
-                .base = {
-                        .geometry = {
-                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
-                        },
-                        .padding = {6, 2, 6, 2},
+            .base = {
+                .geometry = {
+                    .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
-                .orientation = gui::ListBoxTemplate::HORIZONTAL,
-                .spacing = 2.0f,
+                .padding = {6, 2, 6, 2},
+            },
+            .orientation = gui::ListBoxTemplate::HORIZONTAL,
+            .spacing = 2.0f,
         });
         hListFrame->create_widget<gui::Label>(element_template);
         hListFrame->create_widget<gui::Label>(element_template);
         hListFrame->create_widget<gui::Label>(element_template);
 
         v_list_2->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {.padding = {2, 2, 2, 2}},
-                .text = {
-                        .text = U"Grid:",
-                        .font = font
-                }
+            .base = {.padding = {2, 2, 2, 2}},
+            .text = {
+                .text = U"Grid:",
+                .font = font
+            }
         });
         v_list_2->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {.border = {.thickness = 1}, .padding = {2, 2, 2, 2}},
-                .text = {
-                        .text = U"TODO",
-                        .font = font
-                }
+            .base = {.border = {.thickness = 1}, .padding = {2, 2, 2, 2}},
+            .text = {
+                .text = U"TODO",
+                .font = font
+            }
         });
 
 
@@ -229,54 +230,54 @@ public:
         // #############################################################################################################
 
         auto h_list = master.create_widget<gui::ListBox>(gui::ListBoxTemplate{
-                .base = {
-                        .geometry = {
-                                .anchor = {
-                                        .position = gui::AnchorPosition::TOP_LEFT,
-                                        .offset = math::Vec2<float>(10 + v_list_1->actual_size().x() + 50, 40),
-                                },
-                        },
-                        .border = {
-                                .thickness = 1,
-                        },
-                        .color = gl::Color::TRANSPARENT,
+            .base = {
+                .geometry = {
+                    .anchor = {
+                        .position = gui::AnchorPosition::TOP_LEFT,
+                        .offset = math::Vec2<float>(10 + v_list_1->actual_size().x() + 50, 40),
+                    },
                 },
-                .orientation = gui::ListBoxTemplate::HORIZONTAL,
+                .border = {
+                    .thickness = 1,
+                },
+                .color = gl::Color::TRANSPARENT,
+            },
+            .orientation = gui::ListBoxTemplate::HORIZONTAL,
         });
 
         testLabel = h_list->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {
-                        .geometry = {
-                                .preferred_size = {
-                                        .value = {80, 25},
-                                },
-                                .size_hint = {gui::SizeHint::FIXED, gui::SizeHint::FIXED},
-                        },
-                        .border = {
-                                .thickness = 1,
-                                .color = gl::Color::BROWN,
-                        },
-                        .color = gl::Color::LIGHT_BLUE,
-                        .padding = {2, 2, 2, 2},
+            .base = {
+                .geometry = {
+                    .preferred_size = {
+                        .value = {80, 25},
+                    },
+                    .size_hint = {gui::SizeHint::FIXED, gui::SizeHint::FIXED},
                 },
-                .text = {
-                        .text = U"nested",
-                        .font = font
-                }
+                .border = {
+                    .thickness = 1,
+                    .color = gl::Color::BROWN,
+                },
+                .color = gl::Color::LIGHT_BLUE,
+                .padding = {2, 2, 2, 2},
+            },
+            .text = {
+                .text = U"nested",
+                .font = font
+            }
         });
         h_list->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {
-                        .border = {
-                                .thickness = 1,
-                                .color = gl::Color::GREEN,
-                        },
-                        .color = gl::Color::ORANGE,
-                        .padding = {2, 2, 2, 2},
+            .base = {
+                .border = {
+                    .thickness = 1,
+                    .color = gl::Color::GREEN,
                 },
-                .text = {
-                        .text = U"animations",
-                        .font = font
-                }
+                .color = gl::Color::ORANGE,
+                .padding = {2, 2, 2, 2},
+            },
+            .text = {
+                .text = U"animations",
+                .font = font
+            }
         });
 
 
@@ -304,226 +305,226 @@ public:
         // #############################################################################################################
 
         auto frame_4 = master.create_widget<gui::ListBox>(gui::ListBoxTemplate{
-                .base = {
-                        .geometry = {
-                                .anchor = {
-                                        .position = gui::AnchorPosition::TOP_LEFT,
-                                        .offset = math::Vec2<float>(10 + v_list_2->actual_size().x() + 50,
-                                                                   40 + v_list_1->actual_size().y() + 50),
-                                },
-                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
-                        },
-                        .border = {.thickness = 1},
+            .base = {
+                .geometry = {
+                    .anchor = {
+                        .position = gui::AnchorPosition::TOP_LEFT,
+                        .offset = math::Vec2<float>(10 + v_list_2->actual_size().x() + 50,
+                                                    40 + v_list_1->actual_size().y() + 50),
+                    },
+                    .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
-                .orientation = gui::ListBoxTemplate::VERTICAL,
+                .border = {.thickness = 1},
+            },
+            .orientation = gui::ListBoxTemplate::VERTICAL,
         });
         frame_4->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {.color = gl::Color::LIGHT_BLUE, .padding = {2, 2, 2, 2}},
-                .text = {
-                        .text = U"Buttons:",
-                        .font = font,
-                        .size = 20,
-                }
+            .base = {.color = gl::Color::LIGHT_BLUE, .padding = {2, 2, 2, 2}},
+            .text = {
+                .text = U"Buttons:",
+                .font = font,
+                .size = 20,
+            }
         });
 
         auto h_list_buttons = frame_4->create_widget<gui::ListBox>(gui::ListBoxTemplate{
-                .base = {
-                        .geometry = {
-                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
-                        },
-                        .padding = {5, 5, 5, 5},
+            .base = {
+                .geometry = {
+                    .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
-                .orientation = gui::ListBoxTemplate::VERTICAL,
-                .spacing = 20,
+                .padding = {5, 5, 5, 5},
+            },
+            .orientation = gui::ListBoxTemplate::VERTICAL,
+            .spacing = 20,
         });
 
         frame_clicks = h_list_buttons->create_widget<gui::ListBox>(gui::ListBoxTemplate{
-                .base = {
-                        .geometry = {
-                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
-                        },
+            .base = {
+                .geometry = {
+                    .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
-                .orientation = gui::ListBoxTemplate::HORIZONTAL,
+            },
+            .orientation = gui::ListBoxTemplate::HORIZONTAL,
         });
         frame_clicks->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {.padding = {2, 2, 2, 2}},
-                .text = {
-                        .text = U"Push button: ",
-                        .font = font
-                }
+            .base = {.padding = {2, 2, 2, 2}},
+            .text = {
+                .text = U"Push button: ",
+                .font = font
+            }
         });
         button_clicks = frame_clicks->create_widget<gui::PushButton>(gui::PushButtonTemplate{
-                .base = {
-                        .border = {.thickness = 1},
-                        .color = gl::Color::LIGHT_BLUE,
-                },
-                .click = {
-                        .border = {.thickness = 2},
-                        .color = gl::Color::BLUE,
-                },
-                .hover = {
-                        .border = {.thickness = 2},
-                        .color = gl::Color::LIGHT_BLUE,
-                },
-                .command = [this] { on_button_1_click(); },
+            .base = {
+                .border = {.thickness = 1},
+                .color = gl::Color::LIGHT_BLUE,
+            },
+            .click = {
+                .border = {.thickness = 2},
+                .color = gl::Color::BLUE,
+            },
+            .hover = {
+                .border = {.thickness = 2},
+                .color = gl::Color::LIGHT_BLUE,
+            },
+            .command = [this] { on_button_1_click(); },
         });
         label_clicks = button_clicks->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {.padding = {2, 2, 2, 2}},
-                .text = {
-                        .text = U"clicks: 0",
-                        .font = font,
-                },
+            .base = {.padding = {2, 2, 2, 2}},
+            .text = {
+                .text = U"clicks: 0",
+                .font = font,
+            },
         });
 
 
         frame_check = h_list_buttons->create_widget<gui::ListBox>(gui::ListBoxTemplate{
-                .base = {
-                        .geometry = {
-                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
-                        },
-                        .color = gl::Color::TRANSPARENT
+            .base = {
+                .geometry = {
+                    .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
-                .orientation = gui::ListBoxTemplate::HORIZONTAL,
+                .color = gl::Color::TRANSPARENT
+            },
+            .orientation = gui::ListBoxTemplate::HORIZONTAL,
         });
         frame_check->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {.padding = {2, 2, 2, 2}},
-                .text = {
-                        .text = U"Check button: ",
-                        .font = font
-                }
+            .base = {.padding = {2, 2, 2, 2}},
+            .text = {
+                .text = U"Check button: ",
+                .font = font
+            }
         });
         button_check = frame_check->create_widget<gui::CheckButton>(gui::CheckButtonTemplate{
-                .base = {
-                        .border = {.thickness = 1},
-                        .color = gl::Color::LIGHT_GREY,
-                },
-                .selected = {
-                        .border = {.thickness = 1},
-                        .color = gl::Color::LIGHT_BLUE,
-                },
-                .command = [this](bool state) -> void { this->on_button_2_click(state); },
+            .base = {
+                .border = {.thickness = 1},
+                .color = gl::Color::LIGHT_GREY,
+            },
+            .selected = {
+                .border = {.thickness = 1},
+                .color = gl::Color::LIGHT_BLUE,
+            },
+            .command = [this](bool state) -> void { this->on_button_2_click(state); },
         });
         label_check = button_check->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {
-                        .color = gl::Color::TRANSPARENT,
-                        .padding = {2, 2, 2, 2},
-                },
-                .text = {
-                        .text = U"state: off",
-                        .font = font,
-                }
+            .base = {
+                .color = gl::Color::TRANSPARENT,
+                .padding = {2, 2, 2, 2},
+            },
+            .text = {
+                .text = U"state: off",
+                .font = font,
+            }
         });
 
         frame_radio = h_list_buttons->create_widget<gui::ListBox>(gui::ListBoxTemplate{
-                .base = {
-                        .geometry = {
-                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
-                        },
-                        .color = gl::Color::TRANSPARENT
+            .base = {
+                .geometry = {
+                    .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
-                .orientation = gui::ListBoxTemplate::VERTICAL
+                .color = gl::Color::TRANSPARENT
+            },
+            .orientation = gui::ListBoxTemplate::VERTICAL
         });
         frame_radio->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {
-                        .padding = {2, 2, 2, 2},
-                },
-                .text = {
-                        .text = U"Radio Buttons:",
-                        .font = font
-                }
+            .base = {
+                .padding = {2, 2, 2, 2},
+            },
+            .text = {
+                .text = U"Radio Buttons:",
+                .font = font
+            }
         });
         auto frame_radio_2 = frame_radio->create_widget<gui::ListBox>(gui::ListBoxTemplate{
-                .base = {
-                        .geometry = {
-                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
-                        },
-                        .color = gl::Color::TRANSPARENT
+            .base = {
+                .geometry = {
+                    .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
-                .orientation = gui::ListBoxTemplate::HORIZONTAL,
+                .color = gl::Color::TRANSPARENT
+            },
+            .orientation = gui::ListBoxTemplate::HORIZONTAL,
         });
         auto radio_group_box = frame_radio_2->create_widget<gui::ListBox>(gui::ListBoxTemplate{
-                .base = {
-                        .geometry = {
-                                .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
-                        },
-                        .color = gl::Color::TRANSPARENT
+            .base = {
+                .geometry = {
+                    .size_hint = math::Vec2<gui::SizeHint>(gui::SizeHint::FIT_CHILDREN),
                 },
-                .orientation = gui::ListBoxTemplate::VERTICAL,
+                .color = gl::Color::TRANSPARENT
+            },
+            .orientation = gui::ListBoxTemplate::VERTICAL,
         });
         radioGroup = gui::RadioGroup<int>(0, [this](int value) {
             this->on_radio_click(value);
         });
         auto radio_button_1 = radioGroup.addButton(
-                radio_group_box->create_widget<gui::CheckButton>(gui::CheckButtonTemplate{
-                        .base = {
-                                .border = {.thickness = 1},
-                                .color = gl::Color::LIGHT_GREY,
-                        },
-                        .selected = {
-                                .border = {.thickness = 1},
-                                .color = gl::Color::LIGHT_BLUE,
-                        },
-                }), 1, true);
-        radio_button_1->create_widget<gui::Label>(gui::LabelTemplate{
+            radio_group_box->create_widget<gui::CheckButton>(gui::CheckButtonTemplate{
                 .base = {
-                        .color = gl::Color::TRANSPARENT,
-                        .padding = {2, 2, 2, 2},
+                    .border = {.thickness = 1},
+                    .color = gl::Color::LIGHT_GREY,
                 },
-                .text = {
-                        .text = U"Value 1",
-                        .font = font,
-                }
+                .selected = {
+                    .border = {.thickness = 1},
+                    .color = gl::Color::LIGHT_BLUE,
+                },
+            }), 1, true);
+        radio_button_1->create_widget<gui::Label>(gui::LabelTemplate{
+            .base = {
+                .color = gl::Color::TRANSPARENT,
+                .padding = {2, 2, 2, 2},
+            },
+            .text = {
+                .text = U"Value 1",
+                .font = font,
+            }
         });
         auto radio_button_2 = radioGroup.addButton(
-                radio_group_box->create_widget<gui::CheckButton>(gui::CheckButtonTemplate{
-                        .base = {
-                                .border = {.thickness = 1},
-                                .color = gl::Color::LIGHT_GREY,
-                        },
-                        .selected = {
-                                .border = {.thickness = 1},
-                                .color = gl::Color::LIGHT_BLUE,
-                        },
-                }), 2);
-        radio_button_2->create_widget<gui::Label>(gui::LabelTemplate{
+            radio_group_box->create_widget<gui::CheckButton>(gui::CheckButtonTemplate{
                 .base = {
-                        .color = gl::Color::TRANSPARENT,
-                        .padding = {2, 2, 2, 2},
+                    .border = {.thickness = 1},
+                    .color = gl::Color::LIGHT_GREY,
                 },
-                .text = {
-                        .text = U"Value 2",
-                        .font = font,
-                }
+                .selected = {
+                    .border = {.thickness = 1},
+                    .color = gl::Color::LIGHT_BLUE,
+                },
+            }), 2);
+        radio_button_2->create_widget<gui::Label>(gui::LabelTemplate{
+            .base = {
+                .color = gl::Color::TRANSPARENT,
+                .padding = {2, 2, 2, 2},
+            },
+            .text = {
+                .text = U"Value 2",
+                .font = font,
+            }
         });
         auto radio_button_3 = radioGroup.addButton(
-                radio_group_box->create_widget<gui::CheckButton>(gui::CheckButtonTemplate{
-                        .base = {
-                                .border = {.thickness = 1},
-                                .color = gl::Color::LIGHT_GREY,
-                        },
-                        .selected = {
-                                .border = {.thickness = 1},
-                                .color = gl::Color::LIGHT_BLUE,
-                        },
-                }), 3);
-        radio_button_3->create_widget<gui::Label>(gui::LabelTemplate{
+            radio_group_box->create_widget<gui::CheckButton>(gui::CheckButtonTemplate{
                 .base = {
-                        .color = gl::Color::TRANSPARENT,
-                        .padding = {2, 2, 2, 2},
+                    .border = {.thickness = 1},
+                    .color = gl::Color::LIGHT_GREY,
                 },
-                .text = {
-                        .text = U"Value 3",
-                        .font = font,
-                }
+                .selected = {
+                    .border = {.thickness = 1},
+                    .color = gl::Color::LIGHT_BLUE,
+                },
+            }), 3);
+        radio_button_3->create_widget<gui::Label>(gui::LabelTemplate{
+            .base = {
+                .color = gl::Color::TRANSPARENT,
+                .padding = {2, 2, 2, 2},
+            },
+            .text = {
+                .text = U"Value 3",
+                .font = font,
+            }
         });
         label_radio = frame_radio_2->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {
-                        .padding = {2, 2, 2, 2},
-                },
-                .text = {
-                        .text = U"selected: 1",
-                        .font = font
-                }
+            .base = {
+                .padding = {2, 2, 2, 2},
+            },
+            .text = {
+                .text = U"selected: 1",
+                .font = font
+            }
         });
 
         // #############################################################################################################
@@ -531,42 +532,46 @@ public:
         // #############################################################################################################
 
         auto entryFrame = master.create_widget<gui::ListBox>(gui::ListBoxTemplate{
-                .base = {
-                        .geometry = {.anchor = {.offset = math::Vec2<float>(
-                                10 + v_list_2->actual_size().x() + 50 + frame_4->actual_size().x() + 50,
-                                40 + v_list_1->actual_size().y() + 50),}},
-                        .border = {.thickness = 1}
+            .base = {
+                .geometry = {
+                    .anchor = {
+                        .offset = math::Vec2<float>(
+                            10 + v_list_2->actual_size().x() + 50 + frame_4->actual_size().x() + 50,
+                            40 + v_list_1->actual_size().y() + 50),
+                    }
                 },
-                .orientation = gui::ListBoxTemplate::VERTICAL,
+                .border = {.thickness = 1}
+            },
+            .orientation = gui::ListBoxTemplate::VERTICAL,
         });
         entryFrame->create_widget<gui::Label>(gui::LabelTemplate{
-                .base = {
-                        .color = gl::Color::LIGHT_BLUE,
-                        .padding = {2, 2, 2, 2},
-                },
-                .text = {
-                        .text = U"Text input",
-                        .font = font,
-                },
+            .base = {
+                .color = gl::Color::LIGHT_BLUE,
+                .padding = {2, 2, 2, 2},
+            },
+            .text = {
+                .text = U"Text input",
+                .font = font,
+            },
         });
         entryFrame->create_widget<gui::TextEntry>(gui::TextEntryTemplate{
-                .base = {
-                        .geometry = {
-                                .preferred_size = {.value = {100.0f, 20.0f}},
-                                .size_hint = {gui::SizeHint::FIXED, gui::SizeHint::FIXED},
-                        },
-                        .border = {.thickness = 1},
-                        .padding = {2, 2, 2, 2},
+            .base = {
+                .geometry = {
+                    .preferred_size = {.value = {100.0f, 20.0f}},
+                    .size_hint = {gui::SizeHint::FIXED, gui::SizeHint::FIXED},
                 },
-                .placeholder_text = {
-                        .text = U"input text...",
-                        .font = font,
-                        .color = gl::Color::GREY,
-                },
-                .input_text = {
-                        .text = U"",
-                        .font = font,
-                },
+                .border = {.thickness = 1},
+                .padding = {2, 2, 2, 2},
+            },
+            .placeholder_text = {
+                .text = U"input text...",
+                .font = font,
+                .color = gl::Color::GREY,
+            },
+            .input_text = {
+                .text = U"",
+                .font = font,
+            },
         });
     }
 
@@ -620,7 +625,7 @@ void displayFPS(GuiTest& gui, double dt)
 int main()
 {
     std::shared_ptr<platform::desktop::GlfwWindow> window = std::make_shared<platform::desktop::GlfwWindow>(800, 400,
-                                                                                                            "GUI Demo");
+        "GUI Demo");
     std::shared_ptr<gl::IContext> context = gl::createContext(window);
 
     res::Store<font::Font> fontStore;
@@ -632,6 +637,8 @@ int main()
     guiTest.animation_1->start();
     guiTest.animation_3->start();
 
+    const auto renderer = context->getRenderer();
+    renderer->setClearColor(gl::Color::WHITE);
 
     window->disableVSync();
     window->show();
@@ -640,6 +647,8 @@ int main()
     double dt = 1.0 / 60.0;
     double frame_time;
     while (!window->shouldDestroy()) {
+        renderer->clear();
+
         frame_time = window->getTimeStep();
         timer += frame_time;
 
