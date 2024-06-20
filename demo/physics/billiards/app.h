@@ -32,10 +32,8 @@ public:
         simulation = physics3d::Simulation(physics3d::Visualizer(*glContext));
         simulation.enable_gravity();
 
-        camera = std::make_shared<gl3d::Camera>(
-            gl3d::Camera(math::Vec3d(0.0, 2.0, 2.0),
-                         math::quaternion::euler_angle<double>(math::to_rad(180.), 0, 0) *
-                         math::quaternion::euler_angle<double>(0, 0, math::to_rad(45.))));
+        camera = std::make_shared<gl3d::Camera>();
+        camera->look_at(math::Vec3d(0.0, 2.0, 2.0), math::Vec3d(0.0));
 
         renderer = std::make_shared<gl3d::SceneRenderer>(*glContext);
         renderer->base_renderer().setClearColor(0x008080FFu);
