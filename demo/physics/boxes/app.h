@@ -16,6 +16,7 @@
 #include "MovementListener.h"
 #include "gl3d/shaders.h"
 #include <chrono>
+#include <gui/gui.h>
 
 using namespace yage;
 
@@ -66,6 +67,74 @@ public:
 
         inputListener = MovementListener(window, camera, &simulation, this);
         window->attach(inputListener);
+
+        font::FontFileLoader fontLoader(glContext->getTextureCreator(), window->getFileReader());
+        font = fontStore.loadResource(fontLoader, std::string("fonts/OpenSans-Regular.font"));
+        gui = std::make_unique<gui::Master>(window, glContext);
+        auto frame = gui->create_widget<gui::ListBox>(gui::ListBoxTemplate{
+            .base = {
+                .geometry = {
+                    .size_hint = math::Vec2(gui::SizeHint::FIT_CHILDREN),
+                },
+                .color = gl::Color::WHITE,
+                .padding = {2, 2, 2, 2},
+            },
+            .orientation = gui::ListBoxTemplate::VERTICAL,
+        });
+        frame->create_widget<gui::Label>(gui::LabelTemplate{
+            .text = {
+                .text = U"Controls:",
+                .font = font.value(),
+            },
+        });
+        frame->create_widget<gui::Label>(gui::LabelTemplate{
+            .text = {
+                .text = U"x: toggle mouse capture for looking around",
+                .font = font.value(),
+            },
+        });
+        frame->create_widget<gui::Label>(gui::LabelTemplate{
+            .text = {
+                .text = U"mouse: look around",
+                .font = font.value(),
+            },
+        });
+        frame->create_widget<gui::Label>(gui::LabelTemplate{
+            .text = {
+                .text = U"w,a,s,d: move around",
+                .font = font.value(),
+            },
+        });
+        frame->create_widget<gui::Label>(gui::LabelTemplate{
+            .text = {
+                .text = U"space: toggle simulation",
+                .font = font.value(),
+            },
+        });
+        frame->create_widget<gui::Label>(gui::LabelTemplate{
+            .text = {
+                .text = U"b: spawn box",
+                .font = font.value(),
+            },
+        });
+        frame->create_widget<gui::Label>(gui::LabelTemplate{
+            .text = {
+                .text = U"n: spawn rotated box",
+                .font = font.value(),
+            },
+        });
+        frame->create_widget<gui::Label>(gui::LabelTemplate{
+            .text = {
+                .text = U"enter: spawn moving box",
+                .font = font.value(),
+            },
+        });
+        frame->create_widget<gui::Label>(gui::LabelTemplate{
+            .text = {
+                .text = U"v: toggle contact point visualizer",
+                .font = font.value(),
+            },
+        });
     }
 
     void add_box()
@@ -141,6 +210,9 @@ public:
                 renderer->render_graph(scene, *camera);
             }
 
+            gui->update(1 / 60.);
+            gui->render();
+
             window->swapBuffers();
             window->pollEvents();
         }
@@ -162,6 +234,9 @@ private:
     std::shared_ptr<gl::IShader> pbrShader;
     std::shared_ptr<gl3d::Camera> camera;
     std::shared_ptr<gl3d::SceneRenderer> renderer;
+    res::Store<font::Font> fontStore;
+    std::optional<res::Resource<font::Font> > font;
+    std::unique_ptr<gui::Master> gui;
 
     std::shared_ptr<gl3d::SceneGroup> scene;
 

@@ -6,5 +6,5 @@ add_executable(physics_billiards
 )
 
 target_link_libraries(physics_billiards
-	PUBLIC yage_core yage_gl3d yage_physics3d
+	PUBLIC yage_core yage_gl3d yage_physics3d yage_gui
 )
