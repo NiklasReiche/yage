@@ -22,7 +22,7 @@ Templated library for linear algebra operations, including vectors, matrices, an
 ### Platform abstraction layer
 Platform specific operations like file handling, window creation, or input handling are abstracted into common interfaces, facilitating operation on desktop and android targets.
 ### Graphics pipeline abstraction layer
-The graphics pipeline has its own abstraction layer with high-level interfaces for common graphics objects, like shaders, textures, and drawable vertices. The focus is to provide implementations for OpenGL for desktop and OpenGL-ES for android.
+The graphics pipeline has its own abstraction layer with high-level interfaces for common graphics objects, like shaders, textures, and drawable vertices. The focus is to provide implementations for OpenGL for desktop and OpenGL-ES for Android. Note that the OpenGL-ES implementations are severly outdated. Since the goal for the future is to also support Vulkan, the graphics interfaces will have to be redesigned from scratch anyway, so there is no use in updating the OpenGL-ES implementations now.
 ### Image module
 Handles image file reading/writing and provides a common representation for image data on the CPU (as opposed to GPU textures). 
 ### 3D-Graphics module
