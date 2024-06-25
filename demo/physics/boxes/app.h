@@ -16,6 +16,7 @@
 #include "MovementListener.h"
 #include "gl3d/shaders.h"
 #include <chrono>
+#include <ranges>
 #include <gui/gui.h>
 
 using namespace yage;
@@ -139,14 +140,14 @@ public:
 
     void add_box()
     {
-        const double height = box_stack * (box_length + 0.5);
+        const double height = box_stack * (box_length + box_offset_delta);
         load_cube("models/box.glb", box_offset + math::Vec3d(0, height, 0));
         box_stack++;
     }
 
     void throw_box()
     {
-        const auto rb = load_cube("models/box.glb", box_offset + math::Vec3d(-20, 10, 0));
+        const auto rb = load_cube("models/box.glb", box_offset + math::Vec3d(-20, 5, 0));
         rb->apply_force(math::Vec3d(800, 1000, 0), rb->position() + math::Vec3d(0.2, 0, 0.1));
     }
 
@@ -156,6 +157,18 @@ public:
         load_cube("models/box.glb", box_offset + math::Vec3d(0, height, 0),
                   math::quaternion::euler_angle<double>(0.0, math::to_rad(10.0), math::to_rad(30.0)));
         box_stack++;
+    }
+
+    void reset()
+    {
+        for (const auto& rb : objects | std::ranges::views::values) {
+            rb->destroy();
+        }
+        objects.clear();
+        scene = std::make_shared<gl3d::SceneGroup>("world");
+        load_ground();
+        setup_lights();
+        box_stack = 0;
     }
 
     void run()
@@ -220,8 +233,9 @@ public:
 
 private:
     int box_stack = 0;
-    int box_mass = 1;
-    const math::Vec3d box_offset = math::Vec3d(0, 1.2, 0);
+    const int box_mass = 1;
+    const double box_offset_delta = 0.0000001;
+    const math::Vec3d box_offset = math::Vec3d(0, 1 + box_offset_delta, 0);
     const int box_length = 2;
 
     std::shared_ptr<platform::desktop::GlfwWindow> window;

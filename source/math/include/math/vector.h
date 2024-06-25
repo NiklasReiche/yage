@@ -464,7 +464,7 @@ namespace yage::math
     {
         const T len = length(vector);
         assert(len != 0);
-        return vector / length(vector);
+        return vector / len;
     }
 
     /**

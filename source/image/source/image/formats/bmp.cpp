@@ -252,6 +252,8 @@ namespace yage::img::bmp
 		}
 		else if (bytes == 1) {
 			byteOrderOffset = 0;
+		} else {
+			throw std::runtime_error("unknown byte order offset");
 		}
 
 		uint8_t emptyByte(0);

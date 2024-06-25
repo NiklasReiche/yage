@@ -101,4 +101,8 @@ void MovementListener::onKeyEvent(const input::KeyEvent& event)
     if (code == input::KeyEvent::Code::KEY_ENTER && action == input::KeyEvent::Action::PRESS) {
         app->throw_box();
     }
+
+    if (code == input::KeyEvent::Code::KEY_R && action == input::KeyEvent::Action::PRESS) {
+        app->reset();
+    }
 }

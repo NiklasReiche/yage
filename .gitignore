@@ -28,5 +28,6 @@ cmake-build*/
 # doc files
 *.vpp.bak_*
 
-#drawio backup files
+#drawio files
 *.drawio.bkp
+*.drawio.dtmp
