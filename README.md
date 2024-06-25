@@ -34,6 +34,9 @@ Uses signed distance fields to generate fonts in order to render unicode text at
 ### GUI module
 Provides a framework for building simple hierarchical GUIs with some preliminary automatic layout options like widget stacking or anchoring.  
 
+## Package dependencies
+![package-diagram drawio](https://github.com/NiklasReiche/yage/assets/29310846/0311a117-5c03-4ae6-b511-f0778ad487da)
+
 ## Demos
 ### Physics-based rendering:
 TODO: add screenshots
