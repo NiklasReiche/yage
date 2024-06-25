@@ -153,7 +153,7 @@ public:
 
     void add_box_rotated()
     {
-        const double height = box_stack * (box_length + 0.5);
+        const double height = box_stack * (box_length + 1);
         load_cube("models/box.glb", box_offset + math::Vec3d(0, height, 0),
                   math::quaternion::euler_angle<double>(0.0, math::to_rad(10.0), math::to_rad(30.0)));
         box_stack++;
