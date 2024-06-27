@@ -358,6 +358,10 @@ namespace yage::physics3d
         }
 
         // collision detection narrow phase
+        if (bodies.size() < 2) {
+            return;
+        }
+        // bodies must be at least of size 2 for this to work (unsigned index)
         for (std::size_t i = 0; i < bodies.size() - 1; ++i) {
             auto& rb_a = bodies.at(i);
             if (!rb_a->m_collider.has_value())
