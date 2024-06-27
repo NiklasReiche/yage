@@ -9,6 +9,7 @@
 #include "sceneGraph/sceneObject.h"
 #include "light.h"
 #include "ProjectionView.h"
+#include "shaders.h"
 
 namespace yage::gl3d
 {
@@ -36,9 +37,12 @@ namespace yage::gl3d
 
 		gl::IRenderer& base_renderer();
 
+		ShaderMap shaders() const;
+
 	private:
 		std::shared_ptr<gl::IRenderer> m_renderer;
 		ShaderUniformValues m_uniform_values;
 		ProjectionView m_projection_view;
+		ShaderMap m_shaders;
 	};
 }

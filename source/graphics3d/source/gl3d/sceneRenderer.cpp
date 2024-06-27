@@ -5,7 +5,7 @@ namespace yage::gl3d
 {
     struct Geometry
     {
-        std::shared_ptr<Mesh> mesh;
+        res::Resource<std::unique_ptr<Mesh>> mesh;
         math::Mat4d transform;
     };
 
@@ -13,6 +13,13 @@ namespace yage::gl3d
         : m_renderer(context.getRenderer()),
           m_projection_view(context.getShaderCreator()->createUniformBlock("ProjectionView"))
     {
+        const std::shared_ptr<gl::IShaderCreator> shader_creator = context.getShaderCreator();
+        m_shaders.emplace(ShaderPermutation::PBR,
+                          shader_creator->createShader(shaders::PbrShader::get_vert(),
+                                                       shaders::PbrShader::get_frag()));
+        m_shaders.emplace(ShaderPermutation::PBR_NORMAL_MAP,
+                          shader_creator->createShader(shaders::PbrNormalMappingShader::get_vert(),
+                                                       shaders::PbrNormalMappingShader::get_frag()));
     }
 
     void SceneRenderer::render_graph(const std::shared_ptr<SceneNode>& root, const Camera& target_camera)
@@ -24,7 +31,7 @@ namespace yage::gl3d
         auto collectGeometry = [this, &drawablesLoop](SceneObject& node) {
             const auto& transform = node.world_transform();
             if (node.mesh) {
-                drawablesLoop.emplace_back(node.mesh, transform);
+                drawablesLoop.emplace_back(node.mesh.value(), transform);
             }
             if (node.light) {
                 node.light->update_from_transform(transform);
@@ -50,9 +57,11 @@ namespace yage::gl3d
         m_projection_view.view = static_cast<math::Mat4f>(target_camera.view_matrix());
         m_projection_view.sync();
 
+        base_renderer().enableDepthTest();
+
         // TODO: sort by shader
         for (auto& [mesh, transform]: drawablesLoop) {
-            for (const auto& sub_mesh: mesh->sub_meshes()) {
+            for (const auto& sub_mesh: mesh.get()->sub_meshes()) {
                 auto shader = sub_mesh->material().shader();
 
                 // TODO: don't do this every frame
@@ -70,8 +79,7 @@ namespace yage::gl3d
                     m_uniform_values.point_lights[i]->update_uniforms(*shader, i);
                 }
 
-                if (shader->hasUniform("camPos"))
-                {
+                if (shader->hasUniform("camPos")) {
                     shader->setUniform("camPos", static_cast<math::Vec3f>(target_camera.position()));
                 }
 
@@ -102,5 +110,10 @@ namespace yage::gl3d
     gl::IRenderer& SceneRenderer::base_renderer()
     {
         return *m_renderer;
+    }
+
+    ShaderMap SceneRenderer::shaders() const
+    {
+        return m_shaders;
     }
 }

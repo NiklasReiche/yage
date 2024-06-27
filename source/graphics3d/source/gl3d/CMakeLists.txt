@@ -49,6 +49,9 @@ target_sources(yage_gl3d
         resources/gltf.h
         resources/gltf.cpp
 
+        MeshLoader.h
+        MeshLoader.cpp
+
         shaderSnippets.h
 
         shaders.h

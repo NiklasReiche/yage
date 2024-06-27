@@ -1,6 +1,9 @@
 #pragma once
 
 #include <map>
+#include <optional>
+
+#include <resource/Resource.h>
 
 #include "sceneNode.h"
 #include "../mesh.h"
@@ -15,7 +18,7 @@ namespace yage::gl3d
 	class SceneObject final : public SceneNode
 	{
 	public:
-        std::shared_ptr<Mesh> mesh = nullptr;
+        std::optional<res::Resource<std::unique_ptr<Mesh>>> mesh;
         std::shared_ptr<Light> light = nullptr;
         std::shared_ptr<Camera> camera = nullptr;
 
