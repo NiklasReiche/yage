@@ -13,17 +13,19 @@ namespace yage
     class Engine
     {
     private:
-        std::shared_ptr<gl::IContext> m_gl_context; // this must be destructed last, so keep it at the top
+        // these must be destructed last, so keep them at the top
+        std::shared_ptr<platform::IWindow> m_window;
+        std::shared_ptr<gl::IContext> m_gl_context;
 
     public:
         bool enable_physics_simulation = true;
         bool enable_physics_visualization = false;
 
+        gl3d::SceneRenderer scene_renderer;
+        physics3d::Simulation physics;
+
         std::unique_ptr<gl3d::MeshFileLoader> mesh_loader;
         res::Store<std::unique_ptr<gl3d::Mesh>> mesh_store;
-
-        physics3d::Simulation physics;
-        std::unique_ptr<gl3d::SceneRenderer> scene_renderer;
 
         Engine(int width, int height, const std::string& title);
 
@@ -50,7 +52,6 @@ namespace yage
 
     private:
         std::unique_ptr<Application> m_application;
-        std::shared_ptr<platform::IWindow> m_window;
 
         std::unordered_map<std::string, GameObject> m_game_objects;
     };

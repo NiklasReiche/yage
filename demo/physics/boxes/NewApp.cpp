@@ -15,7 +15,7 @@ void NewApp::initialize()
     camera->move_to(math::Vec3d(25.0, 25.0, 25.0));
     camera->rotate_to(math::quaternion::euler_angle<double>(math::to_rad(225.), 0, 0) *
                                       math::quaternion::euler_angle<double>(0, 0, math::to_rad(30.)));
-    m_engine->scene_renderer->active_camera = camera;
+    m_engine->scene_renderer.active_camera = camera;
 
     m_engine->physics.enable_gravity();
 }
@@ -53,7 +53,7 @@ GameObject NewApp::load_cube(const std::string& filename, math::Vec3d position, 
 
     auto& game_object = m_engine->register_game_object("cube" + std::to_string(n_cubes));
 
-    game_object.scene_node = m_engine->scene_renderer->active_scene->create_object("cube" + n_cubes);
+    game_object.scene_node = m_engine->scene_renderer.active_scene->create_object("cube" + n_cubes);
     game_object.scene_node.value().get().mesh = cube_mesh;
 
     game_object.rigid_body = m_engine->physics.create_rigid_body(
@@ -75,7 +75,7 @@ void NewApp::load_ground()
 
     auto& [scene_node, rigid_body] = m_engine->register_game_object("ground");
 
-    scene_node = m_engine->scene_renderer->active_scene->create_object("ground");
+    scene_node = m_engine->scene_renderer.active_scene->create_object("ground");
     scene_node.value().get().mesh = mesh;
 
     rigid_body = m_engine->physics.create_rigid_body(
@@ -93,7 +93,7 @@ void NewApp::setup_lights() const
     const auto lightRes = std::make_shared<gl3d::PointLight>();
     lightRes->color = math::Vec3f(100);
 
-    auto& light = m_engine->scene_renderer->active_scene->create_object("light1");
+    auto& light = m_engine->scene_renderer.active_scene->create_object("light1");
     light.light = lightRes;
     light.local_transform =
             math::matrix::translate<double>(-10, 10, -10);
@@ -101,7 +101,7 @@ void NewApp::setup_lights() const
     const auto lightRes2 = std::make_shared<gl3d::DirectionalLight>();
     lightRes2->color = math::Vec3f(3);
 
-    auto& light2 = m_engine->scene_renderer->active_scene->create_object("light2");
+    auto& light2 = m_engine->scene_renderer.active_scene->create_object("light2");
     light2.light = lightRes2;
     light2.local_transform =
             math::matrix::from_quaternion<double>(

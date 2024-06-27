@@ -6,26 +6,23 @@
 
 namespace yage
 {
-    Engine::Engine(int width, int height, const std::string& title)
-        : physics(physics3d::Visualizer()),
-          m_window(std::make_unique<platform::desktop::GlfwWindow>(width, height, title))
+    Engine::Engine(int width, int height, const std::string& title) :
+        m_window(std::make_unique<platform::desktop::GlfwWindow>(width, height, title)),
+        m_gl_context(gl::createContext(m_window)),
+        scene_renderer(*m_gl_context),
+        physics(physics3d::Visualizer(*m_gl_context))
     {
-        m_gl_context = gl::createContext(m_window);
+        scene_renderer.base_renderer().setViewport(0, 0, width, height);
+        scene_renderer.base_renderer().setClearColor(0x008080FFu);
 
-        scene_renderer = std::make_unique<gl3d::SceneRenderer>(*m_gl_context);
-        scene_renderer->base_renderer().setViewport(0, 0, width, height);
-        scene_renderer->base_renderer().setClearColor(0x008080FFu);
+        scene_renderer.projection() = math::matrix::perspective<float>(
+                45.0f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 1000.0f);
 
-        scene_renderer->projection() = math::matrix::perspective<float>(
-            45.0f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 1000.0f);
+        mesh_loader =
+                std::make_unique<gl3d::MeshFileLoader>(m_window->getFileReader(), m_gl_context->getTextureCreator(),
+                                                       m_gl_context->getDrawableCreator(), scene_renderer.shaders());
 
-        mesh_loader = std::make_unique<gl3d::MeshFileLoader>(
-            m_window->getFileReader(),
-            m_gl_context->getTextureCreator(),
-            m_gl_context->getDrawableCreator(),
-            scene_renderer->shaders());
-
-        scene_renderer->active_scene = std::make_unique<gl3d::SceneGroup>("root");
+        scene_renderer.active_scene = std::make_unique<gl3d::SceneGroup>("root");
     }
 
     void Engine::run()
@@ -39,8 +36,8 @@ namespace yage
         double accumulator = 0.0;
         while (!m_window->shouldDestroy()) {
             const double frame_time = m_window->getTimeStep();
-            scene_renderer->base_renderer().setClearColor(gl::Color::WHITE);
-            scene_renderer->base_renderer().clear();
+            scene_renderer.base_renderer().setClearColor(gl::Color::WHITE);
+            scene_renderer.base_renderer().clear();
 
             if (enable_physics_simulation) {
                 accumulator += frame_time;
@@ -69,9 +66,9 @@ namespace yage
                         math::matrix::scale(scene_node.value().get().local_transform.scale());
             }
 
-            scene_renderer->base_renderer().clear();
+            scene_renderer.base_renderer().clear();
             m_application->pre_render_update();
-            scene_renderer->render_active_scene();
+            scene_renderer.render_active_scene();
 
             m_window->swapBuffers();
             m_window->pollEvents();
