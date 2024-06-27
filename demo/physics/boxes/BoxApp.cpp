@@ -1,9 +1,9 @@
-#include "NewApp.h"
 #include <gui/gui.h>
+#include "BoxApp.h"
 
 using namespace yage;
 
-void NewApp::initialize()
+void BoxApp::initialize()
 {
     load_gui();
 
@@ -26,19 +26,19 @@ void NewApp::initialize()
     m_engine->register_input_listener(app_listener);
 }
 
-void NewApp::pre_render_update()
+void BoxApp::pre_render_update()
 {
     app_listener.update();
 }
 
-void NewApp::add_box()
+void BoxApp::add_box()
 {
     const double height = box_stack * (box_length + 0.5);
     load_cube("models/box.glb", box_offset + math::Vec3d(0, height, 0));
     box_stack++;
 }
 
-void NewApp::throw_box()
+void BoxApp::throw_box()
 {
     const GameObject& game_object =
         load_cube("models/box.glb", box_offset + math::Vec3d(-20, 10, 0));
@@ -47,7 +47,7 @@ void NewApp::throw_box()
     rigid_body.apply_force(math::Vec3d(800, 1000, 0), rigid_body.position() + math::Vec3d(0.2, 0, 0.1));
 }
 
-void NewApp::add_box_rotated()
+void BoxApp::add_box_rotated()
 {
     const double height = box_stack * (box_length + 0.5);
     load_cube("models/box.glb", box_offset + math::Vec3d(0, height, 0),
@@ -55,7 +55,7 @@ void NewApp::add_box_rotated()
     box_stack++;
 }
 
-void NewApp::reset()
+void BoxApp::reset()
 {
     for (const GameObject& game_object : objects) {
         m_engine->destroy_game_object(game_object);
@@ -74,7 +74,7 @@ void NewApp::reset()
     add_box();
 }
 
-void NewApp::step_simulation() const
+void BoxApp::step_simulation() const
 {
     if (m_engine->enable_physics_simulation)
         return;
@@ -86,22 +86,22 @@ void NewApp::step_simulation() const
     }
 }
 
-void NewApp::toggle_simulation() const
+void BoxApp::toggle_simulation() const
 {
     m_engine->enable_physics_simulation = !m_engine->enable_physics_simulation;
 }
 
-void NewApp::toggle_visualization() const
+void BoxApp::toggle_visualization() const
 {
     m_engine->enable_physics_visualization = !m_engine->enable_physics_visualization;
 }
 
-void NewApp::toggle_mouse_capture()
+void BoxApp::toggle_mouse_capture()
 {
     m_engine->toggle_cursor_visibility();
 }
 
-GameObject NewApp::load_cube(const std::string& filename, math::Vec3d position, math::Quatd orientation)
+GameObject BoxApp::load_cube(const std::string& filename, math::Vec3d position, math::Quatd orientation)
 {
     if (!cube_mesh) {
         cube_mesh = m_engine->mesh_store.loadResource(*m_engine->mesh_loader, filename);
@@ -123,7 +123,7 @@ GameObject NewApp::load_cube(const std::string& filename, math::Vec3d position, 
     return game_object;
 }
 
-void NewApp::load_ground()
+void BoxApp::load_ground()
 {
     ground_mesh = m_engine->mesh_store.loadResource(*m_engine->mesh_loader, std::string{"models/ground.glb"});
 
@@ -141,7 +141,7 @@ void NewApp::load_ground()
     objects.push_back(game_object);
 }
 
-void NewApp::setup_lights() const
+void BoxApp::setup_lights() const
 {
     const auto lightRes = std::make_shared<gl3d::PointLight>();
     lightRes->color = math::Vec3f(100);
@@ -160,7 +160,7 @@ void NewApp::setup_lights() const
                                                   math::quaternion::euler_angle<double>(0, 0, math::to_rad(60.)));
 }
 
-void NewApp::load_gui()
+void BoxApp::load_gui()
 {
     const auto font =
             m_engine->font_store.loadResource(*m_engine->font_loader, std::string{"fonts/OpenSans-Regular.font"});

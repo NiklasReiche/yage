@@ -1,7 +1,7 @@
 add_executable(physics_boxes
         main.cpp
-        NewApp.h
-        NewApp.cpp
+        BoxApp.h
+        BoxApp.cpp
         AppListener.h
         AppListener.cpp
 )

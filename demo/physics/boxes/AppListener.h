@@ -6,7 +6,7 @@
 #include <core/input/InputListener.h>
 #include <gl3d/camera.h>
 
-class NewApp;
+class BoxApp;
 
 struct Mouse
 {
@@ -20,7 +20,7 @@ class AppListener final : public yage::input::InputListener
 public:
     AppListener() = default;
 
-    AppListener(std::shared_ptr<yage::gl3d::Camera> camera, NewApp* app);
+    AppListener(std::shared_ptr<yage::gl3d::Camera> camera, BoxApp* app);
 
     void onMousePosEvent(const yage::input::MousePosEvent& event) override;
 
@@ -34,5 +34,5 @@ private:
     std::map<yage::input::KeyEvent::Code, bool> keyStates;
 
     std::shared_ptr<yage::gl3d::Camera> camera;
-    NewApp* app{};
+    BoxApp* app{};
 };

@@ -1,10 +1,10 @@
 #include <runtime/Engine.h>
 
-#include "NewApp.h"
+#include "BoxApp.h"
 
 int main() {
 	yage::Engine engine = yage::Engine(1500, 900, "Boxes");
-	engine.register_application<NewApp>();
+	engine.register_application<BoxApp>();
 	engine.run();
 	return 0;
 }

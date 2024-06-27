@@ -1,15 +1,14 @@
 #pragma once
 
-#include <math/math.h>
 #include <runtime/Application.h>
 #include <runtime/Engine.h>
 
 #include "AppListener.h"
 
-class NewApp final : public yage::Application
+class BoxApp final : public yage::Application
 {
 public:
-    NewApp() = default;
+    BoxApp() = default;
 
     void initialize() override;
 

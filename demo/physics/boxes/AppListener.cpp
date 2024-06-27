@@ -1,10 +1,10 @@
 #include "AppListener.h"
 
-#include "NewApp.h"
+#include "BoxApp.h"
 
 using namespace yage;
 
-AppListener::AppListener(std::shared_ptr<gl3d::Camera> camera, NewApp* app)
+AppListener::AppListener(std::shared_ptr<gl3d::Camera> camera, BoxApp* app)
         : camera(std::move(camera)), app(app)
 {
     keyStates[input::KeyEvent::Code::KEY_W] = false;
