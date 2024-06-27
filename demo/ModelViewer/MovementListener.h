@@ -93,16 +93,16 @@ public:
 	void applyUpdate()
 	{
 		if (keyStates[input::KeyEvent::Code::KEY_W]) {
-			camera->move_forward(speed);
+			camera->move_forward(movement_speed);
 		}
 		if (keyStates[input::KeyEvent::Code::KEY_A]) {
-			camera->move_left(speed);
+			camera->move_left(movement_speed);
 		}
 		if (keyStates[input::KeyEvent::Code::KEY_S]) {
-			camera->move_backward(speed);
+			camera->move_backward(movement_speed);
 		}
 		if (keyStates[input::KeyEvent::Code::KEY_D]) {
-			camera->move_right(speed);
+			camera->move_right(movement_speed);
 		}
 	}
 
@@ -111,5 +111,5 @@ private:
 	std::map<input::KeyEvent::Code, bool> keyStates;
 	std::shared_ptr<platform::IWindow> window;
 	std::shared_ptr<gl3d::Camera> camera;
-    float speed = 0.01f;
+    float movement_speed = 0.01f;
 };

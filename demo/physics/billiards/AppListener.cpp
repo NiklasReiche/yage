@@ -1,10 +1,10 @@
 #include "AppListener.h"
 
-#include "BoxApp.h"
+#include "BilliardsApp.h"
 
 using namespace yage;
 
-AppListener::AppListener(std::shared_ptr<gl3d::Camera> camera, BoxApp* app)
+MovementListener::MovementListener(std::shared_ptr<gl3d::Camera> camera, BilliardsApp* app)
         : camera(std::move(camera)), app(app)
 {
     keyStates[input::KeyEvent::Code::KEY_W] = false;
@@ -13,7 +13,7 @@ AppListener::AppListener(std::shared_ptr<gl3d::Camera> camera, BoxApp* app)
     keyStates[input::KeyEvent::Code::KEY_D] = false;
 }
 
-void AppListener::onMousePosEvent(const input::MousePosEvent& event)
+void MovementListener::onMousePosEvent(const input::MousePosEvent& event)
 {
     const float x = event.getXPos();
     const float y = event.getYPos();
@@ -30,7 +30,7 @@ void AppListener::onMousePosEvent(const input::MousePosEvent& event)
     mouse.position = math::Vec2f(x, y);
 }
 
-void AppListener::update()
+void MovementListener::update()
 {
     if (keyStates[input::KeyEvent::Code::KEY_W]) {
         camera->move_forward(movement_speed);
@@ -53,7 +53,7 @@ void AppListener::update()
     }
 }
 
-void AppListener::onKeyEvent(const input::KeyEvent& event)
+void MovementListener::onKeyEvent(const input::KeyEvent& event)
 {
     const auto code = event.getKey();
     const auto action = event.getAction();
@@ -63,6 +63,10 @@ void AppListener::onKeyEvent(const input::KeyEvent& event)
     if (code == input::KeyEvent::Code::KEY_X && action == input::KeyEvent::Action::PRESS) {
         app->toggle_mouse_capture();
         mouse.is_captured = !mouse.is_captured;
+    }
+
+    if (code == input::KeyEvent::Code::KEY_ENTER && action == input::KeyEvent::Action::PRESS) {
+        app->hit_ball();
     }
 
     if (code == input::KeyEvent::Code::KEY_RIGHT && (action == input::KeyEvent::Action::PRESS ||
@@ -76,21 +80,5 @@ void AppListener::onKeyEvent(const input::KeyEvent& event)
 
     if (code == input::KeyEvent::Code::KEY_V && action == input::KeyEvent::Action::PRESS) {
         app->toggle_visualization();
-    }
-
-    if (code == input::KeyEvent::Code::KEY_B && action == input::KeyEvent::Action::PRESS) {
-        app->add_box();
-    }
-
-    if (code == input::KeyEvent::Code::KEY_N && action == input::KeyEvent::Action::PRESS) {
-        app->add_box_rotated();
-    }
-
-    if (code == input::KeyEvent::Code::KEY_ENTER && action == input::KeyEvent::Action::PRESS) {
-        app->throw_box();
-    }
-
-    if (code == input::KeyEvent::Code::KEY_R && action == input::KeyEvent::Action::PRESS) {
-        app->reset();
     }
 }

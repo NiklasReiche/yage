@@ -1,6 +1,10 @@
-#include "app.h"
+#include <runtime/Engine.h>
+
+#include "BilliardsApp.h"
 
 int main() {
-	App app;
-	app.run();
+    yage::Engine engine = yage::Engine(1500, 900, "Billiards");
+    engine.register_application<BilliardsApp>();
+    engine.run();
+    return 0;
 }
