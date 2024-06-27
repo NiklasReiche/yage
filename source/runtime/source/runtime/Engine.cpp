@@ -12,20 +12,20 @@ namespace yage
     {
         m_gl_context = gl::createContext(m_window);
 
-        m_scene_renderer = std::make_unique<gl3d::SceneRenderer>(*m_gl_context);
-        m_scene_renderer->base_renderer().setViewport(0, 0, width, height);
-        m_scene_renderer->base_renderer().setClearColor(0x008080FFu);
+        scene_renderer = std::make_unique<gl3d::SceneRenderer>(*m_gl_context);
+        scene_renderer->base_renderer().setViewport(0, 0, width, height);
+        scene_renderer->base_renderer().setClearColor(0x008080FFu);
 
-        m_scene_renderer->projection() = math::matrix::perspective<float>(
+        scene_renderer->projection() = math::matrix::perspective<float>(
             45.0f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 1000.0f);
 
         mesh_loader = std::make_unique<gl3d::MeshFileLoader>(
             m_window->getFileReader(),
             m_gl_context->getTextureCreator(),
             m_gl_context->getDrawableCreator(),
-            m_scene_renderer->shaders());
+            scene_renderer->shaders());
 
-        scene = std::make_unique<gl3d::SceneGroup>("root");
+        scene_renderer->active_scene = std::make_unique<gl3d::SceneGroup>("root");
     }
 
     void Engine::run()
@@ -39,8 +39,8 @@ namespace yage
         double accumulator = 0.0;
         while (!m_window->shouldDestroy()) {
             const double frame_time = m_window->getTimeStep();
-            m_scene_renderer->base_renderer().setClearColor(gl::Color::WHITE);
-            m_scene_renderer->base_renderer().clear();
+            scene_renderer->base_renderer().setClearColor(gl::Color::WHITE);
+            scene_renderer->base_renderer().clear();
 
             if (enable_physics_simulation) {
                 accumulator += frame_time;
@@ -69,9 +69,9 @@ namespace yage
                         math::matrix::scale(scene_node.value().get().local_transform.scale());
             }
 
-            m_scene_renderer->base_renderer().clear();
+            scene_renderer->base_renderer().clear();
             m_application->pre_render_update();
-            m_scene_renderer->render_graph(scene, render_camera);
+            scene_renderer->render_active_scene();
 
             m_window->swapBuffers();
             m_window->pollEvents();

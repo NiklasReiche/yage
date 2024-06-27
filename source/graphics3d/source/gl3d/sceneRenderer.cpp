@@ -1,66 +1,39 @@
 #include "sceneRenderer.h"
+
 #include "shaderSnippets.h"
 
 namespace yage::gl3d
 {
-    struct Geometry
-    {
-        res::Resource<std::unique_ptr<Mesh>> mesh;
-        math::Mat4d transform;
-    };
-
-    SceneRenderer::SceneRenderer(gl::IContext& context)
-        : m_renderer(context.getRenderer()),
-          m_projection_view(context.getShaderCreator()->createUniformBlock("ProjectionView"))
+    SceneRenderer::SceneRenderer(gl::IContext& context) :
+        m_renderer(context.getRenderer()),
+        m_projection_view(context.getShaderCreator()->createUniformBlock("ProjectionView"))
     {
         const std::shared_ptr<gl::IShaderCreator> shader_creator = context.getShaderCreator();
         m_shaders.emplace(ShaderPermutation::PBR,
-                          shader_creator->createShader(shaders::PbrShader::get_vert(),
-                                                       shaders::PbrShader::get_frag()));
+                          shader_creator->createShader(shaders::PbrShader::get_vert(), shaders::PbrShader::get_frag()));
         m_shaders.emplace(ShaderPermutation::PBR_NORMAL_MAP,
                           shader_creator->createShader(shaders::PbrNormalMappingShader::get_vert(),
                                                        shaders::PbrNormalMappingShader::get_frag()));
     }
 
-    void SceneRenderer::render_graph(const std::shared_ptr<SceneNode>& root, const Camera& target_camera)
+    void SceneRenderer::render_active_scene()
     {
-        std::vector<Geometry> drawablesLoop;
+        m_drawables.clear();
         m_uniform_values.point_lights.clear();
         m_uniform_values.dir_lights.clear();
 
-        auto collectGeometry = [this, &drawablesLoop](SceneObject& node) {
-            const auto& transform = node.world_transform();
-            if (node.mesh) {
-                drawablesLoop.emplace_back(node.mesh.value(), transform);
-            }
-            if (node.light) {
-                node.light->update_from_transform(transform);
-                switch (node.light->type()) {
-                    case LightType::DIRECTIONAL_LIGHT:
-                        m_uniform_values.dir_lights.push_back(node.light);
-                        break;
-                    case LightType::POINT_LIGHT:
-                        m_uniform_values.point_lights.push_back(node.light);
-                        break;
-                }
-            }
-            if (node.camera) {
-                node.camera->move_to(transform.translation());
-                node.camera->rotate_to(math::quaternion::from_matrix<double>(transform.rotation()));
-            }
-        };
+        active_scene->apply([this](SceneObject& node) { collect_entities(node); }, math::matrix::Id4d);
 
-        // TODO: use found camera from scene graph to set shader camPos, like we do with lights
-
-        root->apply(collectGeometry, math::matrix::Id4d);
-
-        m_projection_view.view = static_cast<math::Mat4f>(target_camera.view_matrix());
+        m_projection_view.view = static_cast<math::Mat4f>(active_camera->view_matrix());
         m_projection_view.sync();
 
         base_renderer().enableDepthTest();
 
         // TODO: sort by shader
-        for (auto& [mesh, transform]: drawablesLoop) {
+        for (auto& node: m_drawables) {
+            MeshResource& mesh = node.get().mesh.value();
+            const math::Mat4d& transform = node.get().world_transform();
+
             for (const auto& sub_mesh: mesh.get()->sub_meshes()) {
                 auto shader = sub_mesh->material().shader();
 
@@ -80,7 +53,7 @@ namespace yage::gl3d
                 }
 
                 if (shader->hasUniform("camPos")) {
-                    shader->setUniform("camPos", static_cast<math::Vec3f>(target_camera.position()));
+                    shader->setUniform("camPos", static_cast<math::Vec3f>(active_camera->position()));
                 }
 
                 shader->setUniform("model", static_cast<math::Mat4f>(transform));
@@ -115,5 +88,31 @@ namespace yage::gl3d
     ShaderMap SceneRenderer::shaders() const
     {
         return m_shaders;
+    }
+
+    void SceneRenderer::collect_entities(SceneObject& node)
+    {
+        const math::Mat4d& transform = node.world_transform();
+
+        if (node.mesh) {
+            m_drawables.emplace_back(node);
+        }
+
+        if (node.light) {
+            node.light->update_from_transform(transform);
+            switch (node.light->type()) {
+                case LightType::DIRECTIONAL_LIGHT:
+                    m_uniform_values.dir_lights.push_back(node.light);
+                    break;
+                case LightType::POINT_LIGHT:
+                    m_uniform_values.point_lights.push_back(node.light);
+                    break;
+            }
+        }
+
+        if (node.camera) {
+            node.camera->move_to(transform.translation());
+            node.camera->rotate_to(math::quaternion::from_matrix<double>(transform.rotation()));
+        }
     }
 }

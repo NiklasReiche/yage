@@ -5,6 +5,7 @@
 #include <core/gl/Drawable.h>
 
 #include "material.h"
+#include "resource/Resource.h"
 
 namespace yage::gl3d
 {
@@ -45,4 +46,6 @@ namespace yage::gl3d
 	private:
 		std::vector<std::unique_ptr<SubMesh>> m_sub_meshes;
 	};
+
+    using MeshResource = res::Resource<std::unique_ptr<Mesh>>;
 }

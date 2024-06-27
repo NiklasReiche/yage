@@ -22,9 +22,8 @@ namespace yage
         std::unique_ptr<gl3d::MeshFileLoader> mesh_loader;
         res::Store<std::unique_ptr<gl3d::Mesh>> mesh_store;
 
-        gl3d::Camera render_camera;
         physics3d::Simulation physics;
-        std::shared_ptr<gl3d::SceneGroup> scene;
+        std::unique_ptr<gl3d::SceneRenderer> scene_renderer;
 
         Engine(int width, int height, const std::string& title);
 
@@ -52,7 +51,6 @@ namespace yage
     private:
         std::unique_ptr<Application> m_application;
         std::shared_ptr<platform::IWindow> m_window;
-        std::unique_ptr<gl3d::SceneRenderer> m_scene_renderer;
 
         std::unordered_map<std::string, GameObject> m_game_objects;
     };
