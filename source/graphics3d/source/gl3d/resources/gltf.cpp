@@ -13,7 +13,7 @@
 
 namespace yage::gl3d::resources
 {
-    gl::TextureWrapper convert_wrapper(int wrap)
+    gl::TextureWrapper convert_wrapper(const int wrap)
     {
         switch (wrap) {
             case TINYGLTF_TEXTURE_WRAP_REPEAT:
@@ -27,7 +27,7 @@ namespace yage::gl3d::resources
         }
     }
 
-    gl::TextureFilter convert_filter(int filter)
+    gl::TextureFilter convert_filter(const int filter)
     {
         switch (filter) {
             case TINYGLTF_TEXTURE_FILTER_LINEAR:
@@ -47,7 +47,7 @@ namespace yage::gl3d::resources
         }
     }
 
-    std::span<const std::byte> readBuffer(tinygltf::Model& model, int i, std::size_t offset, std::size_t size)
+    std::span<const std::byte> readBuffer(tinygltf::Model& model, const int i, const std::size_t offset, const std::size_t size)
     {
         return std::as_bytes(std::span<unsigned char>{
                 model.buffers[i].data.begin() + offset,
@@ -56,21 +56,21 @@ namespace yage::gl3d::resources
     }
 
     std::span<const std::byte>
-    readBufferView(tinygltf::Model& model, int i, std::size_t offset, std::size_t byte_length)
+    readBufferView(tinygltf::Model& model, const int i, const std::size_t offset, const std::size_t byte_length)
     {
-        auto& bufferView = model.bufferViews[i];
+        const auto& bufferView = model.bufferViews[i];
         return readBuffer(model, bufferView.buffer, bufferView.byteOffset + offset, byte_length);
     }
 
-    std::span<const std::byte> readAccessor(tinygltf::Model& model, tinygltf::Accessor& accessor)
+    std::span<const std::byte> readAccessor(tinygltf::Model& model, const tinygltf::Accessor& accessor)
     {
-        auto type_byte_length = tinygltf::GetNumComponentsInType(accessor.type) *
-                                tinygltf::GetComponentSizeInBytes(accessor.componentType);
+        const auto type_byte_length = tinygltf::GetNumComponentsInType(accessor.type) *
+                                      tinygltf::GetComponentSizeInBytes(accessor.componentType);
         return readBufferView(model, accessor.bufferView, accessor.byteOffset, accessor.count * type_byte_length);
     }
 
     std::shared_ptr<gl::ITexture2D>
-    read_texture(gl::ITextureCreator& textureCreator, tinygltf::Model& model, tinygltf::Texture& texture)
+    read_texture(gl::ITextureCreator& textureCreator, tinygltf::Model& model, const tinygltf::Texture& texture)
     {
         auto& image = model.images[texture.source];
 
@@ -93,11 +93,11 @@ namespace yage::gl3d::resources
                 throw std::invalid_argument("unsupported number of texture channels");
         }
 
-        auto sampler = model.samplers[texture.sampler];
-        gl::TextureWrapper wrapper_s = convert_wrapper(sampler.wrapS);
-        gl::TextureWrapper wrapper_t = convert_wrapper(sampler.wrapT);
-        gl::TextureFilter filter_min = convert_filter(sampler.minFilter);
-        gl::TextureFilter filter_mag = convert_filter(sampler.magFilter);
+        const auto sampler = model.samplers[texture.sampler];
+        const gl::TextureWrapper wrapper_s = convert_wrapper(sampler.wrapS);
+        const gl::TextureWrapper wrapper_t = convert_wrapper(sampler.wrapT);
+        const gl::TextureFilter filter_min = convert_filter(sampler.minFilter);
+        const gl::TextureFilter filter_mag = convert_filter(sampler.magFilter);
 
         auto t = textureCreator.createTexture2D(image.width, image.height, format, image.image);
         t->configTextureWrapper(wrapper_s, wrapper_t);
@@ -109,9 +109,8 @@ namespace yage::gl3d::resources
     }
 
     std::shared_ptr<gl3d::Material>
-    read_material(tinygltf::Material& material,
+    read_material(const tinygltf::Material& material,
                   const std::vector<std::shared_ptr<gl::ITexture2D>>& textures,
-                  std::shared_ptr<gl::IShader>& shader,
                   const std::shared_ptr<gl::ITexture2D>& full_texture)
     {
         auto gl3d_material = std::make_shared<Material>();
@@ -151,23 +150,20 @@ namespace yage::gl3d::resources
             gl3d_material->add_uniform("aoMap", full_texture);
         }
 
-        gl3d_material->set_shader(shader);
-
         return gl3d_material;
     }
 
-    std::unique_ptr<SubMesh> read_sub_mesh(tinygltf::Model& model, tinygltf::Primitive& primitive,
+    std::unique_ptr<SubMesh> read_sub_mesh(tinygltf::Model& model, const tinygltf::Primitive& primitive,
                                            gl::IDrawableCreator& drawableCreator,
                                            const std::vector<std::shared_ptr<gl3d::Material>>& materials,
-                                           std::shared_ptr<gl::IShader>& shader,
-                                           std::shared_ptr<gl::IShader>& shader_normal_mapping)
+                                           const ShaderMap& shaders)
     {
         auto& gl3d_material = materials.at(primitive.material);
 
         std::vector<std::byte> vertices;
         std::vector<unsigned int> vertex_layout;
 
-        auto position_accessor = model.accessors.at(primitive.attributes.at("POSITION"));
+        const auto position_accessor = model.accessors.at(primitive.attributes.at("POSITION"));
         if (position_accessor.type != TINYGLTF_TYPE_VEC3 || position_accessor.componentType != TINYGLTF_COMPONENT_TYPE_FLOAT) {
             throw std::runtime_error("unsupported format");
         }
@@ -176,7 +172,7 @@ namespace yage::gl3d::resources
         vertex_layout.push_back(static_cast<unsigned int>(tinygltf::GetNumComponentsInType(position_accessor.type)));
 
         // TODO: construct normals if not present
-        auto normal_accessor = model.accessors.at(primitive.attributes.at("NORMAL"));
+        const auto normal_accessor = model.accessors.at(primitive.attributes.at("NORMAL"));
         if (normal_accessor.type != TINYGLTF_TYPE_VEC3 || normal_accessor.componentType != TINYGLTF_COMPONENT_TYPE_FLOAT) {
             throw std::runtime_error("unsupported format");
         }
@@ -185,7 +181,7 @@ namespace yage::gl3d::resources
         vertex_layout.push_back(static_cast<unsigned int>(tinygltf::GetNumComponentsInType(normal_accessor.type)));
 
         if (primitive.attributes.contains("TANGENT")) {
-            auto tangent_accessor = model.accessors.at(primitive.attributes.at("TANGENT"));
+            const auto tangent_accessor = model.accessors.at(primitive.attributes.at("TANGENT"));
             if (tangent_accessor.type != TINYGLTF_TYPE_VEC4 ||
                     tangent_accessor.componentType != TINYGLTF_COMPONENT_TYPE_FLOAT) {
                 throw std::runtime_error("unsupported format");
@@ -193,13 +189,13 @@ namespace yage::gl3d::resources
             auto tangents = readAccessor(model, tangent_accessor);
             vertices.insert(vertices.end(), tangents.begin(), tangents.end());
             vertex_layout.push_back(static_cast<unsigned int>(tinygltf::GetNumComponentsInType(tangent_accessor.type)));
-            gl3d_material->set_shader(shader_normal_mapping);
+            gl3d_material->set_shader(shaders.at(ShaderPermutation::PBR_NORMAL_MAP));
         } else {
-            gl3d_material->set_shader(shader);
+            gl3d_material->set_shader(shaders.at(ShaderPermutation::PBR));
         }
 
         // TODO: fill in dummy tex coords if not present
-        auto tex_coord_accessor = model.accessors.at(primitive.attributes.at("TEXCOORD_0")); // TODO
+        const auto tex_coord_accessor = model.accessors.at(primitive.attributes.at("TEXCOORD_0")); // TODO
         if (tex_coord_accessor.type != TINYGLTF_TYPE_VEC2 ||
                 tex_coord_accessor.componentType != TINYGLTF_COMPONENT_TYPE_FLOAT) {
             throw std::runtime_error("unsupported format");
@@ -208,8 +204,8 @@ namespace yage::gl3d::resources
         vertices.insert(vertices.end(), tex_coords.begin(), tex_coords.end());
         vertex_layout.push_back(static_cast<unsigned int>(tinygltf::GetNumComponentsInType(tex_coord_accessor.type)));
 
-        auto indices_accessor = model.accessors[primitive.indices];
-        auto indices = readAccessor(model, indices_accessor);
+        const auto indices_accessor = model.accessors[primitive.indices];
+        const auto indices = readAccessor(model, indices_accessor);
 
         std::shared_ptr<gl::IDrawable> drawable = drawableCreator.createDrawable(
                 vertices, indices, vertex_layout,
@@ -223,17 +219,16 @@ namespace yage::gl3d::resources
     std::unique_ptr<Mesh> read_mesh(tinygltf::Model& model, tinygltf::Mesh& mesh,
                                     gl::IDrawableCreator& drawableCreator,
                                     const std::vector<std::shared_ptr<gl3d::Material>>& materials,
-                                    std::shared_ptr <gl::IShader>& shader,
-                                    std::shared_ptr<gl::IShader>& shader_normal_mapping)
+                                    const ShaderMap& shaders)
     {
         auto gl3d_mesh = std::make_unique<Mesh>();
         for (auto& primitive: mesh.primitives) {
-            gl3d_mesh->add_sub_mesh(read_sub_mesh(model, primitive, drawableCreator, materials, shader, shader_normal_mapping));
+            gl3d_mesh->add_sub_mesh(read_sub_mesh(model, primitive, drawableCreator, materials, shaders));
         }
         return gl3d_mesh;
     }
 
-    std::unique_ptr<SceneGroup> read_node(tinygltf::Node& node, const std::vector<std::shared_ptr<gl3d::Mesh>>& meshes)
+    std::unique_ptr<SceneGroup> read_node(tinygltf::Node& node, const std::vector<std::shared_ptr<gl3d::Mesh>>&)
     {
         math::Mat4d transform;
         if (node.matrix.size() == 16) {
@@ -256,17 +251,17 @@ namespace yage::gl3d::resources
 
         if (node.children.empty()) {
             std::unique_ptr<SceneGroup> group = std::make_unique<gl3d::SceneGroup>(node.name + "_group");
-            SceneObject& object = group->create_object(node.name, transform);
+            //SceneObject& object = group->create_object(node.name, transform);
             if (node.mesh > -1) {
-                object.mesh = meshes.at(node.mesh);
+                //object.mesh = meshes.at(node.mesh); TODO
             }
 
             return group;
         } else {
             std::unique_ptr<SceneGroup> group = std::make_unique<gl3d::SceneGroup>(node.name, transform);
             if (node.mesh > -1) {
-                SceneObject& object = group->create_object(node.name + "_object");
-                object.mesh = meshes.at(node.mesh);
+                //SceneObject& object = group->create_object(node.name + "_object");
+                //object.mesh = meshes.at(node.mesh); TODO
             }
 
             return group;
@@ -277,7 +272,7 @@ namespace yage::gl3d::resources
                         const std::unique_ptr<gl3d::SceneGroup>& root,
                         std::vector<std::unique_ptr<gl3d::SceneGroup>>& scene_nodes)
     {
-        for (auto& child_index: node.children) {
+        for (const auto& child_index: node.children) {
             auto& child = scene_nodes.at(child_index);
             construct_node(model, model.nodes[child_index], child, scene_nodes);
             root->add_node(std::move(child));
@@ -287,7 +282,7 @@ namespace yage::gl3d::resources
     tinygltf::Model read_file(const platform::IFileReader& fileReader, const std::string& filename)
     {
         auto tmp = utils::strip(filename, "/");
-        std::string filetype = utils::strip(tmp.back(), ".").back();
+        const std::string filetype = utils::strip(tmp.back(), ".").back();
         tmp.pop_back();
         std::string basedir = utils::join(tmp, "/");
         basedir.pop_back();
@@ -300,7 +295,7 @@ namespace yage::gl3d::resources
         std::string warn;
         bool ret;
         if (filetype == "gltf") {
-            std::string data = fileReader.openTextFile(filename, platform::IFile::AccessMode::READ)->readAll();
+            const std::string data = fileReader.openTextFile(filename, platform::IFile::AccessMode::READ)->readAll();
             ret = loader.LoadASCIIFromString(&model, &err, &warn, data.data(), data.length(), basedir);
         } else if (filetype == "glb") {
             std::vector<std::byte> data = fileReader.openBinaryFile(filename, platform::IFile::AccessMode::READ)
@@ -321,14 +316,13 @@ namespace yage::gl3d::resources
         return model;
     }
 
-    std::vector<std::shared_ptr<gl3d::Mesh>> read_meshes(tinygltf::Model& model,
+    std::vector<std::unique_ptr<gl3d::Mesh>> read_meshes(tinygltf::Model& model,
                                                          gl::IDrawableCreator& drawableCreator,
                                                          gl::ITextureCreator& textureCreator,
-                                                         std::shared_ptr<gl::IShader>& shader,
-                                                         std::shared_ptr<gl::IShader>& shader_normal_mapping)
+                                                         const ShaderMap& shaders)
     {
         std::vector<unsigned char> full_data{255, 255, 255, 255};
-        std::shared_ptr<gl::ITexture2D> full_texture = textureCreator.createTexture2D(
+        const std::shared_ptr<gl::ITexture2D> full_texture = textureCreator.createTexture2D(
                 1, 1, gl::ImageFormat::RGBA, full_data);
 
         std::vector<std::shared_ptr<gl::ITexture2D>> textures;
@@ -340,13 +334,13 @@ namespace yage::gl3d::resources
         std::vector<std::shared_ptr<gl3d::Material>> materials;
         materials.reserve(model.materials.size());
         for (auto& material: model.materials) {
-            materials.push_back(read_material(material, textures, shader, full_texture));
+            materials.push_back(read_material(material, textures, full_texture));
         }
 
-        std::vector<std::shared_ptr<gl3d::Mesh>> meshes;
+        std::vector<std::unique_ptr<gl3d::Mesh>> meshes;
         meshes.reserve(model.meshes.size());
         for (auto& mesh: model.meshes) {
-            meshes.push_back(read_mesh(model, mesh, drawableCreator, materials, shader, shader_normal_mapping));
+            meshes.push_back(read_mesh(model, mesh, drawableCreator, materials, shaders));
         }
 
         return meshes;
@@ -355,12 +349,13 @@ namespace yage::gl3d::resources
     std::unique_ptr<SceneGroup> gltf_read_scene(
             const platform::IFileReader& fileReader, const std::string& filename,
             gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator,
-            std::shared_ptr<gl::IShader>& shader,
-            std::shared_ptr<gl::IShader>& shader_normal_mapping)
+            const ShaderMap& shaders)
     {
         tinygltf::Model model = read_file(fileReader, filename);
 
-        auto meshes = read_meshes(model, drawableCreator, textureCreator, shader, shader_normal_mapping);
+        std::vector<std::unique_ptr<Mesh>> temp = read_meshes(model, drawableCreator, textureCreator, shaders);
+        std::vector<std::shared_ptr<Mesh>> meshes;
+        std::ranges::move(temp, std::back_inserter(meshes));
 
         std::vector<std::unique_ptr<gl3d::SceneGroup>> scene_nodes;
         scene_nodes.reserve(model.nodes.size());
@@ -373,7 +368,7 @@ namespace yage::gl3d::resources
         scenes.reserve(model.scenes.size());
         for (auto& scene: model.scenes) {
             auto world_root = std::make_unique<gl3d::SceneGroup>("root");
-            for (auto root_index : scene.nodes) {
+            for (const auto root_index : scene.nodes) {
                 auto& root = scene_nodes.at(root_index);
                 construct_node(model, model.nodes.at(root_index), root, scene_nodes);
                 world_root->add_node(std::move(root));
@@ -387,12 +382,11 @@ namespace yage::gl3d::resources
         // TODO: do we need to handle sparse accessors explicitly?
     }
 
-    std::vector<std::shared_ptr<gl3d::Mesh>> gltf_read_meshes(const platform::IFileReader& fileReader, const std::string& filename,
+    std::vector<std::unique_ptr<gl3d::Mesh>> gltf_read_meshes(const platform::IFileReader& fileReader, const std::string& filename,
                                              gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator,
-                                             std::shared_ptr<gl::IShader>& shader,
-                                             std::shared_ptr<gl::IShader>& shader_normal_mapping)
+                                             const ShaderMap& shaders)
     {
         tinygltf::Model model = read_file(fileReader, filename);
-        return read_meshes(model, drawableCreator, textureCreator, shader, shader_normal_mapping);
+        return read_meshes(model, drawableCreator, textureCreator, shaders);
     }
 }

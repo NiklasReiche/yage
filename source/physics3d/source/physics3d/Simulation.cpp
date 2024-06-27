@@ -118,6 +118,11 @@ namespace yage::physics3d
         clear_forces();
     }
 
+    RigidBody& Simulation::lookup(const RigidBodyHandle handle)
+    {
+        return m_bodies[handle.id];
+    }
+
     void Simulation::enable_gravity()
     {
         m_external_acceleration = {0, -9.81, 0};
@@ -317,32 +322,39 @@ namespace yage::physics3d
 
     void Simulation::integrate_forces(const double dt)
     {
-        for (const std::shared_ptr<RigidBody>& rb : bodies) {
+        for (RigidBody& rb : m_bodies) {
+            if (rb.m_should_destroy) {
+                continue;
+            }
+
             // external forces
-            if (rb->m_inertia_shape.inverse_mass() > 0) {
-                rb->m_velocity += m_external_acceleration * dt;
+            if (rb.m_inertia_shape.inverse_mass() > 0) {
+                rb.m_velocity += m_external_acceleration * dt;
             }
 
             // linear component
-            rb->m_velocity += rb->m_inertia_shape.inverse_mass() * rb->m_force * dt;
+            rb.m_velocity += rb.m_inertia_shape.inverse_mass() * rb.m_force * dt;
 
             // angular component
-            rb->m_angular_velocity +=
-                    rb->m_inertia_shape.inverse_inertia_tensor() * rb->m_torque * dt;
+            rb.m_angular_velocity += rb.m_inertia_shape.inverse_inertia_tensor() * rb.m_torque * dt;
         }
     }
 
     void Simulation::integrate_positions(const double dt)
     {
-        for (const std::shared_ptr<RigidBody>& rb: bodies) {
+        for (RigidBody& rb: m_bodies) {
+            if (rb.m_should_destroy) {
+                continue;
+            }
+
             // linear component
-            rb->m_position += rb->m_velocity * dt;
+            rb.m_position += rb.m_velocity * dt;
 
             // angular component
-            rb->m_orientation += 0.5 * math::Quatd(rb->m_angular_velocity) * rb->m_orientation * dt;
-            rb->m_orientation.normalize();
+            rb.m_orientation += 0.5 * math::Quatd(rb.m_angular_velocity) * rb.m_orientation * dt;
+            rb.m_orientation.normalize();
 
-            rb->update_collider();
+            rb.update_collider();
         }
     }
 
@@ -358,47 +370,53 @@ namespace yage::physics3d
         }
 
         // collision detection narrow phase
-        for (std::size_t i = 0; i < bodies.size() - 1; ++i) {
-            auto& rb_a = bodies.at(i);
-            if (!rb_a->m_collider.has_value())
+        if (m_bodies.size() < 2) {
+            return;
+        }
+        // bodies must be at least of size 2 for this to work (unsigned index)
+        for (std::size_t i = 0; i < m_bodies.size() - 1; ++i) {
+            RigidBody& rb_a = m_bodies[i];
+            if (rb_a.m_should_destroy || !rb_a.m_collider.has_value()) {
                 continue;
+            }
 
-            for (std::size_t j = i + 1; j < bodies.size(); ++j) {
-                auto& rb_b = bodies.at(j);
-                if (!rb_b->m_collider.has_value())
+            for (std::size_t j = i + 1; j < m_bodies.size(); ++j) {
+                RigidBody& rb_b = m_bodies[j];
+                if (rb_b.m_should_destroy || !rb_b.m_collider.has_value()) {
                     continue;
+                }
 
                 std::optional<ContactManifold> result = std::visit(m_collision_visitor,
-                                                                   rb_a->m_collider.value(),
-                                                                   rb_b->m_collider.value());
+                                                                   rb_a.m_collider.value(),
+                                                                   rb_b.m_collider.value());
                 if (result.has_value()) {
                     ContactManifold& manifold = result.value();
                     for (ContactPoint& contact: manifold.contacts) {
-                        math::Vec3d v_abs_p_a = rb_a->m_velocity + math::cross(rb_a->m_angular_velocity, contact.r_a);
-                        math::Vec3d v_abs_p_b = rb_b->m_velocity + math::cross(rb_b->m_angular_velocity, contact.r_b);
+                        math::Vec3d v_abs_p_a = rb_a.m_velocity + cross(rb_a.m_angular_velocity, contact.r_a);
+                        math::Vec3d v_abs_p_b = rb_b.m_velocity + cross(rb_b.m_angular_velocity, contact.r_b);
                         contact.rel_v = v_abs_p_b - v_abs_p_a;
-                        contact.rel_v_n = math::dot(contact.rel_v, manifold.normal);
+                        contact.rel_v_n = dot(contact.rel_v, manifold.normal);
 
                         // Gram-Schmidt method using the relative velocity as the initial vector for the projection
                         // don't normalize tangent here, since it might be zero-length
-                        manifold.tangent_1 = contact.rel_v - manifold.normal * math::dot(contact.rel_v, manifold.normal);
-                        if (math::length_sqr(manifold.tangent_1) < 0.0000001) {
+                        manifold.tangent_1 = contact.rel_v - manifold.normal * dot(contact.rel_v, manifold.normal);
+                        if (length_sqr(manifold.tangent_1) < 0.0000001) {
                             // tangent is parallel to n, so we need another approach
                             std::tie(manifold.tangent_1, manifold.tangent_2) = tangent_plane(manifold.normal);
                         } else {
                             manifold.tangent_1.normalize();
                             // normalization not necessary, since tangent and normal are already normalized
-                            manifold.tangent_2 = math::cross(manifold.tangent_1, manifold.normal);
+                            manifold.tangent_2 = cross(manifold.tangent_1, manifold.normal);
                         }
 
                         m_penetration_constraints.push_back(
-                                prepare_penetration_constraint(*rb_a, *rb_b, manifold, contact, dt));
+                                prepare_penetration_constraint(rb_a, rb_b, manifold, contact, dt));
 
-                        auto [cf_0, cf_1] = prepare_friction_constraints(*rb_a, *rb_b, manifold, contact);
+                        auto [cf_0, cf_1] = prepare_friction_constraints(rb_a, rb_b, manifold, contact);
                         m_friction_constraints.push_back(cf_0);
                         m_friction_constraints.push_back(cf_1);
 
-                        auto [crf_0, crf_1, crf_2] = prepare_rolling_friction_constraints(*rb_a, *rb_b, manifold);
+                        auto [crf_0, crf_1, crf_2] = prepare_rolling_friction_constraints(rb_a, rb_b, manifold);
                         m_rolling_friction_constraints.push_back(crf_0);
                         m_rolling_friction_constraints.push_back(crf_1);
                         m_rolling_friction_constraints.push_back(crf_2);
@@ -436,27 +454,18 @@ namespace yage::physics3d
 
     void Simulation::remove_destroyed_bodies()
     {
-        // gather bodies marked for deletion
-        std::vector<std::size_t> indices_to_delete;
-        for (std::size_t i = 0; i < bodies.size(); ++i) {
-            if (bodies[i]->m_should_destroy) {
-                indices_to_delete.push_back(i);
+        for (std::size_t i = 0; i < m_bodies.size(); ++i) {
+            if (m_bodies[i].m_should_destroy) {
+                m_free_ids.push(i);
             }
-        }
-
-        // erase bodies marked for deletion
-        std::ptrdiff_t n_deleted = 0;
-        for (const std::size_t i: indices_to_delete) {
-            bodies.erase(bodies.begin() + static_cast<std::ptrdiff_t>(i) - n_deleted);
-            n_deleted++;
         }
     }
 
     void Simulation::clear_forces()
     {
-        for (const std::shared_ptr<RigidBody>& rb : bodies) {
-            rb->m_force = math::Vec3d();
-            rb->m_torque = math::Vec3d();
+        for (RigidBody& rb : m_bodies) {
+            rb.m_force = math::Vec3d();
+            rb.m_torque = math::Vec3d();
         }
     }
 }

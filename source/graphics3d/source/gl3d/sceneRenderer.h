@@ -9,24 +9,25 @@
 #include "sceneGraph/sceneObject.h"
 #include "light.h"
 #include "ProjectionView.h"
+#include "shaders.h"
 
 namespace yage::gl3d
 {
 	struct ShaderUniformValues
 	{
-		math::Vec3d viewPos;
-		math::Mat4d view;
         std::vector<std::shared_ptr<Light>> dir_lights;
 		std::vector<std::shared_ptr<Light>> point_lights;
-        std::shared_ptr<Camera> camera;
 	};
 
 	class SceneRenderer
 	{
 	public:
+	    std::shared_ptr<Camera> active_camera;
+        std::shared_ptr<SceneGroup> active_scene;
+
 		explicit SceneRenderer(gl::IContext& context);
 
-		void render_graph(const std::shared_ptr<SceneNode>& root, const Camera& target_camera);
+		void render_active_scene();
 
 		math::Mat4f& projection();
 
@@ -36,9 +37,16 @@ namespace yage::gl3d
 
 		gl::IRenderer& base_renderer();
 
+		ShaderMap shaders() const;
+
 	private:
-		std::shared_ptr<gl::IRenderer> m_renderer;
+        std::shared_ptr<gl::IRenderer> m_renderer;
 		ShaderUniformValues m_uniform_values;
 		ProjectionView m_projection_view;
+		ShaderMap m_shaders;
+
+	    std::vector<std::reference_wrapper<SceneObject>> m_drawables;
+
+	    void collect_entities(SceneObject& node);
 	};
 }

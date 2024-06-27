@@ -2,10 +2,12 @@
 
 namespace yage
 {
+    class Engine;
+
     class Application
     {
     public:
-        Application() = default;
+        explicit Application() = default;
 
         virtual ~Application() = default;
 
@@ -20,5 +22,11 @@ namespace yage
         virtual void pre_physics_update()
         {
         }
+
+    protected:
+        Engine* m_engine = nullptr;
+
+    private:
+        friend class Engine;
     };
 }

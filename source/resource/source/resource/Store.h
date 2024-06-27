@@ -20,7 +20,7 @@ namespace yage::res
         Resource<ResourceType> loadResource(Loader<ResourceType, LocationType>& loader, const LocationType& location);
 
     private:
-        std::unordered_map<std::size_t, ResourceType> resources;
+        std::unordered_map<std::size_t, ResourceType> resources; // TODO: could use vector with custom ofset handling
 
         ResourceType& getUnderlyingResource(std::size_t key);
 
