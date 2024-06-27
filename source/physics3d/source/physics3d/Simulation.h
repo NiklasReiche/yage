@@ -1,11 +1,12 @@
 #pragma once
 
 #include <memory>
+#include <queue>
 #include <tuple>
 #include <vector>
 
-#include "RigidBody.h"
 #include "Collision.h"
+#include "RigidBody.h"
 #include "Visualizer.h"
 
 namespace yage::physics3d
@@ -48,11 +49,24 @@ namespace yage::physics3d
          * @return A pointer to the constructed rigid body.
          */
         template<typename... Args>
-        std::shared_ptr<RigidBody> create_rigid_body(Args&& ... args)
+        RigidBodyHandle create_rigid_body(Args&&... args)
         {
-            bodies.push_back(std::make_shared<RigidBody>(args...));
-            return bodies.back();
+            std::size_t id;
+            if (m_free_ids.empty()) {
+                id = m_bodies.size();
+                m_bodies.push_back(RigidBody(args...));
+            } else {
+                id = m_free_ids.front();
+                m_free_ids.pop();
+                m_bodies[id] = RigidBody(args...);
+            }
+
+            RigidBodyHandle handle;
+            handle.id = id;
+            return handle;
         }
+
+        RigidBody& lookup(RigidBodyHandle handle);
 
         void enable_gravity();
 
@@ -78,7 +92,9 @@ namespace yage::physics3d
          */
         int m_solver_iterations = 10;
 
-        std::vector<std::shared_ptr<RigidBody>> bodies;
+        std::queue<std::size_t> m_free_ids;
+        std::vector<RigidBody> m_bodies;
+
         CollisionVisitor m_collision_visitor{};
         math::Vec3d m_external_acceleration{};
 
@@ -104,13 +120,12 @@ namespace yage::physics3d
 
         static void apply_impulse(const Constraint& constraint, const math::Matd<12, 1>& impulse);
 
-        Constraint
-        prepare_penetration_constraint(RigidBody& rb_a, RigidBody& rb_b, const ContactManifold& manifold,
-                                       const ContactPoint& contact, double dt) const;
+        Constraint prepare_penetration_constraint(RigidBody& rb_a, RigidBody& rb_b, const ContactManifold& manifold,
+                                                  const ContactPoint& contact, double dt) const;
 
-        static std::tuple<Constraint, Constraint>
-        prepare_friction_constraints(RigidBody& rb_a, RigidBody& rb_b, const ContactManifold& manifold,
-                                     const ContactPoint& contact);
+        static std::tuple<Constraint, Constraint> prepare_friction_constraints(RigidBody& rb_a, RigidBody& rb_b,
+                                                                               const ContactManifold& manifold,
+                                                                               const ContactPoint& contact);
 
         static std::tuple<Constraint, Constraint, Constraint>
         prepare_rolling_friction_constraints(RigidBody& rb_a, RigidBody& rb_b, const ContactManifold& manifold);

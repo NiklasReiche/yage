@@ -8,6 +8,14 @@
 
 namespace yage::physics3d
 {
+    class RigidBodyHandle
+    {
+    private:
+        std::size_t id = 0;
+
+        friend class Simulation;
+    };
+
     /**
      * Contains properties related to bounciness and friction for rigid bodies.
      */

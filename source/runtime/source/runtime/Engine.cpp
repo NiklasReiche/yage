@@ -56,13 +56,16 @@ namespace yage
             }
 
             // update scene graph from rigid bodies
-            for (auto& [scene_node, rigid_body]: m_game_objects | std::ranges::views::values) {
-                if (!scene_node || !rigid_body) {
+            for (auto& [scene_node, rigid_body_handle]: m_game_objects | std::ranges::views::values) {
+                if (!scene_node || !rigid_body_handle) {
                     continue;
                 }
+
+                physics3d::RigidBody& rigid_body = physics.lookup(rigid_body_handle.value());
+
                 scene_node.value().get().local_transform =
-                        math::matrix::translate(rigid_body->position()) *
-                        math::matrix::from_quaternion(rigid_body->orientation()) *
+                        math::matrix::translate(rigid_body.position()) *
+                        math::matrix::from_quaternion(rigid_body.orientation()) *
                         math::matrix::scale(scene_node.value().get().local_transform.scale());
             }
 

@@ -22,23 +22,25 @@ void NewApp::initialize()
 void NewApp::add_box()
 {
     const double height = box_stack * (box_length + 0.5);
-    load_cube("models/box.glb", box_offset + yage::math::Vec3d(0, height, 0));
+    load_cube("models/box.glb", box_offset + math::Vec3d(0, height, 0));
     box_stack++;
 }
 
 void NewApp::throw_box()
 {
-    const auto& [_, rigid_body] =
-        load_cube("models/box.glb", box_offset + yage::math::Vec3d(-20, 10, 0));
-    rigid_body->apply_force(yage::math::Vec3d(800, 1000, 0),
-                               rigid_body->position() + yage::math::Vec3d(0.2, 0, 0.1));
+    const auto& [_, rigid_body_handle] =
+        load_cube("models/box.glb", box_offset + math::Vec3d(-20, 10, 0));
+    physics3d::RigidBody& rigid_body = m_engine->physics.lookup(rigid_body_handle.value());
+
+    rigid_body.apply_force(math::Vec3d(800, 1000, 0),
+        rigid_body.position() + math::Vec3d(0.2, 0, 0.1));
 }
 
 void NewApp::add_box_rotated()
 {
     const double height = box_stack * (box_length + 0.5);
-    load_cube("models/box.glb", box_offset + yage::math::Vec3d(0, height, 0),
-              yage::math::quaternion::euler_angle<double>(0.0, yage::math::to_rad(10.0), yage::math::to_rad(30.0)));
+    load_cube("models/box.glb", box_offset + math::Vec3d(0, height, 0),
+              math::quaternion::euler_angle<double>(0.0, math::to_rad(10.0), math::to_rad(30.0)));
     box_stack++;
 }
 
