@@ -75,9 +75,19 @@ namespace yage
         }
     }
 
+    void Engine::register_input_listener(input::InputListener& input_listener)
+    {
+        m_window->attach(input_listener);
+    }
+
     GameObject& Engine::register_game_object(const std::string& id)
     {
         return m_game_objects[id];
+    }
+
+    void Engine::toggle_cursor_visibility()
+    {
+        m_window->toggleCursor();
     }
 
     gl::IContext& Engine::gl_context()

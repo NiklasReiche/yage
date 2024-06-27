@@ -14,10 +14,18 @@ void NewApp::initialize()
     const std::shared_ptr<gl3d::Camera> camera = std::make_shared<gl3d::Camera>();
     camera->move_to(math::Vec3d(25.0, 25.0, 25.0));
     camera->rotate_to(math::quaternion::euler_angle<double>(math::to_rad(225.), 0, 0) *
-                                      math::quaternion::euler_angle<double>(0, 0, math::to_rad(30.)));
+                      math::quaternion::euler_angle<double>(0, 0, math::to_rad(30.)));
     m_engine->scene_renderer.active_camera = camera;
 
     m_engine->physics.enable_gravity();
+
+    app_listener = AppListener(camera, this);
+    m_engine->register_input_listener(app_listener);
+}
+
+void NewApp::pre_render_update()
+{
+    app_listener.update();
 }
 
 void NewApp::add_box()
@@ -43,6 +51,48 @@ void NewApp::add_box_rotated()
     load_cube("models/box.glb", box_offset + math::Vec3d(0, height, 0),
               math::quaternion::euler_angle<double>(0.0, math::to_rad(10.0), math::to_rad(30.0)));
     box_stack++;
+}
+
+void NewApp::reset()
+{
+    for (const physics3d::RigidBodyHandle& rb: rigid_bodies) {
+        m_engine->physics.lookup(rb).destroy();
+    }
+    rigid_bodies.clear();
+
+    m_engine->scene_renderer.active_scene = std::make_shared<gl3d::SceneGroup>("root");
+
+    box_stack = 0;
+
+    load_ground();
+    setup_lights();
+}
+
+void NewApp::step_simulation() const
+{
+    if (m_engine->enable_physics_simulation)
+        return;
+
+    if (m_engine->enable_physics_visualization) {
+        m_engine->physics.update_staggered(1. / 60);
+    } else {
+        m_engine->physics.update(1. / 60.);
+    }
+}
+
+void NewApp::toggle_simulation() const
+{
+    m_engine->enable_physics_simulation = !m_engine->enable_physics_simulation;
+}
+
+void NewApp::toggle_visualization() const
+{
+    m_engine->enable_physics_visualization = !m_engine->enable_physics_visualization;
+}
+
+void NewApp::toggle_mouse_capture()
+{
+    m_engine->toggle_cursor_visibility();
 }
 
 GameObject NewApp::load_cube(const std::string& filename, math::Vec3d position, math::Quatd orientation)

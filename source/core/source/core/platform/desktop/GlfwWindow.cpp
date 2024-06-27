@@ -120,11 +120,21 @@ namespace yage::platform::desktop
 	}
 
 	void GlfwWindow::disableVSync()
+    {
+        glfwSwapInterval(0);
+    }
+
+    void GlfwWindow::toggleCursor()
 	{
-		glfwSwapInterval(0);
+	    if (cursorVisible) {
+	        hideCursor();
+	    } else {
+	        showCursor();
+	    }
+	    cursorVisible = !cursorVisible;
 	}
 
-	void GlfwWindow::hideCursor()
+    void GlfwWindow::hideCursor()
 	{
 		glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}

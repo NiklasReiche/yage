@@ -41,8 +41,9 @@ namespace yage::platform::desktop
 		void enableVSync();
 		void disableVSync();
 
-		void hideCursor();
-		void showCursor();
+	    void toggleCursor() override;
+		void hideCursor() override;
+		void showCursor() override;
 
 		int shouldDestroy() override;
 
@@ -75,6 +76,7 @@ namespace yage::platform::desktop
 
 		std::vector<std::reference_wrapper<input::InputListener>> inputListeners;
 
+	    bool cursorVisible = true;
 		bool isCharInputEnabled = false;
 		bool isKeyInputEnabled = true;
 		int dpi = 0;

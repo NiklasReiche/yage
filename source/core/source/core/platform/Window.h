@@ -27,6 +27,10 @@ namespace yage::platform
 
 		virtual int shouldDestroy() = 0;
 
+	    virtual void toggleCursor() = 0;
+        virtual void hideCursor() = 0;
+        virtual void showCursor() = 0;
+
 		virtual void enableCharInput() = 0;
 		virtual void disableCharInput() = 0;
 		virtual void enableKeyInput() = 0;

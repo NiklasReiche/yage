@@ -46,7 +46,11 @@ namespace yage
             m_application->m_engine = this;
         }
 
+        void register_input_listener(input::InputListener& input_listener);
+
         GameObject& register_game_object(const std::string& id);
+
+        void toggle_cursor_visibility();
 
         gl::IContext& gl_context();
 
