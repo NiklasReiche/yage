@@ -55,6 +55,8 @@ namespace yage
 
         GameObject& register_game_object(const std::string& id);
 
+        void destroy_game_object(const GameObject& game_object);
+
         void toggle_cursor_visibility();
 
         gl::IContext& gl_context();

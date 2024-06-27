@@ -61,17 +61,17 @@ namespace yage
             }
 
             // update scene graph from rigid bodies
-            for (auto& [scene_node, rigid_body_handle]: m_game_objects | std::ranges::views::values) {
-                if (!scene_node || !rigid_body_handle) {
+            for (GameObject& game_object : m_game_objects | std::ranges::views::values) {
+                if (!game_object.scene_node || !game_object.rigid_body) {
                     continue;
                 }
 
-                physics3d::RigidBody& rigid_body = physics.lookup(rigid_body_handle.value());
+                physics3d::RigidBody& rigid_body = physics.lookup(game_object.rigid_body.value());
 
-                scene_node.value().get().local_transform =
+                game_object.scene_node.value().get().local_transform =
                         math::matrix::translate(rigid_body.position()) *
                         math::matrix::from_quaternion(rigid_body.orientation()) *
-                        math::matrix::scale(scene_node.value().get().local_transform.scale());
+                        math::matrix::scale(game_object.scene_node.value().get().local_transform.scale());
             }
 
             // render scene
@@ -108,7 +108,17 @@ namespace yage
 
     GameObject& Engine::register_game_object(const std::string& id)
     {
+        m_game_objects[id].id = id;
         return m_game_objects[id];
+    }
+
+    void Engine::destroy_game_object(const GameObject& game_object)
+    {
+        if (game_object.rigid_body) {
+            physics.lookup(game_object.rigid_body.value()).destroy();
+        }
+        // TODO: allow destroying individual scene graph nodes
+        m_game_objects.erase(game_object.id);
     }
 
     void Engine::toggle_cursor_visibility()

@@ -7,8 +7,8 @@ void NewApp::initialize()
 {
     load_gui();
 
-    load_ground();
     setup_lights();
+    load_ground();
     add_box();
     add_box();
     add_box();
@@ -40,8 +40,9 @@ void NewApp::add_box()
 
 void NewApp::throw_box()
 {
-    const auto& [_, rigid_body_handle] = load_cube("models/box.glb", box_offset + math::Vec3d(-20, 10, 0));
-    physics3d::RigidBody& rigid_body = m_engine->physics.lookup(rigid_body_handle.value());
+    const GameObject& game_object =
+        load_cube("models/box.glb", box_offset + math::Vec3d(-20, 10, 0));
+    physics3d::RigidBody& rigid_body = m_engine->physics.lookup(game_object.rigid_body.value());
 
     rigid_body.apply_force(math::Vec3d(800, 1000, 0), rigid_body.position() + math::Vec3d(0.2, 0, 0.1));
 }
@@ -56,17 +57,21 @@ void NewApp::add_box_rotated()
 
 void NewApp::reset()
 {
-    for (const physics3d::RigidBodyHandle& rb: rigid_bodies) {
-        m_engine->physics.lookup(rb).destroy();
+    for (const GameObject& game_object : objects) {
+        m_engine->destroy_game_object(game_object);
     }
-    rigid_bodies.clear();
-
+    objects.clear();
     m_engine->scene_renderer.active_scene = std::make_shared<gl3d::SceneGroup>("root");
 
     box_stack = 0;
+    n_cubes = 0;
 
-    load_ground();
     setup_lights();
+    load_ground();
+    add_box();
+    add_box();
+    add_box();
+    add_box();
 }
 
 void NewApp::step_simulation() const
@@ -104,7 +109,7 @@ GameObject NewApp::load_cube(const std::string& filename, math::Vec3d position, 
 
     auto& game_object = m_engine->register_game_object("cube" + std::to_string(n_cubes));
 
-    game_object.scene_node = m_engine->scene_renderer.active_scene->create_object("cube" + n_cubes);
+    game_object.scene_node = m_engine->scene_renderer.active_scene->create_object("cube" + std::to_string(n_cubes));
     game_object.scene_node.value().get().mesh = cube_mesh;
 
     game_object.rigid_body = m_engine->physics.create_rigid_body(physics3d::InertiaShape::cube(2, box_mass),
@@ -113,24 +118,27 @@ GameObject NewApp::load_cube(const std::string& filename, math::Vec3d position, 
                                                                  },
                                                                  cube_material, position, orientation);
 
+    objects.push_back(game_object);
     n_cubes++;
     return game_object;
 }
 
 void NewApp::load_ground()
 {
-    const auto mesh = m_engine->mesh_store.loadResource(*m_engine->mesh_loader, std::string{"models/ground.glb"});
+    ground_mesh = m_engine->mesh_store.loadResource(*m_engine->mesh_loader, std::string{"models/ground.glb"});
 
-    auto& [scene_node, rigid_body] = m_engine->register_game_object("ground");
+    GameObject& game_object = m_engine->register_game_object("ground");
 
-    scene_node = m_engine->scene_renderer.active_scene->create_object("ground");
-    scene_node.value().get().mesh = mesh;
+    game_object.scene_node = m_engine->scene_renderer.active_scene->create_object("ground");
+    game_object.scene_node.value().get().mesh = ground_mesh;
 
-    rigid_body = m_engine->physics.create_rigid_body(physics3d::InertiaShape::static_shape(),
+    game_object.rigid_body = m_engine->physics.create_rigid_body(physics3d::InertiaShape::static_shape(),
                                                      physics3d::colliders::OrientedPlane{
                                                              .original_normal = {0, -1, 0},
                                                      },
                                                      ground_material, math::Vec3d(0), math::Quatd());
+
+    objects.push_back(game_object);
 }
 
 void NewApp::setup_lights() const

@@ -46,8 +46,9 @@ private:
         .kinetic_friction = 0.5,
     };
 
-    std::optional<yage::res::Resource<std::unique_ptr<yage::gl3d::Mesh>>> cube_mesh;
-    std::vector<yage::physics3d::RigidBodyHandle> rigid_bodies;
+    std::optional<yage::gl3d::MeshResource> ground_mesh;
+    std::optional<yage::gl3d::MeshResource> cube_mesh;
+    std::vector<yage::GameObject> objects;
     AppListener app_listener;
 
     yage::GameObject

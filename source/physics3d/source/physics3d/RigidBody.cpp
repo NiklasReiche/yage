@@ -76,8 +76,13 @@ namespace yage::physics3d
         return m_torque;
     }
 
+    bool RigidBody::should_ignore() const
+    {
+        return m_destroyed || m_destruction_pending;
+    }
+
     void RigidBody::destroy()
     {
-        m_should_destroy = true;
+        m_destruction_pending = true;
     }
 }

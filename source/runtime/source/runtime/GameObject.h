@@ -9,6 +9,7 @@ namespace yage
 {
     struct GameObject
     {
+        std::string id;
         std::optional<std::reference_wrapper<gl3d::SceneObject>> scene_node;
         std::optional<physics3d::RigidBodyHandle> rigid_body;
     };

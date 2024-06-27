@@ -69,6 +69,9 @@ namespace yage::physics3d
         [[nodiscard]]
         math::Vec3d torque() const;
 
+        [[nodiscard]]
+        bool should_ignore() const;
+
     private:
         math::Vec3d m_position;
         math::Quatd m_orientation;
@@ -84,7 +87,8 @@ namespace yage::physics3d
         std::optional<Collider> m_collider;
         math::Vec3d m_collider_offset;
 
-        bool m_should_destroy{};
+        bool m_destruction_pending = false;
+        bool m_destroyed = false;
 
         void update_collider();
 

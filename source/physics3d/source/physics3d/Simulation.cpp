@@ -323,7 +323,7 @@ namespace yage::physics3d
     void Simulation::integrate_forces(const double dt)
     {
         for (RigidBody& rb : m_bodies) {
-            if (rb.m_should_destroy) {
+            if (rb.should_ignore()) {
                 continue;
             }
 
@@ -343,7 +343,7 @@ namespace yage::physics3d
     void Simulation::integrate_positions(const double dt)
     {
         for (RigidBody& rb: m_bodies) {
-            if (rb.m_should_destroy) {
+            if (rb.should_ignore()) {
                 continue;
             }
 
@@ -376,13 +376,13 @@ namespace yage::physics3d
         // bodies must be at least of size 2 for this to work (unsigned index)
         for (std::size_t i = 0; i < m_bodies.size() - 1; ++i) {
             RigidBody& rb_a = m_bodies[i];
-            if (rb_a.m_should_destroy || !rb_a.m_collider.has_value()) {
+            if (rb_a.should_ignore() || !rb_a.m_collider.has_value()) {
                 continue;
             }
 
             for (std::size_t j = i + 1; j < m_bodies.size(); ++j) {
                 RigidBody& rb_b = m_bodies[j];
-                if (rb_b.m_should_destroy || !rb_b.m_collider.has_value()) {
+                if (rb_b.should_ignore() || !rb_b.m_collider.has_value()) {
                     continue;
                 }
 
@@ -455,8 +455,10 @@ namespace yage::physics3d
     void Simulation::remove_destroyed_bodies()
     {
         for (std::size_t i = 0; i < m_bodies.size(); ++i) {
-            if (m_bodies[i].m_should_destroy) {
+            if (m_bodies[i].m_destruction_pending) {
                 m_free_ids.push(i);
+                m_bodies[i].m_destruction_pending = false;
+                m_bodies[i].m_destroyed = true;
             }
         }
     }
