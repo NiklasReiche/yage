@@ -10,19 +10,21 @@ namespace yage
         m_window(std::make_unique<platform::desktop::GlfwWindow>(width, height, title)),
         m_gl_context(gl::createContext(m_window)),
         scene_renderer(*m_gl_context),
-        physics(physics3d::Visualizer(*m_gl_context))
+        physics(physics3d::Visualizer(*m_gl_context)),
+        gui(m_window, m_gl_context)
     {
         scene_renderer.base_renderer().setViewport(0, 0, width, height);
         scene_renderer.base_renderer().setClearColor(0x008080FFu);
-
         scene_renderer.projection() = math::matrix::perspective<float>(
                 45.0f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 1000.0f);
+        scene_renderer.active_scene = std::make_unique<gl3d::SceneGroup>("root");
 
         mesh_loader =
                 std::make_unique<gl3d::MeshFileLoader>(m_window->getFileReader(), m_gl_context->getTextureCreator(),
                                                        m_gl_context->getDrawableCreator(), scene_renderer.shaders());
 
-        scene_renderer.active_scene = std::make_unique<gl3d::SceneGroup>("root");
+        font_loader =
+                std::make_unique<font::FontFileLoader>(m_gl_context->getTextureCreator(), m_window->getFileReader());
     }
 
     void Engine::run()
@@ -32,23 +34,29 @@ namespace yage
         m_window->show();
         m_window->getTimeStep();
 
-        constexpr double dt = 1. / 60.;
-        double accumulator = 0.0;
+        constexpr double physics_dt = 1. / 60.;
+        double physics_dt_accumulator = 0.0;
+
+        constexpr double gui_dt = 1. / 60.;
+        double gui_dt_accumulator = 0.0;
+
         while (!m_window->shouldDestroy()) {
             const double frame_time = m_window->getTimeStep();
+
             scene_renderer.base_renderer().setClearColor(gl::Color::WHITE);
             scene_renderer.base_renderer().clear();
 
+            // simulate physics
             if (enable_physics_simulation) {
-                accumulator += frame_time;
-                while (accumulator >= dt) {
+                physics_dt_accumulator += frame_time;
+                while (physics_dt_accumulator >= physics_dt) {
                     m_application->pre_physics_update();
                     if (enable_physics_visualization) {
-                        physics.update_staggered(dt);
+                        physics.update_staggered(physics_dt);
                     } else {
-                        physics.update(dt);
+                        physics.update(physics_dt);
                     }
-                    accumulator -= dt;
+                    physics_dt_accumulator -= physics_dt;
                 }
             }
 
@@ -66,9 +74,27 @@ namespace yage
                         math::matrix::scale(scene_node.value().get().local_transform.scale());
             }
 
+            // render scene
             scene_renderer.base_renderer().clear();
             m_application->pre_render_update();
-            scene_renderer.render_active_scene();
+            if (enable_physics_visualization) {
+                scene_renderer.base_renderer().enableWireframe();
+                scene_renderer.render_active_scene();
+                scene_renderer.base_renderer().disableWireframe();
+
+                physics.visualize_collisions(static_cast<math::Mat4d>(scene_renderer.projection()),
+                                             static_cast<math::Mat4d>(scene_renderer.view()));
+            } else {
+                scene_renderer.render_active_scene();
+            }
+
+            // update gui
+            gui_dt_accumulator += frame_time;
+            while (gui_dt_accumulator >= gui_dt) {
+                gui.update(gui_dt);
+                gui_dt_accumulator -= gui_dt;
+            }
+            gui.render();
 
             m_window->swapBuffers();
             m_window->pollEvents();

@@ -56,4 +56,6 @@ private:
     void load_ground();
 
     void setup_lights() const;
+
+    void load_gui();
 };

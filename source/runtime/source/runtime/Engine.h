@@ -3,8 +3,9 @@
 #include "Application.h"
 #include "GameObject.h"
 #include "core/platform/Window.h"
-#include "gl3d/sceneRenderer.h"
 #include "gl3d/MeshLoader.h"
+#include "gl3d/sceneRenderer.h"
+#include "gui/master.h"
 #include "physics3d/Simulation.h"
 #include "resource/Store.h"
 
@@ -23,9 +24,13 @@ namespace yage
 
         gl3d::SceneRenderer scene_renderer;
         physics3d::Simulation physics;
+        gui::Master gui;
 
         std::unique_ptr<gl3d::MeshFileLoader> mesh_loader;
         res::Store<std::unique_ptr<gl3d::Mesh>> mesh_store;
+
+        std::unique_ptr<font::FontFileLoader> font_loader;
+        res::Store<font::Font> font_store;
 
         Engine(int width, int height, const std::string& title);
 

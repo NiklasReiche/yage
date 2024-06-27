@@ -49,6 +49,7 @@ NamespaceIndentation: All
 FixNamespaceComments: false
 AllowShortFunctionsOnASingleLine: Empty
 PointerAlignment: Left
+PackConstructorInitializers: Never
 SpaceAfterCStyleCast: true
 SpaceAfterTemplateKeyword: false
 SpaceBeforeRangeBasedForLoopColon: false
