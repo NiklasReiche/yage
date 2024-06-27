@@ -22,7 +22,7 @@ class App
 public:
     explicit App(const std::string& filename)
     {
-        window = std::make_shared<platform::desktop::GlfwWindow>(1500, 900, "Sandbox");
+        window = std::make_shared<platform::desktop::GlfwWindow>(1500, 900, "Model Viewer");
         glContext = gl::createContext(window);
 
         camera = std::make_shared<gl3d::Camera>();
@@ -53,7 +53,7 @@ public:
 
         scene = loadScene(filename);
 
-        auto light = std::make_shared<gl3d::DirectionalLight>();
+        const auto light = std::make_shared<gl3d::DirectionalLight>();
         light->color = math::Vec3f(5, 5, 5);
         auto& light_node = scene->create_object("light");
         light_node.local_transform = math::matrix::from_quaternion<double>(
@@ -69,7 +69,7 @@ public:
         font::FontFileLoader fontLoader(glContext->getTextureCreator(), window->getFileReader());
         font = fontStore.loadResource(fontLoader, std::string("assets/fonts/OpenSans-Regular.font"));
         gui = std::make_unique<gui::Master>(window, glContext);
-        auto frame = gui->create_widget<gui::ListBox>(gui::ListBoxTemplate{
+        const auto frame = gui->create_widget<gui::ListBox>(gui::ListBoxTemplate{
             .base = {
                 .geometry = {
                     .size_hint = math::Vec2(gui::SizeHint::FIT_CHILDREN),
@@ -112,6 +112,9 @@ public:
 
         baseRenderer->setClearColor(gl::Color::WHITE);
 
+        renderer->active_camera = camera;
+        renderer->active_scene = scene;
+
         while (!window->shouldDestroy()) {
             baseRenderer->clear();
 
@@ -122,7 +125,7 @@ public:
 
             baseRenderer->useShader(*pbrShader);
 
-            renderer->render_graph(scene, *camera);
+            renderer->render_active_scene();
 
             gui->update(1/60.);
             gui->render();
@@ -153,6 +156,6 @@ private:
     {
         return gl3d::resources::gltf_read_scene(platform::desktop::FileReader(),
                                                 filename, *glContext->getDrawableCreator(),
-                                                *glContext->getTextureCreator(), pbrShader, pbrShaderNormalMapping);
+                                                *glContext->getTextureCreator(), renderer->shaders());
     }
 };
