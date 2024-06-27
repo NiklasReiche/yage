@@ -1,8 +1,5 @@
 add_executable(physics_boxes
 	main.cpp
-	MovementListener.h
-	MovementListener.cpp
-	app.h
 	NewApp.h
 	NewApp.cpp
 )

@@ -4,15 +4,23 @@
 #include "GameObject.h"
 #include "core/platform/Window.h"
 #include "gl3d/sceneRenderer.h"
+#include "gl3d/MeshLoader.h"
 #include "physics3d/Simulation.h"
+#include "resource/Store.h"
 
 namespace yage
 {
     class Engine
     {
+    private:
+        std::shared_ptr<gl::IContext> m_gl_context; // this must be destructed last, so keep it at the top
+
     public:
         bool enable_physics_simulation = true;
         bool enable_physics_visualization = false;
+
+        std::unique_ptr<gl3d::MeshFileLoader> mesh_loader;
+        res::Store<std::unique_ptr<gl3d::Mesh>> mesh_store;
 
         gl3d::Camera render_camera;
         physics3d::Simulation physics;
@@ -37,21 +45,13 @@ namespace yage
             m_application->m_engine = this;
         }
 
-        GameObject register_game_object(const std::string& id)
-        {
-            m_game_objects.insert({id, GameObject()});
-            return m_game_objects[id];
-        }
+        GameObject& register_game_object(const std::string& id);
 
-        gl::IContext& gl_context()
-        {
-            return *m_gl_context;
-        }
+        gl::IContext& gl_context();
 
     private:
         std::unique_ptr<Application> m_application;
         std::shared_ptr<platform::IWindow> m_window;
-        std::shared_ptr<gl::IContext> m_gl_context;
         std::unique_ptr<gl3d::SceneRenderer> m_scene_renderer;
 
         std::unordered_map<std::string, GameObject> m_game_objects;
