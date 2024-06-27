@@ -52,7 +52,7 @@ private:
     std::optional<std::reference_wrapper<yage::GameObject>> player_ball;
 
     std::vector<yage::GameObject> objects;
-    MovementListener app_listener;
+    AppListener app_listener;
 
     yage::GameObject&
     load_ball(yage::math::Vec3d position);
@@ -66,4 +66,6 @@ private:
     void setup_lights() const;
 
     void load_gui();
+
+    void setup_scene();
 };

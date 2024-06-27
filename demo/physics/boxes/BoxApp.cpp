@@ -5,14 +5,12 @@ using namespace yage;
 
 void BoxApp::initialize()
 {
+    cube_mesh = m_engine->mesh_store.loadResource(*m_engine->mesh_loader, std::string{"models/box.glb"});
+    ground_mesh = m_engine->mesh_store.loadResource(*m_engine->mesh_loader, std::string{"models/ground.glb"});
+
     load_gui();
 
-    setup_lights();
-    load_ground();
-    add_box();
-    add_box();
-    add_box();
-    add_box();
+    setup_scene();
 
     const std::shared_ptr<gl3d::Camera> camera = std::make_shared<gl3d::Camera>();
     camera->move_to(math::Vec3d(25.0, 25.0, 25.0));
@@ -34,14 +32,13 @@ void BoxApp::pre_render_update()
 void BoxApp::add_box()
 {
     const double height = box_stack * (box_length + 0.5);
-    load_cube("models/box.glb", box_offset + math::Vec3d(0, height, 0));
+    load_cube(box_offset + math::Vec3d(0, height, 0));
     box_stack++;
 }
 
 void BoxApp::throw_box()
 {
-    const GameObject& game_object =
-        load_cube("models/box.glb", box_offset + math::Vec3d(-20, 10, 0));
+    const GameObject& game_object = load_cube(box_offset + math::Vec3d(-20, 10, 0));
     physics3d::RigidBody& rigid_body = m_engine->physics.lookup(game_object.rigid_body.value());
 
     rigid_body.apply_force(math::Vec3d(800, 1000, 0), rigid_body.position() + math::Vec3d(0.2, 0, 0.1));
@@ -50,7 +47,7 @@ void BoxApp::throw_box()
 void BoxApp::add_box_rotated()
 {
     const double height = box_stack * (box_length + 0.5);
-    load_cube("models/box.glb", box_offset + math::Vec3d(0, height, 0),
+    load_cube(box_offset + math::Vec3d(0, height, 0),
               math::quaternion::euler_angle<double>(0.0, math::to_rad(10.0), math::to_rad(30.0)));
     box_stack++;
 }
@@ -66,12 +63,7 @@ void BoxApp::reset()
     box_stack = 0;
     n_cubes = 0;
 
-    setup_lights();
-    load_ground();
-    add_box();
-    add_box();
-    add_box();
-    add_box();
+    setup_scene();
 }
 
 void BoxApp::step_simulation() const
@@ -101,12 +93,8 @@ void BoxApp::toggle_mouse_capture()
     m_engine->toggle_cursor_visibility();
 }
 
-GameObject BoxApp::load_cube(const std::string& filename, math::Vec3d position, math::Quatd orientation)
+GameObject BoxApp::load_cube(math::Vec3d position, math::Quatd orientation)
 {
-    if (!cube_mesh) {
-        cube_mesh = m_engine->mesh_store.loadResource(*m_engine->mesh_loader, filename);
-    }
-
     auto& game_object = m_engine->register_game_object("cube" + std::to_string(n_cubes));
 
     game_object.scene_node = m_engine->scene_renderer.active_scene->create_object("cube" + std::to_string(n_cubes));
@@ -125,8 +113,6 @@ GameObject BoxApp::load_cube(const std::string& filename, math::Vec3d position, 
 
 void BoxApp::load_ground()
 {
-    ground_mesh = m_engine->mesh_store.loadResource(*m_engine->mesh_loader, std::string{"models/ground.glb"});
-
     GameObject& game_object = m_engine->register_game_object("ground");
 
     game_object.scene_node = m_engine->scene_renderer.active_scene->create_object("ground");
@@ -244,4 +230,14 @@ void BoxApp::load_gui()
                             .font = font,
                     },
     });
+}
+
+void BoxApp::setup_scene()
+{
+    setup_lights();
+    load_ground();
+    add_box();
+    add_box();
+    add_box();
+    add_box();
 }

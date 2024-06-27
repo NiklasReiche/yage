@@ -11,16 +11,7 @@ void BilliardsApp::initialize()
 
     load_gui();
 
-    setup_lights();
-    load_ground(math::Vec3d(0));
-    load_barrier(math::Vec3d(1, 0, 0), math::quaternion::euler_angle<double>(-std::numbers::pi_v<double> / 2, 0, 0),
-                 math::Vec3d(0.5, 1.0, 1.0));
-    load_barrier(math::Vec3d(0, 0, 0.5), math::quaternion::euler_angle<double>(std::numbers::pi_v<double>, 0, 0));
-    load_barrier(math::Vec3d(0, 0, -0.5), math::Quatd());
-    load_barrier(math::Vec3d(-1, 0, 0), math::quaternion::euler_angle<double>(std::numbers::pi_v<double> / 2, 0, 0),
-                 math::Vec3d(0.5, 1.0, 1.0));
-    setup_balls(math::Vec3d(0.35, table_position.y() + billiard_ball_radius + 0.00001, 0));
-    player_ball = load_ball(math::Vec3d(-0.5, table_position.y() + billiard_ball_radius + 0.00001, 0));
+    setup_scene();
 
     const std::shared_ptr<gl3d::Camera> camera = std::make_shared<gl3d::Camera>();
     camera->look_at(math::Vec3d(0.0, 2.0, 2.0), math::Vec3d(0.0));
@@ -28,7 +19,7 @@ void BilliardsApp::initialize()
 
     m_engine->physics.enable_gravity();
 
-    app_listener = MovementListener(camera, this);
+    app_listener = AppListener(camera, this);
     m_engine->register_input_listener(app_listener);
 }
 
@@ -50,6 +41,11 @@ void BilliardsApp::reset()
     }
     objects.clear();
     m_engine->scene_renderer.active_scene = std::make_shared<gl3d::SceneGroup>("root");
+
+    n_barriers = 0;
+    n_balls = 0;
+
+    setup_scene();
 }
 
 void BilliardsApp::step_simulation() const
@@ -218,4 +214,18 @@ void BilliardsApp::load_gui()
                             .font = font,
                     },
     });
+}
+
+void BilliardsApp::setup_scene()
+{
+    setup_lights();
+    load_ground(math::Vec3d(0));
+    load_barrier(math::Vec3d(1, 0, 0), math::quaternion::euler_angle<double>(-std::numbers::pi_v<double> / 2, 0, 0),
+                 math::Vec3d(0.5, 1.0, 1.0));
+    load_barrier(math::Vec3d(0, 0, 0.5), math::quaternion::euler_angle<double>(std::numbers::pi_v<double>, 0, 0));
+    load_barrier(math::Vec3d(0, 0, -0.5), math::Quatd());
+    load_barrier(math::Vec3d(-1, 0, 0), math::quaternion::euler_angle<double>(std::numbers::pi_v<double> / 2, 0, 0),
+                 math::Vec3d(0.5, 1.0, 1.0));
+    setup_balls(math::Vec3d(0.35, table_position.y() + billiard_ball_radius + 0.00001, 0));
+    player_ball = load_ball(math::Vec3d(-0.5, table_position.y() + billiard_ball_radius + 0.00001, 0));
 }

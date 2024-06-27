@@ -4,7 +4,7 @@
 
 using namespace yage;
 
-MovementListener::MovementListener(std::shared_ptr<gl3d::Camera> camera, BilliardsApp* app)
+AppListener::AppListener(std::shared_ptr<gl3d::Camera> camera, BilliardsApp* app)
         : camera(std::move(camera)), app(app)
 {
     keyStates[input::KeyEvent::Code::KEY_W] = false;
@@ -13,7 +13,7 @@ MovementListener::MovementListener(std::shared_ptr<gl3d::Camera> camera, Billiar
     keyStates[input::KeyEvent::Code::KEY_D] = false;
 }
 
-void MovementListener::onMousePosEvent(const input::MousePosEvent& event)
+void AppListener::onMousePosEvent(const input::MousePosEvent& event)
 {
     const float x = event.getXPos();
     const float y = event.getYPos();
@@ -30,7 +30,7 @@ void MovementListener::onMousePosEvent(const input::MousePosEvent& event)
     mouse.position = math::Vec2f(x, y);
 }
 
-void MovementListener::update()
+void AppListener::update()
 {
     if (keyStates[input::KeyEvent::Code::KEY_W]) {
         camera->move_forward(movement_speed);
@@ -53,7 +53,7 @@ void MovementListener::update()
     }
 }
 
-void MovementListener::onKeyEvent(const input::KeyEvent& event)
+void AppListener::onKeyEvent(const input::KeyEvent& event)
 {
     const auto code = event.getKey();
     const auto action = event.getAction();
@@ -80,5 +80,9 @@ void MovementListener::onKeyEvent(const input::KeyEvent& event)
 
     if (code == input::KeyEvent::Code::KEY_V && action == input::KeyEvent::Action::PRESS) {
         app->toggle_visualization();
+    }
+
+    if (code == input::KeyEvent::Code::KEY_R && action == input::KeyEvent::Action::PRESS) {
+        app->reset();
     }
 }

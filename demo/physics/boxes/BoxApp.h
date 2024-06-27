@@ -51,11 +51,13 @@ private:
     AppListener app_listener;
 
     yage::GameObject
-    load_cube(const std::string& filename, yage::math::Vec3d position, yage::math::Quatd orientation = yage::math::Quatd());
+    load_cube(yage::math::Vec3d position, yage::math::Quatd orientation = yage::math::Quatd());
 
     void load_ground();
 
     void setup_lights() const;
 
     void load_gui();
+
+    void setup_scene();
 };

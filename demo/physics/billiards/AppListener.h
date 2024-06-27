@@ -17,12 +17,12 @@ struct Mouse
 
 class BilliardsApp;
 
-class MovementListener final : public yage::input::InputListener
+class AppListener final : public yage::input::InputListener
 {
 public:
-    MovementListener() = default;
+    AppListener() = default;
 
-    MovementListener(std::shared_ptr<yage::gl3d::Camera> camera, BilliardsApp* app);
+    AppListener(std::shared_ptr<yage::gl3d::Camera> camera, BilliardsApp* app);
 
     void onMousePosEvent(const yage::input::MousePosEvent& event) override;
 
