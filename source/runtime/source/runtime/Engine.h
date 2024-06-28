@@ -26,10 +26,7 @@ namespace yage
         physics3d::Simulation physics;
         gui::Master gui;
 
-        std::unique_ptr<gl3d::MeshFileLoader> mesh_loader;
-        res::Store<std::unique_ptr<gl3d::Mesh>> mesh_store;
-
-        std::unique_ptr<font::FontFileLoader> font_loader;
+        res::Store<gl3d::Mesh> mesh_store;
         res::Store<font::Font> font_store;
 
         Engine(int width, int height, const std::string& title);

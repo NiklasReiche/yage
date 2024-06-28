@@ -67,7 +67,7 @@ public:
         window->attach(inputListener);
 
         font::FontFileLoader fontLoader(glContext->getTextureCreator(), window->getFileReader());
-        font = fontStore.loadResource(fontLoader, std::string("assets/fonts/OpenSans-Regular.font"));
+        font = fontStore.load_resource(fontLoader, std::string("assets/fonts/OpenSans-Regular.font"));
         gui = std::make_unique<gui::Master>(window, glContext);
         const auto frame = gui->create_widget<gui::ListBox>(gui::ListBoxTemplate{
             .base = {

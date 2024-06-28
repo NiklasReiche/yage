@@ -1,8 +1,6 @@
 #pragma once
 
-#include <cstdint>
-#include <memory>
-#include <utility>
+#include <string>
 
 namespace yage::res
 {
@@ -16,12 +14,15 @@ namespace yage::res
         ResourceType& get();
 
     private:
-        std::size_t key;
-        Store<ResourceType>* store; // TODO: pointer type (if we use raw pointer, we should add custom validation)
+        std::string m_uri;
+        Store<ResourceType>* m_store;
 
-        Resource(std::size_t key, Store<ResourceType>* store);
+        Resource(std::string uri, Store<ResourceType>* store)
+            : m_uri(std::move(uri)), m_store(store)
+        {
+        }
 
-        friend class Store<ResourceType>; // TODO: is there a better way to do this?
+        friend class Store<ResourceType>;
     };
 }
 
@@ -30,12 +31,8 @@ namespace yage::res
 namespace yage::res
 {
     template<typename ResourceType>
-    Resource<ResourceType>::Resource(std::size_t key, Store<ResourceType>* store) : key(key), store(store)
-    {}
-
-    template<typename ResourceType>
     ResourceType& Resource<ResourceType>::get()
     {
-        return store->getUnderlyingResource(key);
+        return m_store->get(m_uri);
     }
 }

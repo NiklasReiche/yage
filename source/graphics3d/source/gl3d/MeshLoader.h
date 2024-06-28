@@ -8,7 +8,7 @@
 
 namespace yage::gl3d
 {
-    class MeshFileLoader final : public res::Loader<std::unique_ptr<Mesh>, std::string>
+    class MeshFileLoader final : public res::Loader<Mesh>
     {
     public:
         explicit MeshFileLoader(const std::shared_ptr<platform::IFileReader>& file_reader,
@@ -16,7 +16,7 @@ namespace yage::gl3d
                                 const std::shared_ptr<gl::IDrawableCreator>& drawable_creator,
                                 ShaderMap shaders) noexcept;
 
-        std::unique_ptr<Mesh> load(std::string location) override;
+        Mesh load(const std::string& location) override;
 
     private:
         std::shared_ptr<platform::IFileReader> m_file_reader;

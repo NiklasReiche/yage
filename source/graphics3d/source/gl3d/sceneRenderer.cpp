@@ -34,7 +34,7 @@ namespace yage::gl3d
             MeshResource& mesh = node.get().mesh.value();
             const math::Mat4d& transform = node.get().world_transform();
 
-            for (const auto& sub_mesh: mesh.get()->sub_meshes()) {
+            for (const auto& sub_mesh: mesh.get().sub_meshes()) {
                 auto shader = sub_mesh->material().shader();
 
                 // TODO: don't do this every frame

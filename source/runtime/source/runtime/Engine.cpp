@@ -11,20 +11,16 @@ namespace yage
         m_gl_context(gl::createContext(m_window)),
         scene_renderer(*m_gl_context),
         physics(physics3d::Visualizer(*m_gl_context)),
-        gui(m_window, m_gl_context)
+        gui(m_window, m_gl_context),
+        mesh_store(std::make_unique<gl3d::MeshFileLoader>(m_window->getFileReader(), m_gl_context->getTextureCreator(),
+            m_gl_context->getDrawableCreator(), scene_renderer.shaders())),
+        font_store(std::make_unique<font::FontFileLoader>(m_gl_context->getTextureCreator(), m_window->getFileReader()))
     {
         scene_renderer.base_renderer().setViewport(0, 0, width, height);
         scene_renderer.base_renderer().setClearColor(0x008080FFu);
         scene_renderer.projection() = math::matrix::perspective<float>(
                 45.0f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 1000.0f);
         scene_renderer.active_scene = std::make_unique<gl3d::SceneGroup>("root");
-
-        mesh_loader =
-                std::make_unique<gl3d::MeshFileLoader>(m_window->getFileReader(), m_gl_context->getTextureCreator(),
-                                                       m_gl_context->getDrawableCreator(), scene_renderer.shaders());
-
-        font_loader =
-                std::make_unique<font::FontFileLoader>(m_gl_context->getTextureCreator(), m_window->getFileReader());
     }
 
     void Engine::run()

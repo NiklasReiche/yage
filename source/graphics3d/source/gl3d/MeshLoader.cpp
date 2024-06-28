@@ -15,7 +15,7 @@ namespace yage::gl3d
     {
     }
 
-    std::unique_ptr<Mesh> MeshFileLoader::load(const std::string location)
+    Mesh MeshFileLoader::load(const std::string& location)
     {
         return std::move(resources::gltf_read_meshes(*m_file_reader, location, *m_drawable_creator, *m_texture_creator, m_shaders).at(0));
     }

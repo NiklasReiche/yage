@@ -47,5 +47,5 @@ namespace yage::gl3d
 		std::vector<std::unique_ptr<SubMesh>> m_sub_meshes;
 	};
 
-    using MeshResource = res::Resource<std::unique_ptr<Mesh>>;
+    using MeshResource = res::Resource<Mesh>;
 }

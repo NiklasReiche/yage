@@ -16,7 +16,7 @@ namespace yage::gl3d::resources
             gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator,
             const ShaderMap& shaders);
 
-    std::vector<std::unique_ptr<gl3d::Mesh>> gltf_read_meshes(
+    std::vector<Mesh> gltf_read_meshes(
             const platform::IFileReader& fileReader, const std::string& filename,
             gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator,
             const ShaderMap& shaders);

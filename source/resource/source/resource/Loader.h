@@ -1,13 +1,22 @@
 #pragma once
 
+#include <string>
+
 namespace yage::res
 {
-    template<typename ResourceType, typename LocationType>
+    template<typename ResourceType>
+    class Store;
+
+    template<typename ResourceType>
     class Loader
     {
     public:
         virtual ~Loader() = default;
 
-        virtual ResourceType load(LocationType location) = 0;
+    protected:
+        virtual ResourceType load(const std::string& uri) = 0;
+
+    private:
+        friend class Store<ResourceType>;
     };
 }

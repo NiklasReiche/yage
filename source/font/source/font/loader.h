@@ -10,13 +10,13 @@
 
 namespace yage::font
 {
-    class FontFileLoader : public res::Loader<Font, std::string>
+    class FontFileLoader : public res::Loader<Font>
 	{
 	public:
 		explicit FontFileLoader(const std::shared_ptr<gl::ITextureCreator>& textureCreator,
                                 const std::shared_ptr<platform::IFileReader>& fileReader) noexcept;
 
-        Font load(std::string location) override;
+        Font load(const std::string& uri) override;
 
 	private:
         std::shared_ptr<gl::ITextureCreator> textureCreator;

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstdint>
 #include <unordered_map>
+#include <memory>
 
 #include "Loader.h"
 
@@ -10,19 +10,29 @@ namespace yage::res
     template<typename ResourceType>
     class Resource;
 
-    // TODO: should the loader be coupled to the store? Would make reloading easier (caching/hotswap). Would mean a 1-to-1 relationship between stores and loaders.
-    // TODO: alternatively, store the loader with the resource handle
     template<typename ResourceType>
     class Store final
     {
     public:
-        template<typename LocationType>
-        Resource<ResourceType> loadResource(Loader<ResourceType, LocationType>& loader, const LocationType& location);
+        explicit Store(std::unique_ptr<Loader<ResourceType>> loader) : m_loader(std::move(loader))
+        {
+        }
+
+        Resource<ResourceType> load_resource(const std::string& uri);
 
     private:
-        std::unordered_map<std::size_t, ResourceType> resources; // TODO: could use vector with custom ofset handling
+        std::unique_ptr<Loader<ResourceType>> m_loader;
+        std::unordered_map<std::string, ResourceType> resources;
 
-        ResourceType& getUnderlyingResource(std::size_t key);
+        ResourceType& get(const std::string& uri)
+        {
+            if (resources.contains(uri)) {
+                return resources[uri];
+            }
+
+            load_resource(uri);
+            return resources[uri];
+        }
 
         friend class Resource<ResourceType>;
     };
@@ -33,18 +43,9 @@ namespace yage::res
 namespace yage::res
 {
     template<typename ResourceType>
-    ResourceType& Store<ResourceType>::getUnderlyingResource(std::size_t key)
+    Resource<ResourceType> Store<ResourceType>::load_resource(const std::string& uri)
     {
-        return resources.at(key);
-    }
-
-    template<typename ResourceType>
-    template<typename LocationType>
-    Resource<ResourceType>
-    Store<ResourceType>::loadResource(Loader<ResourceType, LocationType>& loader, const LocationType& location)
-    {
-        std::size_t key = std::hash<LocationType>{}(location);
-        resources.insert({key, loader.load(location)});
-        return Resource(key, this);
+        resources.insert(std::make_pair(uri, m_loader->load(uri)));
+        return Resource(uri, this);
     }
 }

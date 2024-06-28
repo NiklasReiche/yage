@@ -5,17 +5,15 @@ using namespace yage;
 
 void BoxApp::initialize()
 {
-    cube_mesh = m_engine->mesh_store.loadResource(*m_engine->mesh_loader, std::string{"models/box.glb"});
-    ground_mesh = m_engine->mesh_store.loadResource(*m_engine->mesh_loader, std::string{"models/ground.glb"});
+    cube_mesh = m_engine->mesh_store.load_resource(std::string{"models/box.glb"});
+    ground_mesh = m_engine->mesh_store.load_resource(std::string{"models/ground.glb"});
 
     load_gui();
 
     setup_scene();
 
     const std::shared_ptr<gl3d::Camera> camera = std::make_shared<gl3d::Camera>();
-    camera->move_to(math::Vec3d(25.0, 25.0, 25.0));
-    camera->rotate_to(math::quaternion::euler_angle<double>(math::to_rad(225.), 0, 0) *
-                      math::quaternion::euler_angle<double>(0, 0, math::to_rad(30.)));
+    camera->look_at(math::Vec3d(25.0, 25.0, 25.0), math::Vec3d(0.0));
     m_engine->scene_renderer.active_camera = camera;
 
     m_engine->physics.enable_gravity();
@@ -149,7 +147,7 @@ void BoxApp::setup_lights() const
 void BoxApp::load_gui()
 {
     const auto font =
-            m_engine->font_store.loadResource(*m_engine->font_loader, std::string{"fonts/OpenSans-Regular.font"});
+            m_engine->font_store.load_resource(std::string{"fonts/OpenSans-Regular.font"});
 
     const auto frame = m_engine->gui
                                .create_widget<gui::ListBox>(

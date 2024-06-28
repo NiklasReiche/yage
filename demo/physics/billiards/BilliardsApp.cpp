@@ -5,9 +5,9 @@ using namespace yage;
 
 void BilliardsApp::initialize()
 {
-    ground_mesh = m_engine->mesh_store.loadResource(*m_engine->mesh_loader, std::string{"models/ground.glb"});
-    barrier_mesh = m_engine->mesh_store.loadResource(*m_engine->mesh_loader, std::string{"models/barrier.glb"});
-    ball_mesh = m_engine->mesh_store.loadResource(*m_engine->mesh_loader, std::string{"models/old_billiard_ball.glb"});
+    ground_mesh = m_engine->mesh_store.load_resource(std::string{"models/ground.glb"});
+    barrier_mesh = m_engine->mesh_store.load_resource(std::string{"models/barrier.glb"});
+    ball_mesh = m_engine->mesh_store.load_resource(std::string{"models/old_billiard_ball.glb"});
 
     load_gui();
 
@@ -162,7 +162,7 @@ void BilliardsApp::setup_lights() const
 void BilliardsApp::load_gui()
 {
     const auto font =
-            m_engine->font_store.loadResource(*m_engine->font_loader, std::string{"fonts/OpenSans-Regular.font"});
+            m_engine->font_store.load_resource(std::string{"fonts/OpenSans-Regular.font"});
 
     const auto frame = m_engine->gui
                                .create_widget<gui::ListBox>(

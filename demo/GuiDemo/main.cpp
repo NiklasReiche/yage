@@ -630,7 +630,7 @@ int main()
 
     res::Store<font::Font> fontStore;
     font::FontFileLoader fontLoader(context->getTextureCreator(), window->getFileReader());
-    res::Resource<font::Font> font = fontStore.loadResource(fontLoader, std::string("assets/OpenSans-Regular.font"));
+    res::Resource<font::Font> font = fontStore.load_resource(fontLoader, std::string("assets/OpenSans-Regular.font"));
 
     GuiTest guiTest(window, context, font);
 

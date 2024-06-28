@@ -46,7 +46,7 @@ int main(int argc, char *argv[], char *[])
 
     res::Store<font::Font> fontStore;
     font::FontFileLoader fontLoader(context->getTextureCreator(), window->getFileReader());
-    res::Resource<font::Font> font = fontStore.loadResource(fontLoader, fontPath + ".font");
+    res::Resource<font::Font> font = fontStore.load_resource(fontLoader, fontPath + ".font");
 
     auto textShader = context->getShaderCreator()->createShader(font::shaders::TextShader::vert,
                                                                 font::shaders::TextShader::frag);

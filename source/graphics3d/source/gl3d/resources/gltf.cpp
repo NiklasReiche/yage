@@ -49,7 +49,7 @@ namespace yage::gl3d::resources
 
     std::span<const std::byte> readBuffer(tinygltf::Model& model, const int i, const std::size_t offset, const std::size_t size)
     {
-        return std::as_bytes(std::span<unsigned char>{
+        return std::as_bytes(std::span{
                 model.buffers[i].data.begin() + offset,
                 model.buffers[i].data.begin() + offset + size
         });
@@ -108,7 +108,7 @@ namespace yage::gl3d::resources
         return t;
     }
 
-    std::shared_ptr<gl3d::Material>
+    std::shared_ptr<Material>
     read_material(const tinygltf::Material& material,
                   const std::vector<std::shared_ptr<gl::ITexture2D>>& textures,
                   const std::shared_ptr<gl::ITexture2D>& full_texture)
@@ -155,7 +155,7 @@ namespace yage::gl3d::resources
 
     std::unique_ptr<SubMesh> read_sub_mesh(tinygltf::Model& model, const tinygltf::Primitive& primitive,
                                            gl::IDrawableCreator& drawableCreator,
-                                           const std::vector<std::shared_ptr<gl3d::Material>>& materials,
+                                           const std::vector<std::shared_ptr<Material>>& materials,
                                            const ShaderMap& shaders)
     {
         auto& gl3d_material = materials.at(primitive.material);
@@ -216,19 +216,19 @@ namespace yage::gl3d::resources
         return std::make_unique<SubMesh>(drawable, gl3d_material);
     }
 
-    std::unique_ptr<Mesh> read_mesh(tinygltf::Model& model, tinygltf::Mesh& mesh,
+    Mesh read_mesh(tinygltf::Model& model, tinygltf::Mesh& mesh,
                                     gl::IDrawableCreator& drawableCreator,
-                                    const std::vector<std::shared_ptr<gl3d::Material>>& materials,
+                                    const std::vector<std::shared_ptr<Material>>& materials,
                                     const ShaderMap& shaders)
     {
-        auto gl3d_mesh = std::make_unique<Mesh>();
+        Mesh gl3d_mesh;
         for (auto& primitive: mesh.primitives) {
-            gl3d_mesh->add_sub_mesh(read_sub_mesh(model, primitive, drawableCreator, materials, shaders));
+            gl3d_mesh.add_sub_mesh(read_sub_mesh(model, primitive, drawableCreator, materials, shaders));
         }
         return gl3d_mesh;
     }
 
-    std::unique_ptr<SceneGroup> read_node(tinygltf::Node& node, const std::vector<std::shared_ptr<gl3d::Mesh>>&)
+    std::unique_ptr<SceneGroup> read_node(tinygltf::Node& node, const std::vector<std::shared_ptr<Mesh>>&)
     {
         math::Mat4d transform;
         if (node.matrix.size() == 16) {
@@ -316,10 +316,10 @@ namespace yage::gl3d::resources
         return model;
     }
 
-    std::vector<std::unique_ptr<gl3d::Mesh>> read_meshes(tinygltf::Model& model,
-                                                         gl::IDrawableCreator& drawableCreator,
-                                                         gl::ITextureCreator& textureCreator,
-                                                         const ShaderMap& shaders)
+    std::vector<Mesh> read_meshes(tinygltf::Model& model,
+        gl::IDrawableCreator& drawableCreator,
+        gl::ITextureCreator& textureCreator,
+        const ShaderMap& shaders)
     {
         std::vector<unsigned char> full_data{255, 255, 255, 255};
         const std::shared_ptr<gl::ITexture2D> full_texture = textureCreator.createTexture2D(
@@ -331,13 +331,13 @@ namespace yage::gl3d::resources
             textures.push_back(read_texture(textureCreator, model, texture));
         }
 
-        std::vector<std::shared_ptr<gl3d::Material>> materials;
+        std::vector<std::shared_ptr<Material>> materials;
         materials.reserve(model.materials.size());
         for (auto& material: model.materials) {
             materials.push_back(read_material(material, textures, full_texture));
         }
 
-        std::vector<std::unique_ptr<gl3d::Mesh>> meshes;
+        std::vector<Mesh> meshes;
         meshes.reserve(model.meshes.size());
         for (auto& mesh: model.meshes) {
             meshes.push_back(read_mesh(model, mesh, drawableCreator, materials, shaders));
@@ -353,16 +353,14 @@ namespace yage::gl3d::resources
     {
         tinygltf::Model model = read_file(fileReader, filename);
 
-        std::vector<std::unique_ptr<Mesh>> temp = read_meshes(model, drawableCreator, textureCreator, shaders);
-        std::vector<std::shared_ptr<Mesh>> meshes;
-        std::ranges::move(temp, std::back_inserter(meshes));
+        std::vector<Mesh> meshes = read_meshes(model, drawableCreator, textureCreator, shaders);
 
         std::vector<std::unique_ptr<gl3d::SceneGroup>> scene_nodes;
         scene_nodes.reserve(model.nodes.size());
         // TODO: camera
-        for (auto& node: model.nodes) {
-            scene_nodes.push_back(read_node(node, meshes));
-        }
+        //for (auto& node: model.nodes) {
+            //scene_nodes.push_back(read_node(node, meshes));
+        //}
 
         std::vector<std::unique_ptr<gl3d::SceneGroup>> scenes;
         scenes.reserve(model.scenes.size());
@@ -382,7 +380,7 @@ namespace yage::gl3d::resources
         // TODO: do we need to handle sparse accessors explicitly?
     }
 
-    std::vector<std::unique_ptr<gl3d::Mesh>> gltf_read_meshes(const platform::IFileReader& fileReader, const std::string& filename,
+    std::vector<Mesh> gltf_read_meshes(const platform::IFileReader& fileReader, const std::string& filename,
                                              gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator,
                                              const ShaderMap& shaders)
     {
