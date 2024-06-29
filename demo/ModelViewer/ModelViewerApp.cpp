@@ -43,7 +43,9 @@ void ModelViewerApp::load_scene(const std::string& filename)
 void ModelViewerApp::setup_light()
 {
     const auto light = std::make_shared<gl3d::DirectionalLight>();
-    light->color = math::Vec3f(5, 5, 5);
+    light->light_model = gl3d::PbrLightModel{
+        .color = math::Vec3f(5, 5, 5)
+    };
 
     gl3d::SceneObject& light_node = m_engine->scene_renderer.active_scene.value().get().create_object("light");
     light_node.local_transform = math::matrix::from_quaternion<double>(

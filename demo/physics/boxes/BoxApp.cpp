@@ -127,14 +127,18 @@ void BoxApp::load_ground()
 void BoxApp::setup_lights() const
 {
     const auto lightRes = std::make_shared<gl3d::PointLight>();
-    lightRes->color = math::Vec3f(100);
+    lightRes->light_model = gl3d::PbrLightModel{
+        .color = math::Vec3f(100)
+    };
 
     auto& light = m_engine->scene_renderer.active_scene.value().get().create_object("light1");
     light.light = lightRes;
     light.local_transform = math::matrix::translate<double>(-10, 10, -10);
 
     const auto lightRes2 = std::make_shared<gl3d::DirectionalLight>();
-    lightRes2->color = math::Vec3f(3);
+    lightRes2->light_model = gl3d::PbrLightModel{
+        .color = math::Vec3f(3)
+    };
 
     auto& light2 = m_engine->scene_renderer.active_scene.value().get().create_object("light2");
     light2.light = lightRes2;

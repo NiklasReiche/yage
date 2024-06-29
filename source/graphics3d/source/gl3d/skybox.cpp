@@ -80,7 +80,7 @@ namespace yage::gl3d
 		Skybox skybox;
 		skybox.cubemap = context.getTextureCreator()->createCubemap(texture_size, texture_size, gl::ImageFormat::RGB, faces);
 		skybox.drawable = context.getDrawableCreator()->createDrawable(skyboxVertices, indices, std::vector<unsigned int>{3}, gl::VertexFormat::BATCHED);
-		skybox.shader = context.getShaderCreator()->createShader(shaders::SkyboxShader::vert, shaders::SkyboxShader::frag);
+		skybox.shader = context.getShaderCreator()->createShader(shaders::Skybox::vert, shaders::Skybox::frag);
 		return skybox;
 	}
 }

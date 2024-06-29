@@ -12,6 +12,8 @@ namespace yage::gl3d
     {
         PBR,
         PBR_NORMAL_MAP,
+        PHONG,
+        PHONG_NORMAL_MAP,
         SKYBOX
     };
 
@@ -19,27 +21,31 @@ namespace yage::gl3d
 
     namespace shaders
     {
-        struct PbrNormalMappingShader
+        struct Pbr
         {
             static const std::string vert;
             static const std::string frag;
-
-            static std::string get_vert();
-
-            static std::string get_frag();
         };
 
-        struct PbrShader
+        struct PbrNormalMapping
         {
             static const std::string vert;
             static const std::string frag;
-
-            static std::string get_vert();
-
-            static std::string get_frag();
         };
 
-        struct SkyboxShader
+        struct Phong
+        {
+            static const std::string vert;
+            static const std::string frag;
+        };
+
+        struct PhongNormalMapping
+        {
+            static const std::string vert;
+            static const std::string frag;
+        };
+
+        struct Skybox
         {
             static const std::string vert;
             static const std::string frag;

@@ -28,6 +28,7 @@ struct DirLight {
 };
 uniform DirLight dirLights[10];
 uniform int n_dirLights;
+
 struct PointLight {
     vec3 position;
     vec3 color;

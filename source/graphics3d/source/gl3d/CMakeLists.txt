@@ -1,13 +1,23 @@
 # TODO: find a way to do this at build time
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/pbr.vert)
+file(READ shaders/pbr.vert PBR_VERT)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/pbr.frag)
+file(READ shaders/pbr.frag PBR_FRAG)
+
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/pbr_normal_mapping.vert)
 file(READ shaders/pbr_normal_mapping.vert PBR_NORMAL_VERT)
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/pbr_normal_mapping.frag)
 file(READ shaders/pbr_normal_mapping.frag PBR_NORMAL_FRAG)
 
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/pbr.vert)
-file(READ shaders/pbr.vert PBR_VERT)
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/pbr.frag)
-file(READ shaders/pbr.frag PBR_FRAG)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/phong.vert)
+file(READ shaders/phong.vert PHONG_VERT)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/phong.frag)
+file(READ shaders/phong.frag PHONG_FRAG)
+
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/phong_normal_mapping.vert)
+file(READ shaders/phong_normal_mapping.vert PHONG_NORMAL_VERT)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/phong_normal_mapping.frag)
+file(READ shaders/phong_normal_mapping.frag PHONG_NORMAL_FRAG)
 
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS shaders/skybox.vert)
 file(READ shaders/skybox.vert SKYBOX_VERT)
@@ -53,8 +63,6 @@ target_sources(yage_gl3d
         MeshLoader.cpp
         SceneLoader.h
         SceneLoader.cpp
-
-        shaderSnippets.h
 
         shaders.h
         ${CMAKE_CURRENT_BINARY_DIR}/shaders.cpp

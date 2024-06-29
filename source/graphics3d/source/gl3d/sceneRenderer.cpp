@@ -1,7 +1,5 @@
 #include "sceneRenderer.h"
 
-#include "shaderSnippets.h"
-
 namespace yage::gl3d
 {
     SceneRenderer::SceneRenderer(gl::IContext& context) :
@@ -10,10 +8,15 @@ namespace yage::gl3d
     {
         const std::shared_ptr<gl::IShaderCreator> shader_creator = context.getShaderCreator();
         m_shaders.emplace(ShaderPermutation::PBR,
-                          shader_creator->createShader(shaders::PbrShader::get_vert(), shaders::PbrShader::get_frag()));
+                          shader_creator->createShader(shaders::Pbr::vert, shaders::Pbr::frag));
         m_shaders.emplace(ShaderPermutation::PBR_NORMAL_MAP,
-                          shader_creator->createShader(shaders::PbrNormalMappingShader::get_vert(),
-                                                       shaders::PbrNormalMappingShader::get_frag()));
+                          shader_creator->createShader(shaders::PbrNormalMapping::vert,
+                                                       shaders::PbrNormalMapping::frag));
+        m_shaders.emplace(ShaderPermutation::PHONG,
+                          shader_creator->createShader(shaders::Phong::vert, shaders::Phong::frag));
+        m_shaders.emplace(ShaderPermutation::PHONG_NORMAL_MAP,
+                          shader_creator->createShader(shaders::PhongNormalMapping::vert,
+                                                       shaders::PhongNormalMapping::frag));
     }
 
     void SceneRenderer::render_active_scene()
@@ -44,13 +47,12 @@ namespace yage::gl3d
                 shader->linkUniformBlock(m_projection_view.ubo());
 
                 // TODO: lights should probably not be uniforms, but rather UBOs or SSBOs
-                shader->setUniform(std::string(ShaderSnippets::DIR_LIGHTS_AMOUNT_NAME),
-                                   static_cast<int>(m_uniform_values.dir_lights.size()));
+                DirectionalLight::update_global_uniforms(*shader, m_uniform_values.dir_lights.size());
                 for (std::size_t i = 0; i < m_uniform_values.dir_lights.size(); ++i) {
                     m_uniform_values.dir_lights[i]->update_uniforms(*shader, i);
                 }
-                shader->setUniform(std::string(ShaderSnippets::POINT_LIGHTS_AMOUNT_NAME),
-                                   static_cast<int>(m_uniform_values.point_lights.size()));
+
+                PointLight::update_global_uniforms(*shader, m_uniform_values.point_lights.size());
                 for (std::size_t i = 0; i < m_uniform_values.point_lights.size(); ++i) {
                     m_uniform_values.point_lights[i]->update_uniforms(*shader, i);
                 }
