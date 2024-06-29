@@ -128,4 +128,9 @@ namespace yage
     {
         return *m_gl_context;
     }
+
+    std::string Engine::select_file()
+    {
+        return m_window->openFileDialog("");
+    }
 }

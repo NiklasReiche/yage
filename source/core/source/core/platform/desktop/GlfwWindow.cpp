@@ -260,7 +260,12 @@ namespace yage::platform::desktop
 	{
 		std::cout << msg << std::endl;
 	}
-	
+
+	std::string GlfwWindow::openFileDialog(std::string defaultPath)
+	{
+		return openFileDialog(defaultPath, {}, "");
+	}
+
 	std::string GlfwWindow::openFileDialog(std::string defaultPath, std::vector<std::string> filterList, std::string filterName)
 	{
 		const char* defaultPathC = nullptr;

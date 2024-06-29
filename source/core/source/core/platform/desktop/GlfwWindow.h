@@ -57,6 +57,8 @@ namespace yage::platform::desktop
 		double getTimeStep() override;
 
 		void log(const std::string& msg);
+
+		std::string openFileDialog(std::string defaultPath) override;
 		std::string openFileDialog(std::string defaultPath = "", std::vector<std::string> filterList = {}, std::string filterName = "");
 
 

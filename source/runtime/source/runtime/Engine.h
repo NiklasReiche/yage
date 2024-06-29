@@ -59,6 +59,8 @@ namespace yage
 
         gl::IContext& gl_context();
 
+        std::string select_file();
+
     private:
         std::unique_ptr<Application> m_application;
 

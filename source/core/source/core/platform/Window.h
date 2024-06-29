@@ -39,6 +39,8 @@ namespace yage::platform
         [[nodiscard]]
         virtual std::unique_ptr<IFileReader> getFileReader() = 0;
 
+		virtual std::string openFileDialog(std::string defaultPath) = 0;
+
 		[[nodiscard]]
 		virtual double getTime() const = 0;
 

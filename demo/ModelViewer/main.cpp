@@ -1,15 +1,10 @@
-#include "app.h"
-#include "utils/NotImplementedException.h"
+#include <runtime/Engine.h>
 
-int main(const int argc, char* argv[], char* []) {
-    throw NotImplementedException();
+#include "ModelViewerApp.h"
 
-	if (argc < 2) {
-		std::cerr << "Please provide a path to a gltf file (.glb/.gltf)" << "\n";
-		std::cerr << "usage: model_viewer <filepath>" << std::endl;
-		return 1;
-	}
-
-	App app(argv[1]);
-	app.run();
+int main() {
+	yage::Engine engine = yage::Engine(1500, 900, "Model Viewer");
+    engine.register_application<ModelViewerApp>();
+    engine.run();
+    return 0;
 }
