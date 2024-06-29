@@ -16,7 +16,7 @@ namespace yage::font
 		explicit FontFileLoader(const std::shared_ptr<gl::ITextureCreator>& textureCreator,
                                 const std::shared_ptr<platform::IFileReader>& fileReader) noexcept;
 
-        Font load(const std::string& uri) override;
+        Font load_resource(const std::string& uri) override;
 
 	private:
         std::shared_ptr<gl::ITextureCreator> textureCreator;

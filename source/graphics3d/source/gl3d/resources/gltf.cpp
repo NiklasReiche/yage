@@ -6,8 +6,6 @@
 #include <utils/strings.h>
 #include <math/vector.h>
 
-#include <utils/NotImplementedException.h>
-
 #include <tiny_gltf.h>
 #include <numeric>
 

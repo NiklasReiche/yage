@@ -16,7 +16,9 @@ namespace yage::gl3d
                                 const std::shared_ptr<gl::IDrawableCreator>& drawable_creator,
                                 ShaderMap shaders) noexcept;
 
-        Mesh load(const std::string& location) override;
+        Mesh load_resource(const std::string& uri) override;
+
+        std::tuple<std::vector<Mesh>, std::vector<std::string>> load_archive(const std::string& uri) override;
 
     private:
         std::shared_ptr<platform::IFileReader> m_file_reader;

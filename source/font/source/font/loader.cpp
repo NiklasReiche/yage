@@ -9,7 +9,7 @@ namespace yage::font
                                    const std::shared_ptr<platform::IFileReader>& fileReader) noexcept
 		: textureCreator(textureCreator), fileReader(fileReader) {}
 
-    Font FontFileLoader::load(const std::string& uri)
+    Font FontFileLoader::load_resource(const std::string& uri)
     {
         auto file = fileReader->openBinaryFile(uri, platform::IFile::AccessMode::READ);
         FontFile fontFile;
