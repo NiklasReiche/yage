@@ -32,11 +32,13 @@ namespace yage::gl3d
             mesh_index = std::stoi(uri_parts[1]);
         }
 
-        return std::move(resources::gltf_read_meshes(*m_file_reader, uri_parts[0], *m_drawable_creator, *m_texture_creator,
-                                           m_shaders).at(mesh_index));
+        return std::move(resources::gltf_read_meshes(*m_file_reader, uri_parts[0], *m_drawable_creator,
+                                                     *m_texture_creator,
+                                                     m_shaders).at(mesh_index));
     }
 
-    std::tuple<std::vector<Mesh>, std::vector<std::string> > MeshFileLoader::load_archive(const std::string& uri)
+    void MeshFileLoader::load_archive(const std::string& uri, std::vector<Mesh>& resources,
+                                      std::vector<std::string>& uris)
     {
         const std::vector<std::string>& path_parts = utils::strip(uri, ".");
         if (path_parts.size() < 2) {
@@ -46,15 +48,12 @@ namespace yage::gl3d
             throw std::invalid_argument("Unsupported file type in uri '" + uri + "'");
         }
 
-        std::vector<Mesh> meshes =
-                resources::gltf_read_meshes(*m_file_reader, uri, *m_drawable_creator, *m_texture_creator, m_shaders);
+        resources = resources::gltf_read_meshes(*m_file_reader, uri, *m_drawable_creator, *m_texture_creator,
+                                                m_shaders);
 
-        std::vector<std::string> uris;
-        uris.reserve(meshes.size());
-        for (std::size_t i = 0; i < meshes.size(); ++i) {
+        uris.reserve(resources.size());
+        for (std::size_t i = 0; i < resources.size(); ++i) {
             uris.push_back(uri + ":" + std::to_string(i));
         }
-
-        return std::make_tuple(std::move(meshes), uris);
     }
 }

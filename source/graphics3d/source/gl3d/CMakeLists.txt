@@ -51,6 +51,8 @@ target_sources(yage_gl3d
 
         MeshLoader.h
         MeshLoader.cpp
+        SceneLoader.h
+        SceneLoader.cpp
 
         shaderSnippets.h
 

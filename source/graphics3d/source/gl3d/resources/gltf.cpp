@@ -226,11 +226,12 @@ namespace yage::gl3d::resources
         return gl3d_mesh;
     }
 
-    std::unique_ptr<SceneGroup> read_node(tinygltf::Node& node, const std::vector<std::shared_ptr<Mesh>>&)
+    std::unique_ptr<SceneGroup> read_node(tinygltf::Node& node,
+        std::unordered_map<int, std::reference_wrapper<SceneObject>>& mesh_nodes)
     {
         math::Mat4d transform;
         if (node.matrix.size() == 16) {
-            transform = math::transpose(math::Mat4d(std::span<double, 16>{node.matrix.begin(), node.matrix.end()}));
+            transform = transpose(math::Mat4d(std::span<double, 16>{node.matrix.begin(), node.matrix.end()}));
         } else {
             transform = math::matrix::Id4d;
             if (node.scale.size() == 3) {
@@ -248,18 +249,18 @@ namespace yage::gl3d::resources
         }
 
         if (node.children.empty()) {
-            std::unique_ptr<SceneGroup> group = std::make_unique<gl3d::SceneGroup>(node.name + "_group");
-            //SceneObject& object = group->create_object(node.name, transform);
+            std::unique_ptr<SceneGroup> group = std::make_unique<SceneGroup>(node.name + "_group");
+            SceneObject& object = group->create_object(node.name, transform);
             if (node.mesh > -1) {
-                //object.mesh = meshes.at(node.mesh); TODO
+                mesh_nodes.insert(std::make_pair(node.mesh, std::reference_wrapper{object}));
             }
 
             return group;
         } else {
-            std::unique_ptr<SceneGroup> group = std::make_unique<gl3d::SceneGroup>(node.name, transform);
+            std::unique_ptr<SceneGroup> group = std::make_unique<SceneGroup>(node.name, transform);
             if (node.mesh > -1) {
-                //SceneObject& object = group->create_object(node.name + "_object");
-                //object.mesh = meshes.at(node.mesh); TODO
+                SceneObject& object = group->create_object(node.name + "_object");
+                mesh_nodes.insert(std::make_pair(node.mesh, std::reference_wrapper{object}));
             }
 
             return group;
@@ -267,8 +268,8 @@ namespace yage::gl3d::resources
     }
 
     void construct_node(tinygltf::Model& model, tinygltf::Node& node,
-                        const std::unique_ptr<gl3d::SceneGroup>& root,
-                        std::vector<std::unique_ptr<gl3d::SceneGroup>>& scene_nodes)
+                        const std::unique_ptr<SceneGroup>& root,
+                        std::vector<std::unique_ptr<SceneGroup>>& scene_nodes)
     {
         for (const auto& child_index: node.children) {
             auto& child = scene_nodes.at(child_index);
@@ -344,38 +345,32 @@ namespace yage::gl3d::resources
         return meshes;
     }
 
-    std::unique_ptr<SceneGroup> gltf_read_scene(
+    std::vector<SceneGroup> gltf_read_scene(
             const platform::IFileReader& fileReader, const std::string& filename,
-            gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator,
-            const ShaderMap& shaders)
+            std::unordered_map<int, std::reference_wrapper<SceneObject> >& mesh_nodes)
     {
         tinygltf::Model model = read_file(fileReader, filename);
 
-        std::vector<Mesh> meshes = read_meshes(model, drawableCreator, textureCreator, shaders);
+        // TODO: camera, lights
 
-        std::vector<std::unique_ptr<gl3d::SceneGroup>> scene_nodes;
+        std::vector<std::unique_ptr<SceneGroup>> scene_nodes;
         scene_nodes.reserve(model.nodes.size());
-        // TODO: camera
-        //for (auto& node: model.nodes) {
-            //scene_nodes.push_back(read_node(node, meshes));
-        //}
+        for (auto& node: model.nodes) {
+            scene_nodes.push_back(read_node(node, mesh_nodes));
+        }
 
-        std::vector<std::unique_ptr<gl3d::SceneGroup>> scenes;
+        std::vector<SceneGroup> scenes;
         scenes.reserve(model.scenes.size());
         for (auto& scene: model.scenes) {
-            auto world_root = std::make_unique<gl3d::SceneGroup>("root");
+            scenes.emplace_back("root");
             for (const auto root_index : scene.nodes) {
                 auto& root = scene_nodes.at(root_index);
                 construct_node(model, model.nodes.at(root_index), root, scene_nodes);
-                world_root->add_node(std::move(root));
+                scenes.back().add_node(std::move(root));
             }
-            scenes.push_back(std::move(world_root));
         }
 
-        // TODO: support multiple scenes
-        return std::move(scenes.at(model.defaultScene));
-
-        // TODO: do we need to handle sparse accessors explicitly?
+        return scenes;
     }
 
     std::vector<Mesh> gltf_read_meshes(const platform::IFileReader& fileReader, const std::string& filename,

@@ -1,13 +1,13 @@
 #pragma once
 
+#include <core/platform/Window.h>
+#include <gui/master.h>
+#include <gl3d/sceneRenderer.h>
+#include <physics3d/Simulation.h>
+#include <resource/Store.h>
+
 #include "Application.h"
 #include "GameObject.h"
-#include "core/platform/Window.h"
-#include "gl3d/MeshLoader.h"
-#include "gl3d/sceneRenderer.h"
-#include "gui/master.h"
-#include "physics3d/Simulation.h"
-#include "resource/Store.h"
 
 namespace yage
 {
@@ -27,6 +27,7 @@ namespace yage
         gui::Master gui;
 
         res::Store<gl3d::Mesh> mesh_store;
+        res::Store<gl3d::SceneGroup> scene_store;
         res::Store<font::Font> font_store;
 
         Engine(int width, int height, const std::string& title);

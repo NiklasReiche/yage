@@ -16,6 +16,18 @@ namespace yage::gl3d
 	public:
         explicit SceneGroup(const std::string_view& name, const math::Mat4d& transform = math::matrix::Id4d);
 
+		SceneGroup(SceneGroup& other) = delete;
+
+		SceneGroup(SceneGroup&& other) = default;
+
+		SceneGroup& operator=(SceneGroup& other) = delete;
+
+		SceneGroup& operator=(SceneGroup&& other) noexcept
+		{
+			m_children = std::move(other.m_children);
+			return *this;
+		}
+
         void apply(const std::function<void(SceneObject&)>& f, const math::Mat4d& parent_transform) override;
 
         /**

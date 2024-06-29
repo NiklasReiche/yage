@@ -5,16 +5,16 @@
 #include <core/platform/IFileReader.h>
 #include <core/gl/DrawableCreator.h>
 #include <core/gl/TextureCreator.h>
+
 #include "../mesh.h"
 #include "../sceneGraph/sceneGroup.h"
-#include "gl3d/shaders.h"
+#include "../shaders.h"
 
 namespace yage::gl3d::resources
 {
-    std::unique_ptr<gl3d::SceneGroup> gltf_read_scene(
+    std::vector<SceneGroup> gltf_read_scene(
             const platform::IFileReader& fileReader, const std::string& filename,
-            gl::IDrawableCreator& drawableCreator, gl::ITextureCreator& textureCreator,
-            const ShaderMap& shaders);
+            std::unordered_map<int, std::reference_wrapper<SceneObject>>& mesh_nodes);
 
     std::vector<Mesh> gltf_read_meshes(
             const platform::IFileReader& fileReader, const std::string& filename,

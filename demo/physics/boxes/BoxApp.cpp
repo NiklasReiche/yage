@@ -5,8 +5,8 @@ using namespace yage;
 
 void BoxApp::initialize()
 {
-    cube_mesh = m_engine->mesh_store.load_resource(std::string{"models/box.glb"});
-    ground_mesh = m_engine->mesh_store.load_resource(std::string{"models/ground.glb"});
+    cube_mesh = m_engine->mesh_store.load_resource(std::string{"models/box.glb:0"});
+    ground_mesh = m_engine->mesh_store.load_resource(std::string{"models/ground.glb:0"});
 
     load_gui();
 
@@ -56,7 +56,6 @@ void BoxApp::reset()
         m_engine->destroy_game_object(game_object);
     }
     objects.clear();
-    m_engine->scene_renderer.active_scene = std::make_shared<gl3d::SceneGroup>("root");
 
     box_stack = 0;
     n_cubes = 0;
@@ -95,7 +94,7 @@ GameObject BoxApp::load_cube(math::Vec3d position, math::Quatd orientation)
 {
     auto& game_object = m_engine->register_game_object("cube" + std::to_string(n_cubes));
 
-    game_object.scene_node = m_engine->scene_renderer.active_scene->create_object("cube" + std::to_string(n_cubes));
+    game_object.scene_node = m_engine->scene_renderer.active_scene.value().get().create_object("cube" + std::to_string(n_cubes));
     game_object.scene_node.value().get().mesh = cube_mesh;
 
     game_object.rigid_body = m_engine->physics.create_rigid_body(physics3d::InertiaShape::cube(2, box_mass),
@@ -113,7 +112,7 @@ void BoxApp::load_ground()
 {
     GameObject& game_object = m_engine->register_game_object("ground");
 
-    game_object.scene_node = m_engine->scene_renderer.active_scene->create_object("ground");
+    game_object.scene_node = m_engine->scene_renderer.active_scene.value().get().create_object("ground");
     game_object.scene_node.value().get().mesh = ground_mesh;
 
     game_object.rigid_body = m_engine->physics.create_rigid_body(physics3d::InertiaShape::static_shape(),
@@ -130,14 +129,14 @@ void BoxApp::setup_lights() const
     const auto lightRes = std::make_shared<gl3d::PointLight>();
     lightRes->color = math::Vec3f(100);
 
-    auto& light = m_engine->scene_renderer.active_scene->create_object("light1");
+    auto& light = m_engine->scene_renderer.active_scene.value().get().create_object("light1");
     light.light = lightRes;
     light.local_transform = math::matrix::translate<double>(-10, 10, -10);
 
     const auto lightRes2 = std::make_shared<gl3d::DirectionalLight>();
     lightRes2->color = math::Vec3f(3);
 
-    auto& light2 = m_engine->scene_renderer.active_scene->create_object("light2");
+    auto& light2 = m_engine->scene_renderer.active_scene.value().get().create_object("light2");
     light2.light = lightRes2;
     light2.local_transform =
             math::matrix::from_quaternion<double>(math::quaternion::euler_angle<double>(math::to_rad(200.), 0, 0) *
@@ -232,6 +231,8 @@ void BoxApp::load_gui()
 
 void BoxApp::setup_scene()
 {
+    m_engine->scene_renderer.active_scene = m_engine->scene_store.load_resource("");
+
     setup_lights();
     load_ground();
     add_box();

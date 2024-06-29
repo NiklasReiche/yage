@@ -18,11 +18,14 @@ namespace yage::gl3d
 
     void SceneRenderer::render_active_scene()
     {
+        if (!active_scene)
+            return;
+
         m_drawables.clear();
         m_uniform_values.point_lights.clear();
         m_uniform_values.dir_lights.clear();
 
-        active_scene->apply([this](SceneObject& node) { collect_entities(node); }, math::matrix::Id4d);
+        active_scene.value().get().apply([this](SceneObject& node) { collect_entities(node); }, math::matrix::Id4d);
 
         m_projection_view.view = static_cast<math::Mat4f>(active_camera->view_matrix());
         m_projection_view.sync();

@@ -23,7 +23,7 @@ namespace yage::gl3d
 	{
 	public:
 	    std::shared_ptr<Camera> active_camera;
-        std::shared_ptr<SceneGroup> active_scene;
+        std::optional<res::Resource<SceneGroup>> active_scene;
 
 		explicit SceneRenderer(gl::IContext& context);
 

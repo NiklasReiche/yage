@@ -28,7 +28,9 @@ namespace yage::res
             return resources;
         }
 
-        virtual std::tuple<std::vector<ResourceType>, std::vector<std::string>> load_archive([[maybe_unused]] const std::string& uri)
+        // TODO: allow emitting resources directly into the store instead of explicitly giving containers to fill
+        virtual void load_archive([[maybe_unused]] const std::string& uri,
+            [[maybe_unused]] std::vector<ResourceType>& resources, [[maybe_unused]] std::vector<std::string>& uris)
         {
             throw std::logic_error("This loader does not implement archive loading");
         }

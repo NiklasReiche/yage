@@ -5,9 +5,9 @@ using namespace yage;
 
 void BilliardsApp::initialize()
 {
-    ground_mesh = m_engine->mesh_store.load_resource(std::string{"models/ground.glb"});
-    barrier_mesh = m_engine->mesh_store.load_resource(std::string{"models/barrier.glb"});
-    ball_mesh = m_engine->mesh_store.load_resource(std::string{"models/old_billiard_ball.glb"});
+    ground_mesh = m_engine->mesh_store.load_resource(std::string{"models/ground.glb:0"});
+    barrier_mesh = m_engine->mesh_store.load_resource(std::string{"models/barrier.glb:0"});
+    ball_mesh = m_engine->mesh_store.load_resource(std::string{"models/old_billiard_ball.glb:0"});
 
     load_gui();
 
@@ -40,7 +40,6 @@ void BilliardsApp::reset()
         m_engine->destroy_game_object(game_object);
     }
     objects.clear();
-    m_engine->scene_renderer.active_scene = std::make_shared<gl3d::SceneGroup>("root");
 
     n_barriers = 0;
     n_balls = 0;
@@ -80,7 +79,7 @@ void BilliardsApp::load_barrier(const math::Vec3d& position, const math::Quatd& 
     GameObject& game_object = m_engine->register_game_object("barrier" + std::to_string(n_barriers));
 
     game_object.scene_node =
-            m_engine->scene_renderer.active_scene->create_object("barrier" + std::to_string(n_barriers));
+            m_engine->scene_renderer.active_scene.value().get().create_object("barrier" + std::to_string(n_barriers));
     game_object.scene_node.value().get().mesh = barrier_mesh;
     game_object.scene_node.value().get().local_transform = math::matrix::scale(scale);
 
@@ -98,7 +97,7 @@ void BilliardsApp::load_ground(const math::Vec3d& position)
 {
     GameObject& game_object = m_engine->register_game_object("ground");
 
-    game_object.scene_node = m_engine->scene_renderer.active_scene->create_object("ground");
+    game_object.scene_node = m_engine->scene_renderer.active_scene.value().get().create_object("ground");
     game_object.scene_node.value().get().mesh = ground_mesh;
     game_object.scene_node.value().get().local_transform = math::matrix::scale(1.0, 1.0, 0.5);
 
@@ -115,7 +114,7 @@ GameObject& BilliardsApp::load_ball(math::Vec3d position)
 {
     GameObject& game_object = m_engine->register_game_object("ball" + std::to_string(n_balls));
 
-    game_object.scene_node = m_engine->scene_renderer.active_scene->create_object("ball" + std::to_string(n_balls));
+    game_object.scene_node = m_engine->scene_renderer.active_scene.value().get().create_object("ball" + std::to_string(n_balls));
     game_object.scene_node.value().get().mesh = ball_mesh;
     game_object.scene_node.value().get().local_transform =
             math::matrix::scale<double>(math::Vec3d(billiard_ball_radius));
@@ -154,7 +153,7 @@ void BilliardsApp::setup_lights() const
     const auto lightRes = std::make_shared<gl3d::PointLight>();
     lightRes->color = math::Vec3f(30);
 
-    auto& light = m_engine->scene_renderer.active_scene->create_object("light1");
+    auto& light = m_engine->scene_renderer.active_scene.value().get().create_object("light1");
     light.light = lightRes;
     light.local_transform = math::matrix::translate<double>(0, 3, 0);
 }
@@ -218,6 +217,8 @@ void BilliardsApp::load_gui()
 
 void BilliardsApp::setup_scene()
 {
+    m_engine->scene_renderer.active_scene = m_engine->scene_store.load_resource("");
+
     setup_lights();
     load_ground(math::Vec3d(0));
     load_barrier(math::Vec3d(1, 0, 0), math::quaternion::euler_angle<double>(-std::numbers::pi_v<double> / 2, 0, 0),

@@ -34,11 +34,11 @@ namespace yage::res
         ResourceType& get(const std::string& uri)
         {
             if (m_resources.contains(uri)) {
-                return m_resources[uri];
+                return m_resources.at(uri);
             }
 
             load_resource(uri);
-            return m_resources[uri];
+            return m_resources.at(uri);
         }
 
         friend class Resource<ResourceType>;
@@ -52,7 +52,7 @@ namespace yage::res
     template<typename ResourceType>
     Resource<ResourceType> Store<ResourceType>::load_resource(const std::string& uri)
     {
-        m_resources.insert(std::make_pair(uri, m_loader->load_resource(uri)));
+        m_resources.insert_or_assign(uri, m_loader->load_resource(uri));
         return Resource(uri, this);
     }
 
@@ -65,8 +65,8 @@ namespace yage::res
         std::vector<Resource<ResourceType>> handles;
         handles.reserve(resources.size());
         for (int i = 0; i < resources.size(); ++i) {
-            m_resources.insert(std::make_pair(uris[i], resources[i]));
-            handles.emplace_back(uris[i], this);
+            m_resources.insert_or_assign(uris[i], std::move(resources[i]));
+            handles.push_back(Resource<ResourceType>(uris[i], this));
         }
         return handles;
     }
@@ -74,14 +74,16 @@ namespace yage::res
     template<typename ResourceType>
     std::vector<Resource<ResourceType>> Store<ResourceType>::load_archive(const std::string& uri)
     {
-        const auto& [resources, uris] = m_loader->load_archive(uri);
+        std::vector<ResourceType> resources;
+        std::vector<std::string> uris;
+        m_loader->load_archive(uri, resources, uris);
         assert(resources.size() == uris.size());
 
         std::vector<Resource<ResourceType>> handles;
         handles.reserve(resources.size());
-        for (int i = 0; i < resources.size(); ++i) {
-            m_resources.insert(std::make_pair(uris[i], resources[i]));
-            handles.emplace_back(uris[i], this);
+        for (std::size_t i = 0; i < resources.size(); ++i) {
+            m_resources.insert_or_assign(uris[i], std::move(resources[i]));
+            handles.push_back(Resource<ResourceType>(uris[i], this));
         }
         return handles;
     }

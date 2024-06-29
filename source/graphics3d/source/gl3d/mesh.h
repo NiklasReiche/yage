@@ -19,6 +19,14 @@ namespace yage::gl3d
     public:
         SubMesh(std::shared_ptr<gl::IDrawable> m_drawable, const std::shared_ptr<Material>& m_material);
 
+    	SubMesh(SubMesh& other) = delete;
+
+    	SubMesh(SubMesh&& other) = default;
+
+    	SubMesh& operator=(SubMesh& other) = delete;
+
+    	SubMesh& operator=(SubMesh&& other) = default;
+
         [[nodiscard]]
         gl::IDrawable& drawable() const;
 
@@ -38,6 +46,16 @@ namespace yage::gl3d
 	class Mesh
 	{
 	public:
+		Mesh() = default;
+
+		Mesh(Mesh& other) = delete;
+
+		Mesh(Mesh&& other) = default;
+
+		Mesh& operator=(Mesh& other) = delete;
+
+		Mesh& operator=(Mesh&& other) = default;
+
         void add_sub_mesh(std::unique_ptr<SubMesh> sub_mesh);
 
         [[nodiscard]]
