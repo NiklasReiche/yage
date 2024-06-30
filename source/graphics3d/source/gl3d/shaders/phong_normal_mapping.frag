@@ -15,8 +15,10 @@ struct Material {
 	vec3 diffuse;
 	vec3 specular;
 	float shininess;
+	sampler2D ambientMap;
 	sampler2D diffuseMap;
 	sampler2D specularMap;
+	sampler2D shininessMap;
 	sampler2D normalMap;
 };
 uniform Material material;
@@ -61,10 +63,10 @@ void main(){
 	vec3 viewDir = normalize(camPos - fs_in.FragPos);
 
 	ComputedMaterial mat;
-	mat.ambient = material.ambient;
+	mat.ambient = texture(material.ambientMap, fs_in.TexCoords).rgb * material.ambient;
 	mat.diffuse = texture(material.diffuseMap, fs_in.TexCoords).rgb * material.diffuse;
 	mat.specular = texture(material.specularMap, fs_in.TexCoords).rgb * material.specular;
-	mat.shininess = material.shininess;
+	mat.shininess = texture(material.shininessMap, fs_in.TexCoords).r * material.shininess;
 
 	vec3 result = vec3(0.0);
 	for (int i = 0; i < n_dirLights; i++) {
@@ -78,7 +80,7 @@ void main(){
 
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir, ComputedMaterial material) {
 	// --- Ambient Lighting
-    vec3 ambient = light.ambient * material.diffuse;
+    vec3 ambient = light.ambient * material.ambient;
 	// --- Diffuse Lighting
 	vec3 lightDir = normalize(-light.direction);
 	float diff = max(dot(normal, lightDir), 0.0);
@@ -96,7 +98,7 @@ vec3 calcPointLight(PointLight light, vec3 normal, vec3 viewDir, vec3 FragPos, C
 	float distance    = length(light.position - FragPos);
 	float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 	// --- Ambient Lighting
-    vec3 ambient = light.ambient * material.diffuse;
+    vec3 ambient = light.ambient * material.ambient;
 	// --- Diffuse Lighting
 	vec3 lightDir = normalize(light.position - FragPos);
 	float diff = max(dot(normal, lightDir), 0.0);

@@ -48,7 +48,7 @@ namespace yage::img
 		}
 	}
 
-	std::unique_ptr<gl::ITexture2D> Image::toTexture(const std::shared_ptr<gl::ITextureCreator>& creator) const
+	std::unique_ptr<gl::ITexture2D> Image::toTexture(gl::ITextureCreator& creator) const
 	{
 		gl::ImageFormat format;
 		switch (depth) {
@@ -62,7 +62,7 @@ namespace yage::img
 				break;
 			default: format = gl::ImageFormat::UNDEFINED;
 		}
-		return creator->createTexture2D(width, height, format, {data(), imageData.size()});
+		return creator.createTexture2D(width, height, format, {data(), imageData.size()});
 	}
 
 

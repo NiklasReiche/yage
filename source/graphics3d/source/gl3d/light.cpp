@@ -6,12 +6,17 @@ namespace yage::gl3d
 {
     void Light::update_uniforms(gl::IShader& shader, const std::size_t i)
     {
-        if (std::holds_alternative<PhongLightModel>(light_model)) {
-            shader.setUniform(uniform_prefix(i) + ".ambient", std::get<PhongLightModel>(light_model).ambient);
-            shader.setUniform(uniform_prefix(i) + ".diffuse", std::get<PhongLightModel>(light_model).diffuse);
-            shader.setUniform(uniform_prefix(i) + ".specular", std::get<PhongLightModel>(light_model).specular);
-        } else if (std::holds_alternative<PbrLightModel>(light_model)) {
-            shader.setUniform(uniform_prefix(i) + ".color", std::get<PbrLightModel>(light_model).color);
+        for (LightModel light_model: light_models) {
+            if (std::holds_alternative<PhongLightModel>(light_model)) {
+                if (shader.hasUniform(uniform_prefix(i) + ".ambient")) {
+                    shader.setUniform(uniform_prefix(i) + ".ambient", std::get<PhongLightModel>(light_model).ambient);
+                    shader.setUniform(uniform_prefix(i) + ".diffuse", std::get<PhongLightModel>(light_model).diffuse);
+                    shader.setUniform(uniform_prefix(i) + ".specular", std::get<PhongLightModel>(light_model).specular);
+                }
+            } else if (std::holds_alternative<PbrLightModel>(light_model)) {
+                if (shader.hasUniform(uniform_prefix(i) + ".color"))
+                    shader.setUniform(uniform_prefix(i) + ".color", std::get<PbrLightModel>(light_model).color);
+            }
         }
     }
 

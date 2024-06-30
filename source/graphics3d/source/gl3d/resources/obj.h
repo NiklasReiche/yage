@@ -4,11 +4,22 @@
 
 #include <core/platform/IFileReader.h>
 #include <core/gl/DrawableCreator.h>
-#include <gl3d/material.h>
+#include "../material.h"
+#include "../mesh.h"
+#include "../shaders.h"
 
 namespace yage::gl3d::resources
 {
-	std::tuple<std::unique_ptr<gl::IDrawable>, gl3d::Material> readObj(
-		const platform::IFileReader& fileReader, const std::string& filename,
-		gl::IDrawableCreator& drawableCreator);
+    std::unordered_map<std::string, Material> read_mtl(
+        const std::string& filename,
+        const platform::IFileReader& file_reader,
+        gl::ITextureCreator& texture_creator,
+        const ShaderMap& shaders);
+
+    std::vector<Mesh> read_obj(
+        const std::string& filename,
+        const platform::IFileReader& file_reader,
+        gl::ITextureCreator& texture_creator,
+        gl::IDrawableCreator& drawable_creator,
+        const ShaderMap& shaders);
 }

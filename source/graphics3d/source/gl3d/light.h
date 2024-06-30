@@ -1,6 +1,8 @@
 #pragma once
 
 #include <variant>
+#include <vector>
+
 #include <math/vector.h>
 #include <core/gl/Shader.h>
 
@@ -24,10 +26,12 @@ namespace yage::gl3d
         math::Vec3f specular;
     };
 
+    using LightModel = std::variant<PhongLightModel, PbrLightModel>;
+
     class Light
     {
     public:
-        std::variant<PhongLightModel, PbrLightModel> light_model;
+        std::vector<LightModel> light_models;
 
         virtual ~Light() = default;
 

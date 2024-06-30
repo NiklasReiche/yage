@@ -23,7 +23,7 @@ namespace yage::img
 		void flipVertically();
 
 		[[nodiscard]]
-		std::unique_ptr<gl::ITexture2D> toTexture(const std::shared_ptr<gl::ITextureCreator>& creator) const;
+		std::unique_ptr<gl::ITexture2D> toTexture(gl::ITextureCreator& creator) const;
 
 		[[nodiscard]]
 		int getWidth() const;
