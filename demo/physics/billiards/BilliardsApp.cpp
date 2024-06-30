@@ -151,9 +151,9 @@ void BilliardsApp::setup_balls(const math::Vec3d& offset)
 void BilliardsApp::setup_lights() const
 {
     const auto lightRes = std::make_shared<gl3d::PointLight>();
-    lightRes->light_model = gl3d::PbrLightModel{
+    lightRes->light_models.emplace_back(gl3d::PbrLightModel{
         .color = math::Vec3f(30)
-    };
+    });
 
     auto& light = m_engine->scene_renderer.active_scene.value().get().create_object("light1");
     light.light = lightRes;
