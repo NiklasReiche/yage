@@ -5,7 +5,7 @@ add_library(yage_core SHARED)
 find_package(Vulkan REQUIRED)
 
 target_link_libraries(yage_core
-	PUBLIC yage_gml yage_utils glfw glad ${Vulkan_LIBRARIES} tfd)
+	PUBLIC yage_math yage_utils glfw glad ${Vulkan_LIBRARIES} tfd)
 
 target_include_directories(yage_core
 	PUBLIC source ${Vulkan_INCLUDE_DIRS})

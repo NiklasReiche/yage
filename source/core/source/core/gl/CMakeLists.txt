@@ -1,6 +1,7 @@
 target_sources(yage_core
 	PRIVATE
 		color.h
+		enums.h
 		Context.h
 		Cubemap.h
 		Drawable.h

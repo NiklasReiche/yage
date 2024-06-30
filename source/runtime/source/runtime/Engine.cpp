@@ -9,8 +9,8 @@
 namespace yage
 {
     Engine::Engine(int width, int height, const std::string& title) :
-        m_window(std::make_unique<platform::desktop::GlfwWindow>(width, height, title)),
-        m_gl_context(gl::createContext(m_window)),
+        m_window(std::make_unique<platform::desktop::GlfwWindow>(width, height, title, platform::desktop::GlfwWindow::GlApi::API_OPENGL)),
+        m_gl_context(gl::createOpenGlContext(m_window)),
         scene_renderer(*m_gl_context),
         physics(physics3d::Visualizer(*m_gl_context)),
         gui(m_window, m_gl_context),

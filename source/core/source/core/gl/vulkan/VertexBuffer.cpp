@@ -4,16 +4,16 @@
 
 #include <utility>
 
-namespace gl::vulkan
+namespace yage::gl::vulkan
 {
-    VertexBuffer::VertexBuffer(std::weak_ptr<Instance> instance, const std::span<const std::byte>& vertices)
+    VertexBuffer::VertexBuffer(std::weak_ptr<Instance> instance, const std::span<const std::byte>& data)
             : m_instance(std::move(instance))
     {
-        auto device = m_instance.lock()->device();
+        VkDevice device = m_instance.lock()->device();
 
         VkBufferCreateInfo bufferInfo{};
         bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-        bufferInfo.size = vertices.size();
+        bufferInfo.size = data.size();
         bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
         bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         bufferInfo.flags = 0;
@@ -36,20 +36,20 @@ namespace gl::vulkan
 
         vkBindBufferMemory(device, m_buffer_handle, m_memory_handle, 0);
 
-        void* data;
-        vkMapMemory(device, m_memory_handle, 0, bufferInfo.size, 0, &data);
-        memcpy(data, vertices.data(), bufferInfo.size);
+        void* raw_data;
+        vkMapMemory(device, m_memory_handle, 0, bufferInfo.size, 0, &raw_data);
+        memcpy(raw_data, data.data(), bufferInfo.size);
         vkUnmapMemory(device, m_memory_handle);
     }
 
     VertexBuffer::~VertexBuffer()
     {
-        auto device = m_instance.lock()->device();
+        const auto device = m_instance.lock()->device();
         vkDestroyBuffer(device, m_buffer_handle, nullptr);
         vkFreeMemory(device, m_memory_handle, nullptr);
     }
 
-    std::uint32_t VertexBuffer::findMemoryType(std::uint32_t typeFilter, VkMemoryPropertyFlags properties)
+    std::uint32_t VertexBuffer::findMemoryType(const std::uint32_t typeFilter, VkMemoryPropertyFlags properties)
     {
         VkPhysicalDeviceMemoryProperties memProperties;
         vkGetPhysicalDeviceMemoryProperties(m_instance.lock()->physical_device(), &memProperties);

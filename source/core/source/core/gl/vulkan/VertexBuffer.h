@@ -6,17 +6,17 @@
 
 #include "Instance.h"
 
-namespace gl::vulkan
+namespace yage::gl::vulkan
 {
-    class VertexBuffer
+    class VertexBuffer final
     {
     public:
-        explicit VertexBuffer(std::weak_ptr<Instance> instance, const std::span<const std::byte>& vertices);
+        explicit VertexBuffer(std::weak_ptr<Instance> instance, const std::span<const std::byte>& data);
 
-        virtual ~VertexBuffer();
+        ~VertexBuffer();
 
     private:
-        std::weak_ptr<Instance> m_instance{}; // TODO: type of dependency
+        std::weak_ptr<Instance> m_instance{};
         VkBuffer m_buffer_handle{};
         VkDeviceMemory m_memory_handle{};
 

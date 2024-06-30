@@ -5,4 +5,13 @@ target_sources(yage_core PRIVATE
         VertexBuffer.cpp
         Pipeline.h
         Pipeline.cpp
+        PipelineBuilder.h
+        PipelineBuilder.cpp
+        Shader.h
+        Shader.cpp
+        enums.h
+        FrameBuffer.h
+        FrameBuffer.cpp
+        RenderPass.h
+        RenderPass.cpp
 )

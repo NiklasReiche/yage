@@ -1,12 +1,13 @@
 #pragma once
 
 #include <optional>
+#include <cstdint>
 
 #include <vulkan/vulkan.h>
 
 #include "../../platform/desktop/GlfwWindow.h"
 
-namespace gl::vulkan
+namespace yage::gl::vulkan
 {
     struct QueueFamilyIndices
     {
@@ -27,7 +28,7 @@ namespace gl::vulkan
         std::vector<VkPresentModeKHR> presentModes;
     };
 
-    class Instance
+    class Instance final
     {
     public:
         explicit Instance(std::weak_ptr<platform::desktop::GlfwWindow> window);
@@ -104,9 +105,9 @@ namespace gl::vulkan
 
         SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 
-        VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+        static VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 
-        VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+        static VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 
         VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 

@@ -1,3 +1,5 @@
+// ReSharper disable CppLocalVariableMayBeConst
+// ReSharper disable CppParameterMayBeConst
 #include <cstdint>
 #include <cstring>
 #include <utility>
@@ -6,26 +8,26 @@
 #include "Instance.h"
 #include "GLFW/glfw3.h"
 
-namespace gl::vulkan
+namespace yage::gl::vulkan
 {
     VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
                                           const VkAllocationCallbacks* pAllocator,
                                           VkDebugUtilsMessengerEXT* pDebugMessenger)
     {
-        auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(
-                instance, "vkCreateDebugUtilsMessengerEXT");
+        const auto func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(
+            instance, "vkCreateDebugUtilsMessengerEXT"));
         if (func != nullptr) {
             return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
-        } else {
-            return VK_ERROR_EXTENSION_NOT_PRESENT;
         }
+
+        return VK_ERROR_EXTENSION_NOT_PRESENT;
     }
 
     void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger,
                                        const VkAllocationCallbacks* pAllocator)
     {
-        auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(
-                instance, "vkDestroyDebugUtilsMessengerEXT");
+        const auto func = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(
+            instance, "vkDestroyDebugUtilsMessengerEXT"));
         if (func != nullptr) {
             func(instance, debugMessenger, pAllocator);
         }
@@ -94,7 +96,7 @@ namespace gl::vulkan
         createInfo.pApplicationInfo = &appInfo;
 
         // load extensions
-        auto extensions = required_extensions();
+        const std::vector<const char*> extensions = required_extensions();
         createInfo.enabledExtensionCount = static_cast<std::uint32_t>(extensions.size());
         createInfo.ppEnabledExtensionNames = extensions.data();
 
@@ -109,7 +111,7 @@ namespace gl::vulkan
         createInfo.enabledLayerCount = static_cast<uint32_t>(m_validation_layers.size());
         createInfo.ppEnabledLayerNames = m_validation_layers.data();
 
-        auto debug_create_info = populate_debug_messenger_create_info();
+        const VkDebugUtilsMessengerCreateInfoEXT debug_create_info = populate_debug_messenger_create_info();
         createInfo.pNext = &debug_create_info;
 #endif
 
@@ -205,7 +207,7 @@ namespace gl::vulkan
 
     void Instance::setup_debug_messenger()
     {
-        VkDebugUtilsMessengerCreateInfoEXT createInfo = populate_debug_messenger_create_info();
+        const VkDebugUtilsMessengerCreateInfoEXT createInfo = populate_debug_messenger_create_info();
         if (CreateDebugUtilsMessengerEXT(m_instance, &createInfo, nullptr, &m_debug_messenger) != VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to set up debug messenger!");
         }
@@ -249,13 +251,13 @@ namespace gl::vulkan
         VkPhysicalDeviceFeatures deviceFeatures;
         vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 #endif
-        QueueFamilyIndices indices = findQueueFamilies(device);
+        const QueueFamilyIndices indices = findQueueFamilies(device);
 
-        bool extensionsSupported = checkDeviceExtensionSupport(device);
+        const bool extensionsSupported = checkDeviceExtensionSupport(device);
 
         bool swapChainAdequate = false;
         if (extensionsSupported) {
-            SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
+            const SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
             swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
         }
 
@@ -403,31 +405,31 @@ namespace gl::vulkan
     {
         if (capabilities.currentExtent.width != std::numeric_limits<std::uint32_t>::max()) {
             return capabilities.currentExtent;
-        } else {
-            int width = m_window.lock()->getPixelWidth();
-            int height = m_window.lock()->getPixelHeight();
-
-            VkExtent2D actualExtent = {
-                    static_cast<std::uint32_t>(width),
-                    static_cast<std::uint32_t>(height)
-            };
-
-            actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width,
-                                            capabilities.maxImageExtent.width);
-            actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height,
-                                             capabilities.maxImageExtent.height);
-
-            return actualExtent;
         }
+
+        const int width = m_window.lock()->getPixelWidth();
+        const int height = m_window.lock()->getPixelHeight();
+
+        VkExtent2D actualExtent = {
+            static_cast<std::uint32_t>(width),
+            static_cast<std::uint32_t>(height)
+        };
+
+        actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width,
+                                        capabilities.maxImageExtent.width);
+        actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height,
+                                         capabilities.maxImageExtent.height);
+
+        return actualExtent;
     }
 
     void Instance::create_swap_chain()
     {
-        SwapChainSupportDetails swapChainSupport = querySwapChainSupport(m_physical_device);
+        const SwapChainSupportDetails swapChainSupport = querySwapChainSupport(m_physical_device);
 
-        VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
-        VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
-        VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities);
+        const VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
+        const VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
+        const VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities);
 
         std::uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
         if (swapChainSupport.capabilities.maxImageCount > 0 &&
@@ -446,8 +448,8 @@ namespace gl::vulkan
         createInfo.imageArrayLayers = 1;
         createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-        QueueFamilyIndices indices = findQueueFamilies(m_physical_device);
-        std::uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+        const QueueFamilyIndices indices = findQueueFamilies(m_physical_device);
+        const std::uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
         if (indices.graphicsFamily != indices.presentFamily) {
             createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
             createInfo.queueFamilyIndexCount = 2;
@@ -760,7 +762,7 @@ namespace gl::vulkan
 
     void Instance::create_command_pool()
     {
-        QueueFamilyIndices queueFamilyIndices = findQueueFamilies(m_physical_device);
+        const QueueFamilyIndices queueFamilyIndices = findQueueFamilies(m_physical_device);
 
         VkCommandPoolCreateInfo poolInfo{};
         poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -804,7 +806,7 @@ namespace gl::vulkan
         renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex];
         renderPassInfo.renderArea.offset = {0, 0};
         renderPassInfo.renderArea.extent = swapChainExtent;
-        VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+        constexpr VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
         renderPassInfo.clearValueCount = 1;
         renderPassInfo.pClearValues = &clearColor;
 
@@ -866,7 +868,9 @@ namespace gl::vulkan
         if (result == VK_ERROR_OUT_OF_DATE_KHR) {
             recreateSwapChain();
             return;
-        } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+        }
+
+        if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
             throw std::runtime_error("failed to acquire swap chain image!");
         }
 
@@ -879,8 +883,8 @@ namespace gl::vulkan
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        VkSemaphore waitSemaphores[] = {imageAvailableSemaphores[currentFrame]};
-        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        const VkSemaphore waitSemaphores[] = {imageAvailableSemaphores[currentFrame]};
+        constexpr VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
         submitInfo.pWaitDstStageMask = waitStages;
@@ -888,7 +892,7 @@ namespace gl::vulkan
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &commandBuffers[currentFrame];
 
-        VkSemaphore signalSemaphores[] = {renderFinishedSemaphores[currentFrame]};
+        const VkSemaphore signalSemaphores[] = {renderFinishedSemaphores[currentFrame]};
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
@@ -902,7 +906,7 @@ namespace gl::vulkan
         presentInfo.waitSemaphoreCount = 1;
         presentInfo.pWaitSemaphores = signalSemaphores;
 
-        VkSwapchainKHR swapChains[] = {swapChain};
+        const VkSwapchainKHR swapChains[] = {swapChain};
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = swapChains;
         presentInfo.pImageIndices = &imageIndex;
@@ -921,11 +925,11 @@ namespace gl::vulkan
 
     void Instance::cleanupSwapChain()
     {
-        for (auto & swapChainFrameBuffer : swapChainFramebuffers) {
+        for (const auto& swapChainFrameBuffer : swapChainFramebuffers) {
             vkDestroyFramebuffer(m_device, swapChainFrameBuffer, nullptr);
         }
 
-        for (auto & swapChainImageView : swapChainImageViews) {
+        for (const auto& swapChainImageView : swapChainImageViews) {
             vkDestroyImageView(m_device, swapChainImageView, nullptr);
         }
 
@@ -934,7 +938,7 @@ namespace gl::vulkan
 
     void Instance::recreateSwapChain()
     {
-        auto window = m_window.lock();
+        const auto window = m_window.lock();
         int width = window->getPixelWidth();
         int height = window->getPixelHeight();
         while (width == 0 || height == 0) {
