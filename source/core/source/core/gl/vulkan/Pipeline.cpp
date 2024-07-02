@@ -4,7 +4,7 @@
 
 namespace yage::gl::vulkan
 {
-    Pipeline::Pipeline(std::weak_ptr<Instance> instance, std::shared_ptr<RenderPass> render_pass,
+    Pipeline::Pipeline(std::weak_ptr<Instance> instance, std::shared_ptr<Handle<RenderPass>> render_pass,
                        VkGraphicsPipelineCreateInfo& pipeline_info,
                        const VkPipelineLayoutCreateInfo& layout_info)
         : m_instance(std::move(instance)),

@@ -10,6 +10,7 @@
 #include "FrameBufferFactory.h"
 #include "Pipeline.h"
 #include "PipelineBuilder.h"
+#include "core/gl/Handle.h"
 
 namespace yage::gl::vulkan
 {
@@ -53,9 +54,11 @@ namespace yage::gl::vulkan
 
         [[nodiscard]] FrameBuffer& swap_chain_frame_buffer_for_frame() const { return *m_swap_chain_frame_buffers[m_current_swap_chain_image_index]; }
 
-        [[nodiscard]] std::shared_ptr<RenderPass> swap_chain_render_pass() const { return m_render_pass; }
+        [[nodiscard]] std::shared_ptr<Handle<RenderPass>> swap_chain_render_pass() const { return m_render_pass; }
 
         [[nodiscard]] VkCommandBuffer command_buffer_for_frame() const { return m_command_buffers[m_current_frame]; }
+
+        const std::shared_ptr<Store<RenderPass>>& store_render_passes() { return m_store_render_passes; }
 
     private:
         const std::vector<const char*> m_validation_layers = {
@@ -79,7 +82,7 @@ namespace yage::gl::vulkan
         VkFormat swapChainImageFormat{};
         VkExtent2D swapChainExtent{};
 
-        std::shared_ptr<RenderPass> m_render_pass;
+        std::shared_ptr<Handle<RenderPass>> m_render_pass;
 
         std::uint32_t m_current_frame = 0;
         std::uint32_t m_current_swap_chain_image_index = 0;
@@ -96,6 +99,8 @@ namespace yage::gl::vulkan
         std::vector<VkFence> inFlightFences{};
 
         bool framebufferResized = false;
+
+        std::shared_ptr<Store<RenderPass>> m_store_render_passes = std::make_shared<Store<RenderPass>>();
 
         void create_instance();
 
@@ -139,7 +144,7 @@ namespace yage::gl::vulkan
 
         VkShaderModule createShaderModule(const std::vector<std::byte>& code);
 
-        void create_render_pass();
+        void create_swap_chain_render_pass();
 
         void create_framebuffers();
 

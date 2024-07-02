@@ -15,6 +15,28 @@ namespace yage::gl::vulkan
 
         ~RenderPass();
 
+        RenderPass(const RenderPass& other) = delete;
+
+        RenderPass(RenderPass&& other) noexcept
+        {
+            m_instance = std::move(other.m_instance);
+            m_vk_handle = other.m_vk_handle;
+
+            other.m_vk_handle = VK_NULL_HANDLE;
+        }
+
+        RenderPass& operator=(const RenderPass& other) = delete;
+
+        RenderPass& operator=(RenderPass&& other) noexcept
+        {
+            m_instance = std::move(other.m_instance);
+            m_vk_handle = other.m_vk_handle;
+
+            other.m_vk_handle = VK_NULL_HANDLE;
+
+            return *this;
+        }
+
         [[nodiscard]] VkRenderPass vk_handle() const;
 
     private:

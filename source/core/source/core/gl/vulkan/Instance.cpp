@@ -69,7 +69,7 @@ namespace yage::gl::vulkan
         create_logical_device();
         create_swap_chain();
         create_image_views();
-        create_render_pass();
+        create_swap_chain_render_pass();
         create_framebuffers();
         create_command_pool();
         create_command_buffers();
@@ -519,7 +519,7 @@ namespace yage::gl::vulkan
         return shaderModule;
     }
 
-    void Instance::create_render_pass()
+    void Instance::create_swap_chain_render_pass()
     {
         VkAttachmentDescription colorAttachment{};
         colorAttachment.format = swapChainImageFormat;
@@ -558,7 +558,8 @@ namespace yage::gl::vulkan
         renderPassInfo.dependencyCount = 1;
         renderPassInfo.pDependencies = &dependency;
 
-        m_render_pass = std::make_shared<RenderPass>(weak_from_this(), renderPassInfo);
+        m_render_pass = std::make_shared<Handle<RenderPass>>(m_store_render_passes->create(
+            weak_from_this(), renderPassInfo));
     }
 
     void Instance::create_framebuffers()

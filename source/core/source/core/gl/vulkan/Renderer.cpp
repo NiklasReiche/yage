@@ -25,7 +25,7 @@ namespace yage::gl::vulkan
     {
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = frame_buffer.render_pass()->vk_handle();
+        renderPassInfo.renderPass = frame_buffer.render_pass()->get().vk_handle();
         renderPassInfo.framebuffer = frame_buffer.vk_handle();
         renderPassInfo.renderArea.offset = {0, 0};
         const math::Vec2ui extent = frame_buffer.extent();

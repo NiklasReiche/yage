@@ -1,5 +1,6 @@
 target_sources(yage_core
 	PRIVATE
+		Handle.h
 		color.h
 		enums.h
 		Context.h

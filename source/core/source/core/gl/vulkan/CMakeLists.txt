@@ -14,6 +14,8 @@ target_sources(yage_core PRIVATE
         FrameBufferFactory.cpp
         RenderPass.h
         RenderPass.cpp
+        RenderPassFactory.h
+        RenderPassFactory.cpp
         ImageView.h
         ImageView.cpp
         Renderer.h

@@ -8,7 +8,7 @@ namespace yage::gl::vulkan
     {
     }
 
-    std::unique_ptr<FrameBuffer> FrameBufferFactory::create_frame_buffer(std::shared_ptr<RenderPass> render_pass,
+    std::unique_ptr<FrameBuffer> FrameBufferFactory::create_frame_buffer(std::shared_ptr<Handle<RenderPass>> render_pass,
                                                                          std::span<ImageView*> attachements,
                                                                          const unsigned int width,
                                                                          const unsigned int height)
@@ -20,7 +20,7 @@ namespace yage::gl::vulkan
 
         VkFramebufferCreateInfo framebufferInfo{};
         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        framebufferInfo.renderPass = render_pass->vk_handle();
+        framebufferInfo.renderPass = render_pass->get().vk_handle();
         framebufferInfo.attachmentCount = vk_attachemtents.size();
         framebufferInfo.pAttachments = vk_attachemtents.data();
         framebufferInfo.width = width;
