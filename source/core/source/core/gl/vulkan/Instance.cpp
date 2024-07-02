@@ -34,41 +34,20 @@ namespace yage::gl::vulkan
     }
 
     Instance::Instance(std::weak_ptr<platform::desktop::GlfwWindow> window)
-            : m_window(std::move(window))
+        : m_window(std::move(window))
     {
-        m_window.lock()->attach_on_framebuffer_resize([this](int, int){ this->framebufferResized = true; });
-
-        create_instance();
-        setup_debug_messenger();
-        create_surface();
-        pick_physical_device();
-        create_logical_device();
-        create_swap_chain();
-        create_image_views();
-        create_render_pass();
-        create_graphics_pipeline();
-        create_framebuffers();
-        create_command_pool();
-        create_command_buffers();
-        create_sync_objects();
+        m_window.lock()->attach_on_framebuffer_resize([this](int, int) { this->framebufferResized = true; });
     }
 
     Instance::~Instance()
     {
-        vkDeviceWaitIdle(m_device);
-        cleanupSwapChain();
-
         for (auto i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             vkDestroySemaphore(m_device, renderFinishedSemaphores[i], nullptr);
             vkDestroySemaphore(m_device, imageAvailableSemaphores[i], nullptr);
             vkDestroyFence(m_device, inFlightFences[i], nullptr);
         }
 
-        vkDestroyCommandPool(m_device, commandPool, nullptr);
-
-        vkDestroyPipeline(m_device, graphicsPipeline, nullptr);
-        vkDestroyPipelineLayout(m_device, pipelineLayout, nullptr);
-        vkDestroyRenderPass(m_device, renderPass, nullptr);
+        vkDestroyCommandPool(m_device, m_command_pool, nullptr);
 
         vkDestroyDevice(m_device, nullptr);
 
@@ -79,6 +58,22 @@ namespace yage::gl::vulkan
 #endif
 
         vkDestroyInstance(m_instance, nullptr);
+    }
+
+    void Instance::initialize()
+    {
+        create_instance();
+        setup_debug_messenger();
+        create_surface();
+        pick_physical_device();
+        create_logical_device();
+        create_swap_chain();
+        create_image_views();
+        create_render_pass();
+        create_framebuffers();
+        create_command_pool();
+        create_command_buffers();
+        create_sync_objects();
     }
 
     void Instance::create_instance()
@@ -215,7 +210,8 @@ namespace yage::gl::vulkan
 
     void Instance::create_surface()
     {
-        if (glfwCreateWindowSurface(m_instance, m_window.lock()->glfw_window_ptr(), nullptr, &m_surface) != VK_SUCCESS) {
+        if (glfwCreateWindowSurface(m_instance, m_window.lock()->glfw_window_ptr(), nullptr, &m_surface) !=
+            VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to create window surface!");
         }
     }
@@ -302,7 +298,7 @@ namespace yage::gl::vulkan
         std::set<std::uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
         float queuePriority = 1.0f;
-        for (std::uint32_t queueFamily : uniqueQueueFamilies) {
+        for (std::uint32_t queueFamily: uniqueQueueFamilies) {
             VkDeviceQueueCreateInfo queueCreateInfo{};
             queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
             queueCreateInfo.queueFamilyIndex = queueFamily;
@@ -372,7 +368,8 @@ namespace yage::gl::vulkan
         vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_surface, &presentModeCount, nullptr);
         if (presentModeCount != 0) {
             details.presentModes.resize(presentModeCount);
-            vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_surface, &presentModeCount, details.presentModes.data());
+            vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_surface, &presentModeCount,
+                                                      details.presentModes.data());
         }
 
         return details;
@@ -393,7 +390,8 @@ namespace yage::gl::vulkan
     VkPresentModeKHR Instance::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes)
     {
         for (const auto& availablePresentMode: availablePresentModes) {
-            if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) { // triple-buffering
+            if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+                // triple-buffering
                 return availablePresentMode;
             }
         }
@@ -473,8 +471,8 @@ namespace yage::gl::vulkan
         }
 
         vkGetSwapchainImagesKHR(m_device, swapChain, &imageCount, nullptr);
-        swapChainImages.resize(imageCount);
-        vkGetSwapchainImagesKHR(m_device, swapChain, &imageCount, swapChainImages.data());
+        m_swap_chain_images.resize(imageCount);
+        vkGetSwapchainImagesKHR(m_device, swapChain, &imageCount, m_swap_chain_images.data());
 
         swapChainImageFormat = surfaceFormat.format;
         swapChainExtent = extent;
@@ -482,11 +480,11 @@ namespace yage::gl::vulkan
 
     void Instance::create_image_views()
     {
-        swapChainImageViews.resize(swapChainImages.size());
-        for (size_t i = 0; i < swapChainImages.size(); i++) {
+        m_swap_chain_image_views.resize(m_swap_chain_images.size());
+        for (size_t i = 0; i < m_swap_chain_images.size(); i++) {
             VkImageViewCreateInfo createInfo{};
             createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-            createInfo.image = swapChainImages[i];
+            createInfo.image = m_swap_chain_images[i];
 
             createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
             createInfo.format = swapChainImageFormat;
@@ -502,179 +500,8 @@ namespace yage::gl::vulkan
             createInfo.subresourceRange.baseArrayLayer = 0;
             createInfo.subresourceRange.layerCount = 1;
 
-            if (vkCreateImageView(m_device, &createInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS) {
-                throw std::runtime_error("Vulkan: failed to create image views!");
-            }
+            m_swap_chain_image_views[i] = std::make_unique<ImageView>(weak_from_this(), createInfo);
         }
-    }
-
-    void Instance::create_graphics_pipeline()
-    {
-        // shaders
-        auto file_reader = m_window.lock()->getFileReader();
-        auto vertShaderCode = file_reader->openBinaryFile(
-                R"(C:\Users\Niklas\Code\yage\demo\SimpleWindow\assets\vert.spv)",
-                platform::IFile::AccessMode::READ)->read_all();
-        auto fragShaderCode = file_reader->openBinaryFile(
-                R"(C:\Users\Niklas\Code\yage\demo\SimpleWindow\assets\frag.spv)",
-                platform::IFile::AccessMode::READ)->read_all();
-
-        VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
-        VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
-
-        VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
-        vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-        vertShaderStageInfo.module = vertShaderModule;
-        vertShaderStageInfo.pName = "main";
-        vertShaderStageInfo.pSpecializationInfo = nullptr; // injection of constants
-
-        VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
-        fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-        fragShaderStageInfo.module = fragShaderModule;
-        fragShaderStageInfo.pName = "main";
-        vertShaderStageInfo.pSpecializationInfo = nullptr; // injection of constants
-
-        VkPipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
-
-        // dynamic state
-        std::vector<VkDynamicState> dynamicStates = {
-                VK_DYNAMIC_STATE_VIEWPORT,
-                VK_DYNAMIC_STATE_SCISSOR
-        };
-
-        VkPipelineDynamicStateCreateInfo dynamicState{};
-        dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-        dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
-        dynamicState.pDynamicStates = dynamicStates.data();
-
-        // vertex input
-        VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-        vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        vertexInputInfo.vertexBindingDescriptionCount = 0;
-        vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-        vertexInputInfo.vertexAttributeDescriptionCount = 0;
-        vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
-
-        // input assembly
-        VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
-        inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-        inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-        inputAssembly.primitiveRestartEnable = VK_FALSE;
-
-        // viewports and scissors
-        VkViewport viewport{};
-        viewport.x = 0.0f;
-        viewport.y = 0.0f;
-        viewport.width = static_cast<float>(swapChainExtent.width);
-        viewport.height = static_cast<float>(swapChainExtent.height);
-        viewport.minDepth = 0.0f;
-        viewport.maxDepth = 1.0f;
-
-        VkRect2D scissor{};
-        scissor.offset = {0, 0};
-        scissor.extent = swapChainExtent;
-
-        VkPipelineViewportStateCreateInfo viewportState{};
-        viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-        viewportState.viewportCount = 1;
-        viewportState.pViewports = &viewport;
-        viewportState.scissorCount = 1;
-        viewportState.pScissors = &scissor;
-
-        // rasterizer
-        VkPipelineRasterizationStateCreateInfo rasterizer{};
-        rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-        rasterizer.depthClampEnable = VK_FALSE;
-        rasterizer.rasterizerDiscardEnable = VK_FALSE;
-        rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
-        rasterizer.lineWidth = 1.0f;
-        rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-        rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
-
-        rasterizer.depthBiasEnable = VK_FALSE;
-        rasterizer.depthBiasConstantFactor = 0.0f; // Optional
-        rasterizer.depthBiasClamp = 0.0f; // Optional
-        rasterizer.depthBiasSlopeFactor = 0.0f; // Optional
-
-        // multisampling
-        VkPipelineMultisampleStateCreateInfo multisampling{};
-        multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-        multisampling.sampleShadingEnable = VK_FALSE;
-        multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-        multisampling.minSampleShading = 1.0f; // Optional
-        multisampling.pSampleMask = nullptr; // Optional
-        multisampling.alphaToCoverageEnable = VK_FALSE; // Optional
-        multisampling.alphaToOneEnable = VK_FALSE; // Optional
-
-        // depth and stencil testing
-
-        // color blending
-        VkPipelineColorBlendAttachmentState colorBlendAttachment{};
-        colorBlendAttachment.colorWriteMask =
-                VK_COLOR_COMPONENT_R_BIT |
-                VK_COLOR_COMPONENT_G_BIT |
-                VK_COLOR_COMPONENT_B_BIT |
-                VK_COLOR_COMPONENT_A_BIT;
-        colorBlendAttachment.blendEnable = VK_FALSE;
-        colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
-        colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
-        colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD; // Optional
-        colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
-        colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
-        colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD; // Optional
-
-        VkPipelineColorBlendStateCreateInfo colorBlending{};
-        colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-        colorBlending.logicOpEnable = VK_FALSE;
-        colorBlending.logicOp = VK_LOGIC_OP_COPY; // Optional
-        colorBlending.attachmentCount = 1;
-        colorBlending.pAttachments = &colorBlendAttachment;
-        colorBlending.blendConstants[0] = 0.0f; // Optional
-        colorBlending.blendConstants[1] = 0.0f; // Optional
-        colorBlending.blendConstants[2] = 0.0f; // Optional
-        colorBlending.blendConstants[3] = 0.0f; // Optional
-
-        // pipeline layout
-        VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-        pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo.setLayoutCount = 0; // Optional
-        pipelineLayoutInfo.pSetLayouts = nullptr; // Optional
-        pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
-        pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
-
-        if (vkCreatePipelineLayout(m_device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
-            throw std::runtime_error("Vulkan: failed to create pipeline layout!");
-        }
-
-        // pipeline
-        VkGraphicsPipelineCreateInfo pipelineInfo{};
-        pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-        pipelineInfo.stageCount = 2;
-        pipelineInfo.pStages = shaderStages;
-        pipelineInfo.pVertexInputState = &vertexInputInfo;
-        pipelineInfo.pInputAssemblyState = &inputAssembly;
-        pipelineInfo.pViewportState = &viewportState;
-        pipelineInfo.pRasterizationState = &rasterizer;
-        pipelineInfo.pMultisampleState = &multisampling;
-        pipelineInfo.pDepthStencilState = nullptr; // Optional
-        pipelineInfo.pColorBlendState = &colorBlending;
-        pipelineInfo.pDynamicState = &dynamicState;
-        pipelineInfo.layout = pipelineLayout;
-        pipelineInfo.renderPass = renderPass;
-        pipelineInfo.subpass = 0;
-        pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
-        pipelineInfo.basePipelineIndex = -1; // Optional
-
-        if (vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) !=
-            VK_SUCCESS) {
-            throw std::runtime_error("Vulkan: failed to create graphics pipeline!");
-        }
-
-        // cleanup
-        vkDestroyShaderModule(m_device, fragShaderModule, nullptr);
-        vkDestroyShaderModule(m_device, vertShaderModule, nullptr);
     }
 
     VkShaderModule Instance::createShaderModule(const std::vector<std::byte>& code)
@@ -731,32 +558,20 @@ namespace yage::gl::vulkan
         renderPassInfo.dependencyCount = 1;
         renderPassInfo.pDependencies = &dependency;
 
-        if (vkCreateRenderPass(m_device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
-            throw std::runtime_error("Vulkan: failed to create render pass!");
-        }
+        m_render_pass = std::make_shared<RenderPass>(weak_from_this(), renderPassInfo);
     }
 
     void Instance::create_framebuffers()
     {
-        swapChainFramebuffers.resize(swapChainImageViews.size());
+        FrameBufferFactory frame_buffer_factory(weak_from_this());
 
-        for (size_t i = 0; i < swapChainImageViews.size(); i++) {
-            VkImageView attachments[] = {
-                    swapChainImageViews[i]
+        m_swap_chain_frame_buffers.resize(m_swap_chain_image_views.size());
+        for (size_t i = 0; i < m_swap_chain_image_views.size(); i++) {
+            ImageView* attachments[] = {
+                m_swap_chain_image_views[i].get()
             };
-
-            VkFramebufferCreateInfo framebufferInfo{};
-            framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-            framebufferInfo.renderPass = renderPass;
-            framebufferInfo.attachmentCount = 1;
-            framebufferInfo.pAttachments = attachments;
-            framebufferInfo.width = swapChainExtent.width;
-            framebufferInfo.height = swapChainExtent.height;
-            framebufferInfo.layers = 1;
-
-            if (vkCreateFramebuffer(m_device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
-                throw std::runtime_error("Vulkan: failed to create frame buffer!");
-            }
+            m_swap_chain_frame_buffers[i] = frame_buffer_factory.create_frame_buffer(m_render_pass, attachments,
+                swapChainExtent.width, swapChainExtent.height);
         }
     }
 
@@ -769,70 +584,23 @@ namespace yage::gl::vulkan
         poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
         poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
 
-        if (vkCreateCommandPool(m_device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
+        if (vkCreateCommandPool(m_device, &poolInfo, nullptr, &m_command_pool) != VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to create command pool!");
         }
     }
 
     void Instance::create_command_buffers()
     {
-        commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+        m_command_buffers.resize(MAX_FRAMES_IN_FLIGHT);
 
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.commandPool = commandPool;
+        allocInfo.commandPool = m_command_pool;
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandBufferCount = static_cast<std::uint32_t>(commandBuffers.size());
+        allocInfo.commandBufferCount = static_cast<std::uint32_t>(m_command_buffers.size());
 
-        if (vkAllocateCommandBuffers(m_device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
+        if (vkAllocateCommandBuffers(m_device, &allocInfo, m_command_buffers.data()) != VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to allocate command buffers!");
-        }
-    }
-
-    void Instance::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
-    {
-        VkCommandBufferBeginInfo beginInfo{};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        beginInfo.flags = 0; // Optional
-        beginInfo.pInheritanceInfo = nullptr; // Optional
-
-        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-            throw std::runtime_error("Vulkan: failed to begin recording command buffer!");
-        }
-
-        VkRenderPassBeginInfo renderPassInfo{};
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = renderPass;
-        renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex];
-        renderPassInfo.renderArea.offset = {0, 0};
-        renderPassInfo.renderArea.extent = swapChainExtent;
-        constexpr VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
-        renderPassInfo.clearValueCount = 1;
-        renderPassInfo.pClearValues = &clearColor;
-
-        vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-
-        VkViewport viewport{};
-        viewport.x = 0.0f;
-        viewport.y = 0.0f;
-        viewport.width = static_cast<float>(swapChainExtent.width);
-        viewport.height = static_cast<float>(swapChainExtent.height);
-        viewport.minDepth = 0.0f;
-        viewport.maxDepth = 1.0f;
-        vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
-
-        VkRect2D scissor{};
-        scissor.offset = {0, 0};
-        scissor.extent = swapChainExtent;
-        vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
-
-        vkCmdDraw(commandBuffer, 3, 1, 0, 0);
-
-        vkCmdEndRenderPass(commandBuffer);
-
-        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-            throw std::runtime_error("Vulkan: failed to record command buffer!");
         }
     }
 
@@ -853,18 +621,17 @@ namespace yage::gl::vulkan
             if (vkCreateSemaphore(m_device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
                 vkCreateSemaphore(m_device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
                 vkCreateFence(m_device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
-
                 throw std::runtime_error("Vulkan: failed to create synchronization objects for a frame!");
             }
         }
     }
 
-    void Instance::drawFrame()
+    void Instance::prepare_frame()
     {
-        vkWaitForFences(m_device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+        vkWaitForFences(m_device, 1, &inFlightFences[m_current_frame], VK_TRUE, UINT64_MAX);
 
-        std::uint32_t imageIndex;
-        auto result = vkAcquireNextImageKHR(m_device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+        auto result = vkAcquireNextImageKHR(m_device, swapChain, UINT64_MAX, imageAvailableSemaphores[m_current_frame],
+                                            VK_NULL_HANDLE, &m_current_swap_chain_image_index);
         if (result == VK_ERROR_OUT_OF_DATE_KHR) {
             recreateSwapChain();
             return;
@@ -875,28 +642,30 @@ namespace yage::gl::vulkan
         }
 
         // Only reset the fence if we are submitting work
-        vkResetFences(m_device, 1, &inFlightFences[currentFrame]);
+        vkResetFences(m_device, 1, &inFlightFences[m_current_frame]);
 
-        vkResetCommandBuffer(commandBuffers[currentFrame], 0);
-        recordCommandBuffer(commandBuffers[currentFrame], imageIndex);
+        vkResetCommandBuffer(m_command_buffers[m_current_frame], 0);
+    }
 
+    void Instance::present_frame()
+    {
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        const VkSemaphore waitSemaphores[] = {imageAvailableSemaphores[currentFrame]};
+        const VkSemaphore waitSemaphores[] = {imageAvailableSemaphores[m_current_frame]};
         constexpr VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
         submitInfo.pWaitDstStageMask = waitStages;
 
         submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &commandBuffers[currentFrame];
+        submitInfo.pCommandBuffers = &m_command_buffers[m_current_frame];
 
-        const VkSemaphore signalSemaphores[] = {renderFinishedSemaphores[currentFrame]};
+        const VkSemaphore signalSemaphores[] = {renderFinishedSemaphores[m_current_frame]};
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
-        if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) {
+        if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[m_current_frame]) != VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to submit draw command buffer!");
         }
 
@@ -909,10 +678,10 @@ namespace yage::gl::vulkan
         const VkSwapchainKHR swapChains[] = {swapChain};
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = swapChains;
-        presentInfo.pImageIndices = &imageIndex;
+        presentInfo.pImageIndices = &m_current_swap_chain_image_index;
         presentInfo.pResults = nullptr; // Optional
 
-        result = vkQueuePresentKHR(presentQueue, &presentInfo);
+        VkResult result = vkQueuePresentKHR(presentQueue, &presentInfo);
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
             framebufferResized = false;
             recreateSwapChain();
@@ -920,17 +689,24 @@ namespace yage::gl::vulkan
             throw std::runtime_error("Vulkan: failed to present swap chain image!");
         }
 
-        currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+        m_current_frame = (m_current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
+    }
+
+    void Instance::flush_resources()
+    {
+        vkDeviceWaitIdle(m_device);
+        cleanupSwapChain();
+        m_render_pass.reset();
     }
 
     void Instance::cleanupSwapChain()
     {
-        for (const auto& swapChainFrameBuffer : swapChainFramebuffers) {
-            vkDestroyFramebuffer(m_device, swapChainFrameBuffer, nullptr);
+        for (auto& frame_buffer: m_swap_chain_frame_buffers) {
+            frame_buffer.reset();
         }
 
-        for (const auto& swapChainImageView : swapChainImageViews) {
-            vkDestroyImageView(m_device, swapChainImageView, nullptr);
+        for (auto& image_view: m_swap_chain_image_views) {
+            image_view.reset();
         }
 
         vkDestroySwapchainKHR(m_device, swapChain, nullptr);

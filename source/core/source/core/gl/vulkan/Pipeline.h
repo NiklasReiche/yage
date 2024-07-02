@@ -1,22 +1,30 @@
 #pragma once
 
+#include <memory>
+
 #include <vulkan/vulkan.h>
 
-#include "Instance.h"
+#include "RenderPass.h"
 
 namespace yage::gl::vulkan
 {
+    class Instance;
+
     class Pipeline final
     {
     public:
-        Pipeline(std::weak_ptr<Instance> instance, VkGraphicsPipelineCreateInfo& pipeline_info,
+        Pipeline(std::weak_ptr<Instance> instance, std::shared_ptr<RenderPass> render_pass,
+                 VkGraphicsPipelineCreateInfo& pipeline_info,
                  const VkPipelineLayoutCreateInfo& layout_info);
 
         ~Pipeline();
 
+        [[nodiscard]] VkPipeline vk_handle() const;
+
     private:
         std::weak_ptr<Instance> m_instance;
-        VkPipeline m_graphics_pipeline{};
+        std::shared_ptr<RenderPass> m_render_pass;
+        VkPipeline m_vk_handle{};
         VkPipelineLayout m_graphics_pipeline_layout{};
     };
 }

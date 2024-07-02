@@ -1,20 +1,24 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
+#include <memory>
 
-#include "Instance.h"
+#include <vulkan/vulkan.h>
 
 namespace yage::gl::vulkan
 {
+    class Instance;
+
     class RenderPass
     {
     public:
-        explicit RenderPass(std::weak_ptr<Instance> instance);
+        explicit RenderPass(std::weak_ptr<Instance> instance, const VkRenderPassCreateInfo& create_info);
 
-        [[nodiscard]] VkRenderPass vk_get() const;
+        ~RenderPass();
+
+        [[nodiscard]] VkRenderPass vk_handle() const;
 
     private:
         std::weak_ptr<Instance> m_instance;
-        VkRenderPass m_vk{};
+        VkRenderPass m_vk_handle{};
     };
 }

@@ -7,11 +7,15 @@ target_sources(yage_core PRIVATE
         Pipeline.cpp
         PipelineBuilder.h
         PipelineBuilder.cpp
-        Shader.h
-        Shader.cpp
         enums.h
         FrameBuffer.h
         FrameBuffer.cpp
+        FrameBufferFactory.h
+        FrameBufferFactory.cpp
         RenderPass.h
         RenderPass.cpp
+        ImageView.h
+        ImageView.cpp
+        Renderer.h
+        Renderer.cpp
 )

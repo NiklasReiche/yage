@@ -1,6 +1,5 @@
-// ReSharper disable CppLocalVariableMayBeConst
 #include "PipelineBuilder.h"
-
+#include "Instance.h"
 #include <utility>
 
 #include "enums.h"
@@ -69,17 +68,26 @@ namespace yage::gl::vulkan
                                                          const std::span<const VertexComponent> layout,
                                                          const VertexFormat format)
     {
+        m_vertex_binding_descriptions.clear();
+        m_vertex_attribute_descriptions.clear();
+
         m_input_assembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
         m_input_assembly.topology = convert(topology);
         m_input_assembly.primitiveRestartEnable = VK_FALSE;
+
+        if (layout.empty()) {
+            m_vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+            m_vertex_input_info.vertexBindingDescriptionCount = 0;
+            m_vertex_input_info.pVertexBindingDescriptions = nullptr;
+            m_vertex_input_info.vertexAttributeDescriptionCount = 0;
+            m_vertex_input_info.pVertexAttributeDescriptions = nullptr;
+            return *this;
+        }
 
         std::size_t vertex_size_bytes = 0;
         for (const VertexComponent& component: layout) {
             vertex_size_bytes += byte_size(component);
         }
-
-        m_vertex_binding_descriptions.clear();
-        m_vertex_attribute_descriptions.clear();
 
         switch (format) {
             case VertexFormat::INTERLEAVED: {
@@ -141,9 +149,9 @@ namespace yage::gl::vulkan
         return *this;
     }
 
-    PipelineBuilder& PipelineBuilder::with_framebuffer(const FrameBuffer& frame_buffer)
+    PipelineBuilder& PipelineBuilder::with_render_pass(std::shared_ptr<RenderPass> render_pass)
     {
-        m_render_pass = frame_buffer.render_pass();
+        m_render_pass = std::move(render_pass);
 
         return *this;
     }
@@ -167,12 +175,12 @@ namespace yage::gl::vulkan
         pipeline_info.pDepthStencilState = nullptr; // Optional
         pipeline_info.pColorBlendState = &m_blend_info;
         pipeline_info.pDynamicState = &m_dynamic_state;
-        pipeline_info.renderPass = m_render_pass->vk_get();
+        pipeline_info.renderPass = m_render_pass->vk_handle();
         pipeline_info.subpass = 0;
         pipeline_info.basePipelineHandle = VK_NULL_HANDLE; // Optional
         pipeline_info.basePipelineIndex = -1; // Optional
 
-        return std::make_unique<Pipeline>(m_instance, pipeline_info, m_pipeline_layout_info);
+        return std::make_unique<Pipeline>(m_instance, m_render_pass, pipeline_info, m_pipeline_layout_info);
     }
 
     PipelineBuilder& PipelineBuilder::with_blending()

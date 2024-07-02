@@ -6,6 +6,10 @@
 #include <vulkan/vulkan.h>
 
 #include "../../platform/desktop/GlfwWindow.h"
+#include "FrameBuffer.h"
+#include "FrameBufferFactory.h"
+#include "Pipeline.h"
+#include "PipelineBuilder.h"
 
 namespace yage::gl::vulkan
 {
@@ -28,18 +32,30 @@ namespace yage::gl::vulkan
         std::vector<VkPresentModeKHR> presentModes;
     };
 
-    class Instance final
+    class Instance final : public std::enable_shared_from_this<Instance>
     {
     public:
         explicit Instance(std::weak_ptr<platform::desktop::GlfwWindow> window);
 
         ~Instance();
 
-        void drawFrame();
+        void initialize();
+
+        void prepare_frame();
+
+        void present_frame();
+
+        void flush_resources();
 
         [[nodiscard]] VkDevice device() const { return m_device; }
 
         [[nodiscard]] VkPhysicalDevice physical_device() const { return m_physical_device; }
+
+        [[nodiscard]] FrameBuffer& swap_chain_frame_buffer_for_frame() const { return *m_swap_chain_frame_buffers[m_current_swap_chain_image_index]; }
+
+        [[nodiscard]] std::shared_ptr<RenderPass> swap_chain_render_pass() const { return m_render_pass; }
+
+        [[nodiscard]] VkCommandBuffer command_buffer_for_frame() const { return m_command_buffers[m_current_frame]; }
 
     private:
         const std::vector<const char*> m_validation_layers = {
@@ -59,20 +75,26 @@ namespace yage::gl::vulkan
         VkQueue graphicsQueue{};
         VkQueue presentQueue{};
         VkSwapchainKHR swapChain{};
-        std::vector<VkImage> swapChainImages{};
+
         VkFormat swapChainImageFormat{};
         VkExtent2D swapChainExtent{};
-        std::vector<VkImageView> swapChainImageViews{};
-        VkRenderPass renderPass{};
-        VkPipelineLayout pipelineLayout{};
-        VkPipeline graphicsPipeline{};
-        std::vector<VkFramebuffer> swapChainFramebuffers{};
-        VkCommandPool commandPool{};
-        std::vector<VkCommandBuffer> commandBuffers{};
+
+        std::shared_ptr<RenderPass> m_render_pass;
+
+        std::uint32_t m_current_frame = 0;
+        std::uint32_t m_current_swap_chain_image_index = 0;
+
+        std::vector<VkImage> m_swap_chain_images{};
+        std::vector<std::unique_ptr<ImageView>> m_swap_chain_image_views{};
+        std::vector<std::unique_ptr<FrameBuffer>> m_swap_chain_frame_buffers{};
+
+        VkCommandPool m_command_pool{};
+        std::vector<VkCommandBuffer> m_command_buffers{};
+
         std::vector<VkSemaphore> imageAvailableSemaphores{};
         std::vector<VkSemaphore> renderFinishedSemaphores{};
         std::vector<VkFence> inFlightFences{};
-        std::uint32_t currentFrame = 0;
+
         bool framebufferResized = false;
 
         void create_instance();
@@ -115,8 +137,6 @@ namespace yage::gl::vulkan
 
         void create_image_views();
 
-        void create_graphics_pipeline();
-
         VkShaderModule createShaderModule(const std::vector<std::byte>& code);
 
         void create_render_pass();
@@ -126,8 +146,6 @@ namespace yage::gl::vulkan
         void create_command_pool();
 
         void create_command_buffers();
-
-        void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
         void create_sync_objects();
 

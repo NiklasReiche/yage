@@ -7,11 +7,12 @@
 #include "../DrawableCreator.h"
 #include "../enums.h"
 #include "FrameBuffer.h"
-#include "Instance.h"
 #include "Pipeline.h"
 
 namespace yage::gl::vulkan
 {
+    class Instance;
+
     class PipelineBuilder final
     {
     public:
@@ -35,7 +36,7 @@ namespace yage::gl::vulkan
 
         PipelineBuilder& with_viewport(Viewport viewport, ScissorRectangle scissor);
 
-        PipelineBuilder& with_framebuffer(const FrameBuffer& frame_buffer);
+        PipelineBuilder& with_render_pass(std::shared_ptr<RenderPass> render_pass);
 
         std::unique_ptr<Pipeline> build();
 
