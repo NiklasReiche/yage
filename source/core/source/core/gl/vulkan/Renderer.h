@@ -5,6 +5,7 @@
 #include "Instance.h"
 #include "FrameBuffer.h"
 #include "Pipeline.h"
+#include "VertexBuffer.h"
 
 namespace yage::gl::vulkan
 {
@@ -19,7 +20,7 @@ namespace yage::gl::vulkan
 
         void bind_pipeline(const Pipeline& pipeline);
 
-        void draw();
+        void draw(const VertexBuffer& vertex_buffer);
 
         void end_render_pass();
 

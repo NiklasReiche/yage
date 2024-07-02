@@ -1,13 +1,12 @@
 #include "VertexBuffer.h"
-
-#include <vulkan/vulkan.h>
+#include "Instance.h"
 
 #include <utility>
 
 namespace yage::gl::vulkan
 {
-    VertexBuffer::VertexBuffer(std::weak_ptr<Instance> instance, const std::span<const std::byte>& data)
-            : m_instance(std::move(instance))
+    VertexBuffer::VertexBuffer(std::weak_ptr<Instance> instance, const std::span<const std::byte>& data, const std::size_t vertex_count)
+            : m_instance(std::move(instance)), m_vertex_count(vertex_count)
     {
         VkDevice device = m_instance.lock()->device();
 
@@ -47,6 +46,16 @@ namespace yage::gl::vulkan
         const auto device = m_instance.lock()->device();
         vkDestroyBuffer(device, m_buffer_handle, nullptr);
         vkFreeMemory(device, m_memory_handle, nullptr);
+    }
+
+    VkBuffer VertexBuffer::vk_handle() const
+    {
+        return m_buffer_handle;
+    }
+
+    std::size_t VertexBuffer::vertex_count() const
+    {
+        return m_vertex_count;
     }
 
     std::uint32_t VertexBuffer::findMemoryType(const std::uint32_t typeFilter, VkMemoryPropertyFlags properties)
