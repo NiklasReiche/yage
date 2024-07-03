@@ -149,14 +149,14 @@ namespace yage::gl::vulkan
         return *this;
     }
 
-    PipelineBuilder& PipelineBuilder::with_render_pass(std::shared_ptr<Handle<RenderPass>> render_pass)
+    PipelineBuilder& PipelineBuilder::with_render_pass(std::shared_ptr<RenderPassHandle> render_pass)
     {
         m_render_pass = std::move(render_pass);
 
         return *this;
     }
 
-    std::unique_ptr<Pipeline> PipelineBuilder::build()
+    PipelineHandle PipelineBuilder::build()
     {
         with_blending();
         with_multisampling();
@@ -175,12 +175,12 @@ namespace yage::gl::vulkan
         pipeline_info.pDepthStencilState = nullptr; // Optional
         pipeline_info.pColorBlendState = &m_blend_info;
         pipeline_info.pDynamicState = &m_dynamic_state;
-        pipeline_info.renderPass = m_render_pass->get().vk_handle();
+        pipeline_info.renderPass = m_render_pass->get<RenderPass>().vk_handle();
         pipeline_info.subpass = 0;
         pipeline_info.basePipelineHandle = VK_NULL_HANDLE; // Optional
         pipeline_info.basePipelineIndex = -1; // Optional
 
-        return std::make_unique<Pipeline>(m_instance, m_render_pass, pipeline_info, m_pipeline_layout_info);
+        return m_instance.lock()->store_pipelines()->create(m_instance, m_render_pass, pipeline_info, m_pipeline_layout_info);
     }
 
     PipelineBuilder& PipelineBuilder::with_blending()
@@ -263,8 +263,8 @@ namespace yage::gl::vulkan
 
     void PipelineBuilder::destroy_shader_modules()
     {
-        VkDevice device = m_instance.lock()->device();
-        for (VkShaderModule module: m_shader_modules) {
+        const VkDevice device = m_instance.lock()->device();
+        for (const VkShaderModule module: m_shader_modules) {
             if (module != nullptr) {
                 vkDestroyShaderModule(device, module, nullptr);
             }

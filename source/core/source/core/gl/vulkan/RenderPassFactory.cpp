@@ -11,7 +11,7 @@ namespace yage::gl::vulkan
     {
     }
 
-    Handle<RenderPass> RenderPassFactory::create(const VkFormat image_format)
+    RenderPassHandle RenderPassFactory::create(const VkFormat image_format)
     {
         VkAttachmentDescription color_attachment{};
         color_attachment.format = image_format;

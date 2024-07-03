@@ -4,6 +4,8 @@
 
 #include <vulkan/vulkan.h>
 
+#include "../Handle.h"
+
 namespace yage::gl::vulkan
 {
     class Instance;
@@ -17,30 +19,19 @@ namespace yage::gl::vulkan
 
         RenderPass(const RenderPass& other) = delete;
 
-        RenderPass(RenderPass&& other) noexcept
-        {
-            m_instance = std::move(other.m_instance);
-            m_vk_handle = other.m_vk_handle;
-
-            other.m_vk_handle = VK_NULL_HANDLE;
-        }
+        RenderPass(RenderPass&& other) noexcept;
 
         RenderPass& operator=(const RenderPass& other) = delete;
 
-        RenderPass& operator=(RenderPass&& other) noexcept
-        {
-            m_instance = std::move(other.m_instance);
-            m_vk_handle = other.m_vk_handle;
-
-            other.m_vk_handle = VK_NULL_HANDLE;
-
-            return *this;
-        }
+        RenderPass& operator=(RenderPass&& other) noexcept;
 
         [[nodiscard]] VkRenderPass vk_handle() const;
 
     private:
         std::weak_ptr<Instance> m_instance;
+        VkDevice m_vk_device;
         VkRenderPass m_vk_handle{};
     };
+
+    using RenderPassHandle = Handle<RenderPass>;
 }

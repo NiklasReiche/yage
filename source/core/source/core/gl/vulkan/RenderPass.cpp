@@ -4,16 +4,42 @@
 namespace yage::gl::vulkan
 {
     RenderPass::RenderPass(std::weak_ptr<Instance> instance, const VkRenderPassCreateInfo& create_info)
-        : m_instance(std::move(instance))
+        : m_instance(std::move(instance)),
+          m_vk_device(m_instance.lock()->device())
     {
-        if (vkCreateRenderPass(m_instance.lock()->device(), &create_info, nullptr, &m_vk_handle) != VK_SUCCESS) {
+        if (vkCreateRenderPass(m_vk_device, &create_info, nullptr, &m_vk_handle) != VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to create render pass!");
         }
     }
 
     RenderPass::~RenderPass()
     {
-        vkDestroyRenderPass(m_instance.lock()->device(), m_vk_handle, nullptr);
+        if (m_vk_handle != VK_NULL_HANDLE) {
+            vkDestroyRenderPass(m_vk_device, m_vk_handle, nullptr);
+        }
+    }
+
+    RenderPass::RenderPass(RenderPass&& other) noexcept
+        : m_instance(std::move(other.m_instance)),
+          m_vk_device(other.m_vk_device),
+          m_vk_handle(other.m_vk_handle)
+    {
+        other.m_vk_device = VK_NULL_HANDLE;
+        other.m_vk_handle = VK_NULL_HANDLE;
+    }
+
+    RenderPass& RenderPass::operator=(RenderPass&& other) noexcept
+    {
+        if (this == &other)
+            return *this;
+        m_instance = std::move(other.m_instance);
+        m_vk_device = other.m_vk_device;
+        m_vk_handle = other.m_vk_handle;
+
+        other.m_vk_device = VK_NULL_HANDLE;
+        other.m_vk_handle = VK_NULL_HANDLE;
+
+        return *this;
     }
 
     VkRenderPass RenderPass::vk_handle() const

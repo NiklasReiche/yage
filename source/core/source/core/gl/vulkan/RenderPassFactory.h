@@ -3,8 +3,8 @@
 #include <memory>
 #include <vulkan/vulkan.h>
 
-#include "../TextureParams.h"
 #include "../Handle.h"
+#include "../TextureParams.h"
 #include "RenderPass.h"
 
 namespace yage::gl::vulkan
@@ -16,9 +16,9 @@ namespace yage::gl::vulkan
     public:
         explicit RenderPassFactory(std::weak_ptr<Instance> instance);
 
-        Handle<RenderPass> create(VkFormat image_format);
+        RenderPassHandle create(VkFormat image_format);
 
-        Handle<RenderPass> create(ImageFormat image_format);
+        RenderPassHandle create(ImageFormat image_format);
 
     private:
         std::weak_ptr<Instance> m_instance;

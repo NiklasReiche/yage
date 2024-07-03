@@ -20,4 +20,6 @@ target_sources(yage_core PRIVATE
         ImageView.cpp
         Renderer.h
         Renderer.cpp
+        VertexBufferFactory.h
+        VertexBufferFactory.cpp
 )

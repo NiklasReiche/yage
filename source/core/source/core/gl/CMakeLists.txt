@@ -2,7 +2,6 @@ target_sources(yage_core
 	PRIVATE
 		Handle.h
 		color.h
-		enums.h
 		Context.h
 		Cubemap.h
 		Drawable.h
@@ -18,7 +17,14 @@ target_sources(yage_core
 		Shader.h
 		ShaderCreator.h
 		Texture2D.h
-		TextureCreator.h)
+		TextureCreator.h
+
+		enums.h
+		IFrameBuffer.h
+		IFrameBufferFactory.h
+		IVertexBuffer.h
+		IVertexBufferFactory.h
+)
 
 if(WIN32 OR UNIX)
 	add_subdirectory(opengl)

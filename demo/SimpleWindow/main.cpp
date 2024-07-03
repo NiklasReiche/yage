@@ -6,10 +6,11 @@
 
 #include <core/gl/vulkan/Instance.h>
 #include <core/gl/vulkan/Renderer.h>
+#include <core/gl/vulkan/PipelineBuilder.h>
 
 using namespace yage;
 
-std::unique_ptr<gl::vulkan::Pipeline> create_pipeline(platform::IWindow& window, const std::weak_ptr<gl::vulkan::Instance>& context)
+gl::vulkan::PipelineHandle create_pipeline(platform::IWindow& window, const std::weak_ptr<gl::vulkan::Instance>& context)
 {
     const auto file_reader = window.getFileReader();
     auto vert_code = file_reader->openBinaryFile(

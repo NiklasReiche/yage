@@ -1,16 +1,16 @@
 #pragma once
 
-#include <optional>
 #include <cstdint>
+#include <optional>
 
 #include <vulkan/vulkan.h>
 
 #include "../../platform/desktop/GlfwWindow.h"
+#include "../Handle.h"
 #include "FrameBuffer.h"
 #include "FrameBufferFactory.h"
 #include "Pipeline.h"
-#include "PipelineBuilder.h"
-#include "core/gl/Handle.h"
+#include "VertexBuffer.h"
 
 namespace yage::gl::vulkan
 {
@@ -19,8 +19,7 @@ namespace yage::gl::vulkan
         std::optional<uint32_t> graphicsFamily;
         std::optional<uint32_t> presentFamily;
 
-        [[nodiscard]]
-        bool is_complete() const
+        [[nodiscard]] bool is_complete() const
         {
             return graphicsFamily.has_value() && presentFamily.has_value();
         }
@@ -48,25 +47,54 @@ namespace yage::gl::vulkan
 
         void flush_resources();
 
-        [[nodiscard]] VkDevice device() const { return m_device; }
+        [[nodiscard]] VkDevice device() const
+        {
+            return m_device;
+        }
 
-        [[nodiscard]] VkPhysicalDevice physical_device() const { return m_physical_device; }
+        [[nodiscard]] VkPhysicalDevice physical_device() const
+        {
+            return m_physical_device;
+        }
 
-        [[nodiscard]] FrameBuffer& swap_chain_frame_buffer_for_frame() const { return *m_swap_chain_frame_buffers[m_current_swap_chain_image_index]; }
+        [[nodiscard]] FrameBuffer& swap_chain_frame_buffer_for_frame() const
+        {
+            return m_swap_chain_frame_buffers[m_current_swap_chain_image_index].get<FrameBuffer>();
+        }
 
-        [[nodiscard]] std::shared_ptr<Handle<RenderPass>> swap_chain_render_pass() const { return m_render_pass; }
+        [[nodiscard]] std::shared_ptr<RenderPassHandle> swap_chain_render_pass() const
+        {
+            return m_render_pass;
+        }
 
-        [[nodiscard]] VkCommandBuffer command_buffer_for_frame() const { return m_command_buffers[m_current_frame]; }
+        [[nodiscard]] VkCommandBuffer command_buffer_for_frame() const
+        {
+            return m_command_buffers[m_current_frame];
+        }
 
-        const std::shared_ptr<Store<RenderPass>>& store_render_passes() { return m_store_render_passes; }
+        const std::shared_ptr<Store<RenderPass, RenderPass>>& store_render_passes()
+        {
+            return m_store_render_passes;
+        }
+
+        const std::shared_ptr<Store<IFrameBuffer, FrameBuffer>>& store_frame_buffers()
+        {
+            return m_store_frame_buffers;
+        }
+
+        const std::shared_ptr<Store<Pipeline, Pipeline>>& store_pipelines()
+        {
+            return m_store_pipelines;
+        }
+
+        const std::shared_ptr<Store<IVertexBuffer, VertexBuffer>>& store_vertex_buffers()
+        {
+            return m_store_vertex_buffers;
+        }
 
     private:
-        const std::vector<const char*> m_validation_layers = {
-                "VK_LAYER_KHRONOS_validation"
-        };
-        const std::vector<const char*> m_device_extensions = {
-                VK_KHR_SWAPCHAIN_EXTENSION_NAME
-        };
+        const std::vector<const char*> m_validation_layers = {"VK_LAYER_KHRONOS_validation"};
+        const std::vector<const char*> m_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
         const int MAX_FRAMES_IN_FLIGHT = 2;
 
         std::weak_ptr<platform::desktop::GlfwWindow> m_window;
@@ -82,14 +110,14 @@ namespace yage::gl::vulkan
         VkFormat swapChainImageFormat{};
         VkExtent2D swapChainExtent{};
 
-        std::shared_ptr<Handle<RenderPass>> m_render_pass;
+        std::shared_ptr<RenderPassHandle> m_render_pass;
 
         std::uint32_t m_current_frame = 0;
         std::uint32_t m_current_swap_chain_image_index = 0;
 
         std::vector<VkImage> m_swap_chain_images{};
-        std::vector<std::unique_ptr<ImageView>> m_swap_chain_image_views{};
-        std::vector<std::unique_ptr<FrameBuffer>> m_swap_chain_frame_buffers{};
+        std::vector<ImageViewHandle> m_swap_chain_image_views{};
+        std::vector<FrameBufferHandle> m_swap_chain_frame_buffers{};
 
         VkCommandPool m_command_pool{};
         std::vector<VkCommandBuffer> m_command_buffers{};
@@ -100,15 +128,18 @@ namespace yage::gl::vulkan
 
         bool framebufferResized = false;
 
-        std::shared_ptr<Store<RenderPass>> m_store_render_passes = std::make_shared<Store<RenderPass>>();
+        std::shared_ptr<Store<RenderPass, RenderPass>> m_store_render_passes = std::make_shared<Store<RenderPass, RenderPass>>();
+        std::shared_ptr<Store<ImageView, ImageView>> m_store_image_views = std::make_shared<Store<ImageView, ImageView>>();
+        std::shared_ptr<Store<IFrameBuffer, FrameBuffer>> m_store_frame_buffers = std::make_shared<Store<IFrameBuffer, FrameBuffer>>();
+        std::shared_ptr<Store<IVertexBuffer, VertexBuffer>> m_store_vertex_buffers = std::make_shared<Store<IVertexBuffer, VertexBuffer>>();
+        std::shared_ptr<Store<Pipeline, Pipeline>> m_store_pipelines = std::make_shared<Store<Pipeline, Pipeline>>();
 
         void create_instance();
 
-        static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
-                VkDebugUtilsMessageSeverityFlagBitsEXT severity,
-                VkDebugUtilsMessageTypeFlagsEXT type,
-                const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
-                void* user_data);
+        static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+                                                             VkDebugUtilsMessageTypeFlagsEXT type,
+                                                             const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
+                                                             void* user_data);
 
         static bool checkValidationLayerSupport(const std::vector<const char*>& validationLayers);
 

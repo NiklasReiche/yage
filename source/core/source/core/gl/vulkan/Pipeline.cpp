@@ -1,34 +1,62 @@
 #include "Pipeline.h"
-#include "Instance.h"
 #include <stdexcept>
+#include "Instance.h"
 
 namespace yage::gl::vulkan
 {
-    Pipeline::Pipeline(std::weak_ptr<Instance> instance, std::shared_ptr<Handle<RenderPass>> render_pass,
-                       VkGraphicsPipelineCreateInfo& pipeline_info,
-                       const VkPipelineLayoutCreateInfo& layout_info)
+    Pipeline::Pipeline(std::weak_ptr<Instance> instance, std::shared_ptr<RenderPassHandle> render_pass,
+                       VkGraphicsPipelineCreateInfo& pipeline_info, const VkPipelineLayoutCreateInfo& layout_info)
         : m_instance(std::move(instance)),
+          m_vk_device(m_instance.lock()->device()),
           m_render_pass(std::move(render_pass))
     {
-        VkDevice device = m_instance.lock()->device();
-
-        if (vkCreatePipelineLayout(device, &layout_info, nullptr, &m_graphics_pipeline_layout) != VK_SUCCESS) {
+        if (vkCreatePipelineLayout(m_vk_device, &layout_info, nullptr, &m_graphics_pipeline_layout) != VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to create pipeline layout!");
         }
 
         pipeline_info.layout = m_graphics_pipeline_layout;
 
-        if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr,
-                                      &m_vk_handle) != VK_SUCCESS) {
+        if (vkCreateGraphicsPipelines(m_vk_device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &m_vk_handle) !=
+            VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to create graphics pipeline!");
         }
     }
 
     Pipeline::~Pipeline()
     {
-        VkDevice device = m_instance.lock()->device();
-        vkDestroyPipeline(device, m_vk_handle, nullptr);
-        vkDestroyPipelineLayout(device, m_graphics_pipeline_layout, nullptr);
+        if (m_vk_handle != VK_NULL_HANDLE) {
+            vkDestroyPipeline(m_vk_device, m_vk_handle, nullptr);
+            vkDestroyPipelineLayout(m_vk_device, m_graphics_pipeline_layout, nullptr);
+        }
+    }
+
+    Pipeline::Pipeline(Pipeline&& other) noexcept
+        : m_instance(std::move(other.m_instance)),
+          m_vk_device(other.m_vk_device),
+          m_render_pass(std::move(other.m_render_pass)),
+          m_vk_handle(other.m_vk_handle),
+          m_graphics_pipeline_layout(other.m_graphics_pipeline_layout)
+    {
+        other.m_vk_device = VK_NULL_HANDLE;
+        other.m_vk_handle = VK_NULL_HANDLE;
+        other.m_graphics_pipeline_layout = VK_NULL_HANDLE;
+    }
+
+    Pipeline& Pipeline::operator=(Pipeline&& other) noexcept
+    {
+        if (this == &other)
+            return *this;
+        m_instance = std::move(other.m_instance);
+        m_vk_device = other.m_vk_device,
+        m_render_pass = std::move(other.m_render_pass);
+        m_vk_handle = other.m_vk_handle;
+        m_graphics_pipeline_layout = other.m_graphics_pipeline_layout;
+
+        other.m_vk_device = VK_NULL_HANDLE;
+        other.m_vk_handle = VK_NULL_HANDLE;
+        other.m_graphics_pipeline_layout = VK_NULL_HANDLE;
+
+        return *this;
     }
 
     VkPipeline Pipeline::vk_handle() const

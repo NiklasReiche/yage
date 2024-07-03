@@ -1,21 +1,20 @@
-// ReSharper disable CppLocalVariableMayBeConst
-// ReSharper disable CppParameterMayBeConst
+#include "Instance.h"
 #include <cstdint>
 #include <cstring>
-#include <utility>
-#include <set>
 #include <limits>
-#include "Instance.h"
-#include "GLFW/glfw3.h"
+#include <set>
+#include <utility>
+#include <GLFW/glfw3.h>
 
 namespace yage::gl::vulkan
 {
-    VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+    VkResult CreateDebugUtilsMessengerEXT(const VkInstance instance,
+                                          const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
                                           const VkAllocationCallbacks* pAllocator,
                                           VkDebugUtilsMessengerEXT* pDebugMessenger)
     {
-        const auto func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(
-            instance, "vkCreateDebugUtilsMessengerEXT"));
+        const auto func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
+                vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT"));
         if (func != nullptr) {
             return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
         }
@@ -23,11 +22,11 @@ namespace yage::gl::vulkan
         return VK_ERROR_EXTENSION_NOT_PRESENT;
     }
 
-    void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger,
+    void DestroyDebugUtilsMessengerEXT(const VkInstance instance, const VkDebugUtilsMessengerEXT debugMessenger,
                                        const VkAllocationCallbacks* pAllocator)
     {
-        const auto func = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(
-            instance, "vkDestroyDebugUtilsMessengerEXT"));
+        const auto func = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
+                vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT"));
         if (func != nullptr) {
             func(instance, debugMessenger, pAllocator);
         }
@@ -41,6 +40,12 @@ namespace yage::gl::vulkan
 
     Instance::~Instance()
     {
+        m_store_frame_buffers->clear();
+        m_store_image_views->clear();
+        m_store_pipelines->clear();
+        m_store_render_passes->clear();
+        m_store_vertex_buffers->clear();
+
         for (auto i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             vkDestroySemaphore(m_device, renderFinishedSemaphores[i], nullptr);
             vkDestroySemaphore(m_device, imageAvailableSemaphores[i], nullptr);
@@ -145,8 +150,7 @@ namespace yage::gl::vulkan
     {
         std::uint32_t glfwExtensionCount = 0;
         const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-        std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+        std::vector extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
 #ifndef NDEBUG
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
@@ -155,10 +159,9 @@ namespace yage::gl::vulkan
         return extensions;
     }
 
-    VkBool32 VKAPI_CALL Instance::debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+    VkBool32 VKAPI_CALL Instance::debug_callback(const VkDebugUtilsMessageSeverityFlagBitsEXT severity,
                                                  VkDebugUtilsMessageTypeFlagsEXT,
-                                                 const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
-                                                 void*)
+                                                 const VkDebugUtilsMessengerCallbackDataEXT* callback_data, void*)
     {
         std::ostream& ostream = severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT ? std::cerr : std::cout;
 
@@ -189,12 +192,10 @@ namespace yage::gl::vulkan
         VkDebugUtilsMessengerCreateInfoEXT createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
         createInfo.messageSeverity =
-                VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-                VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-        createInfo.messageType =
-                VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-                VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-                VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+                VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                                 VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                                 VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
         createInfo.pfnUserCallback = debug_callback;
         createInfo.pUserData = this;
         return createInfo;
@@ -260,7 +261,7 @@ namespace yage::gl::vulkan
         return indices.is_complete() && extensionsSupported && swapChainAdequate;
     }
 
-    QueueFamilyIndices Instance::findQueueFamilies(VkPhysicalDevice device)
+    QueueFamilyIndices Instance::findQueueFamilies(const VkPhysicalDevice device)
     {
         QueueFamilyIndices indices;
 
@@ -334,7 +335,7 @@ namespace yage::gl::vulkan
         vkGetDeviceQueue(m_device, indices.presentFamily.value(), 0, &presentQueue);
     }
 
-    bool Instance::checkDeviceExtensionSupport(VkPhysicalDevice device)
+    bool Instance::checkDeviceExtensionSupport(const VkPhysicalDevice device)
     {
         std::uint32_t extensionCount;
         vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
@@ -351,7 +352,7 @@ namespace yage::gl::vulkan
         return requiredExtensions.empty();
     }
 
-    SwapChainSupportDetails Instance::querySwapChainSupport(VkPhysicalDevice device)
+    SwapChainSupportDetails Instance::querySwapChainSupport(const VkPhysicalDevice device)
     {
         SwapChainSupportDetails details;
 
@@ -408,15 +409,12 @@ namespace yage::gl::vulkan
         const int width = m_window.lock()->getPixelWidth();
         const int height = m_window.lock()->getPixelHeight();
 
-        VkExtent2D actualExtent = {
-            static_cast<std::uint32_t>(width),
-            static_cast<std::uint32_t>(height)
-        };
+        VkExtent2D actualExtent = {static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height)};
 
-        actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width,
-                                        capabilities.maxImageExtent.width);
-        actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height,
-                                         capabilities.maxImageExtent.height);
+        actualExtent.width =
+                std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+        actualExtent.height =
+                std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
 
         return actualExtent;
     }
@@ -500,7 +498,7 @@ namespace yage::gl::vulkan
             createInfo.subresourceRange.baseArrayLayer = 0;
             createInfo.subresourceRange.layerCount = 1;
 
-            m_swap_chain_image_views[i] = std::make_unique<ImageView>(weak_from_this(), createInfo);
+            m_swap_chain_image_views[i] = std::move(m_store_image_views->create(weak_from_this(), createInfo));
         }
     }
 
@@ -558,8 +556,8 @@ namespace yage::gl::vulkan
         renderPassInfo.dependencyCount = 1;
         renderPassInfo.pDependencies = &dependency;
 
-        m_render_pass = std::make_shared<Handle<RenderPass>>(m_store_render_passes->create(
-            weak_from_this(), renderPassInfo));
+        m_render_pass =
+                std::make_shared<Handle<RenderPass>>(m_store_render_passes->create(weak_from_this(), renderPassInfo));
     }
 
     void Instance::create_framebuffers()
@@ -568,11 +566,9 @@ namespace yage::gl::vulkan
 
         m_swap_chain_frame_buffers.resize(m_swap_chain_image_views.size());
         for (size_t i = 0; i < m_swap_chain_image_views.size(); i++) {
-            ImageView* attachments[] = {
-                m_swap_chain_image_views[i].get()
-            };
-            m_swap_chain_frame_buffers[i] = frame_buffer_factory.create_frame_buffer(m_render_pass, attachments,
-                swapChainExtent.width, swapChainExtent.height);
+            ImageViewHandle* attachments[] = {&m_swap_chain_image_views[i]};
+            m_swap_chain_frame_buffers[i] = frame_buffer_factory.create_frame_buffer(
+                    m_render_pass, attachments, swapChainExtent.width, swapChainExtent.height);
         }
     }
 
@@ -631,8 +627,9 @@ namespace yage::gl::vulkan
     {
         vkWaitForFences(m_device, 1, &inFlightFences[m_current_frame], VK_TRUE, UINT64_MAX);
 
-        auto result = vkAcquireNextImageKHR(m_device, swapChain, UINT64_MAX, imageAvailableSemaphores[m_current_frame],
-                                            VK_NULL_HANDLE, &m_current_swap_chain_image_index);
+        const VkResult result =
+                vkAcquireNextImageKHR(m_device, swapChain, UINT64_MAX, imageAvailableSemaphores[m_current_frame],
+                                      VK_NULL_HANDLE, &m_current_swap_chain_image_index);
         if (result == VK_ERROR_OUT_OF_DATE_KHR) {
             recreateSwapChain();
             return;
@@ -682,7 +679,7 @@ namespace yage::gl::vulkan
         presentInfo.pImageIndices = &m_current_swap_chain_image_index;
         presentInfo.pResults = nullptr; // Optional
 
-        VkResult result = vkQueuePresentKHR(presentQueue, &presentInfo);
+        const VkResult result = vkQueuePresentKHR(presentQueue, &presentInfo);
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
             framebufferResized = false;
             recreateSwapChain();
@@ -697,7 +694,6 @@ namespace yage::gl::vulkan
     {
         vkDeviceWaitIdle(m_device);
         cleanupSwapChain();
-        m_render_pass.reset();
     }
 
     void Instance::cleanupSwapChain()
