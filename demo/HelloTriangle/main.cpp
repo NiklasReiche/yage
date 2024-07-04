@@ -16,11 +16,11 @@ gl::vulkan::PipelineHandle create_pipeline(platform::IWindow& window,
 {
     const auto file_reader = window.getFileReader();
     auto vert_code = file_reader
-                             ->openBinaryFile(R"(C:\Users\Niklas\Code\yage\demo\SimpleWindow\assets\vert.spv)",
+                             ->openBinaryFile(R"(assets/vert.spv)",
                                               platform::IFile::AccessMode::READ)
                              ->read_all();
     auto frag_code = file_reader
-                             ->openBinaryFile(R"(C:\Users\Niklas\Code\yage\demo\SimpleWindow\assets\frag.spv)",
+                             ->openBinaryFile(R"(assets/frag.spv)",
                                               platform::IFile::AccessMode::READ)
                              ->read_all();
 
