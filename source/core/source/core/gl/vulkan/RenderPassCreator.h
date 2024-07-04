@@ -11,10 +11,10 @@ namespace yage::gl::vulkan
 {
     class Instance;
 
-    class RenderPassFactory
+    class RenderPassCreator
     {
     public:
-        explicit RenderPassFactory(std::weak_ptr<Instance> instance);
+        explicit RenderPassCreator(std::weak_ptr<Instance> instance);
 
         RenderPassHandle create(VkFormat image_format);
 

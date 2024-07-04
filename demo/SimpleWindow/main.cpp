@@ -8,7 +8,7 @@
 #include <core/gl/vulkan/PipelineBuilder.h>
 #include <core/gl/vulkan/Renderer.h>
 
-#include "core/gl/vulkan/VertexBufferFactory.h"
+#include "core/gl/vulkan/VertexBufferCreator.h"
 
 using namespace yage;
 
@@ -46,7 +46,7 @@ int main()
     const std::shared_ptr<gl::vulkan::Instance> context = std::make_shared<gl::vulkan::Instance>(std::static_pointer_cast<platform::desktop::GlfwWindow>(window));
     context->initialize();
 
-    const auto vertex_buffer_factory = gl::vulkan::VertexBufferFactory(context);
+    const auto vertex_buffer_factory = gl::vulkan::VertexBufferCreator(context);
 
     const gl::VertexDataInfo vertex_data_info{
         .vertex_description = {

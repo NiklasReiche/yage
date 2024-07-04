@@ -1,4 +1,4 @@
-#include "RenderPassFactory.h"
+#include "RenderPassCreator.h"
 
 #include <vulkan/vulkan.h>
 
@@ -6,12 +6,12 @@
 
 namespace yage::gl::vulkan
 {
-    RenderPassFactory::RenderPassFactory(std::weak_ptr<Instance> instance)
+    RenderPassCreator::RenderPassCreator(std::weak_ptr<Instance> instance)
         : m_instance(std::move(instance))
     {
     }
 
-    RenderPassHandle RenderPassFactory::create(const VkFormat image_format)
+    RenderPassHandle RenderPassCreator::create(const VkFormat image_format)
     {
         VkAttachmentDescription color_attachment{};
         color_attachment.format = image_format;

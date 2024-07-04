@@ -5,9 +5,9 @@
 
 namespace yage::gl
 {
-    class IFrameBufferFactory
+    class IFrameBufferCreator
     {
     public:
-        virtual ~IFrameBufferFactory() = default;
+        virtual ~IFrameBufferCreator() = default;
     };
 }

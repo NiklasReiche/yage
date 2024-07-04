@@ -562,12 +562,12 @@ namespace yage::gl::vulkan
 
     void Instance::create_framebuffers()
     {
-        FrameBufferFactory frame_buffer_factory(weak_from_this());
+        FrameBufferCreator frame_buffer_factory(weak_from_this());
 
         m_swap_chain_frame_buffers.resize(m_swap_chain_image_views.size());
         for (size_t i = 0; i < m_swap_chain_image_views.size(); i++) {
             ImageViewHandle* attachments[] = {&m_swap_chain_image_views[i]};
-            m_swap_chain_frame_buffers[i] = frame_buffer_factory.create_frame_buffer(
+            m_swap_chain_frame_buffers[i] = frame_buffer_factory.create(
                     m_render_pass, attachments, m_swap_chain_extent.width, m_swap_chain_extent.height);
         }
     }

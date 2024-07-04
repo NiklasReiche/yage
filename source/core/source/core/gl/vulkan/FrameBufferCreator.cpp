@@ -1,14 +1,14 @@
-#include "FrameBufferFactory.h"
+#include "FrameBufferCreator.h"
 #include "Instance.h"
 
 namespace yage::gl::vulkan
 {
-    FrameBufferFactory::FrameBufferFactory(std::weak_ptr<Instance> instance)
+    FrameBufferCreator::FrameBufferCreator(std::weak_ptr<Instance> instance)
         : m_instance(std::move(instance))
     {
     }
 
-    Handle<IFrameBuffer> FrameBufferFactory::create_frame_buffer(std::shared_ptr<Handle<RenderPass>> render_pass,
+    Handle<IFrameBuffer> FrameBufferCreator::create(std::shared_ptr<Handle<RenderPass>> render_pass,
                                                                 std::span<ImageViewHandle*> attachements,
                                                                 const unsigned int width, const unsigned int height)
     {

@@ -8,7 +8,7 @@
 #include "../../platform/desktop/GlfwWindow.h"
 #include "../Handle.h"
 #include "FrameBuffer.h"
-#include "FrameBufferFactory.h"
+#include "FrameBufferCreator.h"
 #include "Pipeline.h"
 #include "VertexBuffer.h"
 

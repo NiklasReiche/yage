@@ -3,6 +3,12 @@ target_sources(yage_core PRIVATE
         Instance.cpp
         VertexBuffer.h
         VertexBuffer.cpp
+        VertexBufferCreator.h
+        VertexBufferCreator.cpp
+        IndexBuffer.h
+        IndexBuffer.cpp
+        IndexBufferCreator.h
+        IndexBufferCreator.cpp
         Pipeline.h
         Pipeline.cpp
         PipelineBuilder.h
@@ -10,16 +16,15 @@ target_sources(yage_core PRIVATE
         enums.h
         FrameBuffer.h
         FrameBuffer.cpp
-        FrameBufferFactory.h
-        FrameBufferFactory.cpp
+        FrameBufferCreator.h
+        FrameBufferCreator.cpp
         RenderPass.h
         RenderPass.cpp
-        RenderPassFactory.h
-        RenderPassFactory.cpp
+        RenderPassCreator.h
+        RenderPassCreator.cpp
         ImageView.h
         ImageView.cpp
         Renderer.h
         Renderer.cpp
-        VertexBufferFactory.h
-        VertexBufferFactory.cpp
+
 )

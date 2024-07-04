@@ -8,10 +8,10 @@
 
 namespace yage::gl
 {
-    class IVertexBufferFactory
+    class IVertexBufferCreator
     {
     public:
-        virtual ~IVertexBufferFactory() = default;
+        virtual ~IVertexBufferCreator() = default;
 
         [[nodiscard]] virtual Handle<IVertexBuffer> create(const VertexDataInfo& data_info,
                                                            std::span<const std::byte> data) const = 0;

@@ -4,7 +4,7 @@
 #include <span>
 
 #include "../Handle.h"
-#include "../IFrameBufferFactory.h"
+#include "../IFrameBufferCreator.h"
 #include "FrameBuffer.h"
 #include "ImageView.h"
 
@@ -12,12 +12,12 @@ namespace yage::gl::vulkan
 {
     class Instance;
 
-    class FrameBufferFactory final : public IFrameBufferFactory
+    class FrameBufferCreator final : public IFrameBufferCreator
     {
     public:
-        explicit FrameBufferFactory(std::weak_ptr<Instance> instance);
+        explicit FrameBufferCreator(std::weak_ptr<Instance> instance);
 
-        FrameBufferHandle create_frame_buffer(std::shared_ptr<RenderPassHandle> render_pass,
+        FrameBufferHandle create(std::shared_ptr<RenderPassHandle> render_pass,
                                                 std::span<ImageViewHandle*> attachements, unsigned int width,
                                                 unsigned int height);
 

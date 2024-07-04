@@ -21,9 +21,11 @@ target_sources(yage_core
 
 		enums.h
 		IFrameBuffer.h
-		IFrameBufferFactory.h
+        IFrameBufferCreator.h
 		IVertexBuffer.h
-		IVertexBufferFactory.h
+		IVertexBufferCreator.h
+		IIndexBuffer.h
+		IIndexBufferCreator.h
 )
 
 if(WIN32 OR UNIX)
