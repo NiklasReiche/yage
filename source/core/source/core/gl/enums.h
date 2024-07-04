@@ -3,6 +3,8 @@
 #include <cassert>
 #include <numeric>
 #include <stdexcept>
+#include <vector>
+#include <span>
 
 namespace yage::gl
 {
@@ -45,24 +47,16 @@ namespace yage::gl
     inline std::size_t byte_size(const VertexComponentType data_type)
     {
         switch (data_type) {
-            case VertexComponentType::FLOAT_32:
-                return 4;
-            case VertexComponentType::FLOAT_64:
-                return 8;
-            case VertexComponentType::INT_16:
-                return 2;
-            case VertexComponentType::INT_32:
-                return 4;
-            case VertexComponentType::INT_64:
-                return 8;
-            case VertexComponentType::UINT_16:
-                return 2;
-            case VertexComponentType::UINT_32:
-                return 4;
-            case VertexComponentType::UINT_64:
-                return 8;
-            default:
-                throw std::invalid_argument("Unknown VertexDataType value");
+            case VertexComponentType::FLOAT_32: return 4;
+            case VertexComponentType::FLOAT_64: return 8;
+            case VertexComponentType::INT_16:   return 2;
+            case VertexComponentType::INT_32:   return 4;
+            case VertexComponentType::INT_64:   return 8;
+            case VertexComponentType::UINT_16:  return 2;
+            case VertexComponentType::UINT_32:  return 4;
+            case VertexComponentType::UINT_64:  return 8;
+
+            default: throw std::invalid_argument("Unknown VertexComponentType value");
         }
     }
 
@@ -87,8 +81,9 @@ namespace yage::gl
 
     inline std::size_t byte_size(const std::span<const VertexComponent> vertex_description)
     {
-        return std::accumulate(vertex_description.begin(), vertex_description.end(), static_cast<std::size_t>(0),
-            [](const std::size_t acc, const VertexComponent vertex){return acc + byte_size(vertex);});
+        return std::accumulate(
+                vertex_description.begin(), vertex_description.end(), static_cast<std::size_t>(0),
+                [](const std::size_t acc, const VertexComponent vertex) { return acc + byte_size(vertex); });
     }
 
     enum class VertexDataLayout
@@ -103,12 +98,35 @@ namespace yage::gl
         VertexDataLayout data_layout;
     };
 
-    inline std::size_t vertex_count(const VertexDataInfo& vertex_data_info, const std::span<const std::byte> vertex_data)
+    inline std::size_t vertex_count(const VertexDataInfo& vertex_data_info,
+                                    const std::span<const std::byte> vertex_data)
     {
         const std::size_t vertex_byte_size = byte_size(vertex_data_info.vertex_description);
         assert(vertex_data.size() % vertex_byte_size == 0);
         return vertex_data.size() / vertex_byte_size;
     }
+
+    enum class IndexType
+    {
+        UINT_16,
+        UINT_32,
+    };
+
+    inline std::size_t byte_size(const IndexType index_type)
+    {
+        switch (index_type) {
+            case IndexType::UINT_16: return 2;
+            case IndexType::UINT_32: return 4;
+
+            default: throw std::invalid_argument("Unknown IndexType value");
+        }
+    }
+
+    struct IndexDataInfo
+    {
+        IndexType data_type;
+        std::size_t index_count;
+    };
 
     struct Viewport
     {

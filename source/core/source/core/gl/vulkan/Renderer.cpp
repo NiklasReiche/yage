@@ -1,4 +1,9 @@
 #include "Renderer.h"
+#include "Drawable.h"
+#include "IndexBuffer.h"
+#include "Instance.h"
+#include "VertexBuffer.h"
+#include "enums.h"
 
 namespace yage::gl::vulkan
 {
@@ -42,14 +47,19 @@ namespace yage::gl::vulkan
         vkCmdBindPipeline(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.vk_handle());
     }
 
-    void Renderer::draw(const IVertexBuffer& vertex_buffer)
+    void Renderer::draw(const IDrawable2& drawable)
     {
-        const auto& vertex_buffer_impl = static_cast<const VertexBuffer&>(vertex_buffer);
-        const VkBuffer vertexBuffers[] = {vertex_buffer_impl.vk_handle()};
-        constexpr VkDeviceSize offsets[] = {0};
-        vkCmdBindVertexBuffers(m_command_buffer, 0, 1, vertexBuffers, offsets); // TODO: bindings
+        const auto& descriptor = static_cast<const Drawable&>(drawable).descriptor();
 
-        vkCmdDraw(m_command_buffer, vertex_buffer_impl.vertex_count(), 1, 0, 0);
+        const VkBuffer vertex_buffers[] = {descriptor.vertex_buffer->get<VertexBuffer>().vk_handle()};
+        const VkDeviceSize vertex_buffer_offsets[] = {descriptor.vertex_buffer_offset};
+        // TODO: bindings
+        vkCmdBindVertexBuffers(m_command_buffer, 0, 1, vertex_buffers, vertex_buffer_offsets);
+
+        vkCmdBindIndexBuffer(m_command_buffer, descriptor.index_buffer->get<IndexBuffer>().vk_handle(),
+                             descriptor.index_buffer_offset, convert(descriptor.index_data_info.data_type));
+
+        vkCmdDrawIndexed(m_command_buffer, descriptor.index_data_info.index_count, 1, 0, 0, 0);
     }
 
     void Renderer::end_render_pass()

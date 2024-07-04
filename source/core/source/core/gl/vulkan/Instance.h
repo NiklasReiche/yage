@@ -9,8 +9,10 @@
 #include "../Handle.h"
 #include "FrameBuffer.h"
 #include "FrameBufferCreator.h"
+#include "IndexBuffer.h"
 #include "Pipeline.h"
 #include "VertexBuffer.h"
+#include "Drawable.h"
 
 namespace yage::gl::vulkan
 {
@@ -47,57 +49,31 @@ namespace yage::gl::vulkan
 
         void flush_resources();
 
-        [[nodiscard]] VkDevice device() const
-        {
-            return m_device;
-        }
+        [[nodiscard]] VkDevice device() const;
 
-        [[nodiscard]] VkPhysicalDevice physical_device() const
-        {
-            return m_physical_device;
-        }
+        [[nodiscard]] VkPhysicalDevice physical_device() const;
 
-        [[nodiscard]] VkQueue graphics_queue() const
-        {
-            return m_graphics_queue;
-        }
+        [[nodiscard]] VkQueue graphics_queue() const;
 
-        [[nodiscard]] FrameBuffer& swap_chain_frame_buffer_for_frame() const
-        {
-            return m_swap_chain_frame_buffers[m_current_swap_chain_image_index].get<FrameBuffer>();
-        }
+        [[nodiscard]] FrameBuffer& swap_chain_frame_buffer_for_frame() const;
 
-        [[nodiscard]] std::shared_ptr<RenderPassHandle> swap_chain_render_pass() const
-        {
-            return m_render_pass;
-        }
+        [[nodiscard]] std::shared_ptr<RenderPassHandle> swap_chain_render_pass() const;
 
-        [[nodiscard]] VkCommandBuffer command_buffer_for_frame() const
-        {
-            return m_command_buffers[m_current_frame];
-        }
+        [[nodiscard]] VkCommandBuffer command_buffer_for_frame() const;
 
-        const std::shared_ptr<Store<RenderPass, RenderPass>>& store_render_passes()
-        {
-            return m_store_render_passes;
-        }
+        const std::shared_ptr<Store<RenderPass, RenderPass>>& store_render_passes();
 
-        const std::shared_ptr<Store<IFrameBuffer, FrameBuffer>>& store_frame_buffers()
-        {
-            return m_store_frame_buffers;
-        }
+        const std::shared_ptr<Store<IFrameBuffer, FrameBuffer>>& store_frame_buffers();
 
-        const std::shared_ptr<Store<Pipeline, Pipeline>>& store_pipelines()
-        {
-            return m_store_pipelines;
-        }
+        const std::shared_ptr<Store<Pipeline, Pipeline>>& store_pipelines();
 
-        const std::shared_ptr<Store<IVertexBuffer, VertexBuffer>>& store_vertex_buffers()
-        {
-            return m_store_vertex_buffers;
-        }
+        const std::shared_ptr<Store<IVertexBuffer, VertexBuffer>>& store_vertex_buffers();
 
-        [[nodiscard]] VkCommandPool command_pool() const { return m_command_pool; }
+        const std::shared_ptr<Store<IIndexBuffer, IndexBuffer>>& store_index_buffers();
+
+        const std::shared_ptr<Store<IDrawable2, Drawable>>& store_drawables();
+
+        [[nodiscard]] VkCommandPool command_pool() const;
 
     private:
         const std::vector<const char*> VALIDATION_LAYERS = {"VK_LAYER_KHRONOS_validation"};
@@ -138,10 +114,18 @@ namespace yage::gl::vulkan
 
         bool m_framebuffer_resized = false;
 
-        std::shared_ptr<Store<RenderPass, RenderPass>> m_store_render_passes = std::make_shared<Store<RenderPass, RenderPass>>();
-        std::shared_ptr<Store<ImageView, ImageView>> m_store_image_views = std::make_shared<Store<ImageView, ImageView>>();
-        std::shared_ptr<Store<IFrameBuffer, FrameBuffer>> m_store_frame_buffers = std::make_shared<Store<IFrameBuffer, FrameBuffer>>();
-        std::shared_ptr<Store<IVertexBuffer, VertexBuffer>> m_store_vertex_buffers = std::make_shared<Store<IVertexBuffer, VertexBuffer>>();
+        std::shared_ptr<Store<RenderPass, RenderPass>> m_store_render_passes =
+                std::make_shared<Store<RenderPass, RenderPass>>();
+        std::shared_ptr<Store<ImageView, ImageView>> m_store_image_views =
+                std::make_shared<Store<ImageView, ImageView>>();
+        std::shared_ptr<Store<IFrameBuffer, FrameBuffer>> m_store_frame_buffers =
+                std::make_shared<Store<IFrameBuffer, FrameBuffer>>();
+        std::shared_ptr<Store<IVertexBuffer, VertexBuffer>> m_store_vertex_buffers =
+                std::make_shared<Store<IVertexBuffer, VertexBuffer>>();
+        std::shared_ptr<Store<IIndexBuffer, IndexBuffer>> m_store_index_buffers =
+                std::make_shared<Store<IIndexBuffer, IndexBuffer>>();
+        std::shared_ptr<Store<IDrawable2, Drawable>> m_store_drawables =
+                std::make_shared<Store<IDrawable2, Drawable>>();
         std::shared_ptr<Store<Pipeline, Pipeline>> m_store_pipelines = std::make_shared<Store<Pipeline, Pipeline>>();
 
         void create_instance();

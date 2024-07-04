@@ -9,6 +9,10 @@ target_sources(yage_core PRIVATE
         IndexBuffer.cpp
         IndexBufferCreator.h
         IndexBufferCreator.cpp
+        Drawable.h
+        Drawable.cpp
+        DrawableCreator.h
+        DrawableCreator.cpp
         Pipeline.h
         Pipeline.cpp
         PipelineBuilder.h
@@ -26,5 +30,4 @@ target_sources(yage_core PRIVATE
         ImageView.cpp
         Renderer.h
         Renderer.cpp
-
 )

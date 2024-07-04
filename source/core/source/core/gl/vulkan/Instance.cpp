@@ -1,10 +1,10 @@
 #include "Instance.h"
+#include <GLFW/glfw3.h>
 #include <cstdint>
 #include <cstring>
 #include <limits>
 #include <set>
 #include <utility>
-#include <GLFW/glfw3.h>
 
 namespace yage::gl::vulkan
 {
@@ -45,6 +45,8 @@ namespace yage::gl::vulkan
         m_store_pipelines->clear();
         m_store_render_passes->clear();
         m_store_vertex_buffers->clear();
+        m_store_index_buffers->clear();
+        m_store_drawables->clear();
 
         for (auto i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             vkDestroySemaphore(m_device, m_render_finished_semaphores[i], nullptr);
@@ -167,20 +169,11 @@ namespace yage::gl::vulkan
 
         ostream << "Vulkan validation layer ";
         switch (severity) {
-            case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
-                ostream << "[ERROR]: ";
-                break;
-            case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
-                ostream << "[WARNING]: ";
-                break;
-            case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
-                ostream << "[INFO]: ";
-                break;
-            case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
-                ostream << "[VERBOSE]: ";
-                break;
-            default:
-                break;
+            case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:   ostream << "[ERROR]: "; break;
+            case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: ostream << "[WARNING]: "; break;
+            case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:    ostream << "[INFO]: "; break;
+            case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT: ostream << "[VERBOSE]: "; break;
+            default:                                              break;
         }
         ostream << callback_data->pMessage << std::endl;
 
@@ -694,6 +687,71 @@ namespace yage::gl::vulkan
     {
         vkDeviceWaitIdle(m_device);
         cleanupSwapChain();
+    }
+
+    VkDevice Instance::device() const
+    {
+        return m_device;
+    }
+
+    VkPhysicalDevice Instance::physical_device() const
+    {
+        return m_physical_device;
+    }
+
+    VkQueue Instance::graphics_queue() const
+    {
+        return m_graphics_queue;
+    }
+
+    FrameBuffer& Instance::swap_chain_frame_buffer_for_frame() const
+    {
+        return m_swap_chain_frame_buffers[m_current_swap_chain_image_index].get<FrameBuffer>();
+    }
+
+    std::shared_ptr<RenderPassHandle> Instance::swap_chain_render_pass() const
+    {
+        return m_render_pass;
+    }
+
+    VkCommandBuffer Instance::command_buffer_for_frame() const
+    {
+        return m_command_buffers[m_current_frame];
+    }
+
+    const std::shared_ptr<Store<RenderPass, RenderPass>>& Instance::store_render_passes()
+    {
+        return m_store_render_passes;
+    }
+
+    const std::shared_ptr<Store<IFrameBuffer, FrameBuffer>>& Instance::store_frame_buffers()
+    {
+        return m_store_frame_buffers;
+    }
+
+    const std::shared_ptr<Store<Pipeline, Pipeline>>& Instance::store_pipelines()
+    {
+        return m_store_pipelines;
+    }
+
+    const std::shared_ptr<Store<IVertexBuffer, VertexBuffer>>& Instance::store_vertex_buffers()
+    {
+        return m_store_vertex_buffers;
+    }
+
+    const std::shared_ptr<Store<IIndexBuffer, IndexBuffer>>& Instance::store_index_buffers()
+    {
+        return m_store_index_buffers;
+    }
+
+    const std::shared_ptr<Store<IDrawable2, Drawable>>& Instance::store_drawables()
+    {
+        return m_store_drawables;
+    }
+
+    VkCommandPool Instance::command_pool() const
+    {
+        return m_command_pool;
     }
 
     void Instance::cleanupSwapChain()

@@ -26,6 +26,8 @@ target_sources(yage_core
 		IVertexBufferCreator.h
 		IIndexBuffer.h
 		IIndexBufferCreator.h
+		IDrawable.h
+		IDrawableCreator.h
 )
 
 if(WIN32 OR UNIX)

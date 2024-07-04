@@ -2,13 +2,14 @@
 
 #include <vulkan/vulkan.h>
 
-#include "Instance.h"
 #include "FrameBuffer.h"
 #include "Pipeline.h"
-#include "VertexBuffer.h"
+#include "../IDrawable.h"
 
 namespace yage::gl::vulkan
 {
+    class Instance;
+
     class Renderer
     {
     public:
@@ -20,7 +21,7 @@ namespace yage::gl::vulkan
 
         void bind_pipeline(const Pipeline& pipeline);
 
-        void draw(const IVertexBuffer& vertex_buffer);
+        void draw(const IDrawable2& drawable);
 
         void end_render_pass();
 
