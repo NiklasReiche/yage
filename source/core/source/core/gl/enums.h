@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+#include <numeric>
 #include <stdexcept>
 
 namespace yage::gl
@@ -81,6 +83,31 @@ namespace yage::gl
     inline std::size_t byte_size(const VertexComponent vertex_element)
     {
         return static_cast<std::size_t>(vertex_element.n_components) * byte_size(vertex_element.data_type);
+    }
+
+    inline std::size_t byte_size(const std::span<const VertexComponent> vertex_description)
+    {
+        return std::accumulate(vertex_description.begin(), vertex_description.end(), static_cast<std::size_t>(0),
+            [](const std::size_t acc, const VertexComponent vertex){return acc + byte_size(vertex);});
+    }
+
+    enum class VertexDataLayout
+    {
+        INTERLEAVED,
+        BATCHED
+    };
+
+    struct VertexDataInfo
+    {
+        std::vector<VertexComponent> vertex_description;
+        VertexDataLayout data_layout;
+    };
+
+    inline std::size_t vertex_count(const VertexDataInfo& vertex_data_info, const std::span<const std::byte> vertex_data)
+    {
+        const std::size_t vertex_byte_size = byte_size(vertex_data_info.vertex_description);
+        assert(vertex_data.size() % vertex_byte_size == 0);
+        return vertex_data.size() / vertex_byte_size;
     }
 
     struct Viewport

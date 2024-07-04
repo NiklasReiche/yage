@@ -4,6 +4,7 @@
 
 #include "Handle.h"
 #include "IVertexBuffer.h"
+#include "enums.h"
 
 namespace yage::gl
 {
@@ -12,6 +13,7 @@ namespace yage::gl
     public:
         virtual ~IVertexBufferFactory() = default;
 
-        virtual Handle<IVertexBuffer> create_test(const std::span<const std::byte>& data, std::size_t vertex_count) = 0;
+        virtual Handle<IVertexBuffer> create(const VertexDataInfo& data_info,
+                                             std::span<const std::byte> data) = 0;
     };
 }

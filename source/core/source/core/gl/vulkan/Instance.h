@@ -57,6 +57,11 @@ namespace yage::gl::vulkan
             return m_physical_device;
         }
 
+        [[nodiscard]] VkQueue graphics_queue() const
+        {
+            return m_graphics_queue;
+        }
+
         [[nodiscard]] FrameBuffer& swap_chain_frame_buffer_for_frame() const
         {
             return m_swap_chain_frame_buffers[m_current_swap_chain_image_index].get<FrameBuffer>();
@@ -93,22 +98,25 @@ namespace yage::gl::vulkan
         }
 
     private:
-        const std::vector<const char*> m_validation_layers = {"VK_LAYER_KHRONOS_validation"};
-        const std::vector<const char*> m_device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+        const std::vector<const char*> VALIDATION_LAYERS = {"VK_LAYER_KHRONOS_validation"};
+        const std::vector<const char*> DEVICE_EXTENSIONS = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
         const int MAX_FRAMES_IN_FLIGHT = 2;
 
         std::weak_ptr<platform::desktop::GlfwWindow> m_window;
+
         VkInstance m_instance{};
         VkDebugUtilsMessengerEXT m_debug_messenger{};
         VkSurfaceKHR m_surface{};
+
         VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
         VkDevice m_device{};
-        VkQueue graphicsQueue{};
-        VkQueue presentQueue{};
-        VkSwapchainKHR swapChain{};
 
-        VkFormat swapChainImageFormat{};
-        VkExtent2D swapChainExtent{};
+        VkQueue m_graphics_queue{};
+        VkQueue m_present_queue{};
+
+        VkSwapchainKHR m_swap_chain{};
+        VkFormat m_swap_chain_image_format{};
+        VkExtent2D m_swap_chain_extent{};
 
         std::shared_ptr<RenderPassHandle> m_render_pass;
 
@@ -122,11 +130,11 @@ namespace yage::gl::vulkan
         VkCommandPool m_command_pool{};
         std::vector<VkCommandBuffer> m_command_buffers{};
 
-        std::vector<VkSemaphore> imageAvailableSemaphores{};
-        std::vector<VkSemaphore> renderFinishedSemaphores{};
-        std::vector<VkFence> inFlightFences{};
+        std::vector<VkSemaphore> m_image_available_semaphores{};
+        std::vector<VkSemaphore> m_render_finished_semaphores{};
+        std::vector<VkFence> m_in_flight_fences{};
 
-        bool framebufferResized = false;
+        bool m_framebuffer_resized = false;
 
         std::shared_ptr<Store<RenderPass, RenderPass>> m_store_render_passes = std::make_shared<Store<RenderPass, RenderPass>>();
         std::shared_ptr<Store<ImageView, ImageView>> m_store_image_views = std::make_shared<Store<ImageView, ImageView>>();

@@ -1,13 +1,14 @@
 #pragma once
 
-#include <span>
-#include <memory>
 #include <cstdint>
+#include <memory>
+#include <span>
 
 #include <vulkan/vulkan.h>
 
 #include "../Handle.h"
 #include "../IVertexBuffer.h"
+#include "../enums.h"
 
 namespace yage::gl::vulkan
 {
@@ -16,7 +17,8 @@ namespace yage::gl::vulkan
     class VertexBuffer final : public IVertexBuffer
     {
     public:
-        explicit VertexBuffer(std::weak_ptr<Instance> instance, const std::span<const std::byte>& data, std::size_t vertex_count);
+        explicit VertexBuffer(std::weak_ptr<Instance> instance, const VertexDataInfo& data_info,
+                              const std::span<const std::byte>& data);
 
         ~VertexBuffer();
 
@@ -39,7 +41,7 @@ namespace yage::gl::vulkan
         VkDeviceMemory m_memory_handle{};
         std::size_t m_vertex_count = 0;
 
-        std::uint32_t findMemoryType(std::uint32_t typeFilter, VkMemoryPropertyFlags properties);
+        std::uint32_t find_memory_type(std::uint32_t typeFilter, VkMemoryPropertyFlags properties);
     };
 
     using VertexBufferHandle = Handle<VertexBuffer>;

@@ -5,11 +5,11 @@
 
 namespace yage::gl::vulkan
 {
-    VertexBuffer::VertexBuffer(std::weak_ptr<Instance> instance, const std::span<const std::byte>& data,
-                               const std::size_t vertex_count)
+    VertexBuffer::VertexBuffer(std::weak_ptr<Instance> instance, const VertexDataInfo& data_info,
+                               const std::span<const std::byte>& data)
         : m_instance(std::move(instance)),
           m_vk_device(m_instance.lock()->device()),
-          m_vertex_count(vertex_count)
+          m_vertex_count(gl::vertex_count(data_info, data))
     {
         VkBufferCreateInfo bufferInfo{};
         bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -28,7 +28,7 @@ namespace yage::gl::vulkan
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         allocInfo.allocationSize = memRequirements.size;
         allocInfo.memoryTypeIndex =
-                findMemoryType(memRequirements.memoryTypeBits,
+                find_memory_type(memRequirements.memoryTypeBits,
                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
         if (vkAllocateMemory(m_vk_device, &allocInfo, nullptr, &m_memory_handle) != VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to allocate vertex buffer memory!");
@@ -67,8 +67,7 @@ namespace yage::gl::vulkan
         if (this == &other)
             return *this;
         m_instance = std::move(other.m_instance);
-        m_vk_device = other.m_vk_device,
-        m_buffer_handle = other.m_buffer_handle;
+        m_vk_device = other.m_vk_device, m_buffer_handle = other.m_buffer_handle;
         m_memory_handle = other.m_memory_handle;
         m_vertex_count = other.m_vertex_count;
 
@@ -89,7 +88,7 @@ namespace yage::gl::vulkan
         return m_vertex_count;
     }
 
-    std::uint32_t VertexBuffer::findMemoryType(const std::uint32_t typeFilter, const VkMemoryPropertyFlags properties)
+    std::uint32_t VertexBuffer::find_memory_type(const std::uint32_t typeFilter, const VkMemoryPropertyFlags properties)
     {
         VkPhysicalDeviceMemoryProperties memProperties;
         vkGetPhysicalDeviceMemoryProperties(m_instance.lock()->physical_device(), &memProperties);

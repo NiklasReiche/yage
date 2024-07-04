@@ -35,7 +35,7 @@ namespace yage::gl::vulkan
     Instance::Instance(std::weak_ptr<platform::desktop::GlfwWindow> window)
         : m_window(std::move(window))
     {
-        m_window.lock()->attach_on_framebuffer_resize([this](int, int) { this->framebufferResized = true; });
+        m_window.lock()->attach_on_framebuffer_resize([this](int, int) { this->m_framebuffer_resized = true; });
     }
 
     Instance::~Instance()
@@ -47,9 +47,9 @@ namespace yage::gl::vulkan
         m_store_vertex_buffers->clear();
 
         for (auto i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-            vkDestroySemaphore(m_device, renderFinishedSemaphores[i], nullptr);
-            vkDestroySemaphore(m_device, imageAvailableSemaphores[i], nullptr);
-            vkDestroyFence(m_device, inFlightFences[i], nullptr);
+            vkDestroySemaphore(m_device, m_render_finished_semaphores[i], nullptr);
+            vkDestroySemaphore(m_device, m_image_available_semaphores[i], nullptr);
+            vkDestroyFence(m_device, m_in_flight_fences[i], nullptr);
         }
 
         vkDestroyCommandPool(m_device, m_command_pool, nullptr);
@@ -104,12 +104,12 @@ namespace yage::gl::vulkan
         createInfo.enabledLayerCount = 0;
         createInfo.pNext = nullptr;
 #else
-        if (!checkValidationLayerSupport(m_validation_layers)) {
+        if (!checkValidationLayerSupport(VALIDATION_LAYERS)) {
             throw std::runtime_error("validation layers requested, but not available!");
         }
 
-        createInfo.enabledLayerCount = static_cast<uint32_t>(m_validation_layers.size());
-        createInfo.ppEnabledLayerNames = m_validation_layers.data();
+        createInfo.enabledLayerCount = static_cast<uint32_t>(VALIDATION_LAYERS.size());
+        createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data();
 
         const VkDebugUtilsMessengerCreateInfoEXT debug_create_info = populate_debug_messenger_create_info();
         createInfo.pNext = &debug_create_info;
@@ -316,23 +316,23 @@ namespace yage::gl::vulkan
         createInfo.pQueueCreateInfos = queueCreateInfos.data();
 
         createInfo.pEnabledFeatures = &deviceFeatures;
-        createInfo.enabledExtensionCount = static_cast<uint32_t>(m_device_extensions.size());
-        createInfo.ppEnabledExtensionNames = m_device_extensions.data();
+        createInfo.enabledExtensionCount = static_cast<uint32_t>(DEVICE_EXTENSIONS.size());
+        createInfo.ppEnabledExtensionNames = DEVICE_EXTENSIONS.data();
 
 #ifdef NDEBUG
         createInfo.enabledLayerCount = 0;
 #else
         // for backwards-compatibility
-        createInfo.enabledLayerCount = static_cast<uint32_t>(m_validation_layers.size());
-        createInfo.ppEnabledLayerNames = m_validation_layers.data();
+        createInfo.enabledLayerCount = static_cast<uint32_t>(VALIDATION_LAYERS.size());
+        createInfo.ppEnabledLayerNames = VALIDATION_LAYERS.data();
 #endif
 
         if (vkCreateDevice(m_physical_device, &createInfo, nullptr, &m_device) != VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to create logical device!");
         }
 
-        vkGetDeviceQueue(m_device, indices.graphicsFamily.value(), 0, &graphicsQueue);
-        vkGetDeviceQueue(m_device, indices.presentFamily.value(), 0, &presentQueue);
+        vkGetDeviceQueue(m_device, indices.graphicsFamily.value(), 0, &m_graphics_queue);
+        vkGetDeviceQueue(m_device, indices.presentFamily.value(), 0, &m_present_queue);
     }
 
     bool Instance::checkDeviceExtensionSupport(const VkPhysicalDevice device)
@@ -343,7 +343,7 @@ namespace yage::gl::vulkan
         std::vector<VkExtensionProperties> availableExtensions(extensionCount);
         vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
 
-        std::set<std::string> requiredExtensions(m_device_extensions.begin(), m_device_extensions.end());
+        std::set<std::string> requiredExtensions(DEVICE_EXTENSIONS.begin(), DEVICE_EXTENSIONS.end());
 
         for (const auto& extension: availableExtensions) {
             requiredExtensions.erase(extension.extensionName);
@@ -464,16 +464,16 @@ namespace yage::gl::vulkan
 
         createInfo.oldSwapchain = VK_NULL_HANDLE; // TODO: window resizing
 
-        if (vkCreateSwapchainKHR(m_device, &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
+        if (vkCreateSwapchainKHR(m_device, &createInfo, nullptr, &m_swap_chain) != VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to create swap chain!");
         }
 
-        vkGetSwapchainImagesKHR(m_device, swapChain, &imageCount, nullptr);
+        vkGetSwapchainImagesKHR(m_device, m_swap_chain, &imageCount, nullptr);
         m_swap_chain_images.resize(imageCount);
-        vkGetSwapchainImagesKHR(m_device, swapChain, &imageCount, m_swap_chain_images.data());
+        vkGetSwapchainImagesKHR(m_device, m_swap_chain, &imageCount, m_swap_chain_images.data());
 
-        swapChainImageFormat = surfaceFormat.format;
-        swapChainExtent = extent;
+        m_swap_chain_image_format = surfaceFormat.format;
+        m_swap_chain_extent = extent;
     }
 
     void Instance::create_image_views()
@@ -485,7 +485,7 @@ namespace yage::gl::vulkan
             createInfo.image = m_swap_chain_images[i];
 
             createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-            createInfo.format = swapChainImageFormat;
+            createInfo.format = m_swap_chain_image_format;
 
             createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
             createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -520,7 +520,7 @@ namespace yage::gl::vulkan
     void Instance::create_swap_chain_render_pass()
     {
         VkAttachmentDescription colorAttachment{};
-        colorAttachment.format = swapChainImageFormat;
+        colorAttachment.format = m_swap_chain_image_format;
         colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
         colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -568,7 +568,7 @@ namespace yage::gl::vulkan
         for (size_t i = 0; i < m_swap_chain_image_views.size(); i++) {
             ImageViewHandle* attachments[] = {&m_swap_chain_image_views[i]};
             m_swap_chain_frame_buffers[i] = frame_buffer_factory.create_frame_buffer(
-                    m_render_pass, attachments, swapChainExtent.width, swapChainExtent.height);
+                    m_render_pass, attachments, m_swap_chain_extent.width, m_swap_chain_extent.height);
         }
     }
 
@@ -603,9 +603,9 @@ namespace yage::gl::vulkan
 
     void Instance::create_sync_objects()
     {
-        imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-        renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-        inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+        m_image_available_semaphores.resize(MAX_FRAMES_IN_FLIGHT);
+        m_render_finished_semaphores.resize(MAX_FRAMES_IN_FLIGHT);
+        m_in_flight_fences.resize(MAX_FRAMES_IN_FLIGHT);
 
         VkSemaphoreCreateInfo semaphoreInfo{};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -615,9 +615,9 @@ namespace yage::gl::vulkan
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
         for (auto i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-            if (vkCreateSemaphore(m_device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
-                vkCreateSemaphore(m_device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
-                vkCreateFence(m_device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
+            if (vkCreateSemaphore(m_device, &semaphoreInfo, nullptr, &m_image_available_semaphores[i]) != VK_SUCCESS ||
+                vkCreateSemaphore(m_device, &semaphoreInfo, nullptr, &m_render_finished_semaphores[i]) != VK_SUCCESS ||
+                vkCreateFence(m_device, &fenceInfo, nullptr, &m_in_flight_fences[i]) != VK_SUCCESS) {
                 throw std::runtime_error("Vulkan: failed to create synchronization objects for a frame!");
             }
         }
@@ -625,10 +625,10 @@ namespace yage::gl::vulkan
 
     void Instance::prepare_frame()
     {
-        vkWaitForFences(m_device, 1, &inFlightFences[m_current_frame], VK_TRUE, UINT64_MAX);
+        vkWaitForFences(m_device, 1, &m_in_flight_fences[m_current_frame], VK_TRUE, UINT64_MAX);
 
         const VkResult result =
-                vkAcquireNextImageKHR(m_device, swapChain, UINT64_MAX, imageAvailableSemaphores[m_current_frame],
+                vkAcquireNextImageKHR(m_device, m_swap_chain, UINT64_MAX, m_image_available_semaphores[m_current_frame],
                                       VK_NULL_HANDLE, &m_current_swap_chain_image_index);
         if (result == VK_ERROR_OUT_OF_DATE_KHR) {
             recreateSwapChain();
@@ -640,7 +640,7 @@ namespace yage::gl::vulkan
         }
 
         // Only reset the fence if we are submitting work
-        vkResetFences(m_device, 1, &inFlightFences[m_current_frame]);
+        vkResetFences(m_device, 1, &m_in_flight_fences[m_current_frame]);
 
         vkResetCommandBuffer(m_command_buffers[m_current_frame], 0);
     }
@@ -650,7 +650,7 @@ namespace yage::gl::vulkan
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        const VkSemaphore waitSemaphores[] = {imageAvailableSemaphores[m_current_frame]};
+        const VkSemaphore waitSemaphores[] = {m_image_available_semaphores[m_current_frame]};
         constexpr VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
@@ -659,11 +659,11 @@ namespace yage::gl::vulkan
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &m_command_buffers[m_current_frame];
 
-        const VkSemaphore signalSemaphores[] = {renderFinishedSemaphores[m_current_frame]};
+        const VkSemaphore signalSemaphores[] = {m_render_finished_semaphores[m_current_frame]};
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
-        if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[m_current_frame]) != VK_SUCCESS) {
+        if (vkQueueSubmit(m_graphics_queue, 1, &submitInfo, m_in_flight_fences[m_current_frame]) != VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to submit draw command buffer!");
         }
 
@@ -673,15 +673,15 @@ namespace yage::gl::vulkan
         presentInfo.waitSemaphoreCount = 1;
         presentInfo.pWaitSemaphores = signalSemaphores;
 
-        const VkSwapchainKHR swapChains[] = {swapChain};
+        const VkSwapchainKHR swapChains[] = {m_swap_chain};
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = swapChains;
         presentInfo.pImageIndices = &m_current_swap_chain_image_index;
         presentInfo.pResults = nullptr; // Optional
 
-        const VkResult result = vkQueuePresentKHR(presentQueue, &presentInfo);
-        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
-            framebufferResized = false;
+        const VkResult result = vkQueuePresentKHR(m_present_queue, &presentInfo);
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_framebuffer_resized) {
+            m_framebuffer_resized = false;
             recreateSwapChain();
         } else if (result != VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to present swap chain image!");
@@ -706,7 +706,7 @@ namespace yage::gl::vulkan
             image_view.reset();
         }
 
-        vkDestroySwapchainKHR(m_device, swapChain, nullptr);
+        vkDestroySwapchainKHR(m_device, m_swap_chain, nullptr);
     }
 
     void Instance::recreateSwapChain()
