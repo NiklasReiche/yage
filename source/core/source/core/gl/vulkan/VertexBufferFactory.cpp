@@ -9,9 +9,8 @@ namespace yage::gl::vulkan
     }
 
     Handle<IVertexBuffer> VertexBufferFactory::create(const VertexDataInfo& data_info,
-                                                      std::span<const std::byte> data)
+                                                      std::span<const std::byte> data) const
     {
-        const std::size_t vertex_count = vertex_count(data_info, data);
-        return m_instance.lock()->store_vertex_buffers()->create(m_instance, data, vertex_count);
+        return m_instance.lock()->store_vertex_buffers()->create(m_instance, data_info, data);
     }
 }

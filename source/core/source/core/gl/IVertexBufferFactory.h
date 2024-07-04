@@ -13,7 +13,7 @@ namespace yage::gl
     public:
         virtual ~IVertexBufferFactory() = default;
 
-        virtual Handle<IVertexBuffer> create(const VertexDataInfo& data_info,
-                                             std::span<const std::byte> data) = 0;
+        [[nodiscard]] virtual Handle<IVertexBuffer> create(const VertexDataInfo& data_info,
+                                                           std::span<const std::byte> data) const = 0;
     };
 }

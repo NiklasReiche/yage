@@ -42,6 +42,11 @@ namespace yage::gl::vulkan
         std::size_t m_vertex_count = 0;
 
         std::uint32_t find_memory_type(std::uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
+        void create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
+                           VkBuffer& buffer, VkDeviceMemory& buffer_memory);
+
+        void copyBuffer(VkBuffer source, VkBuffer destination, VkDeviceSize size);
     };
 
     using VertexBufferHandle = Handle<VertexBuffer>;

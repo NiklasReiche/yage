@@ -11,8 +11,8 @@ namespace yage::gl::vulkan
     public:
         explicit VertexBufferFactory(std::weak_ptr<Instance> instance);
 
-        Handle<IVertexBuffer> create(const VertexDataInfo& data_info,
-                                     std::span<const std::byte> data) override;
+        [[nodiscard]] Handle<IVertexBuffer> create(const VertexDataInfo& data_info,
+                                                   std::span<const std::byte> data) const override;
 
     private:
         std::weak_ptr<Instance> m_instance;

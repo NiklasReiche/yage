@@ -5,8 +5,10 @@
 #include <core/gl/Context.h>
 
 #include <core/gl/vulkan/Instance.h>
-#include <core/gl/vulkan/Renderer.h>
 #include <core/gl/vulkan/PipelineBuilder.h>
+#include <core/gl/vulkan/Renderer.h>
+
+#include "core/gl/vulkan/VertexBufferFactory.h"
 
 using namespace yage;
 
@@ -44,13 +46,21 @@ int main()
     const std::shared_ptr<gl::vulkan::Instance> context = std::make_shared<gl::vulkan::Instance>(std::static_pointer_cast<platform::desktop::GlfwWindow>(window));
     context->initialize();
 
+    const auto vertex_buffer_factory = gl::vulkan::VertexBufferFactory(context);
 
-    constexpr std::array<const float, 15> vertices = {
+    const gl::VertexDataInfo vertex_data_info{
+        .vertex_description = {
+            {gl::VertexComponentSize::VEC2, gl::VertexComponentType::FLOAT_32},
+            {gl::VertexComponentSize::VEC3, gl::VertexComponentType::FLOAT_32},
+        },
+        .data_layout = gl::VertexDataLayout::INTERLEAVED,
+    };
+    constexpr std::array<const float, 15> vertex_data = {
             0.0f, -0.5f, 1.0f, 0.0f, 0.0f,
             0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
             -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
     };
-    const auto vertex_buffer = gl::vulkan::VertexBuffer(context, std::as_bytes(std::span{vertices}), 3);
+    const auto vertex_buffer = vertex_buffer_factory.create(vertex_data_info, std::as_bytes(std::span{vertex_data}));
 
     const auto graphics_pipeline = create_pipeline(*window, context);
 
@@ -65,7 +75,7 @@ int main()
         renderer.begin_command_buffer();
         renderer.begin_render_pass(context->swap_chain_frame_buffer_for_frame());
         renderer.bind_pipeline(*graphics_pipeline);
-        renderer.draw(vertex_buffer);
+        renderer.draw(*vertex_buffer);
         renderer.end_render_pass();
         renderer.end_command_buffer();
 

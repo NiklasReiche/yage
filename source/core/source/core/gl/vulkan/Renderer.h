@@ -20,7 +20,7 @@ namespace yage::gl::vulkan
 
         void bind_pipeline(const Pipeline& pipeline);
 
-        void draw(const VertexBuffer& vertex_buffer);
+        void draw(const IVertexBuffer& vertex_buffer);
 
         void end_render_pass();
 
