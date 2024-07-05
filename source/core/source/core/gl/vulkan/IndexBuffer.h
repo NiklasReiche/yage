@@ -36,12 +36,5 @@ namespace yage::gl::vulkan
         VkBuffer m_buffer_handle{};
         VkDeviceMemory m_memory_handle{};
         std::size_t m_index_count = 0;
-
-        std::uint32_t find_memory_type(std::uint32_t typeFilter, VkMemoryPropertyFlags properties);
-
-        void create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
-                           VkBuffer& buffer, VkDeviceMemory& buffer_memory);
-
-        void copyBuffer(VkBuffer source, VkBuffer destination, VkDeviceSize size);
     };
 }

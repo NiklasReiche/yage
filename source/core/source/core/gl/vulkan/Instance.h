@@ -75,6 +75,13 @@ namespace yage::gl::vulkan
 
         [[nodiscard]] VkCommandPool command_pool() const;
 
+        std::uint32_t find_memory_type(std::uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
+        void create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
+                           VkBuffer& buffer, VkDeviceMemory& buffer_memory);
+
+        void copy_buffer(VkBuffer source, VkBuffer destination, VkDeviceSize size);
+
     private:
         const std::vector<const char*> VALIDATION_LAYERS = {"VK_LAYER_KHRONOS_validation"};
         const std::vector<const char*> DEVICE_EXTENSIONS = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};

@@ -754,6 +754,84 @@ namespace yage::gl::vulkan
         return m_command_pool;
     }
 
+    std::uint32_t Instance::find_memory_type(const std::uint32_t typeFilter, const VkMemoryPropertyFlags properties)
+    {
+        VkPhysicalDeviceMemoryProperties memProperties;
+        vkGetPhysicalDeviceMemoryProperties(m_physical_device, &memProperties);
+
+        for (std::uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+            if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+                return i;
+            }
+        }
+
+        throw std::runtime_error("Vulkan: failed to find suitable memory type!");
+    }
+
+    void Instance::create_buffer(const VkDeviceSize size, const VkBufferUsageFlags usage,
+                                 const VkMemoryPropertyFlags properties, VkBuffer& buffer,
+                                 VkDeviceMemory& buffer_memory)
+    {
+        VkBufferCreateInfo create_info{};
+        create_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        create_info.size = size;
+        create_info.usage = usage;
+        create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        create_info.flags = 0;
+        if (vkCreateBuffer(m_device, &create_info, nullptr, &buffer) != VK_SUCCESS) {
+            throw std::runtime_error("Vulkan: failed to create vertex buffer!");
+        }
+
+        VkMemoryRequirements memRequirements;
+        vkGetBufferMemoryRequirements(m_device, buffer, &memRequirements);
+
+        // TODO: don't call vkAllocateMemory for every buffer; implement an allocator or use VulkanMemoryAllocator
+        VkMemoryAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        allocInfo.allocationSize = memRequirements.size;
+        allocInfo.memoryTypeIndex = find_memory_type(memRequirements.memoryTypeBits, properties);
+        if (vkAllocateMemory(m_device, &allocInfo, nullptr, &buffer_memory) != VK_SUCCESS) {
+            throw std::runtime_error("Vulkan: failed to allocate vertex buffer memory!");
+        }
+
+        vkBindBufferMemory(m_device, buffer, buffer_memory, 0);
+    }
+
+    void Instance::copy_buffer(const VkBuffer source, const VkBuffer destination, const VkDeviceSize size)
+    {
+        VkCommandBufferAllocateInfo alloc_info{};
+        alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        alloc_info.commandPool = m_command_pool;
+        alloc_info.commandBufferCount = 1;
+
+        VkCommandBuffer command_buffer;
+        vkAllocateCommandBuffers(m_device, &alloc_info, &command_buffer);
+
+        VkCommandBufferBeginInfo begin_info{};
+        begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+        vkBeginCommandBuffer(command_buffer, &begin_info);
+
+        VkBufferCopy copy_region{};
+        copy_region.srcOffset = 0; // Optional
+        copy_region.dstOffset = 0; // Optional
+        copy_region.size = size;
+        vkCmdCopyBuffer(command_buffer, source, destination, 1, &copy_region);
+
+        vkEndCommandBuffer(command_buffer);
+
+        VkSubmitInfo submit_info{};
+        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submit_info.commandBufferCount = 1;
+        submit_info.pCommandBuffers = &command_buffer;
+        // we could use fences here and schedule multiple vertex buffer creations together
+        vkQueueSubmit(m_graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
+        vkQueueWaitIdle(m_graphics_queue);
+
+        vkFreeCommandBuffers(m_device, m_command_pool, 1, &command_buffer);
+    }
+
     void Instance::cleanupSwapChain()
     {
         for (auto& frame_buffer: m_swap_chain_frame_buffers) {
