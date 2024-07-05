@@ -66,7 +66,7 @@ namespace yage::gl::vulkan
                     default: throw std::invalid_argument("Unknown VertexComponent combination");
                 }
             }
-            case VertexComponentType::INT_16: {
+            case VertexComponentType::SINT_16: {
                 switch (vertex_component.n_components) {
                     case VertexComponentSize::SCALAR: return VK_FORMAT_R16_SINT;
                     case VertexComponentSize::VEC2:   return VK_FORMAT_R16G16_SINT;
@@ -76,7 +76,7 @@ namespace yage::gl::vulkan
                     default: throw std::invalid_argument("Unknown VertexComponent combination");
                 }
             }
-            case VertexComponentType::INT_32: {
+            case VertexComponentType::SINT_32: {
                 switch (vertex_component.n_components) {
                     case VertexComponentSize::SCALAR: return VK_FORMAT_R32_SINT;
                     case VertexComponentSize::VEC2:   return VK_FORMAT_R32G32_SINT;
@@ -86,7 +86,7 @@ namespace yage::gl::vulkan
                     default: throw std::invalid_argument("Unknown VertexComponent combination");
                 }
             }
-            case VertexComponentType::INT_64: {
+            case VertexComponentType::SINT_64: {
                 switch (vertex_component.n_components) {
                     case VertexComponentSize::SCALAR: return VK_FORMAT_R64_SINT;
                     case VertexComponentSize::VEC2:   return VK_FORMAT_R64G64_SINT;
@@ -137,6 +137,34 @@ namespace yage::gl::vulkan
             case IndexType::UINT_32: return VK_INDEX_TYPE_UINT32;
 
             default: throw std::invalid_argument("Unknown IndexType combination");
+        }
+    }
+
+    inline VkFormat convert(const ImageFormat2 image_format)
+    {
+        switch (image_format) {
+            case ImageFormat2::R8_UNORM:            return VK_FORMAT_R8_UNORM;
+            case ImageFormat2::R8G8_UNORM:          return VK_FORMAT_R8G8_UNORM;
+            case ImageFormat2::R8G8B8_UNORM:        return VK_FORMAT_R8G8B8_UNORM;
+            case ImageFormat2::R8G8B8A8_UNORM:      return VK_FORMAT_R8G8B8A8_UNORM;
+            case ImageFormat2::R8_UNORM_SRGB:       return VK_FORMAT_R8_SRGB;
+            case ImageFormat2::R8G8_UNORM_SRGB:     return VK_FORMAT_R8G8_SRGB;
+            case ImageFormat2::R8G8B8_UNORM_SRGB:   return VK_FORMAT_R8G8B8_SRGB;
+            case ImageFormat2::R8G8B8A8_UNORM_SRGB: return VK_FORMAT_R8G8B8A8_SRGB;
+            case ImageFormat2::R8_SNORM:            return VK_FORMAT_R8_SNORM;
+            case ImageFormat2::R8G8_SNORM:          return VK_FORMAT_R8G8_SNORM;
+            case ImageFormat2::R8G8B8_SNORM:        return VK_FORMAT_R8G8B8_SNORM;
+            case ImageFormat2::R8G8B8A8_SNORM:      return VK_FORMAT_R8G8B8A8_SNORM;
+            case ImageFormat2::R8_UINT:             return VK_FORMAT_R8_UINT;
+            case ImageFormat2::R8G8_UINT:           return VK_FORMAT_R8G8_UINT;
+            case ImageFormat2::R8G8B8_UINT:         return VK_FORMAT_R8G8B8_UINT;
+            case ImageFormat2::R8G8B8A8_UINT:       return VK_FORMAT_R8G8B8A8_UINT;
+            case ImageFormat2::R8_SINT:             return VK_FORMAT_R8_SINT;
+            case ImageFormat2::R8G8_SINT:           return VK_FORMAT_R8G8_SINT;
+            case ImageFormat2::R8G8B8_SINT:         return VK_FORMAT_R8G8B8_SINT;
+            case ImageFormat2::R8G8B8A8_SINT:       return VK_FORMAT_R8G8B8A8_SINT;
+
+            default: throw std::invalid_argument("Unknown ImageFormat value");
         }
     }
 }

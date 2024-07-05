@@ -13,6 +13,7 @@
 #include "Pipeline.h"
 #include "VertexBuffer.h"
 #include "Drawable.h"
+#include "Texture2D.h"
 
 namespace yage::gl::vulkan
 {
@@ -73,6 +74,8 @@ namespace yage::gl::vulkan
 
         const std::shared_ptr<Store<IDrawable2, Drawable>>& store_drawables();
 
+        const std::shared_ptr<Store<ITexture2D2, Texture2D>>& store_textures();
+
         [[nodiscard]] VkCommandPool command_pool() const;
 
         std::uint32_t find_memory_type(std::uint32_t typeFilter, VkMemoryPropertyFlags properties);
@@ -81,6 +84,18 @@ namespace yage::gl::vulkan
                            VkBuffer& buffer, VkDeviceMemory& buffer_memory);
 
         void copy_buffer(VkBuffer source, VkBuffer destination, VkDeviceSize size);
+
+        void create_image(std::uint32_t width, std::uint32_t height, VkFormat format, VkImageTiling tiling,
+                         VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image,
+                         VkDeviceMemory& image_memory);
+
+        VkCommandBuffer begin_one_time_command_buffer();
+
+        void end_one_time_command_buffer(VkCommandBuffer command_buffer);
+
+        void transition_image_layout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout);
+
+        void copy_buffer_to_image(VkBuffer buffer, VkImage image, std::uint32_t width, std::uint32_t height);
 
     private:
         const std::vector<const char*> VALIDATION_LAYERS = {"VK_LAYER_KHRONOS_validation"};
@@ -133,6 +148,8 @@ namespace yage::gl::vulkan
                 std::make_shared<Store<IIndexBuffer, IndexBuffer>>();
         std::shared_ptr<Store<IDrawable2, Drawable>> m_store_drawables =
                 std::make_shared<Store<IDrawable2, Drawable>>();
+        std::shared_ptr<Store<ITexture2D2, Texture2D>> m_store_textures =
+                std::make_shared<Store<ITexture2D2, Texture2D>>();
         std::shared_ptr<Store<Pipeline, Pipeline>> m_store_pipelines = std::make_shared<Store<Pipeline, Pipeline>>();
 
         void create_instance();

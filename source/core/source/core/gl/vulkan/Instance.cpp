@@ -749,6 +749,11 @@ namespace yage::gl::vulkan
         return m_store_drawables;
     }
 
+    const std::shared_ptr<Store<ITexture2D2, Texture2D>>& Instance::store_textures()
+    {
+        return m_store_textures;
+    }
+
     VkCommandPool Instance::command_pool() const
     {
         return m_command_pool;
@@ -782,15 +787,15 @@ namespace yage::gl::vulkan
             throw std::runtime_error("Vulkan: failed to create vertex buffer!");
         }
 
-        VkMemoryRequirements memRequirements;
-        vkGetBufferMemoryRequirements(m_device, buffer, &memRequirements);
+        VkMemoryRequirements memory_requirements;
+        vkGetBufferMemoryRequirements(m_device, buffer, &memory_requirements);
 
         // TODO: don't call vkAllocateMemory for every buffer; implement an allocator or use VulkanMemoryAllocator
-        VkMemoryAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocInfo.allocationSize = memRequirements.size;
-        allocInfo.memoryTypeIndex = find_memory_type(memRequirements.memoryTypeBits, properties);
-        if (vkAllocateMemory(m_device, &allocInfo, nullptr, &buffer_memory) != VK_SUCCESS) {
+        VkMemoryAllocateInfo alloc_info{};
+        alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        alloc_info.allocationSize = memory_requirements.size;
+        alloc_info.memoryTypeIndex = find_memory_type(memory_requirements.memoryTypeBits, properties);
+        if (vkAllocateMemory(m_device, &alloc_info, nullptr, &buffer_memory) != VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to allocate vertex buffer memory!");
         }
 
@@ -799,19 +804,7 @@ namespace yage::gl::vulkan
 
     void Instance::copy_buffer(const VkBuffer source, const VkBuffer destination, const VkDeviceSize size)
     {
-        VkCommandBufferAllocateInfo alloc_info{};
-        alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        alloc_info.commandPool = m_command_pool;
-        alloc_info.commandBufferCount = 1;
-
-        VkCommandBuffer command_buffer;
-        vkAllocateCommandBuffers(m_device, &alloc_info, &command_buffer);
-
-        VkCommandBufferBeginInfo begin_info{};
-        begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-        vkBeginCommandBuffer(command_buffer, &begin_info);
+        const VkCommandBuffer command_buffer = begin_one_time_command_buffer();
 
         VkBufferCopy copy_region{};
         copy_region.srcOffset = 0; // Optional
@@ -821,15 +814,146 @@ namespace yage::gl::vulkan
 
         vkEndCommandBuffer(command_buffer);
 
+        end_one_time_command_buffer(command_buffer);
+    }
+
+    void Instance::create_image(const std::uint32_t width, const std::uint32_t height, const VkFormat format,
+                                const VkImageTiling tiling, const VkImageUsageFlags usage,
+                                const VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& image_memory)
+    {
+        VkImageCreateInfo create_info{};
+        create_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        create_info.imageType = VK_IMAGE_TYPE_2D;
+        create_info.extent.width = width;
+        create_info.extent.height = height;
+        create_info.extent.depth = 1;
+        create_info.mipLevels = 1;
+        create_info.arrayLayers = 1;
+        create_info.format = format;
+        create_info.tiling = tiling;
+        create_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        create_info.usage = usage;
+        create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        create_info.samples = VK_SAMPLE_COUNT_1_BIT;
+        create_info.flags = 0; // Optional
+
+        if (vkCreateImage(m_device, &create_info, nullptr, &image) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create image!");
+        }
+
+        VkMemoryRequirements memory_requirements;
+        vkGetImageMemoryRequirements(m_device, image, &memory_requirements);
+
+        // TODO: don't call vkAllocateMemory for every buffer; implement an allocator or use VulkanMemoryAllocator
+        VkMemoryAllocateInfo alloc_info{};
+        alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        alloc_info.allocationSize = memory_requirements.size;
+        alloc_info.memoryTypeIndex = find_memory_type(memory_requirements.memoryTypeBits, properties);
+
+        if (vkAllocateMemory(m_device, &alloc_info, nullptr, &image_memory) != VK_SUCCESS) {
+            throw std::runtime_error("failed to allocate image memory!");
+        }
+
+        vkBindImageMemory(m_device, image, image_memory, 0);
+    }
+
+    VkCommandBuffer Instance::begin_one_time_command_buffer()
+    {
+        VkCommandBufferAllocateInfo alloc_info{};
+        alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        alloc_info.commandPool = m_command_pool;
+        alloc_info.commandBufferCount = 1;
+
+        VkCommandBuffer command_buffer;
+        // TODO: don't call vkAllocateMemory for every buffer; implement an allocator or use VulkanMemoryAllocator
+        vkAllocateCommandBuffers(m_device, &alloc_info, &command_buffer);
+
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+        vkBeginCommandBuffer(command_buffer, &beginInfo);
+
+        return command_buffer;
+    }
+
+    void Instance::end_one_time_command_buffer(const VkCommandBuffer command_buffer)
+    {
+        vkEndCommandBuffer(command_buffer);
+
         VkSubmitInfo submit_info{};
         submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         submit_info.commandBufferCount = 1;
         submit_info.pCommandBuffers = &command_buffer;
-        // we could use fences here and schedule multiple vertex buffer creations together
+        // we could use fences here and schedule multiple buffer operations together
         vkQueueSubmit(m_graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
         vkQueueWaitIdle(m_graphics_queue);
 
         vkFreeCommandBuffers(m_device, m_command_pool, 1, &command_buffer);
+    }
+
+    void Instance::transition_image_layout(const VkImage image, VkFormat, const VkImageLayout old_layout,
+                                           const VkImageLayout new_layout)
+    {
+        const VkCommandBuffer command_buffer = begin_one_time_command_buffer();
+
+        VkImageMemoryBarrier barrier{};
+        barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier.oldLayout = old_layout;
+        barrier.newLayout = new_layout;
+        barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.image = image;
+        barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        barrier.subresourceRange.baseMipLevel = 0;
+        barrier.subresourceRange.levelCount = 1;
+        barrier.subresourceRange.baseArrayLayer = 0;
+        barrier.subresourceRange.layerCount = 1;
+
+        VkPipelineStageFlags source_stage;
+        VkPipelineStageFlags destination_stage;
+        if (old_layout == VK_IMAGE_LAYOUT_UNDEFINED && new_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+            barrier.srcAccessMask = 0;
+            barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+            source_stage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+            destination_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        } else if (old_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL &&
+                   new_layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+            barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+            source_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+            destination_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+        } else {
+            throw std::invalid_argument("unsupported layout transition!");
+        }
+
+        vkCmdPipelineBarrier(command_buffer, source_stage, destination_stage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+
+        end_one_time_command_buffer(command_buffer);
+    }
+
+    void Instance::copy_buffer_to_image(const VkBuffer buffer, const VkImage image, const std::uint32_t width,
+                                        const std::uint32_t height)
+    {
+        const VkCommandBuffer command_buffer = begin_one_time_command_buffer();
+
+        VkBufferImageCopy region{};
+        region.bufferOffset = 0;
+        region.bufferRowLength = 0;
+        region.bufferImageHeight = 0;
+        region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        region.imageSubresource.mipLevel = 0;
+        region.imageSubresource.baseArrayLayer = 0;
+        region.imageSubresource.layerCount = 1;
+        region.imageOffset = {0, 0, 0};
+        region.imageExtent = {width, height, 1};
+
+        vkCmdCopyBufferToImage(command_buffer, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+
+        end_one_time_command_buffer(command_buffer);
     }
 
     void Instance::cleanupSwapChain()

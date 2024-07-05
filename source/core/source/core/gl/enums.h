@@ -1,10 +1,11 @@
 #pragma once
 
 #include <cassert>
+#include <cstdint>
 #include <numeric>
+#include <span>
 #include <stdexcept>
 #include <vector>
-#include <span>
 
 namespace yage::gl
 {
@@ -36,10 +37,10 @@ namespace yage::gl
     {
         FLOAT_32,
         FLOAT_64,
-        INT_16,
-        INT_32,
-        INT_64,
-        UINT_16,
+        SINT_16,
+        SINT_32,
+        SINT_64,
+        UINT_16, // TODO: are unsigned components even possible in GLSL?
         UINT_32,
         UINT_64
     };
@@ -49,9 +50,9 @@ namespace yage::gl
         switch (data_type) {
             case VertexComponentType::FLOAT_32: return 4;
             case VertexComponentType::FLOAT_64: return 8;
-            case VertexComponentType::INT_16:   return 2;
-            case VertexComponentType::INT_32:   return 4;
-            case VertexComponentType::INT_64:   return 8;
+            case VertexComponentType::SINT_16:  return 2;
+            case VertexComponentType::SINT_32:  return 4;
+            case VertexComponentType::SINT_64:  return 8;
             case VertexComponentType::UINT_16:  return 2;
             case VertexComponentType::UINT_32:  return 4;
             case VertexComponentType::UINT_64:  return 8;
@@ -68,6 +69,7 @@ namespace yage::gl
         VEC4 = 4,
     };
 
+    // TODO: we could combine VertexComponentSize and VertexComponentType into a single enum like with image formats
     struct VertexComponent
     {
         VertexComponentSize n_components;
@@ -108,24 +110,50 @@ namespace yage::gl
 
     enum class IndexType
     {
-        UINT_16,
-        UINT_32,
+        UINT_16 = 2,
+        UINT_32 = 4,
     };
 
     inline std::size_t byte_size(const IndexType index_type)
     {
-        switch (index_type) {
-            case IndexType::UINT_16: return 2;
-            case IndexType::UINT_32: return 4;
-
-            default: throw std::invalid_argument("Unknown IndexType value");
-        }
+        return static_cast<std::size_t>(index_type);
     }
 
     struct IndexDataInfo
     {
         IndexType data_type;
         std::size_t index_count;
+    };
+
+    enum class ImageFormat2
+    {
+        R8_UNORM, // linear space format, values in range [0.0f, 255.0f]
+        R8G8_UNORM,
+        R8G8B8_UNORM,
+        R8G8B8A8_UNORM,
+        R8_UNORM_SRGB, // srgb space format, values in range [0.0f, 255.0f]
+        R8G8_UNORM_SRGB,
+        R8G8B8_UNORM_SRGB,
+        R8G8B8A8_UNORM_SRGB,
+        R8_SNORM, // values in range [-1.0f, 1.0f]
+        R8G8_SNORM,
+        R8G8B8_SNORM,
+        R8G8B8A8_SNORM,
+        R8_UINT, // values in range [0, 255]
+        R8G8_UINT,
+        R8G8B8_UINT,
+        R8G8B8A8_UINT,
+        R8_SINT, // values in range [-128, 127]
+        R8G8_SINT,
+        R8G8B8_SINT,
+        R8G8B8A8_SINT,
+    };
+
+    struct PixelTransferInfo
+    {
+        ImageFormat2 image_format;
+        std::uint32_t width;
+        std::uint32_t height;
     };
 
     struct Viewport

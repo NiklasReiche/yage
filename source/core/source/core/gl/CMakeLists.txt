@@ -28,6 +28,8 @@ target_sources(yage_core
 		IIndexBufferCreator.h
 		IDrawable.h
 		IDrawableCreator.h
+		ITexture2D.h
+		ITexture2DCreator.h
 )
 
 if(WIN32 OR UNIX)
