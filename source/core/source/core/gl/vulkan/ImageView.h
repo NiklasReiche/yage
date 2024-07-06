@@ -12,12 +12,11 @@ namespace yage::gl::vulkan
 {
     class Instance;
 
-    // TODO: MAX_FRAMES_IN_FLIGHT is different from swap chain size
     class ImageView
     {
     public:
         // TODO: take shared ownership of VkImage Handle (or somehow raw vk handle for swap chain images)
-        ImageView(std::weak_ptr<Instance> instance, std::span<VkImageViewCreateInfo> create_info, ResourceUsage usage, FrameCounter frame_counter);
+        ImageView(std::weak_ptr<Instance> instance, std::span<VkImageViewCreateInfo> create_info, FrameCounter frame_counter);
 
         ~ImageView();
 
@@ -33,14 +32,13 @@ namespace yage::gl::vulkan
 
         [[nodiscard]] VkImageView vk_handle(std::size_t index) const;
 
-        [[nodiscard]] std::size_t n_instances() const;
+        [[nodiscard]] unsigned int n_instances() const;
 
     private:
         std::weak_ptr<Instance> m_instance;
         VkDevice m_vk_device;
-        ResourceUsage m_usage;
         std::vector<VkImageView> m_vk_handles{};
-        FrameCounter m_frame_counter{};
+        FrameCounter m_frame_counter;
     };
 
     using ImageViewHandle = Handle<ImageView>;

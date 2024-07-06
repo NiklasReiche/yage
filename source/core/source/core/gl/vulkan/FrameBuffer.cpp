@@ -5,22 +5,14 @@ namespace yage::gl::vulkan
 {
     FrameBuffer::FrameBuffer(std::weak_ptr<Instance> instance, std::shared_ptr<RenderPassHandle> render_pass,
                              std::span<std::shared_ptr<ImageViewHandle>> attachements,
-                             VkFramebufferCreateInfo& create_info, const ResourceUsage usage,
-                             const FrameCounter frame_counter)
+                             VkFramebufferCreateInfo create_info, const FrameCounter frame_counter)
         : m_instance(std::move(instance)),
           m_vk_device(m_instance.lock()->device()),
           m_render_pass(std::move(render_pass)),
-          m_usage(usage),
           m_extent({create_info.width, create_info.height}),
           m_frame_counter(frame_counter)
     {
-        std::size_t n_instances;
-        switch (usage) {
-            case ResourceUsage::STATIC:  n_instances = 1; break;
-            case ResourceUsage::DYNAMIC: n_instances = m_frame_counter.max_frame_index; break;
-
-            default: throw std::invalid_argument("unknown ResourceUsage value");
-        }
+        const std::size_t n_instances = m_frame_counter.max_frame_index;
 
         m_attachements.resize(attachements.size());
         std::ranges::move(attachements, m_attachements.begin());
@@ -59,9 +51,9 @@ namespace yage::gl::vulkan
         : m_instance(std::move(other.m_instance)),
           m_vk_device(other.m_vk_device),
           m_render_pass(std::move(other.m_render_pass)),
-          m_usage(other.m_usage),
           m_vk_handles(std::move(other.m_vk_handles)),
-          m_extent(other.m_extent)
+          m_extent(other.m_extent),
+          m_frame_counter(other.m_frame_counter)
     {
         other.m_vk_device = VK_NULL_HANDLE;
         for (VkFramebuffer& m_vk_handle: other.m_vk_handles) {
@@ -77,9 +69,9 @@ namespace yage::gl::vulkan
         m_instance = std::move(other.m_instance);
         m_vk_device = other.m_vk_device;
         m_render_pass = std::move(other.m_render_pass);
-        m_usage = other.m_usage;
         m_vk_handles = other.m_vk_handles;
         m_extent = other.m_extent;
+        m_frame_counter = other.m_frame_counter;
 
         other.m_vk_device = VK_NULL_HANDLE;
         for (VkFramebuffer& m_vk_handle: other.m_vk_handles) {
@@ -90,16 +82,9 @@ namespace yage::gl::vulkan
         return *this;
     }
 
-    // TODO: remove this and specify index at the call site, since we don't know if this resource is bound by swap chain
-    // size or frames-in-flight
     VkFramebuffer FrameBuffer::vk_handle() const
     {
-        switch (m_usage) {
-            case ResourceUsage::STATIC:  return m_vk_handles[0];
-            case ResourceUsage::DYNAMIC: return m_vk_handles[*m_frame_counter.curent_frame_index];
-
-            default: throw std::logic_error("unknown ResourceUsage value");
-        }
+        return m_vk_handles[*m_frame_counter.curent_frame_index];
     }
 
     VkFramebuffer FrameBuffer::vk_handle(const std::size_t index) const
@@ -107,14 +92,9 @@ namespace yage::gl::vulkan
         return m_vk_handles[index];
     }
 
-    std::size_t FrameBuffer::n_instances() const
+    unsigned int FrameBuffer::n_instances() const
     {
-        switch (m_usage) {
-            case ResourceUsage::STATIC:  return 1;
-            case ResourceUsage::DYNAMIC: return m_frame_counter.max_frame_index;
-
-            default: throw std::logic_error("unknown ResourceUsage value");
-        }
+        return m_frame_counter.max_frame_index;
     }
 
     std::shared_ptr<RenderPassHandle> FrameBuffer::render_pass() const

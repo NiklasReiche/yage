@@ -495,7 +495,7 @@ namespace yage::gl::vulkan
             create_infos[i] = create_info;
         }
         m_swap_chain_image_view = std::make_shared<ImageViewHandle>(
-                m_store_image_views->create(weak_from_this(), create_infos, ResourceUsage::DYNAMIC, swap_chain_counter()));
+                m_store_image_views->create(weak_from_this(), create_infos, swap_chain_counter()));
     }
 
     VkShaderModule Instance::createShaderModule(const std::vector<std::byte>& code)
@@ -703,6 +703,14 @@ namespace yage::gl::vulkan
         return {
                 .curent_frame_index = &m_current_frame_in_flight,
                 .max_frame_index = MAX_FRAMES_IN_FLIGHT,
+        };
+    }
+
+    FrameCounter Instance::static_counter() const
+    {
+        return {
+                .curent_frame_index = &m_current_frame_static,
+                .max_frame_index = 1,
         };
     }
 

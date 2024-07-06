@@ -55,6 +55,8 @@ namespace yage::gl::vulkan
 
         FrameCounter frames_in_flight_counter() const;
 
+        FrameCounter static_counter() const;
+
         [[nodiscard]] VkDevice device() const;
 
         [[nodiscard]] VkPhysicalDevice physical_device() const;
@@ -126,6 +128,7 @@ namespace yage::gl::vulkan
 
         std::shared_ptr<RenderPassHandle> m_render_pass;
 
+        const unsigned int m_current_frame_static = 0;
         unsigned int m_current_frame_in_flight = 0;
         unsigned int m_current_swap_chain_image_index = 0;
 
