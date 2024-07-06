@@ -14,7 +14,7 @@ namespace yage::gl::vulkan
     class Pipeline final
     {
     public:
-        Pipeline(std::weak_ptr<Instance> instance, std::shared_ptr<RenderPassHandle> render_pass,
+        Pipeline(Instance* instance, std::shared_ptr<RenderPassHandle> render_pass,
                  VkGraphicsPipelineCreateInfo& pipeline_info,
                  const VkPipelineLayoutCreateInfo& layout_info);
 
@@ -31,7 +31,7 @@ namespace yage::gl::vulkan
         [[nodiscard]] VkPipeline vk_handle() const;
 
     private:
-        std::weak_ptr<Instance> m_instance;
+        Instance* m_instance; // can be raw pointer, since the resource lives within the store on the instance
         VkDevice m_vk_device;
         std::shared_ptr<RenderPassHandle> m_render_pass;
         VkPipeline m_vk_handle{};

@@ -13,7 +13,7 @@ namespace yage::gl::vulkan
     class RenderPass
     {
     public:
-        explicit RenderPass(std::weak_ptr<Instance> instance, const VkRenderPassCreateInfo& create_info);
+        explicit RenderPass(Instance* instance, const VkRenderPassCreateInfo& create_info);
 
         ~RenderPass();
 
@@ -28,7 +28,7 @@ namespace yage::gl::vulkan
         [[nodiscard]] VkRenderPass vk_handle() const;
 
     private:
-        std::weak_ptr<Instance> m_instance;
+        Instance* m_instance; // can be raw pointer, since the resource lives within the store on the instance
         VkDevice m_vk_device;
         VkRenderPass m_vk_handle{};
     };

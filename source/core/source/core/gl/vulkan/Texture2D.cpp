@@ -4,17 +4,16 @@
 
 namespace yage::gl::vulkan
 {
-    Texture2D::Texture2D(std::weak_ptr<Instance> instance, const PixelTransferInfo& data_info,
+    Texture2D::Texture2D(Instance* instance, const PixelTransferInfo& data_info,
                          const std::span<const std::byte> data)
-        : m_instance(std::move(instance)),
-          m_vk_device(m_instance.lock()->device())
+        : m_instance(instance),
+          m_vk_device(m_instance->device())
     {
-        const auto instance_lock = m_instance.lock();
         const VkDeviceSize buffer_size = data.size();
 
         VkBuffer staging_buffer;
         VkDeviceMemory staging_buffer_memory;
-        instance_lock->create_buffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+        m_instance->create_buffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                                      staging_buffer, staging_buffer_memory);
 
@@ -25,16 +24,16 @@ namespace yage::gl::vulkan
 
         const VkFormat vk_image_format = convert(data_info.image_format);
 
-        instance_lock->create_image(data_info.width, data_info.height, vk_image_format, VK_IMAGE_TILING_OPTIMAL,
+        m_instance->create_image(data_info.width, data_info.height, vk_image_format, VK_IMAGE_TILING_OPTIMAL,
                                     VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
                                     VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_image_handle, m_memory_handle);
 
-        instance_lock->transition_image_layout(m_image_handle, vk_image_format, VK_IMAGE_LAYOUT_UNDEFINED,
+        m_instance->transition_image_layout(m_image_handle, vk_image_format, VK_IMAGE_LAYOUT_UNDEFINED,
                                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
-        instance_lock->copy_buffer_to_image(staging_buffer, m_image_handle, data_info.width, data_info.height);
+        m_instance->copy_buffer_to_image(staging_buffer, m_image_handle, data_info.width, data_info.height);
 
-        instance_lock->transition_image_layout(m_image_handle, vk_image_format,
+        m_instance->transition_image_layout(m_image_handle, vk_image_format,
                                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
@@ -51,7 +50,7 @@ namespace yage::gl::vulkan
     }
 
     Texture2D::Texture2D(Texture2D&& other) noexcept
-        : m_instance(std::move(other.m_instance)),
+        : m_instance(other.m_instance),
           m_vk_device(other.m_vk_device),
           m_image_handle(other.m_image_handle),
           m_memory_handle(other.m_memory_handle)
@@ -66,7 +65,7 @@ namespace yage::gl::vulkan
         if (this == &other)
             return *this;
 
-        m_instance = std::move(other.m_instance);
+        m_instance = other.m_instance;
         m_vk_device = other.m_vk_device;
         m_image_handle = other.m_image_handle;
         m_memory_handle = other.m_memory_handle;

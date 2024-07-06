@@ -18,7 +18,7 @@ namespace yage::gl::vulkan
     class FrameBuffer final : public IFrameBuffer
     {
     public:
-        explicit FrameBuffer(std::weak_ptr<Instance> instance, std::shared_ptr<RenderPassHandle> render_pass,
+        explicit FrameBuffer(Instance* instance, std::shared_ptr<RenderPassHandle> render_pass,
                              std::span<std::shared_ptr<ImageViewHandle>> attachements,
                              VkFramebufferCreateInfo create_info, FrameCounter frame_counter);
 
@@ -43,7 +43,7 @@ namespace yage::gl::vulkan
         [[nodiscard]] math::Vec2ui extent() const;
 
     private:
-        std::weak_ptr<Instance> m_instance;
+        Instance* m_instance; // can be raw pointer, since the resource lives within the store on the instance
         VkDevice m_vk_device;
         std::shared_ptr<RenderPassHandle> m_render_pass;
         std::vector<std::shared_ptr<ImageViewHandle>> m_attachements;

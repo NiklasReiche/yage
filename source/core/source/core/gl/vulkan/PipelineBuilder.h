@@ -41,7 +41,7 @@ namespace yage::gl::vulkan
         PipelineHandle build();
 
     private:
-        std::weak_ptr<Instance> m_instance;
+        std::weak_ptr<Instance> m_instance; // cannot be raw pointer, since the creator might outlive the instance
 
         std::array<VkShaderModule, 2> m_shader_modules{};
         std::array<VkPipelineShaderStageCreateInfo, 2> m_shader_stages{};

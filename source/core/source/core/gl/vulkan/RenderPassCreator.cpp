@@ -50,6 +50,7 @@ namespace yage::gl::vulkan
         render_pass_info.dependencyCount = 1;
         render_pass_info.pDependencies = &dependency;
 
-        return m_instance.lock()->store_render_passes()->create(m_instance, render_pass_info);
+        const auto instance = m_instance.lock();
+        return instance->store_render_passes()->create(instance.get(), render_pass_info);
     }
 }

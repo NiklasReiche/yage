@@ -15,8 +15,7 @@ namespace yage::gl::vulkan
     class Texture2D final : public ITexture2D2
     {
     public:
-        Texture2D(std::weak_ptr<Instance> instance, const PixelTransferInfo& data_info,
-                  std::span<const std::byte> data);
+        Texture2D(Instance* instance, const PixelTransferInfo& data_info, std::span<const std::byte> data);
 
         ~Texture2D() override;
 
@@ -29,7 +28,7 @@ namespace yage::gl::vulkan
         Texture2D& operator=(Texture2D&& other) noexcept;
 
     private:
-        std::weak_ptr<Instance> m_instance;
+        Instance* m_instance; // can be raw pointer, since the resource lives within the store on the instance
         VkDevice m_vk_device;
         VkImage m_image_handle{};
         VkDeviceMemory m_memory_handle{};

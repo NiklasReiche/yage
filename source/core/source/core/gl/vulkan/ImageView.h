@@ -16,7 +16,7 @@ namespace yage::gl::vulkan
     {
     public:
         // TODO: take shared ownership of VkImage Handle (or somehow raw vk handle for swap chain images)
-        ImageView(std::weak_ptr<Instance> instance, std::span<VkImageViewCreateInfo> create_info, FrameCounter frame_counter);
+        ImageView(Instance* instance, std::span<VkImageViewCreateInfo> create_info, FrameCounter frame_counter);
 
         ~ImageView();
 
@@ -35,7 +35,7 @@ namespace yage::gl::vulkan
         [[nodiscard]] unsigned int n_instances() const;
 
     private:
-        std::weak_ptr<Instance> m_instance;
+        Instance* m_instance; // can be raw pointer, since the resource lives within the store on the instance
         VkDevice m_vk_device;
         std::vector<VkImageView> m_vk_handles{};
         FrameCounter m_frame_counter;

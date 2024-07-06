@@ -4,10 +4,10 @@
 
 namespace yage::gl::vulkan
 {
-    Pipeline::Pipeline(std::weak_ptr<Instance> instance, std::shared_ptr<RenderPassHandle> render_pass,
+    Pipeline::Pipeline(Instance* instance, std::shared_ptr<RenderPassHandle> render_pass,
                        VkGraphicsPipelineCreateInfo& pipeline_info, const VkPipelineLayoutCreateInfo& layout_info)
-        : m_instance(std::move(instance)),
-          m_vk_device(m_instance.lock()->device()),
+        : m_instance(instance),
+          m_vk_device(m_instance->device()),
           m_render_pass(std::move(render_pass))
     {
         if (vkCreatePipelineLayout(m_vk_device, &layout_info, nullptr, &m_graphics_pipeline_layout) != VK_SUCCESS) {
@@ -31,7 +31,7 @@ namespace yage::gl::vulkan
     }
 
     Pipeline::Pipeline(Pipeline&& other) noexcept
-        : m_instance(std::move(other.m_instance)),
+        : m_instance(other.m_instance),
           m_vk_device(other.m_vk_device),
           m_render_pass(std::move(other.m_render_pass)),
           m_vk_handle(other.m_vk_handle),
@@ -46,7 +46,7 @@ namespace yage::gl::vulkan
     {
         if (this == &other)
             return *this;
-        m_instance = std::move(other.m_instance);
+        m_instance = other.m_instance;
         m_vk_device = other.m_vk_device,
         m_render_pass = std::move(other.m_render_pass);
         m_vk_handle = other.m_vk_handle;

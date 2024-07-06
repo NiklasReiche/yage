@@ -28,8 +28,9 @@ namespace yage::gl::vulkan
             default: throw std::invalid_argument("unkown ResourceUsage value");
         }
 
-        return m_instance.lock()->store_frame_buffers()->create(m_instance, std::move(render_pass), attachements,
-                                                                create_info, frame_counter);
+        const auto instance = m_instance.lock();
+        return instance->store_frame_buffers()->create(instance.get(), std::move(render_pass), attachements,
+                                                       create_info, frame_counter);
     }
 
     FrameBufferHandle
@@ -43,7 +44,8 @@ namespace yage::gl::vulkan
         create_info.height = height;
         create_info.layers = 1;
 
-        return m_instance.lock()->store_frame_buffers()->create(m_instance, std::move(render_pass), attachements,
-                                                                create_info, m_instance.lock()->swap_chain_counter());
+        return m_instance.lock()->store_frame_buffers()->create(m_instance.lock().get(), std::move(render_pass),
+                                                                attachements, create_info,
+                                                                m_instance.lock()->swap_chain_counter());
     }
 }

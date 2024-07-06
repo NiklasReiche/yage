@@ -12,6 +12,7 @@ namespace yage::gl::vulkan
     Handle<ITexture2D2> Texture2DCreator::create(const PixelTransferInfo& data_info,
                                                  const std::span<const std::byte> data) const
     {
-        return m_instance.lock()->store_textures()->create(m_instance, data_info, data);
+        const auto instance = m_instance.lock();
+        return instance->store_textures()->create(instance.get(), data_info, data);
     }
 }

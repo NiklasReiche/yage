@@ -28,7 +28,7 @@ namespace yage::gl::vulkan
         void end_command_buffer();
 
     private:
-        std::weak_ptr<Instance> m_instance;
+        std::weak_ptr<Instance> m_instance; // cannot be raw pointer, since the creator might outlive the instance
         VkCommandBuffer m_command_buffer{};
     };
 }

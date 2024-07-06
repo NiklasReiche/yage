@@ -27,6 +27,6 @@ namespace yage::gl::vulkan
                                  std::uint32_t height);
 
     private:
-        std::weak_ptr<Instance> m_instance;
+        std::weak_ptr<Instance> m_instance; // cannot be raw pointer, since the creator might outlive the instance
     };
 }

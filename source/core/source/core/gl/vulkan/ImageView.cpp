@@ -3,10 +3,10 @@
 
 namespace yage::gl::vulkan
 {
-    ImageView::ImageView(std::weak_ptr<Instance> instance, const std::span<VkImageViewCreateInfo> create_info,
+    ImageView::ImageView(Instance* instance, const std::span<VkImageViewCreateInfo> create_info,
                          const FrameCounter frame_counter)
-        : m_instance(std::move(instance)),
-          m_vk_device(m_instance.lock()->device()),
+        : m_instance(instance),
+          m_vk_device(m_instance->device()),
           m_frame_counter(frame_counter)
     {
         const std::size_t n_instances = m_frame_counter.max_frame_index;
@@ -31,7 +31,7 @@ namespace yage::gl::vulkan
     }
 
     ImageView::ImageView(ImageView&& other) noexcept
-        : m_instance(std::move(other.m_instance)),
+        : m_instance(other.m_instance),
           m_vk_device(other.m_vk_device),
           m_vk_handles(std::move(other.m_vk_handles)),
           m_frame_counter(other.m_frame_counter)
@@ -46,7 +46,7 @@ namespace yage::gl::vulkan
     {
         if (this == &other)
             return *this;
-        m_instance = std::move(other.m_instance);
+        m_instance = other.m_instance;
         m_vk_device = other.m_vk_device;
         m_vk_handles = other.m_vk_handles;
         m_frame_counter = other.m_frame_counter;

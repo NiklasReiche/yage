@@ -180,7 +180,8 @@ namespace yage::gl::vulkan
         pipeline_info.basePipelineHandle = VK_NULL_HANDLE; // Optional
         pipeline_info.basePipelineIndex = -1; // Optional
 
-        return m_instance.lock()->store_pipelines()->create(m_instance, m_render_pass, pipeline_info, m_pipeline_layout_info);
+        const auto instance = m_instance.lock();
+        return instance->store_pipelines()->create(instance.get(), m_render_pass, pipeline_info, m_pipeline_layout_info);
     }
 
     PipelineBuilder& PipelineBuilder::with_blending()

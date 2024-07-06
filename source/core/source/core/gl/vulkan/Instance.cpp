@@ -495,7 +495,7 @@ namespace yage::gl::vulkan
             create_infos[i] = create_info;
         }
         m_swap_chain_image_view = std::make_shared<ImageViewHandle>(
-                m_store_image_views->create(weak_from_this(), create_infos, swap_chain_counter()));
+                m_store_image_views->create(this, create_infos, swap_chain_counter()));
     }
 
     VkShaderModule Instance::createShaderModule(const std::vector<std::byte>& code)
@@ -553,7 +553,7 @@ namespace yage::gl::vulkan
         renderPassInfo.pDependencies = &dependency;
 
         m_render_pass =
-                std::make_shared<Handle<RenderPass>>(m_store_render_passes->create(weak_from_this(), renderPassInfo));
+                std::make_shared<Handle<RenderPass>>(m_store_render_passes->create(this, renderPassInfo));
     }
 
     void Instance::create_framebuffers()

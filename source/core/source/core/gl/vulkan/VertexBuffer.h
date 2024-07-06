@@ -17,7 +17,7 @@ namespace yage::gl::vulkan
     class VertexBuffer final : public IVertexBuffer
     {
     public:
-        explicit VertexBuffer(std::weak_ptr<Instance> instance, const VertexDataInfo& data_info,
+        explicit VertexBuffer(Instance* instance, const VertexDataInfo& data_info,
                               const std::span<const std::byte>& data);
 
         ~VertexBuffer();
@@ -35,7 +35,7 @@ namespace yage::gl::vulkan
         [[nodiscard]] std::size_t vertex_count() const;
 
     private:
-        std::weak_ptr<Instance> m_instance{};
+        Instance* m_instance; // can be raw pointer, since the resource lives within the store on the instance
         VkDevice m_vk_device;
         VkBuffer m_buffer_handle{};
         VkDeviceMemory m_memory_handle{};

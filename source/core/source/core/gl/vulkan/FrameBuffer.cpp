@@ -3,11 +3,11 @@
 
 namespace yage::gl::vulkan
 {
-    FrameBuffer::FrameBuffer(std::weak_ptr<Instance> instance, std::shared_ptr<RenderPassHandle> render_pass,
+    FrameBuffer::FrameBuffer(Instance* instance, std::shared_ptr<RenderPassHandle> render_pass,
                              std::span<std::shared_ptr<ImageViewHandle>> attachements,
                              VkFramebufferCreateInfo create_info, const FrameCounter frame_counter)
-        : m_instance(std::move(instance)),
-          m_vk_device(m_instance.lock()->device()),
+        : m_instance(instance),
+          m_vk_device(m_instance->device()),
           m_render_pass(std::move(render_pass)),
           m_extent({create_info.width, create_info.height}),
           m_frame_counter(frame_counter)
@@ -48,7 +48,7 @@ namespace yage::gl::vulkan
     }
 
     FrameBuffer::FrameBuffer(FrameBuffer&& other) noexcept
-        : m_instance(std::move(other.m_instance)),
+        : m_instance(other.m_instance),
           m_vk_device(other.m_vk_device),
           m_render_pass(std::move(other.m_render_pass)),
           m_vk_handles(std::move(other.m_vk_handles)),
@@ -66,7 +66,7 @@ namespace yage::gl::vulkan
     {
         if (this == &other)
             return *this;
-        m_instance = std::move(other.m_instance);
+        m_instance = other.m_instance;
         m_vk_device = other.m_vk_device;
         m_render_pass = std::move(other.m_render_pass);
         m_vk_handles = other.m_vk_handles;

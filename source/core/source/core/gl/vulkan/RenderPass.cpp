@@ -3,9 +3,9 @@
 
 namespace yage::gl::vulkan
 {
-    RenderPass::RenderPass(std::weak_ptr<Instance> instance, const VkRenderPassCreateInfo& create_info)
-        : m_instance(std::move(instance)),
-          m_vk_device(m_instance.lock()->device())
+    RenderPass::RenderPass(Instance* instance, const VkRenderPassCreateInfo& create_info)
+        : m_instance(instance),
+          m_vk_device(m_instance->device())
     {
         if (vkCreateRenderPass(m_vk_device, &create_info, nullptr, &m_vk_handle) != VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to create render pass!");
@@ -20,7 +20,7 @@ namespace yage::gl::vulkan
     }
 
     RenderPass::RenderPass(RenderPass&& other) noexcept
-        : m_instance(std::move(other.m_instance)),
+        : m_instance(other.m_instance),
           m_vk_device(other.m_vk_device),
           m_vk_handle(other.m_vk_handle)
     {
@@ -32,7 +32,7 @@ namespace yage::gl::vulkan
     {
         if (this == &other)
             return *this;
-        m_instance = std::move(other.m_instance);
+        m_instance = other.m_instance;
         m_vk_device = other.m_vk_device;
         m_vk_handle = other.m_vk_handle;
 

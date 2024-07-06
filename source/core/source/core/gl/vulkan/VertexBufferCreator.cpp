@@ -11,6 +11,7 @@ namespace yage::gl::vulkan
     Handle<IVertexBuffer> VertexBufferCreator::create(const VertexDataInfo& data_info,
                                                       std::span<const std::byte> data) const
     {
-        return m_instance.lock()->store_vertex_buffers()->create(m_instance, data_info, data);
+        const auto instance = m_instance.lock();
+        return instance->store_vertex_buffers()->create(instance.get(), data_info, data);
     }
 }

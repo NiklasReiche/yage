@@ -3,31 +3,29 @@
 
 namespace yage::gl::vulkan
 {
-    IndexBuffer::IndexBuffer(std::weak_ptr<Instance> instance, const IndexDataInfo data_info,
-                             const std::span<const std::byte> data)
-        : m_instance(std::move(instance)),
-          m_vk_device(m_instance.lock()->device()),
+    IndexBuffer::IndexBuffer(Instance* instance, const IndexDataInfo data_info, const std::span<const std::byte> data)
+        : m_instance(instance),
+          m_vk_device(m_instance->device()),
           m_index_count(data_info.index_count)
     {
-        const auto instance_lock = m_instance.lock();
         const VkDeviceSize buffer_size = data.size();
 
         // TODO: code duplication with vertex buffer
         VkBuffer staging_buffer;
         VkDeviceMemory staging_buffer_memory;
-        instance_lock->create_buffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer,
-                      staging_buffer_memory);
+        m_instance->create_buffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                  staging_buffer, staging_buffer_memory);
 
         void* mapped_data;
         vkMapMemory(m_vk_device, staging_buffer_memory, 0, buffer_size, 0, &mapped_data);
         memcpy(mapped_data, data.data(), buffer_size);
         vkUnmapMemory(m_vk_device, staging_buffer_memory);
 
-        instance_lock->create_buffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_buffer_handle, m_memory_handle);
+        m_instance->create_buffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                                  VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_buffer_handle, m_memory_handle);
 
-        instance_lock->copy_buffer(staging_buffer, m_buffer_handle, buffer_size);
+        m_instance->copy_buffer(staging_buffer, m_buffer_handle, buffer_size);
 
         vkDestroyBuffer(m_vk_device, staging_buffer, nullptr);
         vkFreeMemory(m_vk_device, staging_buffer_memory, nullptr);
@@ -42,7 +40,7 @@ namespace yage::gl::vulkan
     }
 
     IndexBuffer::IndexBuffer(IndexBuffer&& other) noexcept
-        : m_instance(std::move(other.m_instance)),
+        : m_instance(other.m_instance),
           m_vk_device(other.m_vk_device),
           m_buffer_handle(other.m_buffer_handle),
           m_memory_handle(other.m_memory_handle),
@@ -57,7 +55,7 @@ namespace yage::gl::vulkan
     {
         if (this == &other)
             return *this;
-        m_instance = std::move(other.m_instance);
+        m_instance = other.m_instance;
         m_vk_device = other.m_vk_device;
         m_buffer_handle = other.m_buffer_handle;
         m_memory_handle = other.m_memory_handle;

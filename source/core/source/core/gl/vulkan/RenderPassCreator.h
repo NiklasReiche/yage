@@ -21,6 +21,6 @@ namespace yage::gl::vulkan
         RenderPassHandle create(ImageFormat image_format);
 
     private:
-        std::weak_ptr<Instance> m_instance;
+        std::weak_ptr<Instance> m_instance; // cannot be raw pointer, since the creator might outlive the instance
     };
 }

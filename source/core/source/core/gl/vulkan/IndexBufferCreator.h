@@ -15,6 +15,6 @@ namespace yage::gl::vulkan
                                                   std::span<const std::byte> data) const override;
 
     private:
-        std::weak_ptr<Instance> m_instance;
+        std::weak_ptr<Instance> m_instance; // cannot be raw pointer, since the creator might outlive the instance
     };
 }

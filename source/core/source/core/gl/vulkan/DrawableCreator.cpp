@@ -16,8 +16,6 @@ namespace yage::gl::vulkan
                                               const IndexDataInfo index_data_info,
                                               const std::span<const std::byte> indices) const
     {
-        const auto instance = m_instance.lock();
-
         std::shared_ptr<Handle<IVertexBuffer>> vertex_buffer = std::make_shared<Handle<IVertexBuffer>>(
                 VertexBufferCreator(m_instance).create(vertex_data_info, vertices));
         std::shared_ptr<Handle<IIndexBuffer>> index_buffer =
@@ -30,6 +28,7 @@ namespace yage::gl::vulkan
                                       .index_buffer_offset = 0,
                                       .index_data_info = index_data_info};
 
+        const auto instance = m_instance.lock();
         return instance->store_drawables()->create(descriptor);
     }
 }

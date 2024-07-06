@@ -16,7 +16,7 @@ namespace yage::gl::vulkan
     class IndexBuffer final : public IIndexBuffer
     {
     public:
-        IndexBuffer(std::weak_ptr<Instance> instance, IndexDataInfo data_info, std::span<const std::byte> data);
+        IndexBuffer(Instance* instance, IndexDataInfo data_info, std::span<const std::byte> data);
 
         ~IndexBuffer() override;
 
@@ -31,7 +31,7 @@ namespace yage::gl::vulkan
         [[nodiscard]] VkBuffer vk_handle() const;
 
     private:
-        std::weak_ptr<Instance> m_instance{};
+        Instance* m_instance; // can be raw pointer, since the resource lives within the store on the instance
         VkDevice m_vk_device;
         VkBuffer m_buffer_handle{};
         VkDeviceMemory m_memory_handle{};
