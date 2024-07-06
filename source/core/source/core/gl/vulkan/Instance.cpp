@@ -48,7 +48,7 @@ namespace yage::gl::vulkan
         m_store_index_buffers->clear();
         m_store_drawables->clear();
 
-        for (auto i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        for (std::size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             vkDestroySemaphore(m_device, m_render_finished_semaphores[i], nullptr);
             vkDestroySemaphore(m_device, m_image_available_semaphores[i], nullptr);
             vkDestroyFence(m_device, m_in_flight_fences[i], nullptr);
@@ -471,28 +471,31 @@ namespace yage::gl::vulkan
 
     void Instance::create_image_views()
     {
-        m_swap_chain_image_views.resize(m_swap_chain_images.size());
+        std::vector<VkImageViewCreateInfo> create_infos;
+        create_infos.resize(m_swap_chain_images.size());
         for (size_t i = 0; i < m_swap_chain_images.size(); i++) {
-            VkImageViewCreateInfo createInfo{};
-            createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-            createInfo.image = m_swap_chain_images[i];
+            VkImageViewCreateInfo create_info{};
+            create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            create_info.image = m_swap_chain_images[i];
 
-            createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-            createInfo.format = m_swap_chain_image_format;
+            create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+            create_info.format = m_swap_chain_image_format;
 
-            createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-            createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-            createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-            createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
 
-            createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            createInfo.subresourceRange.baseMipLevel = 0;
-            createInfo.subresourceRange.levelCount = 1;
-            createInfo.subresourceRange.baseArrayLayer = 0;
-            createInfo.subresourceRange.layerCount = 1;
+            create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            create_info.subresourceRange.baseMipLevel = 0;
+            create_info.subresourceRange.levelCount = 1;
+            create_info.subresourceRange.baseArrayLayer = 0;
+            create_info.subresourceRange.layerCount = 1;
 
-            m_swap_chain_image_views[i] = std::move(m_store_image_views->create(weak_from_this(), createInfo));
+            create_infos[i] = create_info;
         }
+        m_swap_chain_image_view = std::make_shared<ImageViewHandle>(
+                m_store_image_views->create(weak_from_this(), create_infos, ResourceUsage::DYNAMIC, swap_chain_counter()));
     }
 
     VkShaderModule Instance::createShaderModule(const std::vector<std::byte>& code)
@@ -557,12 +560,9 @@ namespace yage::gl::vulkan
     {
         FrameBufferCreator frame_buffer_factory(weak_from_this());
 
-        m_swap_chain_frame_buffers.resize(m_swap_chain_image_views.size());
-        for (size_t i = 0; i < m_swap_chain_image_views.size(); i++) {
-            ImageViewHandle* attachments[] = {&m_swap_chain_image_views[i]};
-            m_swap_chain_frame_buffers[i] = frame_buffer_factory.create(
-                    m_render_pass, attachments, m_swap_chain_extent.width, m_swap_chain_extent.height);
-        }
+        std::array attachments = {m_swap_chain_image_view};
+        m_swap_chain_frame_buffer = frame_buffer_factory.create_swap_chain(
+                m_render_pass, attachments, m_swap_chain_extent.width, m_swap_chain_extent.height);
     }
 
     void Instance::create_command_pool()
@@ -607,7 +607,7 @@ namespace yage::gl::vulkan
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-        for (auto i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        for (std::size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             if (vkCreateSemaphore(m_device, &semaphoreInfo, nullptr, &m_image_available_semaphores[i]) != VK_SUCCESS ||
                 vkCreateSemaphore(m_device, &semaphoreInfo, nullptr, &m_render_finished_semaphores[i]) != VK_SUCCESS ||
                 vkCreateFence(m_device, &fenceInfo, nullptr, &m_in_flight_fences[i]) != VK_SUCCESS) {
@@ -618,11 +618,11 @@ namespace yage::gl::vulkan
 
     void Instance::prepare_frame()
     {
-        vkWaitForFences(m_device, 1, &m_in_flight_fences[m_current_frame], VK_TRUE, UINT64_MAX);
+        vkWaitForFences(m_device, 1, &m_in_flight_fences[m_current_frame_in_flight], VK_TRUE, UINT64_MAX);
 
-        const VkResult result =
-                vkAcquireNextImageKHR(m_device, m_swap_chain, UINT64_MAX, m_image_available_semaphores[m_current_frame],
-                                      VK_NULL_HANDLE, &m_current_swap_chain_image_index);
+        const VkResult result = vkAcquireNextImageKHR(m_device, m_swap_chain, UINT64_MAX,
+                                                      m_image_available_semaphores[m_current_frame_in_flight],
+                                                      VK_NULL_HANDLE, &m_current_swap_chain_image_index);
         if (result == VK_ERROR_OUT_OF_DATE_KHR) {
             recreateSwapChain();
             return;
@@ -633,9 +633,9 @@ namespace yage::gl::vulkan
         }
 
         // Only reset the fence if we are submitting work
-        vkResetFences(m_device, 1, &m_in_flight_fences[m_current_frame]);
+        vkResetFences(m_device, 1, &m_in_flight_fences[m_current_frame_in_flight]);
 
-        vkResetCommandBuffer(m_command_buffers[m_current_frame], 0);
+        vkResetCommandBuffer(m_command_buffers[m_current_frame_in_flight], 0);
     }
 
     void Instance::present_frame()
@@ -643,20 +643,21 @@ namespace yage::gl::vulkan
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        const VkSemaphore waitSemaphores[] = {m_image_available_semaphores[m_current_frame]};
+        const VkSemaphore waitSemaphores[] = {m_image_available_semaphores[m_current_frame_in_flight]};
         constexpr VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
         submitInfo.pWaitDstStageMask = waitStages;
 
         submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &m_command_buffers[m_current_frame];
+        submitInfo.pCommandBuffers = &m_command_buffers[m_current_frame_in_flight];
 
-        const VkSemaphore signalSemaphores[] = {m_render_finished_semaphores[m_current_frame]};
+        const VkSemaphore signalSemaphores[] = {m_render_finished_semaphores[m_current_frame_in_flight]};
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
-        if (vkQueueSubmit(m_graphics_queue, 1, &submitInfo, m_in_flight_fences[m_current_frame]) != VK_SUCCESS) {
+        if (vkQueueSubmit(m_graphics_queue, 1, &submitInfo, m_in_flight_fences[m_current_frame_in_flight]) !=
+            VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to submit draw command buffer!");
         }
 
@@ -680,13 +681,29 @@ namespace yage::gl::vulkan
             throw std::runtime_error("Vulkan: failed to present swap chain image!");
         }
 
-        m_current_frame = (m_current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
+        m_current_frame_in_flight = (m_current_frame_in_flight + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 
     void Instance::flush_resources()
     {
         vkDeviceWaitIdle(m_device);
         cleanupSwapChain();
+    }
+
+    FrameCounter Instance::swap_chain_counter() const
+    {
+        return {
+                .curent_frame_index = &m_current_swap_chain_image_index,
+                .max_frame_index = static_cast<unsigned int>(m_swap_chain_images.size()),
+        };
+    }
+
+    FrameCounter Instance::frames_in_flight_counter() const
+    {
+        return {
+                .curent_frame_index = &m_current_frame_in_flight,
+                .max_frame_index = MAX_FRAMES_IN_FLIGHT,
+        };
     }
 
     VkDevice Instance::device() const
@@ -704,9 +721,9 @@ namespace yage::gl::vulkan
         return m_graphics_queue;
     }
 
-    FrameBuffer& Instance::swap_chain_frame_buffer_for_frame() const
+    FrameBuffer& Instance::swap_chain_frame_buffer() const
     {
-        return m_swap_chain_frame_buffers[m_current_swap_chain_image_index].get<FrameBuffer>();
+        return m_swap_chain_frame_buffer.get<FrameBuffer>();
     }
 
     std::shared_ptr<RenderPassHandle> Instance::swap_chain_render_pass() const
@@ -716,7 +733,7 @@ namespace yage::gl::vulkan
 
     VkCommandBuffer Instance::command_buffer_for_frame() const
     {
-        return m_command_buffers[m_current_frame];
+        return m_command_buffers[m_current_frame_in_flight];
     }
 
     const std::shared_ptr<Store<RenderPass, RenderPass>>& Instance::store_render_passes()
@@ -811,8 +828,6 @@ namespace yage::gl::vulkan
         copy_region.dstOffset = 0; // Optional
         copy_region.size = size;
         vkCmdCopyBuffer(command_buffer, source, destination, 1, &copy_region);
-
-        vkEndCommandBuffer(command_buffer);
 
         end_one_time_command_buffer(command_buffer);
     }
@@ -958,13 +973,9 @@ namespace yage::gl::vulkan
 
     void Instance::cleanupSwapChain()
     {
-        for (auto& frame_buffer: m_swap_chain_frame_buffers) {
-            frame_buffer.reset();
-        }
+        m_swap_chain_frame_buffer.reset();
 
-        for (auto& image_view: m_swap_chain_image_views) {
-            image_view.reset();
-        }
+        m_swap_chain_image_view.reset();
 
         vkDestroySwapchainKHR(m_device, m_swap_chain, nullptr);
     }

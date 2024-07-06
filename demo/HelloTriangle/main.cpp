@@ -82,7 +82,7 @@ int main()
         context->prepare_frame();
 
         renderer.begin_command_buffer();
-        renderer.begin_render_pass(context->swap_chain_frame_buffer_for_frame());
+        renderer.begin_render_pass(context->swap_chain_frame_buffer());
         renderer.bind_pipeline(*graphics_pipeline);
         renderer.draw(*drawable);
         renderer.end_render_pass();

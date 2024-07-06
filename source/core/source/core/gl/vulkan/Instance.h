@@ -7,13 +7,14 @@
 
 #include "../../platform/desktop/GlfwWindow.h"
 #include "../Handle.h"
+#include "Drawable.h"
 #include "FrameBuffer.h"
 #include "FrameBufferCreator.h"
+#include "FrameCounter.h"
 #include "IndexBuffer.h"
 #include "Pipeline.h"
-#include "VertexBuffer.h"
-#include "Drawable.h"
 #include "Texture2D.h"
+#include "VertexBuffer.h"
 
 namespace yage::gl::vulkan
 {
@@ -50,13 +51,17 @@ namespace yage::gl::vulkan
 
         void flush_resources();
 
+        FrameCounter swap_chain_counter() const;
+
+        FrameCounter frames_in_flight_counter() const;
+
         [[nodiscard]] VkDevice device() const;
 
         [[nodiscard]] VkPhysicalDevice physical_device() const;
 
         [[nodiscard]] VkQueue graphics_queue() const;
 
-        [[nodiscard]] FrameBuffer& swap_chain_frame_buffer_for_frame() const;
+        [[nodiscard]] FrameBuffer& swap_chain_frame_buffer() const;
 
         [[nodiscard]] std::shared_ptr<RenderPassHandle> swap_chain_render_pass() const;
 
@@ -86,21 +91,22 @@ namespace yage::gl::vulkan
         void copy_buffer(VkBuffer source, VkBuffer destination, VkDeviceSize size);
 
         void create_image(std::uint32_t width, std::uint32_t height, VkFormat format, VkImageTiling tiling,
-                         VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image,
-                         VkDeviceMemory& image_memory);
+                          VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image,
+                          VkDeviceMemory& image_memory);
 
         VkCommandBuffer begin_one_time_command_buffer();
 
         void end_one_time_command_buffer(VkCommandBuffer command_buffer);
 
-        void transition_image_layout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout);
+        void transition_image_layout(VkImage image, VkFormat format, VkImageLayout old_layout,
+                                     VkImageLayout new_layout);
 
         void copy_buffer_to_image(VkBuffer buffer, VkImage image, std::uint32_t width, std::uint32_t height);
 
     private:
+        const unsigned int MAX_FRAMES_IN_FLIGHT = 2;
         const std::vector<const char*> VALIDATION_LAYERS = {"VK_LAYER_KHRONOS_validation"};
         const std::vector<const char*> DEVICE_EXTENSIONS = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-        const int MAX_FRAMES_IN_FLIGHT = 2;
 
         std::weak_ptr<platform::desktop::GlfwWindow> m_window;
 
@@ -120,12 +126,12 @@ namespace yage::gl::vulkan
 
         std::shared_ptr<RenderPassHandle> m_render_pass;
 
-        std::uint32_t m_current_frame = 0;
-        std::uint32_t m_current_swap_chain_image_index = 0;
+        unsigned int m_current_frame_in_flight = 0;
+        unsigned int m_current_swap_chain_image_index = 0;
 
         std::vector<VkImage> m_swap_chain_images{};
-        std::vector<ImageViewHandle> m_swap_chain_image_views{};
-        std::vector<FrameBufferHandle> m_swap_chain_frame_buffers{};
+        std::shared_ptr<ImageViewHandle> m_swap_chain_image_view{};
+        FrameBufferHandle m_swap_chain_frame_buffer{};
 
         VkCommandPool m_command_pool{};
         std::vector<VkCommandBuffer> m_command_buffers{};

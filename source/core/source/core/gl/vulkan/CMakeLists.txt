@@ -1,5 +1,6 @@
 target_sources(yage_core PRIVATE
         enums.h
+        FrameCounter.h
         Instance.h
         Instance.cpp
 

@@ -9,23 +9,34 @@ namespace yage::gl::vulkan
     }
 
     Handle<IFrameBuffer> FrameBufferCreator::create(std::shared_ptr<Handle<RenderPass>> render_pass,
-                                                                std::span<ImageViewHandle*> attachements,
-                                                                const unsigned int width, const unsigned int height)
+                                                    const std::span<std::shared_ptr<ImageViewHandle>> attachements,
+                                                    const std::uint32_t width, const std::uint32_t height,
+                                                    const ResourceUsage usage)
     {
-        std::vector<VkImageView> vk_attachements;
-        vk_attachements.reserve(attachements.size());
-        std::ranges::transform(attachements, std::back_inserter(vk_attachements),
-                               [](const ImageViewHandle* x) { return x->get<ImageView>().vk_handle(); });
 
-        VkFramebufferCreateInfo framebufferInfo{};
-        framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        framebufferInfo.renderPass = render_pass->get<RenderPass>().vk_handle();
-        framebufferInfo.attachmentCount = vk_attachements.size();
-        framebufferInfo.pAttachments = vk_attachements.data();
-        framebufferInfo.width = width;
-        framebufferInfo.height = height;
-        framebufferInfo.layers = 1;
+        VkFramebufferCreateInfo create_info{};
+        create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        create_info.width = width;
+        create_info.height = height;
+        create_info.layers = 1;
 
-        return m_instance.lock()->store_frame_buffers()->create(m_instance, std::move(render_pass), framebufferInfo);
+        return m_instance.lock()->store_frame_buffers()->create(m_instance, std::move(render_pass), attachements,
+                                                                create_info, usage,
+                                                                m_instance.lock()->frames_in_flight_counter());
+    }
+
+    FrameBufferHandle FrameBufferCreator::create_swap_chain(std::shared_ptr<RenderPassHandle> render_pass,
+                                                            const std::span<std::shared_ptr<ImageViewHandle>> attachements,
+                                                            const std::uint32_t width, const std::uint32_t height)
+    {
+        VkFramebufferCreateInfo create_info{};
+        create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        create_info.width = width;
+        create_info.height = height;
+        create_info.layers = 1;
+
+        return m_instance.lock()->store_frame_buffers()->create(m_instance, std::move(render_pass), attachements,
+                                                                create_info, ResourceUsage::DYNAMIC,
+                                                                m_instance.lock()->swap_chain_counter());
     }
 }

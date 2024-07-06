@@ -171,4 +171,10 @@ namespace yage::gl
         unsigned int width = 0;
         unsigned int height = 0;
     };
+
+    enum class ResourceUsage
+    {
+        STATIC,
+        DYNAMIC
+    };
 }
