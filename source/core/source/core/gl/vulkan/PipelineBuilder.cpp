@@ -21,7 +21,7 @@ namespace yage::gl::vulkan
     {
         destroy_shader_modules();
 
-        VkShaderModule vert_module = create_shader_module(vertex_code);
+        const VkShaderModule vert_module = create_shader_module(vertex_code);
         VkPipelineShaderStageCreateInfo vert_stage_info{};
         vert_stage_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         vert_stage_info.stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -29,7 +29,7 @@ namespace yage::gl::vulkan
         vert_stage_info.pName = "main";
         vert_stage_info.pSpecializationInfo = nullptr; // injection of constants
 
-        VkShaderModule frag_module = create_shader_module(fragment_code);
+        const VkShaderModule frag_module = create_shader_module(fragment_code);
         VkPipelineShaderStageCreateInfo frag_stage_info{};
         frag_stage_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
         frag_stage_info.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -46,6 +46,7 @@ namespace yage::gl::vulkan
     PipelineBuilder& PipelineBuilder::with_rasterizer(const PolygonMode polygon_mode, const CullMode cull_mode,
                                                       const float line_width)
     {
+        m_rasterizer_info = VkPipelineRasterizationStateCreateInfo{};
         m_rasterizer_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 
         m_rasterizer_info.depthClampEnable = VK_FALSE;
@@ -71,11 +72,13 @@ namespace yage::gl::vulkan
         m_vertex_binding_descriptions.clear();
         m_vertex_attribute_descriptions.clear();
 
+        m_input_assembly = VkPipelineInputAssemblyStateCreateInfo{};
         m_input_assembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
         m_input_assembly.topology = convert(topology);
         m_input_assembly.primitiveRestartEnable = VK_FALSE;
 
         if (layout.empty()) {
+            m_vertex_input_info = VkPipelineVertexInputStateCreateInfo{};
             m_vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
             m_vertex_input_info.vertexBindingDescriptionCount = 0;
             m_vertex_input_info.pVertexBindingDescriptions = nullptr;
@@ -119,6 +122,7 @@ namespace yage::gl::vulkan
                 throw std::invalid_argument("Unknown VertexFormat value");
         }
 
+        m_vertex_input_info = VkPipelineVertexInputStateCreateInfo{};
         m_vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
         m_vertex_input_info.vertexBindingDescriptionCount = m_vertex_binding_descriptions.size();
         m_vertex_input_info.pVertexBindingDescriptions = m_vertex_binding_descriptions.data();
@@ -130,6 +134,7 @@ namespace yage::gl::vulkan
 
     PipelineBuilder& PipelineBuilder::with_viewport(const Viewport viewport, const ScissorRectangle scissor)
     {
+        m_viewport = VkViewport{};
         m_viewport.x = viewport.x;
         m_viewport.y = viewport.y;
         m_viewport.width = viewport.width;
@@ -186,6 +191,7 @@ namespace yage::gl::vulkan
 
     PipelineBuilder& PipelineBuilder::with_blending()
     {
+        m_blend_attachment = VkPipelineColorBlendAttachmentState{};
         m_blend_attachment.colorWriteMask =
                 VK_COLOR_COMPONENT_R_BIT |
                 VK_COLOR_COMPONENT_G_BIT |
@@ -214,6 +220,7 @@ namespace yage::gl::vulkan
 
     PipelineBuilder& PipelineBuilder::with_multisampling()
     {
+        m_multisampling_info = VkPipelineMultisampleStateCreateInfo{};
         m_multisampling_info.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
         m_multisampling_info.sampleShadingEnable = VK_FALSE;
         m_multisampling_info.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
@@ -227,6 +234,7 @@ namespace yage::gl::vulkan
 
     PipelineBuilder& PipelineBuilder::with_layout()
     {
+        m_pipeline_layout_info = VkPipelineLayoutCreateInfo{};
         m_pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         m_pipeline_layout_info.setLayoutCount = 0; // Optional
         m_pipeline_layout_info.pSetLayouts = nullptr; // Optional
@@ -240,6 +248,7 @@ namespace yage::gl::vulkan
     {
         m_dynamic_states = {};
 
+        m_dynamic_state = VkPipelineDynamicStateCreateInfo{};
         m_dynamic_state.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
         m_dynamic_state.dynamicStateCount = m_dynamic_states.size();
         m_dynamic_state.pDynamicStates = m_dynamic_states.data();
@@ -249,17 +258,17 @@ namespace yage::gl::vulkan
 
     VkShaderModule PipelineBuilder::create_shader_module(const std::span<const std::byte> code)
     {
-        VkShaderModuleCreateInfo createInfo{};
-        createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        createInfo.codeSize = code.size();
-        createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+        VkShaderModuleCreateInfo create_info{};
+        create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        create_info.codeSize = code.size();
+        create_info.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
-        VkShaderModule shaderModule;
-        if (vkCreateShaderModule(m_instance.lock()->device(), &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+        VkShaderModule shader_module;
+        if (vkCreateShaderModule(m_instance.lock()->device(), &create_info, nullptr, &shader_module) != VK_SUCCESS) {
             throw std::runtime_error("failed to create shader module!");
         }
 
-        return shaderModule;
+        return shader_module;
     }
 
     void PipelineBuilder::destroy_shader_modules()
