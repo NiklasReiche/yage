@@ -63,4 +63,9 @@ namespace yage::gl::vulkan
     {
         return m_vk_handle;
     }
+
+    VkPipelineLayout Pipeline::vk_layout() const
+    {
+        return m_graphics_pipeline_layout;
+    }
 }

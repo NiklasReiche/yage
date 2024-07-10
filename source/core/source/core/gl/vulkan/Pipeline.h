@@ -30,6 +30,8 @@ namespace yage::gl::vulkan
 
         [[nodiscard]] VkPipeline vk_handle() const;
 
+        [[nodiscard]] VkPipelineLayout vk_layout() const;
+
     private:
         Instance* m_instance; // can be raw pointer, since the resource lives within the store on the instance
         VkDevice m_vk_device;

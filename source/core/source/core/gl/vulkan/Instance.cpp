@@ -46,7 +46,11 @@ namespace yage::gl::vulkan
         m_store_render_passes->clear();
         m_store_vertex_buffers->clear();
         m_store_index_buffers->clear();
+        m_store_uniform_buffers->clear();
         m_store_drawables->clear();
+
+        m_descriptor_allocator.value().reset();
+        m_store_descriptor_set_layouts->clear();
 
         for (std::size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             vkDestroySemaphore(m_device, m_render_finished_semaphores[i], nullptr);
@@ -81,6 +85,7 @@ namespace yage::gl::vulkan
         create_command_pool();
         create_command_buffers();
         create_sync_objects();
+        create_descriptor_allocator();
     }
 
     void Instance::create_instance()
@@ -552,8 +557,7 @@ namespace yage::gl::vulkan
         renderPassInfo.dependencyCount = 1;
         renderPassInfo.pDependencies = &dependency;
 
-        m_render_pass =
-                std::make_shared<Handle<RenderPass>>(m_store_render_passes->create(this, renderPassInfo));
+        m_render_pass = std::make_shared<Handle<RenderPass>>(m_store_render_passes->create(this, renderPassInfo));
     }
 
     void Instance::create_framebuffers()
@@ -769,6 +773,11 @@ namespace yage::gl::vulkan
         return m_store_index_buffers;
     }
 
+    const std::shared_ptr<Store<UniformBuffer, UniformBuffer>>& Instance::store_uniform_buffers()
+    {
+        return m_store_uniform_buffers;
+    }
+
     const std::shared_ptr<Store<IDrawable2, Drawable>>& Instance::store_drawables()
     {
         return m_store_drawables;
@@ -777,6 +786,16 @@ namespace yage::gl::vulkan
     const std::shared_ptr<Store<ITexture2D2, Texture2D>>& Instance::store_textures()
     {
         return m_store_textures;
+    }
+
+    const std::shared_ptr<Store<DescriptorSetLayout, DescriptorSetLayout>>& Instance::store_descriptor_set_layouts()
+    {
+        return m_store_descriptor_set_layouts;
+    }
+
+    const DescriptorAllocator& Instance::descriptor_allocator() const
+    {
+        return m_descriptor_allocator.value();
     }
 
     VkCommandPool Instance::command_pool() const
@@ -1008,5 +1027,11 @@ namespace yage::gl::vulkan
         create_swap_chain();
         create_image_views();
         create_framebuffers();
+    }
+
+    void Instance::create_descriptor_allocator()
+    {
+        std::vector<DescriptorAllocator::PoolSizeRatio> sizes = {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}};
+        m_descriptor_allocator = DescriptorAllocator(this, 10, sizes);
     }
 }

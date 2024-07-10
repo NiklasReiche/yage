@@ -43,4 +43,22 @@ target_sources(yage_core PRIVATE
         ImageView.cpp
         Renderer.h
         Renderer.cpp
+
+        DescriptorAllocator.h
+        DescriptorAllocator.cpp
+
+        DescriptorSet.h
+        DescriptorSet.cpp
+        DescriptorSetCreator.h
+        DescriptorSetCreator.cpp
+
+        DescriptorSetLayout.h
+        DescriptorSetLayout.cpp
+        DescriptorSetLayoutBuilder.h
+        DescriptorSetLayoutBuilder.cpp
+
+        UniformBuffer.h
+        UniformBuffer.cpp
+        UniformBufferCreator.h
+        UniformBufferCreator.cpp
 )

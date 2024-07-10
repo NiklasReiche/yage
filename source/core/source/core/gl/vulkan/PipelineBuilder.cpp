@@ -166,7 +166,6 @@ namespace yage::gl::vulkan
         with_blending();
         with_multisampling();
         with_dynamic_state();
-        with_layout();
 
         VkGraphicsPipelineCreateInfo pipeline_info{};
         pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -232,12 +231,13 @@ namespace yage::gl::vulkan
         return *this;
     }
 
-    PipelineBuilder& PipelineBuilder::with_layout()
+    PipelineBuilder& PipelineBuilder::with_layout(const std::shared_ptr<Handle<DescriptorSetLayout>>& layout)
     {
+        // TODO: give ownership to pipeline of descriptor layout
         m_pipeline_layout_info = VkPipelineLayoutCreateInfo{};
         m_pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        m_pipeline_layout_info.setLayoutCount = 0; // Optional
-        m_pipeline_layout_info.pSetLayouts = nullptr; // Optional
+        m_pipeline_layout_info.setLayoutCount = 1;
+        m_pipeline_layout_info.pSetLayouts = &layout->get<DescriptorSetLayout>().vk_handle();
         m_pipeline_layout_info.pushConstantRangeCount = 0; // Optional
         m_pipeline_layout_info.pPushConstantRanges = nullptr; // Optional
 

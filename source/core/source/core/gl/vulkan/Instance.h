@@ -7,6 +7,8 @@
 
 #include "../../platform/desktop/GlfwWindow.h"
 #include "../Handle.h"
+#include "DescriptorAllocator.h"
+#include "DescriptorSetLayout.h"
 #include "Drawable.h"
 #include "FrameBuffer.h"
 #include "FrameBufferCreator.h"
@@ -18,6 +20,8 @@
 
 namespace yage::gl::vulkan
 {
+    class DescriptorSet;
+
     struct QueueFamilyIndices
     {
         std::optional<uint32_t> graphicsFamily;
@@ -79,9 +83,15 @@ namespace yage::gl::vulkan
 
         const std::shared_ptr<Store<IIndexBuffer, IndexBuffer>>& store_index_buffers();
 
+        const std::shared_ptr<Store<UniformBuffer, UniformBuffer>>& store_uniform_buffers();
+
         const std::shared_ptr<Store<IDrawable2, Drawable>>& store_drawables();
 
         const std::shared_ptr<Store<ITexture2D2, Texture2D>>& store_textures();
+
+        const std::shared_ptr<Store<DescriptorSetLayout, DescriptorSetLayout>>& store_descriptor_set_layouts();
+
+        const DescriptorAllocator& descriptor_allocator() const;
 
         [[nodiscard]] VkCommandPool command_pool() const;
 
@@ -145,6 +155,7 @@ namespace yage::gl::vulkan
 
         bool m_framebuffer_resized = false;
 
+        std::optional<DescriptorAllocator> m_descriptor_allocator;
         std::shared_ptr<Store<RenderPass, RenderPass>> m_store_render_passes =
                 std::make_shared<Store<RenderPass, RenderPass>>();
         std::shared_ptr<Store<ImageView, ImageView>> m_store_image_views =
@@ -155,11 +166,15 @@ namespace yage::gl::vulkan
                 std::make_shared<Store<IVertexBuffer, VertexBuffer>>();
         std::shared_ptr<Store<IIndexBuffer, IndexBuffer>> m_store_index_buffers =
                 std::make_shared<Store<IIndexBuffer, IndexBuffer>>();
+        std::shared_ptr<Store<UniformBuffer, UniformBuffer>> m_store_uniform_buffers =
+                std::make_shared<Store<UniformBuffer, UniformBuffer>>();
         std::shared_ptr<Store<IDrawable2, Drawable>> m_store_drawables =
                 std::make_shared<Store<IDrawable2, Drawable>>();
         std::shared_ptr<Store<ITexture2D2, Texture2D>> m_store_textures =
                 std::make_shared<Store<ITexture2D2, Texture2D>>();
         std::shared_ptr<Store<Pipeline, Pipeline>> m_store_pipelines = std::make_shared<Store<Pipeline, Pipeline>>();
+        std::shared_ptr<Store<DescriptorSetLayout, DescriptorSetLayout>> m_store_descriptor_set_layouts =
+                std::make_shared<Store<DescriptorSetLayout, DescriptorSetLayout>>();
 
         void create_instance();
 
@@ -215,5 +230,7 @@ namespace yage::gl::vulkan
         void cleanupSwapChain();
 
         void recreateSwapChain();
+
+        void create_descriptor_allocator();
     };
 }

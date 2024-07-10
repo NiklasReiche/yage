@@ -2,9 +2,10 @@
 
 #include <vulkan/vulkan.h>
 
+#include "../IDrawable.h"
+#include "DescriptorSet.h"
 #include "FrameBuffer.h"
 #include "Pipeline.h"
-#include "../IDrawable.h"
 
 namespace yage::gl::vulkan
 {
@@ -19,7 +20,7 @@ namespace yage::gl::vulkan
 
         void begin_render_pass(const FrameBuffer& frame_buffer);
 
-        void bind_pipeline(const Pipeline& pipeline);
+        void bind_pipeline(const Pipeline& pipeline, const DescriptorSet& descriptor_set);
 
         void draw(const IDrawable2& drawable);
 

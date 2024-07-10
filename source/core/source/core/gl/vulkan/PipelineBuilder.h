@@ -6,6 +6,7 @@
 
 #include "../DrawableCreator.h"
 #include "../enums.h"
+#include "DescriptorSetLayout.h"
 #include "FrameBuffer.h"
 #include "Pipeline.h"
 
@@ -38,6 +39,8 @@ namespace yage::gl::vulkan
 
         PipelineBuilder& with_render_pass(std::shared_ptr<RenderPassHandle> render_pass);
 
+        PipelineBuilder& with_layout(const std::shared_ptr<Handle<DescriptorSetLayout>>& layout);
+
         PipelineHandle build();
 
     private:
@@ -69,8 +72,6 @@ namespace yage::gl::vulkan
         PipelineBuilder& with_blending();
 
         PipelineBuilder& with_multisampling();
-
-        PipelineBuilder& with_layout();
 
         PipelineBuilder& with_dynamic_state();
 
