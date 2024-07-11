@@ -12,7 +12,7 @@ namespace yage::gl
     public:
         virtual ~ITexture2DCreator() = default;
 
-        [[nodiscard]] virtual Texture2DHandle create(const PixelTransferInfo& data_info,
-                                                     std::span<const std::byte> data) const = 0;
+        [[nodiscard]] virtual Texture2DHandle create(const TextureSampler& sampler, const PixelTransferInfo& data_info,
+                                                     std::span<const std::byte> data, ResourceUsage usage) const = 0;
     };
 }

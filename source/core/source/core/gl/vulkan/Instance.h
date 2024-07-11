@@ -121,6 +121,10 @@ namespace yage::gl::vulkan
                           VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image,
                           VkDeviceMemory& image_memory);
 
+        VkImageView create_image_view(VkImage image, VkFormat format);
+
+        VkSampler create_texture_sampler(const TextureSampler& sampler);
+
         VkCommandBuffer begin_one_time_command_buffer();
 
         void end_one_time_command_buffer(VkCommandBuffer command_buffer);
@@ -224,7 +228,7 @@ namespace yage::gl::vulkan
 
         void create_swap_chain();
 
-        void create_image_views();
+        void create_swap_chain_image_views();
 
         VkShaderModule createShaderModule(const std::vector<std::byte>& code);
 

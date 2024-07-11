@@ -177,4 +177,30 @@ namespace yage::gl
         STATIC,
         DYNAMIC
     };
+
+    enum class TextureWrapper2
+    {
+        CLAMP_TO_EDGE,
+        CLAMP_TO_BORDER,
+        REPEAT,
+        MIRRORED_REPEAT
+    };
+
+    enum class TextureFilter2
+    {
+        NEAREST,
+        LINEAR
+    };
+
+    struct TextureSampler
+    {
+        TextureFilter2 min_filter;
+        TextureFilter2 mag_filter;
+
+        TextureWrapper2 u_wrapper;
+        TextureWrapper2 v_wrapper;
+        TextureWrapper2 w_wrapper;
+
+        // TODO: border color
+    };
 }

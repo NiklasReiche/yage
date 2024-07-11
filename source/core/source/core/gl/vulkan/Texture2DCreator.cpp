@@ -9,10 +9,19 @@ namespace yage::gl::vulkan
     {
     }
 
-    Texture2DHandle Texture2DCreator::create(const PixelTransferInfo& data_info,
-                                             const std::span<const std::byte> data) const
+    Texture2DHandle Texture2DCreator::create(const TextureSampler& sampler, const PixelTransferInfo& data_info,
+                                             const std::span<const std::byte> data, const ResourceUsage usage) const
     {
         const auto instance = m_instance.lock();
-        return instance->store_textures().create(instance.get(), data_info, data);
+
+        FrameCounter frame_counter{};
+        switch (usage) {
+            case ResourceUsage::STATIC:  frame_counter = m_instance.lock()->static_counter(); break;
+            case ResourceUsage::DYNAMIC: frame_counter = m_instance.lock()->frames_in_flight_counter(); break;
+
+            default: throw std::invalid_argument("unkown ResourceUsage value");
+        }
+
+        return instance->store_textures().create(instance.get(), frame_counter, sampler, data_info, data);
     }
 }

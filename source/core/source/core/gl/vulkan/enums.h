@@ -167,4 +167,26 @@ namespace yage::gl::vulkan
             default: throw std::invalid_argument("Unknown ImageFormat value");
         }
     }
+
+    inline VkFilter convert(const TextureFilter2 filter)
+    {
+        switch (filter) {
+            case TextureFilter2::NEAREST: return VK_FILTER_NEAREST;
+            case TextureFilter2::LINEAR:  return VK_FILTER_LINEAR;
+
+            default: throw std::invalid_argument("unknown TextureFilter value");
+        }
+    }
+
+    inline VkSamplerAddressMode convert(const TextureWrapper2 wrapper)
+    {
+        switch (wrapper) {
+            case TextureWrapper2::REPEAT:          return VK_SAMPLER_ADDRESS_MODE_REPEAT;
+            case TextureWrapper2::MIRRORED_REPEAT: return VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT;
+            case TextureWrapper2::CLAMP_TO_EDGE:   return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+            case TextureWrapper2::CLAMP_TO_BORDER: return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+
+            default: throw std::invalid_argument("unknown TextureWrapper value");
+        }
+    }
 }

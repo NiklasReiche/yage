@@ -20,6 +20,8 @@ namespace yage::gl::vulkan
 
         DescriptorSetLayoutBuilder& with_uniform_buffer_array_at(unsigned int binding, std::uint32_t count);
 
+        IDescriptorSetLayoutBuilder& with_texture_sampler_at(unsigned int binding) override;
+
         DescriptorSetLayoutHandle build() override;
 
         void clear() override;

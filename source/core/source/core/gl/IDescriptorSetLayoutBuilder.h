@@ -11,6 +11,8 @@ namespace yage::gl
 
         virtual IDescriptorSetLayoutBuilder& with_uniform_buffer_at(unsigned int binding) = 0;
 
+        virtual IDescriptorSetLayoutBuilder& with_texture_sampler_at(unsigned int binding) = 0;
+
         virtual DescriptorSetLayoutHandle build() = 0;
 
         virtual void clear() = 0;

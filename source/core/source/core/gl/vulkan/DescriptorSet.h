@@ -28,6 +28,8 @@ namespace yage::gl::vulkan
 
         void write(unsigned int binding, const UniformBufferHandle& uniform_buffer) override;
 
+        void write(unsigned int binding, const Texture2DHandle& texture_2d) override;
+
         [[nodiscard]] const VkDescriptorSet& vk_handle() const;
 
         [[nodiscard]] VkDescriptorSetLayout vk_layout() const;
@@ -42,5 +44,6 @@ namespace yage::gl::vulkan
         // dependant resources
         DescriptorSetLayoutHandle m_layout;
         std::unordered_map<std::uint32_t, UniformBufferHandle> m_bound_uniform_buffers;
+        std::unordered_map<std::uint32_t, Texture2DHandle> m_bound_textures_2d;
     };
 }

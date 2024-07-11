@@ -6,6 +6,8 @@
 #include <set>
 #include <utility>
 
+#include "enums.h"
+
 namespace yage::gl::vulkan
 {
     VkResult CreateDebugUtilsMessengerEXT(const VkInstance instance,
@@ -79,7 +81,7 @@ namespace yage::gl::vulkan
         pick_physical_device();
         create_logical_device();
         create_swap_chain();
-        create_image_views();
+        create_swap_chain_image_views();
         create_swap_chain_render_pass();
         create_framebuffers();
         create_command_pool();
@@ -256,7 +258,10 @@ namespace yage::gl::vulkan
             swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
         }
 
-        return indices.is_complete() && extensionsSupported && swapChainAdequate;
+        VkPhysicalDeviceFeatures supportedFeatures;
+        vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
+
+        return indices.is_complete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
     }
 
     QueueFamilyIndices Instance::findQueueFamilies(const VkPhysicalDevice device)
@@ -307,6 +312,7 @@ namespace yage::gl::vulkan
         }
 
         VkPhysicalDeviceFeatures deviceFeatures{};
+        deviceFeatures.samplerAnisotropy = VK_TRUE;
 
         VkDeviceCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -474,7 +480,7 @@ namespace yage::gl::vulkan
         m_swap_chain_extent = extent;
     }
 
-    void Instance::create_image_views()
+    void Instance::create_swap_chain_image_views()
     {
         std::vector<VkImageViewCreateInfo> create_infos;
         create_infos.resize(m_swap_chain_images.size());
@@ -499,8 +505,7 @@ namespace yage::gl::vulkan
 
             create_infos[i] = create_info;
         }
-        m_swap_chain_image_view =
-                m_store_image_views->create(this, create_infos, swap_chain_counter());
+        m_swap_chain_image_view = m_store_image_views->create(this, create_infos, swap_chain_counter());
     }
 
     VkShaderModule Instance::createShaderModule(const std::vector<std::byte>& code)
@@ -899,6 +904,60 @@ namespace yage::gl::vulkan
         vkBindImageMemory(m_device, image, image_memory, 0);
     }
 
+    VkImageView Instance::create_image_view(const VkImage image, const VkFormat format)
+    {
+        VkImageViewCreateInfo create_info{};
+        create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        create_info.image = image;
+        create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        create_info.format = format;
+        create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        create_info.subresourceRange.baseMipLevel = 0;
+        create_info.subresourceRange.levelCount = 1;
+        create_info.subresourceRange.baseArrayLayer = 0;
+        create_info.subresourceRange.layerCount = 1;
+
+        VkImageView image_view;
+        if (vkCreateImageView(m_device, &create_info, nullptr, &image_view) != VK_SUCCESS) {
+            throw std::runtime_error("Vulkan: failed to create image view!");
+        }
+        return image_view;
+    }
+
+    VkSampler Instance::create_texture_sampler(const TextureSampler& sampler)
+    {
+        VkSamplerCreateInfo samplerInfo{};
+        samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+        samplerInfo.magFilter = convert(sampler.mag_filter);
+        samplerInfo.minFilter = convert(sampler.min_filter);
+        samplerInfo.addressModeU = convert(sampler.u_wrapper);
+        samplerInfo.addressModeV = convert(sampler.v_wrapper);
+        samplerInfo.addressModeW = convert(sampler.w_wrapper);
+
+        VkPhysicalDeviceProperties properties{};
+        vkGetPhysicalDeviceProperties(m_physical_device, &properties);
+        samplerInfo.anisotropyEnable = VK_TRUE;
+        samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+
+        samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK; // TODO
+
+        samplerInfo.unnormalizedCoordinates = VK_FALSE;
+
+        samplerInfo.compareEnable = VK_FALSE;
+        samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+
+        samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+        samplerInfo.mipLodBias = 0.0f;
+        samplerInfo.minLod = 0.0f;
+        samplerInfo.maxLod = 0.0f;
+
+        VkSampler texture_sampler;
+        if (vkCreateSampler(m_device, &samplerInfo, nullptr, &texture_sampler) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create texture sampler!");
+        }
+        return texture_sampler;
+    }
+
     VkCommandBuffer Instance::begin_one_time_command_buffer()
     {
         VkCommandBufferAllocateInfo alloc_info{};
@@ -1025,13 +1084,14 @@ namespace yage::gl::vulkan
         cleanupSwapChain();
 
         create_swap_chain();
-        create_image_views();
+        create_swap_chain_image_views();
         create_framebuffers();
     }
 
     void Instance::create_descriptor_allocator()
     {
-        std::vector<DescriptorAllocator::PoolSizeRatio> sizes = {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}};
+        std::vector<DescriptorAllocator::PoolSizeRatio> sizes = {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0.5},
+                                                                 {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0.5}};
         m_descriptor_allocator = DescriptorAllocator(this, 10, sizes);
     }
 }

@@ -4,38 +4,48 @@
 
 namespace yage::gl::vulkan
 {
-    Texture2D::Texture2D(Instance* instance, const PixelTransferInfo& data_info,
-                         const std::span<const std::byte> data)
+    Texture2D::Texture2D(Instance* instance, const FrameCounter frame_counter, const TextureSampler& sampler,
+                         const PixelTransferInfo& data_info, const std::span<const std::byte> data)
         : m_instance(instance),
-          m_vk_device(m_instance->device())
+          m_vk_device(m_instance->device()),
+          m_frame_counter(frame_counter)
     {
         const VkDeviceSize buffer_size = data.size();
 
         VkBuffer staging_buffer;
         VkDeviceMemory staging_buffer_memory;
         m_instance->create_buffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                                     staging_buffer, staging_buffer_memory);
+                                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                  staging_buffer, staging_buffer_memory);
 
-        void* mapped_data;
-        vkMapMemory(m_vk_device, staging_buffer_memory, 0, buffer_size, 0, &mapped_data);
-        memcpy(mapped_data, data.data(), buffer_size);
-        vkUnmapMemory(m_vk_device, staging_buffer_memory);
+        m_vk_images.resize(m_frame_counter.max_frame_index);
+        m_vk_image_views.resize(m_frame_counter.max_frame_index);
+        m_vk_memories.resize(m_frame_counter.max_frame_index);
 
-        const VkFormat vk_image_format = convert(data_info.image_format);
+        for (unsigned int i = 0; i < m_frame_counter.max_frame_index; ++i) {
+            void* mapped_data;
+            vkMapMemory(m_vk_device, staging_buffer_memory, 0, buffer_size, 0, &mapped_data);
+            memcpy(mapped_data, data.data(), buffer_size);
+            vkUnmapMemory(m_vk_device, staging_buffer_memory);
 
-        m_instance->create_image(data_info.width, data_info.height, vk_image_format, VK_IMAGE_TILING_OPTIMAL,
-                                    VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-                                    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_image_handle, m_memory_handle);
+            const VkFormat vk_image_format = convert(data_info.image_format);
 
-        m_instance->transition_image_layout(m_image_handle, vk_image_format, VK_IMAGE_LAYOUT_UNDEFINED,
-                                               VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+            m_instance->create_image(data_info.width, data_info.height, vk_image_format, VK_IMAGE_TILING_OPTIMAL,
+                                     VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                                     VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_vk_images[i], m_vk_memories[i]);
 
-        m_instance->copy_buffer_to_image(staging_buffer, m_image_handle, data_info.width, data_info.height);
+            m_instance->transition_image_layout(m_vk_images[i], vk_image_format, VK_IMAGE_LAYOUT_UNDEFINED,
+                                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
-        m_instance->transition_image_layout(m_image_handle, vk_image_format,
-                                               VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                                               VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            m_instance->copy_buffer_to_image(staging_buffer, m_vk_images[i], data_info.width, data_info.height);
+
+            m_instance->transition_image_layout(m_vk_images[i], vk_image_format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+            m_vk_image_views[i] = instance->create_image_view(m_vk_images[i], vk_image_format);
+        }
+
+        m_vk_sampler = instance->create_texture_sampler(sampler);
 
         vkDestroyBuffer(m_vk_device, staging_buffer, nullptr);
         vkFreeMemory(m_vk_device, staging_buffer_memory, nullptr);
@@ -43,21 +53,28 @@ namespace yage::gl::vulkan
 
     Texture2D::~Texture2D()
     {
-        if (m_image_handle != VK_NULL_HANDLE) {
-            vkDestroyImage(m_vk_device, m_image_handle, nullptr);
-            vkFreeMemory(m_vk_device, m_memory_handle, nullptr);
+        for (unsigned int i = 0; i < m_frame_counter.max_frame_index; ++i) {
+            vkDestroySampler(m_vk_device, m_vk_sampler, nullptr);
+            vkDestroyImageView(m_vk_device, m_vk_image_views[i], nullptr);
+            vkDestroyImage(m_vk_device, m_vk_images[i], nullptr);
+            vkFreeMemory(m_vk_device, m_vk_memories[i], nullptr);
         }
     }
 
     Texture2D::Texture2D(Texture2D&& other) noexcept
         : m_instance(other.m_instance),
           m_vk_device(other.m_vk_device),
-          m_image_handle(other.m_image_handle),
-          m_memory_handle(other.m_memory_handle)
+          m_frame_counter(other.m_frame_counter),
+          m_vk_memories(std::move(other.m_vk_memories)),
+          m_vk_images(std::move(other.m_vk_images)),
+          m_vk_image_views(std::move(other.m_vk_image_views)),
+          m_vk_sampler(other.m_vk_sampler)
     {
         other.m_vk_device = VK_NULL_HANDLE;
-        other.m_image_handle = VK_NULL_HANDLE;
-        other.m_memory_handle = VK_NULL_HANDLE;
+        other.m_vk_images.clear();
+        other.m_vk_memories.clear();
+        other.m_vk_image_views.clear();
+        other.m_vk_sampler = VK_NULL_HANDLE;
     }
 
     Texture2D& Texture2D::operator=(Texture2D&& other) noexcept
@@ -67,13 +84,38 @@ namespace yage::gl::vulkan
 
         m_instance = other.m_instance;
         m_vk_device = other.m_vk_device;
-        m_image_handle = other.m_image_handle;
-        m_memory_handle = other.m_memory_handle;
+        m_frame_counter = other.m_frame_counter;
+        m_vk_memories = std::move(other.m_vk_memories);
+        m_vk_images = std::move(other.m_vk_images);
+        m_vk_image_views = std::move(other.m_vk_image_views);
+        m_vk_sampler = other.m_vk_sampler;
 
         other.m_vk_device = VK_NULL_HANDLE;
-        other.m_image_handle = VK_NULL_HANDLE;
-        other.m_memory_handle = VK_NULL_HANDLE;
+        other.m_vk_images.clear();
+        other.m_vk_memories.clear();
+        other.m_vk_image_views.clear();
+        other.m_vk_sampler = VK_NULL_HANDLE;
 
         return *this;
+    }
+
+    VkSampler Texture2D::vk_sampler() const
+    {
+        return m_vk_sampler;
+    }
+
+    std::vector<VkDescriptorImageInfo> Texture2D::descriptor_info() const
+    {
+        std::vector<VkDescriptorImageInfo> image_infos;
+        image_infos.reserve(m_frame_counter.max_frame_index);
+        for (unsigned int i = 0; i < m_frame_counter.max_frame_index; ++i) {
+            VkDescriptorImageInfo info{};
+            info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            info.imageView = m_vk_image_views[i];
+            info.sampler = m_vk_sampler;
+
+            image_infos.push_back(info);
+        }
+        return image_infos;
     }
 }

@@ -11,8 +11,8 @@ namespace yage::gl::vulkan
     public:
         explicit Texture2DCreator(std::weak_ptr<Instance> instance);
 
-        [[nodiscard]] Texture2DHandle create(const PixelTransferInfo& data_info,
-                                             std::span<const std::byte> data) const override;
+        [[nodiscard]] Texture2DHandle create(const TextureSampler& sampler, const PixelTransferInfo& data_info,
+                                             std::span<const std::byte> data, ResourceUsage usage) const override;
 
     private:
         std::weak_ptr<Instance> m_instance; // cannot be raw pointer, since the creator might outlive the instance

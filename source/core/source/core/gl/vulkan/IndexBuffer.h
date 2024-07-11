@@ -34,7 +34,7 @@ namespace yage::gl::vulkan
         Instance* m_instance; // can be raw pointer, since the resource lives within the store on the instance
         VkDevice m_vk_device;
         VkBuffer m_buffer_handle{};
-        VkDeviceMemory m_memory_handle{};
+        VkDeviceMemory m_memory_handle{}; // TODO: multi-buffering
         std::size_t m_index_count = 0;
     };
 }

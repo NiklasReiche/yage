@@ -13,7 +13,8 @@ namespace yage::gl::vulkan
         return with_uniform_buffer_array_at(binding, 1);
     }
 
-    DescriptorSetLayoutBuilder& DescriptorSetLayoutBuilder::with_uniform_buffer_array_at(const unsigned int binding, const std::uint32_t count)
+    DescriptorSetLayoutBuilder& DescriptorSetLayoutBuilder::with_uniform_buffer_array_at(const unsigned int binding,
+                                                                                         const std::uint32_t count)
     {
         VkDescriptorSetLayoutBinding ubo_layout_binding{};
         ubo_layout_binding.binding = static_cast<std::uint32_t>(binding);
@@ -23,6 +24,20 @@ namespace yage::gl::vulkan
         ubo_layout_binding.pImmutableSamplers = nullptr; // Optional
 
         m_bindings.push_back(ubo_layout_binding);
+
+        return *this;
+    }
+
+    IDescriptorSetLayoutBuilder& DescriptorSetLayoutBuilder::with_texture_sampler_at(const unsigned int binding)
+    {
+        VkDescriptorSetLayoutBinding sampler_layout_binding{};
+        sampler_layout_binding.binding = static_cast<std::uint32_t>(binding);
+        sampler_layout_binding.descriptorCount = 1;
+        sampler_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        sampler_layout_binding.pImmutableSamplers = nullptr;
+        sampler_layout_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT; // TODO
+
+        m_bindings.push_back(sampler_layout_binding);
 
         return *this;
     }
