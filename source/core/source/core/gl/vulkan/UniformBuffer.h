@@ -4,22 +4,23 @@
 
 #include <vulkan/vulkan.h>
 
+#include "../IUniformBuffer.h"
 #include "FrameCounter.h"
 
 namespace yage::gl::vulkan
 {
     class Instance;
 
-    class UniformBuffer final
+    class UniformBuffer final : public IUniformBuffer
     {
     public:
         UniformBuffer(Instance* m_instance, FrameCounter frame_counter, std::size_t data_byte_size);
 
-        ~UniformBuffer();
+        ~UniformBuffer() override;
 
-        void update_data(std::size_t size, const void* data);
+        void update_data(std::size_t size, const void* data) override;
 
-        void update_sub_data(std::size_t offset, std::size_t size, const void* data);
+        void update_sub_data(std::size_t byte_offset, std::size_t byte_size, const void* data) override;
 
         [[nodiscard]] std::vector<VkDescriptorBufferInfo> descriptor_info() const;
 

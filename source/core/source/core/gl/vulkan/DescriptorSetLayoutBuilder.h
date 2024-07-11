@@ -4,29 +4,31 @@
 #include <vector>
 
 #include "../Handle.h"
+#include "../IDescriptorSetLayoutBuilder.h"
 #include "DescriptorSet.h"
 
 namespace yage::gl::vulkan
 {
     class Instance;
 
-    class DescriptorSetLayoutBuilder
+    class DescriptorSetLayoutBuilder final : public IDescriptorSetLayoutBuilder
     {
     public:
         explicit DescriptorSetLayoutBuilder(std::weak_ptr<Instance> instance);
 
-        DescriptorSetLayoutBuilder& with_uniform_buffer();
+        IDescriptorSetLayoutBuilder& with_uniform_buffer_at(unsigned int binding) override;
 
-        DescriptorSetLayoutBuilder& with_uniform_buffer_array(std::uint32_t count);
+        DescriptorSetLayoutBuilder& with_uniform_buffer_array_at(unsigned int binding, std::uint32_t count);
 
-        Handle<DescriptorSetLayout> build();
+        DescriptorSetLayoutHandle build() override;
 
-        void clear();
+        DescriptorSetLayoutSharedHandle build_shared() override;
+
+        void clear() override;
 
     private:
         std::weak_ptr<Instance> m_instance;
 
-        std::uint32_t m_binding_number = 0;
         std::vector<VkDescriptorSetLayoutBinding> m_bindings;
         VkDescriptorSetLayoutCreateInfo m_create_info{};
     };

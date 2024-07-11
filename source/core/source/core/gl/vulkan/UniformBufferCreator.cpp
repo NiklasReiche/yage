@@ -8,7 +8,7 @@ namespace yage::gl::vulkan
     {
     }
 
-    Handle<UniformBuffer> UniformBufferCreator::create(std::uint32_t size, const ResourceUsage usage) const
+    Handle<IUniformBuffer> UniformBufferCreator::create(std::size_t size, const ResourceUsage usage) const
     {
         const auto instance = m_instance.lock();
 
@@ -20,6 +20,6 @@ namespace yage::gl::vulkan
             default: throw std::invalid_argument("unknown ResourceUsage value");
         }
 
-        return instance->store_uniform_buffers()->create(instance.get(), frame_counter, size);
+        return instance->store_uniform_buffers().create(instance.get(), frame_counter, size);
     }
 }

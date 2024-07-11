@@ -13,6 +13,6 @@ namespace yage::gl::vulkan
                                                  const std::span<const std::byte> data) const
     {
         const auto instance = m_instance.lock();
-        return instance->store_textures()->create(instance.get(), data_info, data);
+        return instance->store_textures().create(instance.get(), data_info, data);
     }
 }

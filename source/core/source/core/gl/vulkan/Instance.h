@@ -16,10 +16,25 @@
 #include "IndexBuffer.h"
 #include "Pipeline.h"
 #include "Texture2D.h"
+#include "UniformBuffer.h"
 #include "VertexBuffer.h"
 
 namespace yage::gl::vulkan
 {
+    using UniformBufferStore = Store<IUniformBuffer, UniformBuffer>;
+    using VertexBufferStore = Store<IVertexBuffer, VertexBuffer>;
+    using IndexBufferStore = Store<IIndexBuffer, IndexBuffer>;
+    using FrameBufferStore = Store<IFrameBuffer, FrameBuffer>;
+
+    using ImageViewStore = Store<ImageView, ImageView>;
+    using Texture2DStore = Store<ITexture2D2, Texture2D>;
+
+    using DrawableStore = Store<IDrawable2, Drawable>;
+
+    using DescriptorSetLayoutStore = Store<IDescriptorSetLayout, DescriptorSetLayout>;
+    using RenderPassStore = Store<RenderPass, RenderPass>;
+    using PipelineStore = Store<Pipeline, Pipeline>;
+
     class DescriptorSet;
 
     struct QueueFamilyIndices
@@ -73,25 +88,25 @@ namespace yage::gl::vulkan
 
         [[nodiscard]] VkCommandBuffer command_buffer_for_frame() const;
 
-        const std::shared_ptr<Store<RenderPass, RenderPass>>& store_render_passes();
+        RenderPassStore& store_render_passes();
 
-        const std::shared_ptr<Store<IFrameBuffer, FrameBuffer>>& store_frame_buffers();
+        FrameBufferStore& store_frame_buffers();
 
-        const std::shared_ptr<Store<Pipeline, Pipeline>>& store_pipelines();
+        PipelineStore& store_pipelines();
 
-        const std::shared_ptr<Store<IVertexBuffer, VertexBuffer>>& store_vertex_buffers();
+        VertexBufferStore& store_vertex_buffers();
 
-        const std::shared_ptr<Store<IIndexBuffer, IndexBuffer>>& store_index_buffers();
+        IndexBufferStore& store_index_buffers();
 
-        const std::shared_ptr<Store<UniformBuffer, UniformBuffer>>& store_uniform_buffers();
+        UniformBufferStore& store_uniform_buffers();
 
-        const std::shared_ptr<Store<IDrawable2, Drawable>>& store_drawables();
+        DrawableStore& store_drawables();
 
-        const std::shared_ptr<Store<ITexture2D2, Texture2D>>& store_textures();
+        Texture2DStore& store_textures();
 
-        const std::shared_ptr<Store<DescriptorSetLayout, DescriptorSetLayout>>& store_descriptor_set_layouts();
+        DescriptorSetLayoutStore& store_descriptor_set_layouts();
 
-        const DescriptorAllocator& descriptor_allocator() const;
+        DescriptorAllocator& descriptor_allocator();
 
         [[nodiscard]] VkCommandPool command_pool() const;
 
@@ -156,25 +171,21 @@ namespace yage::gl::vulkan
         bool m_framebuffer_resized = false;
 
         std::optional<DescriptorAllocator> m_descriptor_allocator;
-        std::shared_ptr<Store<RenderPass, RenderPass>> m_store_render_passes =
-                std::make_shared<Store<RenderPass, RenderPass>>();
-        std::shared_ptr<Store<ImageView, ImageView>> m_store_image_views =
-                std::make_shared<Store<ImageView, ImageView>>();
-        std::shared_ptr<Store<IFrameBuffer, FrameBuffer>> m_store_frame_buffers =
-                std::make_shared<Store<IFrameBuffer, FrameBuffer>>();
-        std::shared_ptr<Store<IVertexBuffer, VertexBuffer>> m_store_vertex_buffers =
-                std::make_shared<Store<IVertexBuffer, VertexBuffer>>();
-        std::shared_ptr<Store<IIndexBuffer, IndexBuffer>> m_store_index_buffers =
-                std::make_shared<Store<IIndexBuffer, IndexBuffer>>();
-        std::shared_ptr<Store<UniformBuffer, UniformBuffer>> m_store_uniform_buffers =
-                std::make_shared<Store<UniformBuffer, UniformBuffer>>();
-        std::shared_ptr<Store<IDrawable2, Drawable>> m_store_drawables =
-                std::make_shared<Store<IDrawable2, Drawable>>();
-        std::shared_ptr<Store<ITexture2D2, Texture2D>> m_store_textures =
-                std::make_shared<Store<ITexture2D2, Texture2D>>();
-        std::shared_ptr<Store<Pipeline, Pipeline>> m_store_pipelines = std::make_shared<Store<Pipeline, Pipeline>>();
-        std::shared_ptr<Store<DescriptorSetLayout, DescriptorSetLayout>> m_store_descriptor_set_layouts =
-                std::make_shared<Store<DescriptorSetLayout, DescriptorSetLayout>>();
+
+        std::shared_ptr<FrameBufferStore> m_store_frame_buffers = std::make_shared<FrameBufferStore>();
+        std::shared_ptr<VertexBufferStore> m_store_vertex_buffers = std::make_shared<VertexBufferStore>();
+        std::shared_ptr<IndexBufferStore> m_store_index_buffers = std::make_shared<IndexBufferStore>();
+        std::shared_ptr<UniformBufferStore> m_store_uniform_buffers = std::make_shared<UniformBufferStore>();
+
+        std::shared_ptr<ImageViewStore> m_store_image_views = std::make_shared<ImageViewStore>();
+        std::shared_ptr<Texture2DStore> m_store_textures = std::make_shared<Texture2DStore>();
+
+        std::shared_ptr<DrawableStore> m_store_drawables = std::make_shared<DrawableStore>();
+
+        std::shared_ptr<DescriptorSetLayoutStore> m_store_descriptor_set_layouts =
+                std::make_shared<DescriptorSetLayoutStore>();
+        std::shared_ptr<RenderPassStore> m_store_render_passes = std::make_shared<RenderPassStore>();
+        std::shared_ptr<PipelineStore> m_store_pipelines = std::make_shared<PipelineStore>();
 
         void create_instance();
 

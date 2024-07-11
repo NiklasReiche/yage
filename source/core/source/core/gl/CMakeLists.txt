@@ -20,14 +20,27 @@ target_sources(yage_core
 		TextureCreator.h
 
 		enums.h
+
+		IDescriptorSetLayout.h
+		IDescriptorSetLayoutBuilder.h
+		IDescriptorSet.h
+		IDescriptorSetCreator.h
+
 		IFrameBuffer.h
         IFrameBufferCreator.h
+
 		IVertexBuffer.h
 		IVertexBufferCreator.h
+
 		IIndexBuffer.h
 		IIndexBufferCreator.h
+
+		IUniformBuffer.h
+		IUniformBufferCreator.h
+
 		IDrawable.h
 		IDrawableCreator.h
+
 		ITexture2D.h
 		ITexture2DCreator.h
 )

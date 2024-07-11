@@ -29,7 +29,7 @@ namespace yage::gl::vulkan
         }
 
         const auto instance = m_instance.lock();
-        return instance->store_frame_buffers()->create(instance.get(), std::move(render_pass), attachements,
+        return instance->store_frame_buffers().create(instance.get(), std::move(render_pass), attachements,
                                                        create_info, frame_counter);
     }
 
@@ -44,7 +44,7 @@ namespace yage::gl::vulkan
         create_info.height = height;
         create_info.layers = 1;
 
-        return m_instance.lock()->store_frame_buffers()->create(m_instance.lock().get(), std::move(render_pass),
+        return m_instance.lock()->store_frame_buffers().create(m_instance.lock().get(), std::move(render_pass),
                                                                 attachements, create_info,
                                                                 m_instance.lock()->swap_chain_counter());
     }

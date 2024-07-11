@@ -20,7 +20,7 @@ namespace yage::gl::vulkan
         explicit VertexBuffer(Instance* instance, const VertexDataInfo& data_info,
                               const std::span<const std::byte>& data);
 
-        ~VertexBuffer();
+        ~VertexBuffer() override;
 
         VertexBuffer(const VertexBuffer& other) = delete;
 

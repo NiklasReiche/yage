@@ -4,7 +4,7 @@
 namespace yage::gl::vulkan
 {
     DescriptorSet::DescriptorSet(Instance* instance, const VkDescriptorSetAllocateInfo& alloc_info,
-                                 const FrameCounter frame_counter, std::shared_ptr<Handle<DescriptorSetLayout>> layout)
+                                 const FrameCounter frame_counter, DescriptorSetLayoutSharedHandle layout)
         : m_instance(instance),
           m_vk_device(instance->device()),
           m_frame_counter(frame_counter),
@@ -17,19 +17,19 @@ namespace yage::gl::vulkan
         }
     }
 
-    void DescriptorSet::write(const std::uint32_t binding, const std::shared_ptr<Handle<UniformBuffer>>& uniform_buffer)
+    void DescriptorSet::write(const unsigned int binding, const UniformBufferSharedHandle& uniform_buffer)
     {
-        m_bound_uniform_buffers.push_back(uniform_buffer); // TODO: map
+        m_bound_uniform_buffers.emplace(static_cast<std::uint32_t>(binding), uniform_buffer);
 
         const std::vector<VkDescriptorBufferInfo> buffer_infos = uniform_buffer->get<UniformBuffer>().descriptor_info();
 
         assert(buffer_infos.size() == m_frame_counter.max_frame_index);
 
-        for (std::size_t i = 0; i < m_frame_counter.max_frame_index; i++) {
+        for (unsigned int i = 0; i < m_frame_counter.max_frame_index; i++) {
             VkWriteDescriptorSet descriptor_write{};
             descriptor_write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             descriptor_write.dstSet = m_vk_handles[i];
-            descriptor_write.dstBinding = binding;
+            descriptor_write.dstBinding = static_cast<std::uint32_t>(binding);
             descriptor_write.dstArrayElement = 0;
             descriptor_write.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
             descriptor_write.descriptorCount = 1;

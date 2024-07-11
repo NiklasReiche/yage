@@ -11,6 +11,6 @@ namespace yage::gl::vulkan
     Handle<IIndexBuffer> IndexBufferCreator::create(IndexDataInfo data_info, std::span<const std::byte> data) const
     {
         const auto instance = m_instance.lock();
-        return instance->store_index_buffers()->create(instance.get(), data_info, data);
+        return instance->store_index_buffers().create(instance.get(), data_info, data);
     }
 }

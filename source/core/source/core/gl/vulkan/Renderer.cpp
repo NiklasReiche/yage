@@ -42,10 +42,12 @@ namespace yage::gl::vulkan
         vkCmdBeginRenderPass(m_command_buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     }
 
-    void Renderer::bind_pipeline(const Pipeline& pipeline, const DescriptorSet& descriptor_set)
+    void Renderer::bind_pipeline(const Pipeline& pipeline, const IDescriptorSet& descriptor_set)
     {
+        const auto& descriptor_set_impl = static_cast<const DescriptorSet&>(descriptor_set);
+
         vkCmdBindDescriptorSets(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.vk_layout(), 0, 1,
-                                &descriptor_set.vk_handle(), 0, nullptr);
+                                &descriptor_set_impl.vk_handle(), 0, nullptr);
 
         vkCmdBindPipeline(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.vk_handle());
     }

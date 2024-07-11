@@ -12,6 +12,6 @@ namespace yage::gl::vulkan
                                                       std::span<const std::byte> data) const
     {
         const auto instance = m_instance.lock();
-        return instance->store_vertex_buffers()->create(instance.get(), data_info, data);
+        return instance->store_vertex_buffers().create(instance.get(), data_info, data);
     }
 }

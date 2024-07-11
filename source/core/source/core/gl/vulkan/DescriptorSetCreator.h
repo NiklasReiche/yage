@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "../IDescriptorSetCreator.h"
 #include "../enums.h"
 #include "DescriptorSet.h"
 
@@ -9,12 +10,12 @@ namespace yage::gl::vulkan
 {
     class Instance;
 
-    class DescriptorSetCreator
+    class DescriptorSetCreator final : public IDescriptorSetCreator
     {
     public:
         explicit DescriptorSetCreator(std::weak_ptr<Instance> instance);
 
-        Handle<DescriptorSet> create(ResourceUsage usage, const std::shared_ptr<Handle<DescriptorSetLayout>>& layout);
+        DescriptorSetHandle create(ResourceUsage usage, const DescriptorSetLayoutSharedHandle& layout) override;
 
     private:
         std::weak_ptr<Instance> m_instance;

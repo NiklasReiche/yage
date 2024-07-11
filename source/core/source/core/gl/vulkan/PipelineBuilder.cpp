@@ -185,7 +185,7 @@ namespace yage::gl::vulkan
         pipeline_info.basePipelineIndex = -1; // Optional
 
         const auto instance = m_instance.lock();
-        return instance->store_pipelines()->create(instance.get(), m_render_pass, pipeline_info, m_pipeline_layout_info);
+        return instance->store_pipelines().create(instance.get(), m_render_pass, pipeline_info, m_pipeline_layout_info);
     }
 
     PipelineBuilder& PipelineBuilder::with_blending()
@@ -231,7 +231,7 @@ namespace yage::gl::vulkan
         return *this;
     }
 
-    PipelineBuilder& PipelineBuilder::with_layout(const std::shared_ptr<Handle<DescriptorSetLayout>>& layout)
+    PipelineBuilder& PipelineBuilder::with_layout(const DescriptorSetLayoutSharedHandle& layout)
     {
         // TODO: give ownership to pipeline of descriptor layout
         m_pipeline_layout_info = VkPipelineLayoutCreateInfo{};

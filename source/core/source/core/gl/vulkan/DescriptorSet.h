@@ -1,12 +1,14 @@
 #pragma once
 
-#include <vector>
-#include <memory>
 #include <cstdint>
+#include <memory>
+#include <unordered_map>
+#include <vector>
 
 #include <vulkan/vulkan.h>
 
 #include "../Handle.h"
+#include "../IDescriptorSet.h"
 #include "DescriptorSetLayout.h"
 #include "FrameCounter.h"
 #include "UniformBuffer.h"
@@ -15,12 +17,16 @@ namespace yage::gl::vulkan
 {
     class Instance;
 
-    class DescriptorSet
+    class DescriptorSet final : public IDescriptorSet
     {
     public:
-        DescriptorSet(Instance* instance, const VkDescriptorSetAllocateInfo& alloc_info, FrameCounter frame_counter, std::shared_ptr<Handle<DescriptorSetLayout>> layout);
+        DescriptorSet(Instance* instance, const VkDescriptorSetAllocateInfo& alloc_info, FrameCounter frame_counter,
+                      DescriptorSetLayoutSharedHandle layout);
 
-        void write(std::uint32_t binding, const std::shared_ptr<Handle<UniformBuffer>>& uniform_buffer);
+        // descriptor sets are destroyed automatically when the descriptor pool dies
+        ~DescriptorSet() override = default;
+
+        void write(unsigned int binding, const UniformBufferSharedHandle& uniform_buffer) override;
 
         [[nodiscard]] const VkDescriptorSet& vk_handle() const;
 
@@ -34,7 +40,7 @@ namespace yage::gl::vulkan
         std::vector<VkDescriptorSet> m_vk_handles;
 
         // dependant resources
-        std::shared_ptr<Handle<DescriptorSetLayout>> m_layout;
-        std::vector<std::shared_ptr<Handle<UniformBuffer>>> m_bound_uniform_buffers;
+        DescriptorSetLayoutSharedHandle m_layout;
+        std::unordered_map<std::uint32_t, UniformBufferSharedHandle> m_bound_uniform_buffers;
     };
 }

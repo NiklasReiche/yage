@@ -71,9 +71,9 @@ namespace yage::gl::vulkan
         m_vk_pool = VK_NULL_HANDLE;
     }
 
-    const std::shared_ptr<Store<DescriptorSet, DescriptorSet>>& DescriptorAllocator::store_descriptor_sets() const
+    DescriptorSetStore& DescriptorAllocator::store_descriptor_sets()
     {
-        return m_store_descriptor_sets;
+        return *m_store_descriptor_sets;
     }
 
     VkDescriptorPool DescriptorAllocator::vk_pool() const

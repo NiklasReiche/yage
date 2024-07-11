@@ -748,52 +748,52 @@ namespace yage::gl::vulkan
         return m_command_buffers[m_current_frame_in_flight];
     }
 
-    const std::shared_ptr<Store<RenderPass, RenderPass>>& Instance::store_render_passes()
+    RenderPassStore& Instance::store_render_passes()
     {
-        return m_store_render_passes;
+        return *m_store_render_passes;
     }
 
-    const std::shared_ptr<Store<IFrameBuffer, FrameBuffer>>& Instance::store_frame_buffers()
+    FrameBufferStore& Instance::store_frame_buffers()
     {
-        return m_store_frame_buffers;
+        return *m_store_frame_buffers;
     }
 
-    const std::shared_ptr<Store<Pipeline, Pipeline>>& Instance::store_pipelines()
+    PipelineStore& Instance::store_pipelines()
     {
-        return m_store_pipelines;
+        return *m_store_pipelines;
     }
 
-    const std::shared_ptr<Store<IVertexBuffer, VertexBuffer>>& Instance::store_vertex_buffers()
+    VertexBufferStore& Instance::store_vertex_buffers()
     {
-        return m_store_vertex_buffers;
+        return *m_store_vertex_buffers;
     }
 
-    const std::shared_ptr<Store<IIndexBuffer, IndexBuffer>>& Instance::store_index_buffers()
+    IndexBufferStore& Instance::store_index_buffers()
     {
-        return m_store_index_buffers;
+        return *m_store_index_buffers;
     }
 
-    const std::shared_ptr<Store<UniformBuffer, UniformBuffer>>& Instance::store_uniform_buffers()
+    UniformBufferStore& Instance::store_uniform_buffers()
     {
-        return m_store_uniform_buffers;
+        return *m_store_uniform_buffers;
     }
 
-    const std::shared_ptr<Store<IDrawable2, Drawable>>& Instance::store_drawables()
+    DrawableStore& Instance::store_drawables()
     {
-        return m_store_drawables;
+        return *m_store_drawables;
     }
 
-    const std::shared_ptr<Store<ITexture2D2, Texture2D>>& Instance::store_textures()
+    Texture2DStore& Instance::store_textures()
     {
-        return m_store_textures;
+        return *m_store_textures;
     }
 
-    const std::shared_ptr<Store<DescriptorSetLayout, DescriptorSetLayout>>& Instance::store_descriptor_set_layouts()
+    DescriptorSetLayoutStore& Instance::store_descriptor_set_layouts()
     {
-        return m_store_descriptor_set_layouts;
+        return *m_store_descriptor_set_layouts;
     }
 
-    const DescriptorAllocator& Instance::descriptor_allocator() const
+    DescriptorAllocator& Instance::descriptor_allocator()
     {
         return m_descriptor_allocator.value();
     }

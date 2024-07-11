@@ -39,7 +39,7 @@ namespace yage::gl::vulkan
 
         PipelineBuilder& with_render_pass(std::shared_ptr<RenderPassHandle> render_pass);
 
-        PipelineBuilder& with_layout(const std::shared_ptr<Handle<DescriptorSetLayout>>& layout);
+        PipelineBuilder& with_layout(const DescriptorSetLayoutSharedHandle& layout);
 
         PipelineHandle build();
 

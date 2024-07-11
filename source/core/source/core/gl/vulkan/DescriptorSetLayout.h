@@ -2,11 +2,13 @@
 
 #include <vulkan/vulkan.h>
 
+#include "../IDescriptorSetLayout.h"
+
 namespace yage::gl::vulkan
 {
     class Instance;
 
-    class DescriptorSetLayout
+    class DescriptorSetLayout : public IDescriptorSetLayout
     {
     public:
         explicit DescriptorSetLayout(Instance* instance, const VkDescriptorSetLayoutCreateInfo& create_info);

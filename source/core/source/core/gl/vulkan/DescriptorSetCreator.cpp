@@ -8,8 +8,8 @@ namespace yage::gl::vulkan
     {
     }
 
-    Handle<DescriptorSet> DescriptorSetCreator::create(const ResourceUsage usage,
-                                                       const std::shared_ptr<Handle<DescriptorSetLayout>>& layout)
+    DescriptorSetHandle DescriptorSetCreator::create(const ResourceUsage usage,
+                                                     const DescriptorSetLayoutSharedHandle& layout)
     {
         const auto instance = m_instance.lock();
 
@@ -29,6 +29,7 @@ namespace yage::gl::vulkan
         alloc_info.descriptorSetCount = frame_counter.max_frame_index;
         alloc_info.pSetLayouts = layouts.data();
 
-        return instance->descriptor_allocator().store_descriptor_sets()->create(instance.get(), alloc_info, frame_counter, layout);
+        return instance->descriptor_allocator().store_descriptor_sets().create(instance.get(), alloc_info,
+                                                                               frame_counter, layout);
     }
 }

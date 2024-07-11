@@ -10,6 +10,8 @@ namespace yage::gl::vulkan
 {
     class Instance;
 
+    using DescriptorSetStore = Store<IDescriptorSet, DescriptorSet>;
+
     class DescriptorAllocator
     {
     public:
@@ -35,7 +37,7 @@ namespace yage::gl::vulkan
 
         void reset();
 
-        [[nodiscard]] const std::shared_ptr<Store<DescriptorSet, DescriptorSet>>& store_descriptor_sets() const;
+        [[nodiscard]] DescriptorSetStore& store_descriptor_sets();
 
         [[nodiscard]] VkDescriptorPool vk_pool() const;
 
@@ -44,7 +46,6 @@ namespace yage::gl::vulkan
         VkDevice m_vk_device = VK_NULL_HANDLE;
         VkDescriptorPool m_vk_pool = VK_NULL_HANDLE;
 
-        std::shared_ptr<Store<DescriptorSet, DescriptorSet>> m_store_descriptor_sets =
-                std::make_shared<Store<DescriptorSet, DescriptorSet>>();
+        std::shared_ptr<DescriptorSetStore> m_store_descriptor_sets = std::make_shared<DescriptorSetStore>();
     };
 }

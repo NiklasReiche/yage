@@ -36,9 +36,9 @@ namespace yage::gl::vulkan
         memcpy(m_buffers_mapped[*m_frame_counter.curent_frame_index], data, size);
     }
 
-    void UniformBuffer::update_sub_data(const std::size_t offset, const std::size_t size, const void* data)
+    void UniformBuffer::update_sub_data(const std::size_t byte_offset, const std::size_t byte_size, const void* data)
     {
-        memcpy(m_buffers_mapped[*m_frame_counter.curent_frame_index] + offset, data, size);
+        memcpy(static_cast<std::byte*>(m_buffers_mapped[*m_frame_counter.curent_frame_index]) + byte_offset, data, byte_size);
     }
 
     std::vector<VkDescriptorBufferInfo> UniformBuffer::descriptor_info() const

@@ -29,6 +29,6 @@ namespace yage::gl::vulkan
                                       .index_data_info = index_data_info};
 
         const auto instance = m_instance.lock();
-        return instance->store_drawables()->create(descriptor);
+        return instance->store_drawables().create(descriptor);
     }
 }
