@@ -37,7 +37,7 @@ namespace yage::gl::vulkan
 
         PipelineBuilder& with_viewport(Viewport viewport, ScissorRectangle scissor);
 
-        PipelineBuilder& with_render_pass(std::shared_ptr<RenderPassHandle> render_pass);
+        PipelineBuilder& with_render_pass(RenderPassHandle render_pass);
 
         PipelineBuilder& with_layout(DescriptorSetLayoutHandle layout);
 
@@ -61,7 +61,7 @@ namespace yage::gl::vulkan
         std::vector<VkDynamicState> m_dynamic_states{};
         VkPipelineDynamicStateCreateInfo m_dynamic_state{};
 
-        std::shared_ptr<RenderPassHandle> m_render_pass{};
+        RenderPassHandle m_render_pass{};
 
         VkPipelineRasterizationStateCreateInfo m_rasterizer_info{};
         VkPipelineColorBlendAttachmentState m_blend_attachment{};

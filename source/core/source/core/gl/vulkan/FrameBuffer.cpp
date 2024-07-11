@@ -3,8 +3,8 @@
 
 namespace yage::gl::vulkan
 {
-    FrameBuffer::FrameBuffer(Instance* instance, std::shared_ptr<RenderPassHandle> render_pass,
-                             std::span<std::shared_ptr<ImageViewHandle>> attachements,
+    FrameBuffer::FrameBuffer(Instance* instance, RenderPassHandle render_pass,
+                             std::span<ImageViewHandle> attachements,
                              VkFramebufferCreateInfo create_info, const FrameCounter frame_counter)
         : m_instance(instance),
           m_vk_device(m_instance->device()),
@@ -17,18 +17,18 @@ namespace yage::gl::vulkan
         m_attachements.resize(attachements.size());
         std::ranges::move(attachements, m_attachements.begin());
 
-        for (const std::shared_ptr<ImageViewHandle>& attachement: m_attachements) {
-            assert(attachement->get<ImageView>().n_instances() == n_instances);
+        for (const ImageViewHandle& attachement: m_attachements) {
+            assert(attachement.get<ImageView>().n_instances() == n_instances);
         }
 
         m_vk_handles.resize(n_instances);
         std::vector<VkImageView> vk_attachements;
         vk_attachements.resize(m_attachements.size());
         create_info.attachmentCount = m_attachements.size();
-        create_info.renderPass = m_render_pass->get<RenderPass>().vk_handle();
+        create_info.renderPass = m_render_pass.get<RenderPass>().vk_handle();
         for (std::size_t i = 0; i < n_instances; ++i) {
             for (std::size_t j = 0; j < m_attachements.size(); j++) {
-                vk_attachements[j] = m_attachements[j]->get<ImageView>().vk_handle(i);
+                vk_attachements[j] = m_attachements[j].get<ImageView>().vk_handle(i);
             }
             create_info.pAttachments = vk_attachements.data();
 
@@ -97,7 +97,7 @@ namespace yage::gl::vulkan
         return m_frame_counter.max_frame_index;
     }
 
-    std::shared_ptr<RenderPassHandle> FrameBuffer::render_pass() const
+    const RenderPassHandle& FrameBuffer::render_pass() const
     {
         return m_render_pass;
     }

@@ -41,6 +41,4 @@ namespace yage::gl::vulkan
         VkDeviceMemory m_memory_handle{};
         std::size_t m_vertex_count = 0;
     };
-
-    using VertexBufferHandle = Handle<VertexBuffer>;
 }

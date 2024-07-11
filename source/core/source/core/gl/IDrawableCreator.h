@@ -2,8 +2,8 @@
 
 #include <span>
 
-#include "IDrawable.h"
 #include "Handle.h"
+#include "IDrawable.h"
 #include "enums.h"
 
 namespace yage::gl
@@ -13,9 +13,8 @@ namespace yage::gl
     public:
         virtual ~IDrawableCreator2() = default;
 
-        [[nodiscard]] virtual Handle<IDrawable2> create(VertexDataInfo vertex_data_info,
-                                                        std::span<const std::byte> vertices,
-                                                        IndexDataInfo index_data_info,
-                                                        std::span<const std::byte> indices) const = 0;
+        [[nodiscard]] virtual DrawableHandle create(VertexDataInfo vertex_data_info,
+                                                    std::span<const std::byte> vertices, IndexDataInfo index_data_info,
+                                                    std::span<const std::byte> indices) const = 0;
     };
 }

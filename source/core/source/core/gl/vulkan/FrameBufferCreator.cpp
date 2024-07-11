@@ -8,12 +8,11 @@ namespace yage::gl::vulkan
     {
     }
 
-    Handle<IFrameBuffer> FrameBufferCreator::create(std::shared_ptr<Handle<RenderPass>> render_pass,
-                                                    const std::span<std::shared_ptr<ImageViewHandle>> attachements,
+    Handle<IFrameBuffer> FrameBufferCreator::create(RenderPassHandle render_pass,
+                                                    const std::span<ImageViewHandle> attachements,
                                                     const std::uint32_t width, const std::uint32_t height,
                                                     const ResourceUsage usage)
     {
-
         VkFramebufferCreateInfo create_info{};
         create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
         create_info.width = width;
@@ -34,8 +33,8 @@ namespace yage::gl::vulkan
     }
 
     FrameBufferHandle
-    FrameBufferCreator::create_swap_chain(std::shared_ptr<RenderPassHandle> render_pass,
-                                          const std::span<std::shared_ptr<ImageViewHandle>> attachements,
+    FrameBufferCreator::create_swap_chain(RenderPassHandle render_pass,
+                                          const std::span<ImageViewHandle> attachements,
                                           const std::uint32_t width, const std::uint32_t height)
     {
         VkFramebufferCreateInfo create_info{};

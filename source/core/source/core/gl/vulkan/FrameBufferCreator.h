@@ -18,12 +18,12 @@ namespace yage::gl::vulkan
     public:
         explicit FrameBufferCreator(std::weak_ptr<Instance> instance);
 
-        FrameBufferHandle create(std::shared_ptr<RenderPassHandle> render_pass,
-                                 std::span<std::shared_ptr<ImageViewHandle>> attachements, std::uint32_t width,
+        FrameBufferHandle create(RenderPassHandle render_pass,
+                                 std::span<ImageViewHandle> attachements, std::uint32_t width,
                                  std::uint32_t height, ResourceUsage usage);
 
-        FrameBufferHandle create_swap_chain(std::shared_ptr<RenderPassHandle> render_pass,
-                                 std::span<std::shared_ptr<ImageViewHandle>> attachements, std::uint32_t width,
+        FrameBufferHandle create_swap_chain(RenderPassHandle render_pass,
+                                 std::span<ImageViewHandle> attachements, std::uint32_t width,
                                  std::uint32_t height);
 
     private:

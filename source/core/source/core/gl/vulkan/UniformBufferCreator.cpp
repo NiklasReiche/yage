@@ -8,7 +8,7 @@ namespace yage::gl::vulkan
     {
     }
 
-    Handle<IUniformBuffer> UniformBufferCreator::create(std::size_t size, const ResourceUsage usage) const
+    UniformBufferHandle UniformBufferCreator::create(std::size_t size, const ResourceUsage usage) const
     {
         const auto instance = m_instance.lock();
 

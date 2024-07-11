@@ -154,7 +154,7 @@ namespace yage::gl::vulkan
         return *this;
     }
 
-    PipelineBuilder& PipelineBuilder::with_render_pass(std::shared_ptr<RenderPassHandle> render_pass)
+    PipelineBuilder& PipelineBuilder::with_render_pass(RenderPassHandle render_pass)
     {
         m_render_pass = std::move(render_pass);
 
@@ -179,7 +179,7 @@ namespace yage::gl::vulkan
         pipeline_info.pDepthStencilState = nullptr; // Optional
         pipeline_info.pColorBlendState = &m_blend_info;
         pipeline_info.pDynamicState = &m_dynamic_state;
-        pipeline_info.renderPass = m_render_pass->get<RenderPass>().vk_handle();
+        pipeline_info.renderPass = m_render_pass.get<RenderPass>().vk_handle();
         pipeline_info.subpass = 0;
         pipeline_info.basePipelineHandle = VK_NULL_HANDLE; // Optional
         pipeline_info.basePipelineIndex = -1; // Optional

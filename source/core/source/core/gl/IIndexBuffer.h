@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Handle.h"
+
 namespace yage::gl
 {
     class IIndexBuffer
@@ -7,4 +9,6 @@ namespace yage::gl
     public:
         virtual ~IIndexBuffer() = default;
     };
+
+    using IndexBufferHandle = Handle<IIndexBuffer>;
 }

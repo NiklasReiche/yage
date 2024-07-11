@@ -1,10 +1,7 @@
 #pragma once
 
-#include <span>
-
-#include "enums.h"
-#include "Handle.h"
 #include "IUniformBuffer.h"
+#include "enums.h"
 
 namespace yage::gl
 {

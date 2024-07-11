@@ -1,9 +1,11 @@
 #include "Drawable.h"
 
+#include <utility>
+
 namespace yage::gl::vulkan
 {
-    Drawable::Drawable(const DrawableDescriptor& descriptor)
-        : m_descriptor(descriptor)
+    Drawable::Drawable(DrawableDescriptor descriptor)
+        : m_descriptor(std::move(descriptor))
     {
     }
 

@@ -1,5 +1,5 @@
-#include "Instance.h"
 #include "VertexBufferCreator.h"
+#include "Instance.h"
 
 namespace yage::gl::vulkan
 {
@@ -8,8 +8,8 @@ namespace yage::gl::vulkan
     {
     }
 
-    Handle<IVertexBuffer> VertexBufferCreator::create(const VertexDataInfo& data_info,
-                                                      std::span<const std::byte> data) const
+    VertexBufferHandle VertexBufferCreator::create(const VertexDataInfo& data_info,
+                                                   std::span<const std::byte> data) const
     {
         const auto instance = m_instance.lock();
         return instance->store_vertex_buffers().create(instance.get(), data_info, data);

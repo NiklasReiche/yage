@@ -84,7 +84,7 @@ namespace yage::gl::vulkan
 
         [[nodiscard]] FrameBuffer& swap_chain_frame_buffer() const;
 
-        [[nodiscard]] std::shared_ptr<RenderPassHandle> swap_chain_render_pass() const;
+        [[nodiscard]] const RenderPassHandle& swap_chain_render_pass() const;
 
         [[nodiscard]] VkCommandBuffer command_buffer_for_frame() const;
 
@@ -151,14 +151,14 @@ namespace yage::gl::vulkan
         VkFormat m_swap_chain_image_format{};
         VkExtent2D m_swap_chain_extent{};
 
-        std::shared_ptr<RenderPassHandle> m_render_pass;
+        RenderPassHandle m_render_pass;
 
         const unsigned int m_current_frame_static = 0;
         unsigned int m_current_frame_in_flight = 0;
         unsigned int m_current_swap_chain_image_index = 0;
 
         std::vector<VkImage> m_swap_chain_images{};
-        std::shared_ptr<ImageViewHandle> m_swap_chain_image_view{};
+        ImageViewHandle m_swap_chain_image_view{};
         FrameBufferHandle m_swap_chain_frame_buffer{};
 
         VkCommandPool m_command_pool{};
