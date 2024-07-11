@@ -56,8 +56,8 @@ int main()
                                                   index_data_info, std::as_bytes(std::span{index_data}));
 
     const auto uniform_buffer_creator = gl::vulkan::UniformBufferCreator(context);
-    const auto ubo = std::make_shared<gl::UniformBufferHandle>(
-            uniform_buffer_creator.create(sizeof(UniformBufferData), gl::ResourceUsage::DYNAMIC));
+    const gl::UniformBufferSharedHandle ubo =
+            uniform_buffer_creator.create(sizeof(UniformBufferData), gl::ResourceUsage::DYNAMIC).as_shared();
 
     auto descriptor_set_layout_builder = gl::vulkan::DescriptorSetLayoutBuilder(context);
     const gl::DescriptorSetLayoutSharedHandle layout =
@@ -65,7 +65,7 @@ int main()
 
     auto descriptor_set_creator = gl::vulkan::DescriptorSetCreator(context);
     gl::DescriptorSetHandle descriptor_set = descriptor_set_creator.create(gl::ResourceUsage::DYNAMIC, layout);
-    (*descriptor_set).write(0, ubo);
+    descriptor_set->write(0, ubo);
 
     const auto file_reader = window->getFileReader();
     auto vert_code = file_reader->openBinaryFile(R"(assets/vert.spv)", platform::IFile::AccessMode::READ)->read_all();

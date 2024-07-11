@@ -38,12 +38,17 @@ namespace yage::gl
         Handle& operator=(Handle&& other) noexcept;
 
         /**
-         * Returns the associated resource as its base type reference.
+         * Returns a base-type pointer to the associated resource.
          */
-        T& operator*() const;
+        T* operator->() const; // TODO: const-correctness?
 
         /**
-         * Returns the associated resource as a given derived type reference.
+         * Returns a base-type reference to the associated resource.
+         */
+        T& operator*() const; // TODO: const-correctness?
+
+        /**
+         * Returns a derived-type reference to the associated resource.
          */
         template<typename T_>
             requires std::derived_from<T_, T>
@@ -58,6 +63,11 @@ namespace yage::gl
          * @return Whether this Handle is empty (i.e. invalid).
          */
         [[nodiscard]] bool empty() const;
+
+        /**
+         * Moves this rvalue Handle to a shared Handle.
+         */
+        std::shared_ptr<Handle> as_shared() &&;
 
     private:
         /**
@@ -181,6 +191,12 @@ namespace yage::gl
     }
 
     template<typename T>
+    T* Handle<T>::operator->() const
+    {
+        return &(m_store.lock()->lookup(*this));
+    }
+
+    template<typename T>
     T& Handle<T>::operator*() const
     {
         return m_store.lock()->lookup(*this);
@@ -211,6 +227,12 @@ namespace yage::gl
     bool Handle<T>::empty() const
     {
         return !m_store.expired() && m_store.lock()->contains(*this);
+    }
+
+    template<typename T>
+    std::shared_ptr<Handle<T>> Handle<T>::as_shared() &&
+    {
+        return std::make_shared<Handle>(std::move(*this));
     }
 
     template<typename T>
