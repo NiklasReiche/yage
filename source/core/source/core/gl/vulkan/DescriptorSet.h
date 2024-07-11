@@ -21,12 +21,12 @@ namespace yage::gl::vulkan
     {
     public:
         DescriptorSet(Instance* instance, const VkDescriptorSetAllocateInfo& alloc_info, FrameCounter frame_counter,
-                      DescriptorSetLayoutSharedHandle layout);
+                      DescriptorSetLayoutHandle layout);
 
         // descriptor sets are destroyed automatically when the descriptor pool dies
         ~DescriptorSet() override = default;
 
-        void write(unsigned int binding, const UniformBufferSharedHandle& uniform_buffer) override;
+        void write(unsigned int binding, const UniformBufferHandle& uniform_buffer) override;
 
         [[nodiscard]] const VkDescriptorSet& vk_handle() const;
 
@@ -40,7 +40,7 @@ namespace yage::gl::vulkan
         std::vector<VkDescriptorSet> m_vk_handles;
 
         // dependant resources
-        DescriptorSetLayoutSharedHandle m_layout;
-        std::unordered_map<std::uint32_t, UniformBufferSharedHandle> m_bound_uniform_buffers;
+        DescriptorSetLayoutHandle m_layout;
+        std::unordered_map<std::uint32_t, UniformBufferHandle> m_bound_uniform_buffers;
     };
 }

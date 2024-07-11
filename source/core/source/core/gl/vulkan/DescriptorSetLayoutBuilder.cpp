@@ -37,11 +37,6 @@ namespace yage::gl::vulkan
         return instance->store_descriptor_set_layouts().create(instance.get(), m_create_info);
     }
 
-    DescriptorSetLayoutSharedHandle DescriptorSetLayoutBuilder::build_shared()
-    {
-        return std::make_shared<DescriptorSetLayoutHandle>(build());
-    }
-
     void DescriptorSetLayoutBuilder::clear()
     {
         m_create_info = VkDescriptorSetLayoutCreateInfo{};

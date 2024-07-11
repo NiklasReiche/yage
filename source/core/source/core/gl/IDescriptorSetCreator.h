@@ -11,6 +11,6 @@ namespace yage::gl
     public:
         virtual ~IDescriptorSetCreator() = default;
 
-        virtual DescriptorSetHandle create(ResourceUsage usage, const DescriptorSetLayoutSharedHandle& layout) = 0;
+        virtual DescriptorSetHandle create(ResourceUsage usage, DescriptorSetLayoutHandle layout) = 0;
     };
 }

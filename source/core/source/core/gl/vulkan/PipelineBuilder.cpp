@@ -231,13 +231,13 @@ namespace yage::gl::vulkan
         return *this;
     }
 
-    PipelineBuilder& PipelineBuilder::with_layout(const DescriptorSetLayoutSharedHandle& layout)
+    PipelineBuilder& PipelineBuilder::with_layout(DescriptorSetLayoutHandle layout)
     {
         // TODO: give ownership to pipeline of descriptor layout
         m_pipeline_layout_info = VkPipelineLayoutCreateInfo{};
         m_pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         m_pipeline_layout_info.setLayoutCount = 1;
-        m_pipeline_layout_info.pSetLayouts = &layout->get<DescriptorSetLayout>().vk_handle();
+        m_pipeline_layout_info.pSetLayouts = &layout.get<DescriptorSetLayout>().vk_handle();
         m_pipeline_layout_info.pushConstantRangeCount = 0; // Optional
         m_pipeline_layout_info.pPushConstantRanges = nullptr; // Optional
 

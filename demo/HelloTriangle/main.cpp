@@ -56,12 +56,12 @@ int main()
                                                   index_data_info, std::as_bytes(std::span{index_data}));
 
     const auto uniform_buffer_creator = gl::vulkan::UniformBufferCreator(context);
-    const gl::UniformBufferSharedHandle ubo =
-            uniform_buffer_creator.create(sizeof(UniformBufferData), gl::ResourceUsage::DYNAMIC).as_shared();
+    const gl::UniformBufferHandle ubo =
+            uniform_buffer_creator.create(sizeof(UniformBufferData), gl::ResourceUsage::DYNAMIC);
 
     auto descriptor_set_layout_builder = gl::vulkan::DescriptorSetLayoutBuilder(context);
-    const gl::DescriptorSetLayoutSharedHandle layout =
-            descriptor_set_layout_builder.with_uniform_buffer_at(0).build_shared();
+    const gl::DescriptorSetLayoutHandle layout =
+            descriptor_set_layout_builder.with_uniform_buffer_at(0).build();
 
     auto descriptor_set_creator = gl::vulkan::DescriptorSetCreator(context);
     gl::DescriptorSetHandle descriptor_set = descriptor_set_creator.create(gl::ResourceUsage::DYNAMIC, layout);
@@ -95,7 +95,7 @@ int main()
     while (!window->shouldDestroy()) {
         window->pollEvents();
 
-        ubo->get<gl::vulkan::UniformBuffer>().update_data(sizeof(UniformBufferData), &ubo_data);
+        ubo->update_data(sizeof(UniformBufferData), &ubo_data);
 
         context->prepare_frame();
 

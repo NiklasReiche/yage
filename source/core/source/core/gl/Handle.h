@@ -29,11 +29,11 @@ namespace yage::gl
 
         ~Handle();
 
-        Handle(const Handle& other) = delete;
+        Handle(const Handle& other);
 
         Handle(Handle&& other) noexcept;
 
-        Handle& operator=(const Handle& other) = delete;
+        Handle& operator=(const Handle& other);
 
         Handle& operator=(Handle&& other) noexcept;
 
@@ -63,11 +63,6 @@ namespace yage::gl
          * @return Whether this Handle is empty (i.e. invalid).
          */
         [[nodiscard]] bool empty() const;
-
-        /**
-         * Moves this rvalue Handle to a shared Handle.
-         */
-        std::shared_ptr<Handle> as_shared() &&;
 
     private:
         /**
@@ -112,6 +107,8 @@ namespace yage::gl
     protected:
         virtual void destroy(const Handle<Base>& handle) = 0;
 
+        virtual void inc_ref_count(const Handle<Base>& handle) = 0;
+
         friend class Handle<Base>;
     };
 
@@ -140,6 +137,9 @@ namespace yage::gl
          * have id '0'.
          */
         std::vector<StoreId> m_ids;
+
+        std::vector<std::size_t> m_ref_counts;
+
         /**
          * Keeps track of holes, so that resource vector only grows when necessary.
          */
@@ -150,6 +150,8 @@ namespace yage::gl
         StoreId m_next_id = 0;
 
         void destroy(const Handle<Base>& handle) override;
+
+        void inc_ref_count(const Handle<Base>& handle) override;
 
         friend class Handle<Base>;
     };
@@ -169,6 +171,18 @@ namespace yage::gl
     }
 
     template<typename T>
+    Handle<T>::Handle(const Handle& other)
+        : m_store(other.m_store),
+          m_id(other.m_id),
+          m_index(other.m_index)
+    {
+        // TODO: multithreading
+        if (!empty()) {
+            m_store.lock()->inc_ref_count(*this);
+        }
+    }
+
+    template<typename T>
     Handle<T>::Handle(Handle&& other) noexcept
     {
         m_store = std::move(other.m_store);
@@ -176,6 +190,26 @@ namespace yage::gl
         m_index = other.m_index;
 
         other.m_id = 0;
+    }
+
+    template<typename T>
+    Handle<T>& Handle<T>::operator=(const Handle& other)
+    {
+        // TODO: multithreading
+        if (!empty()) {
+            m_store.lock()->destroy(*this);
+        }
+
+        m_store = other.m_store;
+        m_id = other.m_id;
+        m_index = other.m_index;
+
+        // TODO: multithreading
+        if (!empty()) {
+            m_store.lock()->inc_ref_count(*this);
+        }
+
+        return *this;
     }
 
     template<typename T>
@@ -213,11 +247,7 @@ namespace yage::gl
     template<typename T>
     void Handle<T>::reset()
     {
-        // If the id is zero, this handle was moved from and is no longer valid, hence we must not destroy the
-        // associated resource.
-        // If the store pointer is expired, the store and all contained resources were already deleted, hence we must
-        // not destroy the associated resource.
-        if (m_id != 0 && !m_store.expired()) {
+        if (!empty()) {
             m_store.lock()->destroy(*this);
         }
         m_id = 0;
@@ -226,13 +256,7 @@ namespace yage::gl
     template<typename T>
     bool Handle<T>::empty() const
     {
-        return !m_store.expired() && m_store.lock()->contains(*this);
-    }
-
-    template<typename T>
-    std::shared_ptr<Handle<T>> Handle<T>::as_shared() &&
-    {
-        return std::make_shared<Handle>(std::move(*this));
+        return m_id == 0 || m_store.expired() || !m_store.lock()->contains(*this);
     }
 
     template<typename T>
@@ -270,6 +294,7 @@ namespace yage::gl
             m_resources.back().emplace(std::forward<Args>(args)...);
             m_next_id++;
             m_ids.push_back(m_next_id);
+            m_ref_counts.push_back(1);
             return Handle<Base>(std::enable_shared_from_this<Store>::weak_from_this(), m_next_id,
                                 m_resources.size() - 1);
         }
@@ -279,6 +304,7 @@ namespace yage::gl
         m_free_queue.pop();
         m_next_id++;
         m_ids[free_index] = m_next_id;
+        m_ref_counts[free_index] = 1;
         return Handle<Base>(std::enable_shared_from_this<Store>::weak_from_this(), m_next_id, free_index);
     }
 
@@ -292,6 +318,9 @@ namespace yage::gl
         std::vector<StoreId> i;
         m_ids.swap(i);
 
+        std::vector<std::size_t> r;
+        m_ref_counts.swap(r);
+
         std::queue<std::size_t> q;
         m_free_queue.swap(q);
     }
@@ -301,8 +330,24 @@ namespace yage::gl
     void Store<Base, Derived>::destroy(const Handle<Base>& handle)
     {
         assert(contains(handle));
-        m_resources[handle.m_index].reset();
-        m_ids[handle.m_index] = 0;
-        m_free_queue.push(handle.m_index);
+
+        if (m_ref_counts[handle.m_index] > 1) {
+            --m_ref_counts[handle.m_index];
+        } else {
+            m_resources[handle.m_index].reset();
+            m_ids[handle.m_index] = 0;
+            m_ref_counts[handle.m_index] = 0;
+            m_free_queue.push(handle.m_index);
+        }
+    }
+
+    template<typename Base, typename Derived>
+        requires std::derived_from<Derived, Base>
+    void Store<Base, Derived>::inc_ref_count(const Handle<Base>& handle)
+    {
+        if (!contains(handle)) {
+            throw std::runtime_error("resource handle is not valid");
+        }
+        ++m_ref_counts[handle.m_index];
     }
 }

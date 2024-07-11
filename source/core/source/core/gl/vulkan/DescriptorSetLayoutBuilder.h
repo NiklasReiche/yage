@@ -22,8 +22,6 @@ namespace yage::gl::vulkan
 
         DescriptorSetLayoutHandle build() override;
 
-        DescriptorSetLayoutSharedHandle build_shared() override;
-
         void clear() override;
 
     private:

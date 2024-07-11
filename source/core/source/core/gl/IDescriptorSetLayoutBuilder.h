@@ -13,8 +13,6 @@ namespace yage::gl
 
         virtual DescriptorSetLayoutHandle build() = 0;
 
-        virtual DescriptorSetLayoutSharedHandle build_shared() = 0;
-
         virtual void clear() = 0;
     };
 }

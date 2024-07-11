@@ -15,6 +15,4 @@ namespace yage::gl
     };
 
     using UniformBufferHandle = Handle<IUniformBuffer>;
-
-    using UniformBufferSharedHandle = std::shared_ptr<Handle<IUniformBuffer>>;
 }

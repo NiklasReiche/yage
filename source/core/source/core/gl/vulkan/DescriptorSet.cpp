@@ -4,7 +4,7 @@
 namespace yage::gl::vulkan
 {
     DescriptorSet::DescriptorSet(Instance* instance, const VkDescriptorSetAllocateInfo& alloc_info,
-                                 const FrameCounter frame_counter, DescriptorSetLayoutSharedHandle layout)
+                                 const FrameCounter frame_counter, DescriptorSetLayoutHandle layout)
         : m_instance(instance),
           m_vk_device(instance->device()),
           m_frame_counter(frame_counter),
@@ -17,11 +17,11 @@ namespace yage::gl::vulkan
         }
     }
 
-    void DescriptorSet::write(const unsigned int binding, const UniformBufferSharedHandle& uniform_buffer)
+    void DescriptorSet::write(const unsigned int binding, const UniformBufferHandle& uniform_buffer)
     {
         m_bound_uniform_buffers.emplace(static_cast<std::uint32_t>(binding), uniform_buffer);
 
-        const std::vector<VkDescriptorBufferInfo> buffer_infos = uniform_buffer->get<UniformBuffer>().descriptor_info();
+        const std::vector<VkDescriptorBufferInfo> buffer_infos = uniform_buffer.get<UniformBuffer>().descriptor_info();
 
         assert(buffer_infos.size() == m_frame_counter.max_frame_index);
 
@@ -48,6 +48,6 @@ namespace yage::gl::vulkan
 
     VkDescriptorSetLayout DescriptorSet::vk_layout() const
     {
-        return m_layout->get<DescriptorSetLayout>().vk_handle();
+        return m_layout.get<DescriptorSetLayout>().vk_handle();
     }
 }

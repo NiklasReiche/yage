@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Handle.h"
 
 namespace yage::gl
@@ -10,5 +11,4 @@ namespace yage::gl
     };
 
     using DescriptorSetLayoutHandle = Handle<IDescriptorSetLayout>;
-    using DescriptorSetLayoutSharedHandle = std::shared_ptr<Handle<IDescriptorSetLayout>>;
 }

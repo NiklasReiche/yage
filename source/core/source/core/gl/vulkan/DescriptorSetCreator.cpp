@@ -9,7 +9,7 @@ namespace yage::gl::vulkan
     }
 
     DescriptorSetHandle DescriptorSetCreator::create(const ResourceUsage usage,
-                                                     const DescriptorSetLayoutSharedHandle& layout)
+    DescriptorSetLayoutHandle layout)
     {
         const auto instance = m_instance.lock();
 
@@ -21,7 +21,7 @@ namespace yage::gl::vulkan
             default: throw std::invalid_argument("unknown ResourceUsage value");
         }
 
-        const std::vector layouts(frame_counter.max_frame_index, layout->get<DescriptorSetLayout>().vk_handle());
+        const std::vector layouts(frame_counter.max_frame_index, layout.get<DescriptorSetLayout>().vk_handle());
 
         VkDescriptorSetAllocateInfo alloc_info{};
         alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -30,6 +30,6 @@ namespace yage::gl::vulkan
         alloc_info.pSetLayouts = layouts.data();
 
         return instance->descriptor_allocator().store_descriptor_sets().create(instance.get(), alloc_info,
-                                                                               frame_counter, layout);
+                                                                               frame_counter, std::move(layout));
     }
 }
