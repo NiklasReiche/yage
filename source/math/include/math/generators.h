@@ -133,7 +133,7 @@ namespace yage::math
         }
 
         /**
-         * Constructs a perspective projection matrix.
+         * Constructs a perspective projection matrix into the OpenGL clip space.
          *
          * @param fov The field of view in degrees.
          * @param aspect The aspect ratio.
@@ -144,6 +144,7 @@ namespace yage::math
         template<std::floating_point T>
         Mat4<T> perspective(const T fov, const T aspect, const T near, const T far)
         {
+            // TODO: vulkan clip space
             Mat4<T> result = matrix::Id<T, 4>;
             const T top = near * std::tan(to_rad(fov / 2));
             const T bottom = 0 - top;
@@ -222,6 +223,7 @@ namespace yage::math
         Mat4<T> look_at(const Vec3<T>& pos, const Vec3<T>& target)
         {
             Vec3<T> reverse_direction = normalize(pos - target);
+            // TODO: crash when pointing straight up/down
             Vec3<T> right = normalize(cross(vector::worldUp<T>(), reverse_direction));
             Vec3<T> up = normalize(cross(reverse_direction, right));
             Mat4<T> mat1(

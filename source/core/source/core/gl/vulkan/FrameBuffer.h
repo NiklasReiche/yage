@@ -45,10 +45,11 @@ namespace yage::gl::vulkan
     private:
         Instance* m_instance; // can be raw pointer, since the resource lives within the store on the instance
         VkDevice m_vk_device;
+        FrameCounter m_frame_counter;
+
         RenderPassHandle m_render_pass;
         std::vector<ImageViewHandle> m_attachements;
         std::vector<VkFramebuffer> m_vk_handles{};
         math::Vec2ui m_extent{};
-        FrameCounter m_frame_counter;
     };
 }

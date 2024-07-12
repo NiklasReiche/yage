@@ -8,9 +8,9 @@ namespace yage::gl::vulkan
                              VkFramebufferCreateInfo create_info, const FrameCounter frame_counter)
         : m_instance(instance),
           m_vk_device(m_instance->device()),
+          m_frame_counter(frame_counter),
           m_render_pass(std::move(render_pass)),
-          m_extent({create_info.width, create_info.height}),
-          m_frame_counter(frame_counter)
+          m_extent({create_info.width, create_info.height})
     {
         const std::size_t n_instances = m_frame_counter.max_frame_index;
 
@@ -50,10 +50,10 @@ namespace yage::gl::vulkan
     FrameBuffer::FrameBuffer(FrameBuffer&& other) noexcept
         : m_instance(other.m_instance),
           m_vk_device(other.m_vk_device),
+          m_frame_counter(other.m_frame_counter),
           m_render_pass(std::move(other.m_render_pass)),
           m_vk_handles(std::move(other.m_vk_handles)),
-          m_extent(other.m_extent),
-          m_frame_counter(other.m_frame_counter)
+          m_extent(other.m_extent)
     {
         other.m_vk_device = VK_NULL_HANDLE;
         for (VkFramebuffer& m_vk_handle: other.m_vk_handles) {
@@ -68,10 +68,10 @@ namespace yage::gl::vulkan
             return *this;
         m_instance = other.m_instance;
         m_vk_device = other.m_vk_device;
+        m_frame_counter = other.m_frame_counter;
         m_render_pass = std::move(other.m_render_pass);
         m_vk_handles = other.m_vk_handles;
         m_extent = other.m_extent;
-        m_frame_counter = other.m_frame_counter;
 
         other.m_vk_device = VK_NULL_HANDLE;
         for (VkFramebuffer& m_vk_handle: other.m_vk_handles) {

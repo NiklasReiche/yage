@@ -42,6 +42,8 @@ namespace yage::gl::vulkan
 
     Instance::~Instance()
     {
+        m_swap_chain.clear();
+
         m_store_frame_buffers->clear();
         m_store_image_views->clear();
         m_store_pipelines->clear();
@@ -81,9 +83,6 @@ namespace yage::gl::vulkan
         pick_physical_device();
         create_logical_device();
         create_swap_chain();
-        create_swap_chain_image_views();
-        create_swap_chain_render_pass();
-        create_framebuffers();
         create_command_pool();
         create_command_buffers();
         create_sync_objects();
@@ -242,7 +241,7 @@ namespace yage::gl::vulkan
 
     bool Instance::isDeviceSuitable(VkPhysicalDevice device)
     {
-#if 0
+#if 0 // TODO
         VkPhysicalDeviceProperties deviceProperties;
         vkGetPhysicalDeviceProperties(device, &deviceProperties);
         VkPhysicalDeviceFeatures deviceFeatures;
@@ -468,110 +467,7 @@ namespace yage::gl::vulkan
 
         createInfo.oldSwapchain = VK_NULL_HANDLE; // TODO: window resizing
 
-        if (vkCreateSwapchainKHR(m_device, &createInfo, nullptr, &m_swap_chain) != VK_SUCCESS) {
-            throw std::runtime_error("Vulkan: failed to create swap chain!");
-        }
-
-        vkGetSwapchainImagesKHR(m_device, m_swap_chain, &imageCount, nullptr);
-        m_swap_chain_images.resize(imageCount);
-        vkGetSwapchainImagesKHR(m_device, m_swap_chain, &imageCount, m_swap_chain_images.data());
-
-        m_swap_chain_image_format = surfaceFormat.format;
-        m_swap_chain_extent = extent;
-    }
-
-    void Instance::create_swap_chain_image_views()
-    {
-        std::vector<VkImageViewCreateInfo> create_infos;
-        create_infos.resize(m_swap_chain_images.size());
-        for (size_t i = 0; i < m_swap_chain_images.size(); i++) {
-            VkImageViewCreateInfo create_info{};
-            create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-            create_info.image = m_swap_chain_images[i];
-
-            create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
-            create_info.format = m_swap_chain_image_format;
-
-            create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-            create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-            create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-            create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-
-            create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            create_info.subresourceRange.baseMipLevel = 0;
-            create_info.subresourceRange.levelCount = 1;
-            create_info.subresourceRange.baseArrayLayer = 0;
-            create_info.subresourceRange.layerCount = 1;
-
-            create_infos[i] = create_info;
-        }
-        m_swap_chain_image_view = m_store_image_views->create(this, create_infos, swap_chain_counter());
-    }
-
-    VkShaderModule Instance::createShaderModule(const std::vector<std::byte>& code)
-    {
-        VkShaderModuleCreateInfo createInfo{};
-        createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        createInfo.codeSize = code.size();
-        createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
-
-        VkShaderModule shaderModule;
-        if (vkCreateShaderModule(m_device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create shader module!");
-        }
-
-        return shaderModule;
-    }
-
-    void Instance::create_swap_chain_render_pass()
-    {
-        VkAttachmentDescription colorAttachment{};
-        colorAttachment.format = m_swap_chain_image_format;
-        colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-        colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-        colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-        VkAttachmentReference colorAttachmentRef{};
-        colorAttachmentRef.attachment = 0;
-        colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-        VkSubpassDescription subpass{};
-        subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-        subpass.colorAttachmentCount = 1;
-        subpass.pColorAttachments = &colorAttachmentRef;
-
-        VkRenderPassCreateInfo renderPassInfo{};
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-        renderPassInfo.attachmentCount = 1;
-        renderPassInfo.pAttachments = &colorAttachment;
-        renderPassInfo.subpassCount = 1;
-        renderPassInfo.pSubpasses = &subpass;
-
-        VkSubpassDependency dependency{};
-        dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-        dependency.dstSubpass = 0;
-        dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-        dependency.srcAccessMask = 0;
-        dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
-        renderPassInfo.dependencyCount = 1;
-        renderPassInfo.pDependencies = &dependency;
-
-        m_render_pass = m_store_render_passes->create(this, renderPassInfo);
-    }
-
-    void Instance::create_framebuffers()
-    {
-        FrameBufferCreator frame_buffer_factory(weak_from_this());
-
-        std::array attachments = {m_swap_chain_image_view};
-        m_swap_chain_frame_buffer = frame_buffer_factory.create_swap_chain(
-                m_render_pass, attachments, m_swap_chain_extent.width, m_swap_chain_extent.height);
+        m_swap_chain = SwapChain(this, createInfo);
     }
 
     void Instance::create_command_pool()
@@ -629,16 +525,16 @@ namespace yage::gl::vulkan
     {
         vkWaitForFences(m_device, 1, &m_in_flight_fences[m_current_frame_in_flight], VK_TRUE, UINT64_MAX);
 
-        const VkResult result = vkAcquireNextImageKHR(m_device, m_swap_chain, UINT64_MAX,
-                                                      m_image_available_semaphores[m_current_frame_in_flight],
-                                                      VK_NULL_HANDLE, &m_current_swap_chain_image_index);
-        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-            recreateSwapChain();
-            return;
-        }
+        VkResult result;
+        do {
+            result = m_swap_chain.acquire_next_image(m_image_available_semaphores[m_current_frame_in_flight]);
+            if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+                recreateSwapChain();
+            }
+        } while(result == VK_ERROR_OUT_OF_DATE_KHR);
 
         if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-            throw std::runtime_error("failed to acquire swap chain image!");
+            throw std::runtime_error("Vulkan: failed to acquire swap chain image!");
         }
 
         // Only reset the fence if we are submitting work
@@ -649,40 +545,36 @@ namespace yage::gl::vulkan
 
     void Instance::present_frame()
     {
-        VkSubmitInfo submitInfo{};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        VkSubmitInfo submit_info{};
+        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        const VkSemaphore waitSemaphores[] = {m_image_available_semaphores[m_current_frame_in_flight]};
-        constexpr VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-        submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = waitSemaphores;
-        submitInfo.pWaitDstStageMask = waitStages;
+        const VkSemaphore wait_semaphores[] = {m_image_available_semaphores[m_current_frame_in_flight]};
+        constexpr VkPipelineStageFlags wait_stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        submit_info.waitSemaphoreCount = 1;
+        submit_info.pWaitSemaphores = wait_semaphores;
+        submit_info.pWaitDstStageMask = wait_stages;
 
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &m_command_buffers[m_current_frame_in_flight];
+        submit_info.commandBufferCount = 1;
+        submit_info.pCommandBuffers = &m_command_buffers[m_current_frame_in_flight];
 
-        const VkSemaphore signalSemaphores[] = {m_render_finished_semaphores[m_current_frame_in_flight]};
-        submitInfo.signalSemaphoreCount = 1;
-        submitInfo.pSignalSemaphores = signalSemaphores;
+        const VkSemaphore signal_semaphores[] = {m_render_finished_semaphores[m_current_frame_in_flight]};
+        submit_info.signalSemaphoreCount = 1;
+        submit_info.pSignalSemaphores = signal_semaphores;
 
-        if (vkQueueSubmit(m_graphics_queue, 1, &submitInfo, m_in_flight_fences[m_current_frame_in_flight]) !=
+        if (vkQueueSubmit(m_graphics_queue, 1, &submit_info, m_in_flight_fences[m_current_frame_in_flight]) !=
             VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to submit draw command buffer!");
         }
 
-        VkPresentInfoKHR presentInfo{};
-        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        VkPresentInfoKHR present_info{};
+        present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
-        presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = signalSemaphores;
+        present_info.waitSemaphoreCount = 1;
+        present_info.pWaitSemaphores = signal_semaphores;
 
-        const VkSwapchainKHR swapChains[] = {m_swap_chain};
-        presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = swapChains;
-        presentInfo.pImageIndices = &m_current_swap_chain_image_index;
-        presentInfo.pResults = nullptr; // Optional
+        m_swap_chain.fill_present_info(present_info);
 
-        const VkResult result = vkQueuePresentKHR(m_present_queue, &presentInfo);
+        const VkResult result = vkQueuePresentKHR(m_present_queue, &present_info);
         if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_framebuffer_resized) {
             m_framebuffer_resized = false;
             recreateSwapChain();
@@ -693,18 +585,9 @@ namespace yage::gl::vulkan
         m_current_frame_in_flight = (m_current_frame_in_flight + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 
-    void Instance::flush_resources()
+    void Instance::flush_gpu()
     {
         vkDeviceWaitIdle(m_device);
-        cleanupSwapChain();
-    }
-
-    FrameCounter Instance::swap_chain_counter() const
-    {
-        return {
-                .curent_frame_index = &m_current_swap_chain_image_index,
-                .max_frame_index = static_cast<unsigned int>(m_swap_chain_images.size()),
-        };
     }
 
     FrameCounter Instance::frames_in_flight_counter() const
@@ -738,19 +621,14 @@ namespace yage::gl::vulkan
         return m_graphics_queue;
     }
 
-    FrameBuffer& Instance::swap_chain_frame_buffer() const
-    {
-        return m_swap_chain_frame_buffer.get<FrameBuffer>();
-    }
-
-    const RenderPassHandle& Instance::swap_chain_render_pass() const
-    {
-        return m_render_pass;
-    }
-
     VkCommandBuffer Instance::command_buffer_for_frame() const
     {
         return m_command_buffers[m_current_frame_in_flight];
+    }
+
+    const SwapChain& Instance::swap_chain() const
+    {
+        return m_swap_chain;
     }
 
     RenderPassStore& Instance::store_render_passes()
@@ -911,6 +789,12 @@ namespace yage::gl::vulkan
         create_info.image = image;
         create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
         create_info.format = format;
+
+        create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
         create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         create_info.subresourceRange.baseMipLevel = 0;
         create_info.subresourceRange.levelCount = 1;
@@ -1057,15 +941,6 @@ namespace yage::gl::vulkan
         end_one_time_command_buffer(command_buffer);
     }
 
-    void Instance::cleanupSwapChain()
-    {
-        m_swap_chain_frame_buffer.reset();
-
-        m_swap_chain_image_view.reset();
-
-        vkDestroySwapchainKHR(m_device, m_swap_chain, nullptr);
-    }
-
     void Instance::recreateSwapChain()
     {
         const auto window = m_window.lock();
@@ -1081,11 +956,7 @@ namespace yage::gl::vulkan
 
         vkDeviceWaitIdle(m_device);
 
-        cleanupSwapChain();
-
         create_swap_chain();
-        create_swap_chain_image_views();
-        create_framebuffers();
     }
 
     void Instance::create_descriptor_allocator()

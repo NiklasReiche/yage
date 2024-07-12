@@ -33,11 +33,13 @@ namespace yage::gl::vulkan
 
         PipelineBuilder& with_rasterizer(PolygonMode polygon_mode, CullMode cull_mode, float line_width);
 
-        PipelineBuilder& with_vertex_format(PrimitiveTopology topology, std::span<const VertexComponent> layout, VertexFormat format);
+        PipelineBuilder& with_vertex_format(PrimitiveTopology topology, std::span<const VertexComponent> vertex_description, VertexFormat format);
 
         PipelineBuilder& with_viewport(Viewport viewport, ScissorRectangle scissor);
 
         PipelineBuilder& with_render_pass(RenderPassHandle render_pass);
+
+        PipelineBuilder& with_swap_chain_render_pass();
 
         PipelineBuilder& with_layout(DescriptorSetLayoutHandle layout);
 

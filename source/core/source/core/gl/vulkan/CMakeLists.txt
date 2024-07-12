@@ -4,6 +4,9 @@ target_sources(yage_core PRIVATE
         Instance.h
         Instance.cpp
 
+        SwapChain.h
+        SwapChain.cpp
+
         VertexBuffer.h
         VertexBuffer.cpp
         VertexBufferCreator.h

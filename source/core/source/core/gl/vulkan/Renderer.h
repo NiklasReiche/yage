@@ -18,6 +18,8 @@ namespace yage::gl::vulkan
 
         void begin_command_buffer();
 
+        void begin_render_pass();
+
         void begin_render_pass(const FrameBuffer& frame_buffer);
 
         void bind_pipeline(const Pipeline& pipeline, const IDescriptorSet& descriptor_set);

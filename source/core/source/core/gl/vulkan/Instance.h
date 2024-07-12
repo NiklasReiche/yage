@@ -15,6 +15,7 @@
 #include "FrameCounter.h"
 #include "IndexBuffer.h"
 #include "Pipeline.h"
+#include "SwapChain.h"
 #include "Texture2D.h"
 #include "UniformBuffer.h"
 #include "VertexBuffer.h"
@@ -68,9 +69,7 @@ namespace yage::gl::vulkan
 
         void present_frame();
 
-        void flush_resources();
-
-        FrameCounter swap_chain_counter() const;
+        void flush_gpu();
 
         FrameCounter frames_in_flight_counter() const;
 
@@ -82,11 +81,9 @@ namespace yage::gl::vulkan
 
         [[nodiscard]] VkQueue graphics_queue() const;
 
-        [[nodiscard]] FrameBuffer& swap_chain_frame_buffer() const;
-
-        [[nodiscard]] const RenderPassHandle& swap_chain_render_pass() const;
-
         [[nodiscard]] VkCommandBuffer command_buffer_for_frame() const;
+
+        const SwapChain& swap_chain() const;
 
         RenderPassStore& store_render_passes();
 
@@ -141,36 +138,27 @@ namespace yage::gl::vulkan
 
         std::weak_ptr<platform::desktop::GlfwWindow> m_window;
 
-        VkInstance m_instance{};
-        VkDebugUtilsMessengerEXT m_debug_messenger{};
-        VkSurfaceKHR m_surface{};
+        VkInstance m_instance = VK_NULL_HANDLE;
+        VkDebugUtilsMessengerEXT m_debug_messenger = VK_NULL_HANDLE;
+        VkSurfaceKHR m_surface = VK_NULL_HANDLE;
 
         VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
-        VkDevice m_device{};
+        VkDevice m_device = VK_NULL_HANDLE;
 
-        VkQueue m_graphics_queue{};
-        VkQueue m_present_queue{};
+        VkQueue m_graphics_queue = VK_NULL_HANDLE;
+        VkQueue m_present_queue = VK_NULL_HANDLE;
 
-        VkSwapchainKHR m_swap_chain{};
-        VkFormat m_swap_chain_image_format{};
-        VkExtent2D m_swap_chain_extent{};
-
-        RenderPassHandle m_render_pass;
+        SwapChain m_swap_chain;
 
         const unsigned int m_current_frame_static = 0;
         unsigned int m_current_frame_in_flight = 0;
-        unsigned int m_current_swap_chain_image_index = 0;
 
-        std::vector<VkImage> m_swap_chain_images{};
-        ImageViewHandle m_swap_chain_image_view{};
-        FrameBufferHandle m_swap_chain_frame_buffer{};
+        VkCommandPool m_command_pool = VK_NULL_HANDLE;
+        std::vector<VkCommandBuffer> m_command_buffers;
 
-        VkCommandPool m_command_pool{};
-        std::vector<VkCommandBuffer> m_command_buffers{};
-
-        std::vector<VkSemaphore> m_image_available_semaphores{};
-        std::vector<VkSemaphore> m_render_finished_semaphores{};
-        std::vector<VkFence> m_in_flight_fences{};
+        std::vector<VkSemaphore> m_image_available_semaphores;
+        std::vector<VkSemaphore> m_render_finished_semaphores;
+        std::vector<VkFence> m_in_flight_fences;
 
         bool m_framebuffer_resized = false;
 
@@ -228,21 +216,11 @@ namespace yage::gl::vulkan
 
         void create_swap_chain();
 
-        void create_swap_chain_image_views();
-
-        VkShaderModule createShaderModule(const std::vector<std::byte>& code);
-
-        void create_swap_chain_render_pass();
-
-        void create_framebuffers();
-
         void create_command_pool();
 
         void create_command_buffers();
 
         void create_sync_objects();
-
-        void cleanupSwapChain();
 
         void recreateSwapChain();
 

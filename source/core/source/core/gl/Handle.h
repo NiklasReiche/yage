@@ -55,7 +55,7 @@ namespace yage::gl
         T_& get() const;
 
         /**
-         * Explicitly destroys the associated resource and invalidates this handle.
+         * Explicitly invalidates this handle.
          */
         void reset();
 
@@ -93,6 +93,48 @@ namespace yage::gl
             requires std::derived_from<Derived, Base>
         friend class Store;
     };
+
+#if 0 // TODO
+    template<typename T>
+    class Handle<T const>
+    {
+    public:
+        Handle();
+
+        ~Handle();
+
+        Handle(const Handle& other);
+
+        Handle(Handle&& other) noexcept;
+
+        Handle& operator=(const Handle& other);
+
+        Handle& operator=(Handle&& other) noexcept;
+
+        Handle(const Handle<T>& other);
+
+        Handle(const Handle<T>&& other);
+
+        const T* operator->() const;
+
+        const T& operator*() const;
+
+        template<typename T_>
+            requires std::derived_from<T_, T>
+        const T_& get() const;
+
+        void reset();
+
+        [[nodiscard]] bool empty() const;
+
+    private:
+        std::weak_ptr<StoreBase<T>> m_store;
+
+        StoreId m_id;
+
+        std::size_t m_index;
+    };
+#endif
 
     template<typename Base>
     class StoreBase
@@ -281,7 +323,7 @@ namespace yage::gl
         requires std::derived_from<Derived, Base>
     bool Store<Base, Derived>::contains(const Handle<Base>& handle) const
     {
-        return m_ids[handle.m_index] == handle.m_id;
+        return handle.m_index < m_ids.size() && m_ids[handle.m_index] == handle.m_id;
     }
 
     template<typename Base, typename Derived>

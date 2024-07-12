@@ -26,6 +26,23 @@ namespace yage::gl::vulkan
         }
     }
 
+    void Renderer::begin_render_pass()
+    {
+        const auto& swap_chain = m_instance.lock()->swap_chain();
+
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = swap_chain.render_pass().get<RenderPass>().vk_handle();
+        renderPassInfo.framebuffer = swap_chain.current_frame_buffer();
+        renderPassInfo.renderArea.offset = {0, 0};
+        renderPassInfo.renderArea.extent = swap_chain.extent();
+        constexpr VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+        renderPassInfo.clearValueCount = 1;
+        renderPassInfo.pClearValues = &clearColor;
+
+        vkCmdBeginRenderPass(m_command_buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    }
+
     void Renderer::begin_render_pass(const FrameBuffer& frame_buffer)
     {
         VkRenderPassBeginInfo renderPassInfo{};

@@ -66,7 +66,7 @@ namespace yage::gl::vulkan
 
 
     PipelineBuilder& PipelineBuilder::with_vertex_format(const PrimitiveTopology topology,
-                                                         const std::span<const VertexComponent> layout,
+                                                         const std::span<const VertexComponent> vertex_description,
                                                          const VertexFormat format)
     {
         m_vertex_binding_descriptions.clear();
@@ -77,7 +77,7 @@ namespace yage::gl::vulkan
         m_input_assembly.topology = convert(topology);
         m_input_assembly.primitiveRestartEnable = VK_FALSE;
 
-        if (layout.empty()) {
+        if (vertex_description.empty()) {
             m_vertex_input_info = VkPipelineVertexInputStateCreateInfo{};
             m_vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
             m_vertex_input_info.vertexBindingDescriptionCount = 0;
@@ -88,7 +88,7 @@ namespace yage::gl::vulkan
         }
 
         std::size_t vertex_size_bytes = 0;
-        for (const VertexComponent& component: layout) {
+        for (const VertexComponent& component: vertex_description) {
             vertex_size_bytes += byte_size(component);
         }
 
@@ -101,10 +101,10 @@ namespace yage::gl::vulkan
                 binding_description.inputRate = VK_VERTEX_INPUT_RATE_VERTEX; // non-instanced rendering
                 m_vertex_binding_descriptions.push_back(binding_description);
 
-                m_vertex_attribute_descriptions.reserve(layout.size());
+                m_vertex_attribute_descriptions.reserve(vertex_description.size());
                 std::size_t offset = 0;
-                for (std::size_t i = 0; i < layout.size(); ++i) {
-                    const VertexComponent& component = layout[i];
+                for (std::size_t i = 0; i < vertex_description.size(); ++i) {
+                    const VertexComponent& component = vertex_description[i];
                     VkVertexInputAttributeDescription attribute_description{};
                     attribute_description.binding = 0;
                     attribute_description.location = i;
@@ -157,6 +157,13 @@ namespace yage::gl::vulkan
     PipelineBuilder& PipelineBuilder::with_render_pass(RenderPassHandle render_pass)
     {
         m_render_pass = std::move(render_pass);
+
+        return *this;
+    }
+
+    PipelineBuilder& PipelineBuilder::with_swap_chain_render_pass()
+    {
+        m_render_pass = m_instance.lock()->swap_chain().render_pass();
 
         return *this;
     }
