@@ -42,7 +42,7 @@ namespace yage::gl::vulkan
             m_instance->transition_image_layout(m_vk_images[i], vk_image_format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                                                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-            m_vk_image_views[i] = instance->create_image_view(m_vk_images[i], vk_image_format);
+            m_vk_image_views[i] = instance->create_image_view(m_vk_images[i], vk_image_format, VK_IMAGE_ASPECT_COLOR_BIT);
         }
 
         m_vk_sampler = instance->create_texture_sampler(sampler);

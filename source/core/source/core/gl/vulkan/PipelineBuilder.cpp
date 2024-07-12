@@ -9,6 +9,7 @@ namespace yage::gl::vulkan
     PipelineBuilder::PipelineBuilder(std::weak_ptr<Instance> instance)
         : m_instance(std::move(instance))
     {
+        populate_defaults();
     }
 
     PipelineBuilder::~PipelineBuilder()
@@ -170,6 +171,7 @@ namespace yage::gl::vulkan
 
     PipelineHandle PipelineBuilder::build()
     {
+        // TODO
         with_blending();
         with_multisampling();
         with_dynamic_state();
@@ -183,7 +185,7 @@ namespace yage::gl::vulkan
         pipeline_info.pViewportState = &m_viewport_state;
         pipeline_info.pRasterizationState = &m_rasterizer_info;
         pipeline_info.pMultisampleState = &m_multisampling_info;
-        pipeline_info.pDepthStencilState = nullptr; // Optional
+        pipeline_info.pDepthStencilState = &m_depth_stencil_state_create_info;
         pipeline_info.pColorBlendState = &m_blend_info;
         pipeline_info.pDynamicState = &m_dynamic_state;
         pipeline_info.renderPass = m_render_pass.get<RenderPass>().vk_handle();
@@ -193,6 +195,17 @@ namespace yage::gl::vulkan
 
         const auto instance = m_instance.lock();
         return instance->store_pipelines().create(instance.get(), m_render_pass, pipeline_info, m_pipeline_layout_info);
+    }
+
+    void PipelineBuilder::populate_defaults()
+    {
+        // TODO: defaults for all stages
+
+        // depth and stencil tests
+        m_depth_stencil_state_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+        m_depth_stencil_state_create_info.depthTestEnable = VK_FALSE;
+        m_depth_stencil_state_create_info.depthWriteEnable = VK_FALSE;
+        m_depth_stencil_state_create_info.stencilTestEnable = VK_FALSE;
     }
 
     PipelineBuilder& PipelineBuilder::with_blending()
@@ -247,6 +260,19 @@ namespace yage::gl::vulkan
         m_pipeline_layout_info.pSetLayouts = &layout.get<DescriptorSetLayout>().vk_handle();
         m_pipeline_layout_info.pushConstantRangeCount = 0; // Optional
         m_pipeline_layout_info.pPushConstantRanges = nullptr; // Optional
+
+        return *this;
+    }
+
+    PipelineBuilder& PipelineBuilder::with_depth_test()
+    {
+        m_depth_stencil_state_create_info.depthTestEnable = VK_TRUE;
+        m_depth_stencil_state_create_info.depthWriteEnable = VK_TRUE;
+        m_depth_stencil_state_create_info.depthCompareOp = VK_COMPARE_OP_LESS;
+
+        m_depth_stencil_state_create_info.depthBoundsTestEnable = VK_FALSE;
+        m_depth_stencil_state_create_info.minDepthBounds = 0.0f; // Optional
+        m_depth_stencil_state_create_info.maxDepthBounds = 1.0f; // Optional
 
         return *this;
     }

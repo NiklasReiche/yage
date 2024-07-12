@@ -118,7 +118,7 @@ namespace yage::gl::vulkan
                           VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image,
                           VkDeviceMemory& image_memory);
 
-        VkImageView create_image_view(VkImage image, VkFormat format);
+        VkImageView create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspect_flags);
 
         VkSampler create_texture_sampler(const TextureSampler& sampler);
 
@@ -213,6 +213,11 @@ namespace yage::gl::vulkan
         static VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 
         VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+
+        VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling,
+                                     VkFormatFeatureFlags features);
+
+        VkFormat findDepthFormat();
 
         void create_swap_chain();
 

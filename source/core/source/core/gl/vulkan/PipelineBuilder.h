@@ -33,7 +33,8 @@ namespace yage::gl::vulkan
 
         PipelineBuilder& with_rasterizer(PolygonMode polygon_mode, CullMode cull_mode, float line_width);
 
-        PipelineBuilder& with_vertex_format(PrimitiveTopology topology, std::span<const VertexComponent> vertex_description, VertexFormat format);
+        PipelineBuilder& with_vertex_format(PrimitiveTopology topology,
+                                            std::span<const VertexComponent> vertex_description, VertexFormat format);
 
         PipelineBuilder& with_viewport(Viewport viewport, ScissorRectangle scissor);
 
@@ -42,6 +43,8 @@ namespace yage::gl::vulkan
         PipelineBuilder& with_swap_chain_render_pass();
 
         PipelineBuilder& with_layout(DescriptorSetLayoutHandle layout);
+
+        PipelineBuilder& with_depth_test();
 
         PipelineHandle build();
 
@@ -70,6 +73,10 @@ namespace yage::gl::vulkan
         VkPipelineColorBlendStateCreateInfo m_blend_info{};
         VkPipelineMultisampleStateCreateInfo m_multisampling_info{};
         VkPipelineLayoutCreateInfo m_pipeline_layout_info{};
+
+        VkPipelineDepthStencilStateCreateInfo m_depth_stencil_state_create_info{};
+
+        void populate_defaults();
 
         PipelineBuilder& with_blending();
 

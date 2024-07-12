@@ -422,6 +422,30 @@ namespace yage::gl::vulkan
         return actualExtent;
     }
 
+    VkFormat Instance::findSupportedFormat(const std::vector<VkFormat>& candidates, const VkImageTiling tiling,
+                                           const VkFormatFeatureFlags features)
+    {
+        for (const VkFormat format: candidates) {
+            VkFormatProperties props;
+            vkGetPhysicalDeviceFormatProperties(m_physical_device, format, &props);
+
+            if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
+                return format;
+            }
+            if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features) {
+                return format;
+            }
+        }
+
+        throw std::runtime_error("failed to find supported format!");
+    }
+
+    VkFormat Instance::findDepthFormat()
+    {
+        return findSupportedFormat({VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
+                                   VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+    }
+
     void Instance::create_swap_chain()
     {
         const SwapChainSupportDetails swapChainSupport = querySwapChainSupport(m_physical_device);
@@ -467,7 +491,7 @@ namespace yage::gl::vulkan
 
         createInfo.oldSwapchain = VK_NULL_HANDLE; // TODO: window resizing
 
-        m_swap_chain = SwapChain(this, createInfo);
+        m_swap_chain = SwapChain(this, createInfo, findDepthFormat());
     }
 
     void Instance::create_command_pool()
@@ -782,7 +806,7 @@ namespace yage::gl::vulkan
         vkBindImageMemory(m_device, image, image_memory, 0);
     }
 
-    VkImageView Instance::create_image_view(const VkImage image, const VkFormat format)
+    VkImageView Instance::create_image_view(const VkImage image, const VkFormat format, VkImageAspectFlags aspect_flags)
     {
         VkImageViewCreateInfo create_info{};
         create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -795,7 +819,7 @@ namespace yage::gl::vulkan
         create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
         create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
 
-        create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        create_info.subresourceRange.aspectMask = aspect_flags;
         create_info.subresourceRange.baseMipLevel = 0;
         create_info.subresourceRange.levelCount = 1;
         create_info.subresourceRange.baseArrayLayer = 0;

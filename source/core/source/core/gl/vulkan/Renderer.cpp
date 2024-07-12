@@ -30,17 +30,21 @@ namespace yage::gl::vulkan
     {
         const auto& swap_chain = m_instance.lock()->swap_chain();
 
-        VkRenderPassBeginInfo renderPassInfo{};
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = swap_chain.render_pass().get<RenderPass>().vk_handle();
-        renderPassInfo.framebuffer = swap_chain.current_frame_buffer();
-        renderPassInfo.renderArea.offset = {0, 0};
-        renderPassInfo.renderArea.extent = swap_chain.extent();
-        constexpr VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
-        renderPassInfo.clearValueCount = 1;
-        renderPassInfo.pClearValues = &clearColor;
+        VkRenderPassBeginInfo render_pass_info{};
+        render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        render_pass_info.renderPass = swap_chain.render_pass().get<RenderPass>().vk_handle();
+        render_pass_info.framebuffer = swap_chain.current_frame_buffer();
+        render_pass_info.renderArea.offset = {0, 0};
+        render_pass_info.renderArea.extent = swap_chain.extent();
 
-        vkCmdBeginRenderPass(m_command_buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        std::array<VkClearValue, 2> clear_values{};
+        clear_values[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
+        clear_values[1].depthStencil = {1.0f, 0};
+
+        render_pass_info.clearValueCount = static_cast<std::uint32_t>(clear_values.size());
+        render_pass_info.pClearValues = &clear_values[0];
+
+        vkCmdBeginRenderPass(m_command_buffer, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
     }
 
     void Renderer::begin_render_pass(const FrameBuffer& frame_buffer)
@@ -50,9 +54,11 @@ namespace yage::gl::vulkan
         renderPassInfo.renderPass = frame_buffer.render_pass().get<RenderPass>().vk_handle();
         renderPassInfo.framebuffer = frame_buffer.vk_handle();
         renderPassInfo.renderArea.offset = {0, 0};
+
         const math::Vec2ui extent = frame_buffer.extent();
         renderPassInfo.renderArea.extent = {extent.x(), extent.y()};
-        constexpr VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+
+        constexpr VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}}; // TODO: depth & stencil
         renderPassInfo.clearValueCount = 1;
         renderPassInfo.pClearValues = &clearColor;
 

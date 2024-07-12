@@ -15,7 +15,7 @@ namespace yage::gl::vulkan
     public:
         SwapChain() = default;
 
-        SwapChain(Instance* instance, const VkSwapchainCreateInfoKHR& create_info);
+        SwapChain(Instance* instance, const VkSwapchainCreateInfoKHR& create_info, VkFormat depth_format);
 
         ~SwapChain();
 
@@ -53,10 +53,17 @@ namespace yage::gl::vulkan
         std::vector<VkImageView> m_image_views;
         std::vector<VkFramebuffer> m_frame_buffers;
 
+        VkFormat m_depth_image_format{};
+        VkImage m_depth_image = VK_NULL_HANDLE;
+        VkDeviceMemory m_depth_image_memory = VK_NULL_HANDLE;
+        VkImageView m_depth_image_view = VK_NULL_HANDLE;
+
         unsigned int m_max_image_index = 0;
         unsigned int m_current_image_index = 0;
 
         void create_image_views();
+
+        void create_depth_resource();
 
         void create_render_pass();
 

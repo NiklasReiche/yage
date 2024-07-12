@@ -75,15 +75,17 @@ int main()
     const auto file_reader = window->getFileReader();
     auto vert_code = file_reader->openBinaryFile(R"(assets/vert.spv)", platform::IFile::AccessMode::READ)->read_all();
     auto frag_code = file_reader->openBinaryFile(R"(assets/frag.spv)", platform::IFile::AccessMode::READ)->read_all();
-    const auto graphics_pipeline = gl::vulkan::PipelineBuilder(context)
-                                           .with_shaders(vert_code, frag_code)
-                                           .with_rasterizer(gl::PolygonMode::FILL, gl::CullMode::NONE, 1.0f)
-                                           .with_swap_chain_render_pass()
-                                           .with_viewport({0, 0, 500.0f, 500.0f}, {0, 0, 500, 500})
-                                           .with_vertex_format(gl::PrimitiveTopology::TRIANGLE_LIST, vertex_data_info.vertex_description,
-                                                               gl::VertexFormat::INTERLEAVED)
-                                           .with_layout(layout)
-                                           .build();
+    const auto graphics_pipeline =
+            gl::vulkan::PipelineBuilder(context)
+                    .with_shaders(vert_code, frag_code)
+                    .with_rasterizer(gl::PolygonMode::FILL, gl::CullMode::NONE, 1.0f)
+                    .with_depth_test()
+                    .with_swap_chain_render_pass()
+                    .with_viewport({0, 0, 500.0f, 500.0f}, {0, 0, 500, 500})
+                    .with_vertex_format(gl::PrimitiveTopology::TRIANGLE_LIST, vertex_data_info.vertex_description,
+                                        gl::VertexFormat::INTERLEAVED)
+                    .with_layout(layout)
+                    .build();
 
     gl::vulkan::Renderer renderer(context);
 
