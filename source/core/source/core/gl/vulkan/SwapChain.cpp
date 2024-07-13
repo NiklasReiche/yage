@@ -3,7 +3,8 @@
 
 namespace yage::gl::vulkan
 {
-    SwapChain::SwapChain(Instance* instance, const VkSwapchainCreateInfoKHR& create_info, const VkFormat depth_format)
+    SwapChain::SwapChain(Instance* instance, const VkSwapchainCreateInfoKHR& create_info, const VkFormat depth_format,
+                         const VkSampleCountFlagBits msaa_samples)
         : m_instance(instance),
           m_vk_device(instance->device())
     {
@@ -18,9 +19,11 @@ namespace yage::gl::vulkan
 
         m_image_format = create_info.imageFormat;
         m_extent = create_info.imageExtent;
+        m_msaa_samples = msaa_samples;
         m_depth_image_format = depth_format;
 
         create_image_views();
+        create_color_resource();
         create_depth_resource();
         create_render_pass();
         create_frame_buffers();
@@ -46,15 +49,29 @@ namespace yage::gl::vulkan
           m_depth_image(other.m_depth_image),
           m_depth_image_memory(other.m_depth_image_memory),
           m_depth_image_view(other.m_depth_image_view),
+          m_msaa_samples(other.m_msaa_samples),
+          m_color_image_msaa(other.m_color_image_msaa),
+          m_color_image_msaa_memory(other.m_color_image_msaa_memory),
+          m_color_image_msaa_view(other.m_color_image_msaa_view),
           m_max_image_index(other.m_max_image_index),
           m_current_image_index(other.m_current_image_index)
     {
         other.m_instance = nullptr;
         other.m_vk_device = VK_NULL_HANDLE;
+
         other.m_swap_chain_khr = VK_NULL_HANDLE;
+        other.m_image_format = VK_FORMAT_UNDEFINED;
+        other.m_extent = VkExtent2D{};
+
+        other.m_depth_image_format = VK_FORMAT_UNDEFINED;
         other.m_depth_image_view = VK_NULL_HANDLE;
         other.m_depth_image = VK_NULL_HANDLE;
         other.m_depth_image_memory = VK_NULL_HANDLE;
+
+        other.m_msaa_samples = VK_SAMPLE_COUNT_1_BIT;
+        other.m_color_image_msaa = VK_NULL_HANDLE;
+        other.m_color_image_msaa_memory = VK_NULL_HANDLE;
+        other.m_color_image_msaa_view = VK_NULL_HANDLE;
     }
 
     SwapChain& SwapChain::operator=(SwapChain&& other) noexcept
@@ -64,6 +81,7 @@ namespace yage::gl::vulkan
 
         m_instance = other.m_instance;
         m_vk_device = other.m_vk_device;
+
         m_swap_chain_khr = other.m_swap_chain_khr;
         m_image_format = other.m_image_format;
         m_extent = other.m_extent;
@@ -76,13 +94,27 @@ namespace yage::gl::vulkan
         m_depth_image_view = other.m_depth_image_view;
         m_max_image_index = other.m_max_image_index;
         m_current_image_index = other.m_current_image_index;
+        m_msaa_samples = other.m_msaa_samples;
+        m_color_image_msaa = other.m_color_image_msaa;
+        m_color_image_msaa_memory = other.m_color_image_msaa_memory;
+        m_color_image_msaa_view = other.m_color_image_msaa_view;
 
         other.m_instance = nullptr;
         other.m_vk_device = VK_NULL_HANDLE;
+
         other.m_swap_chain_khr = VK_NULL_HANDLE;
+        other.m_image_format = VK_FORMAT_UNDEFINED;
+        other.m_extent = VkExtent2D{};
+
+        other.m_depth_image_format = VK_FORMAT_UNDEFINED;
         other.m_depth_image_view = VK_NULL_HANDLE;
         other.m_depth_image = VK_NULL_HANDLE;
         other.m_depth_image_memory = VK_NULL_HANDLE;
+
+        other.m_msaa_samples = VK_SAMPLE_COUNT_1_BIT;
+        other.m_color_image_msaa = VK_NULL_HANDLE;
+        other.m_color_image_msaa_memory = VK_NULL_HANDLE;
+        other.m_color_image_msaa_view = VK_NULL_HANDLE;
 
         return *this;
     }
@@ -120,6 +152,16 @@ namespace yage::gl::vulkan
             vkFreeMemory(m_vk_device, m_depth_image_memory, nullptr);
         }
 
+        if (m_color_image_msaa_view != VK_NULL_HANDLE) {
+            vkDestroyImageView(m_vk_device, m_color_image_msaa_view, nullptr);
+        }
+        if (m_color_image_msaa != VK_NULL_HANDLE) {
+            vkDestroyImage(m_vk_device, m_color_image_msaa, nullptr);
+        }
+        if (m_color_image_msaa_memory != VK_NULL_HANDLE) {
+            vkFreeMemory(m_vk_device, m_color_image_msaa_memory, nullptr);
+        }
+
         for (const auto& m_image_view: m_image_views) {
             vkDestroyImageView(m_vk_device, m_image_view, nullptr);
         }
@@ -153,12 +195,24 @@ namespace yage::gl::vulkan
         }
     }
 
+    void SwapChain::create_color_resource()
+    {
+        m_instance->create_image(m_extent.width, m_extent.height, 1, m_msaa_samples, m_image_format,
+                                 VK_IMAGE_TILING_OPTIMAL,
+                                 VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+                                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_color_image_msaa, m_color_image_msaa_memory);
+
+        m_color_image_msaa_view =
+                m_instance->create_image_view(m_color_image_msaa, m_image_format, VK_IMAGE_ASPECT_COLOR_BIT, 1);
+    }
+
     void SwapChain::create_depth_resource()
     {
-        m_instance->create_image(m_extent.width, m_extent.height, 1, m_depth_image_format, VK_IMAGE_TILING_OPTIMAL,
-                    VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_depth_image,
-                    m_depth_image_memory);
-        m_depth_image_view = m_instance->create_image_view(m_depth_image, m_depth_image_format, VK_IMAGE_ASPECT_DEPTH_BIT, 1);
+        m_instance->create_image(m_extent.width, m_extent.height, 1, m_msaa_samples, m_depth_image_format,
+                                 VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+                                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_depth_image, m_depth_image_memory);
+        m_depth_image_view =
+                m_instance->create_image_view(m_depth_image, m_depth_image_format, VK_IMAGE_ASPECT_DEPTH_BIT, 1);
 
         // TODO: transition?
     }
@@ -167,20 +221,20 @@ namespace yage::gl::vulkan
     {
         VkAttachmentDescription color_attachment{};
         color_attachment.format = m_image_format;
-        color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        color_attachment.samples = m_msaa_samples;
         color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         color_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         color_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         color_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        color_attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        color_attachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
         VkAttachmentReference color_attachment_ref{};
         color_attachment_ref.attachment = 0;
         color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
         VkAttachmentDescription depth_attachment{};
         depth_attachment.format = m_depth_image_format;
-        depth_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        depth_attachment.samples = m_msaa_samples;
         depth_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         depth_attachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         depth_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -191,13 +245,27 @@ namespace yage::gl::vulkan
         depth_attachment_ref.attachment = 1;
         depth_attachment_ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
+        VkAttachmentDescription color_attachment_resolve{};
+        color_attachment_resolve.format = m_image_format;
+        color_attachment_resolve.samples = VK_SAMPLE_COUNT_1_BIT;
+        color_attachment_resolve.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        color_attachment_resolve.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        color_attachment_resolve.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        color_attachment_resolve.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        color_attachment_resolve.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        color_attachment_resolve.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        VkAttachmentReference color_attachment_resolve_ref{};
+        color_attachment_resolve_ref.attachment = 2;
+        color_attachment_resolve_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
         VkSubpassDescription subpass{};
         subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
         subpass.colorAttachmentCount = 1;
         subpass.pColorAttachments = &color_attachment_ref;
         subpass.pDepthStencilAttachment = &depth_attachment_ref;
+        subpass.pResolveAttachments = &color_attachment_resolve_ref;
 
-        const std::array attachments = {color_attachment, depth_attachment};
+        const std::array attachments = {color_attachment, depth_attachment, color_attachment_resolve};
         VkRenderPassCreateInfo create_info{};
         create_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
         create_info.attachmentCount = static_cast<std::uint32_t>(attachments.size());
@@ -208,9 +276,11 @@ namespace yage::gl::vulkan
         VkSubpassDependency dependency{};
         dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
         dependency.dstSubpass = 0;
-        dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+        dependency.srcStageMask =
+                VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
         dependency.srcAccessMask = 0;
-        dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+        dependency.dstStageMask =
+                VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
         dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
         create_info.dependencyCount = 1;
@@ -223,7 +293,7 @@ namespace yage::gl::vulkan
     {
         m_frame_buffers.resize(m_image_views.size());
         for (std::size_t i = 0; i < m_image_views.size(); i++) {
-            const std::array attachments = {m_image_views[i], m_depth_image_view};
+            const std::array attachments = {m_color_image_msaa_view, m_depth_image_view, m_image_views[i]};
 
             VkFramebufferCreateInfo create_info{};
             create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;

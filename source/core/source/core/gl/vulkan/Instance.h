@@ -114,9 +114,10 @@ namespace yage::gl::vulkan
 
         void copy_buffer(VkBuffer source, VkBuffer destination, VkDeviceSize size);
 
-        void create_image(std::uint32_t width, std::uint32_t height, unsigned int mip_levels, VkFormat format,
-                          VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties,
-                          VkImage& image, VkDeviceMemory& image_memory);
+        void create_image(std::uint32_t width, std::uint32_t height, unsigned int mip_levels,
+                          VkSampleCountFlagBits num_samples, VkFormat format, VkImageTiling tiling,
+                          VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image,
+                          VkDeviceMemory& image_memory);
 
         VkImageView create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspect_flags,
                                       unsigned int mip_levels);
@@ -153,6 +154,8 @@ namespace yage::gl::vulkan
         VkQueue m_present_queue = VK_NULL_HANDLE;
 
         SwapChain m_swap_chain;
+
+        VkSampleCountFlagBits m_max_msaa_samples = VK_SAMPLE_COUNT_1_BIT;
 
         const unsigned int m_current_frame_static = 0;
         unsigned int m_current_frame_in_flight = 0;
@@ -222,6 +225,8 @@ namespace yage::gl::vulkan
                                      VkFormatFeatureFlags features);
 
         VkFormat findDepthFormat();
+
+        VkSampleCountFlagBits get_max_usable_sample_count();
 
         void create_swap_chain();
 

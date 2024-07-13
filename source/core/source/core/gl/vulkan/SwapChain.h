@@ -15,7 +15,8 @@ namespace yage::gl::vulkan
     public:
         SwapChain() = default;
 
-        SwapChain(Instance* instance, const VkSwapchainCreateInfoKHR& create_info, VkFormat depth_format);
+        SwapChain(Instance* instance, const VkSwapchainCreateInfoKHR& create_info, VkFormat depth_format,
+                  VkSampleCountFlagBits msaa_samples);
 
         ~SwapChain();
 
@@ -44,7 +45,7 @@ namespace yage::gl::vulkan
         VkDevice m_vk_device = VK_NULL_HANDLE;
 
         VkSwapchainKHR m_swap_chain_khr = VK_NULL_HANDLE;
-        VkFormat m_image_format{};
+        VkFormat m_image_format = VK_FORMAT_UNDEFINED;
         VkExtent2D m_extent{};
 
         RenderPassHandle m_render_pass;
@@ -53,15 +54,22 @@ namespace yage::gl::vulkan
         std::vector<VkImageView> m_image_views;
         std::vector<VkFramebuffer> m_frame_buffers;
 
-        VkFormat m_depth_image_format{};
+        VkFormat m_depth_image_format = VK_FORMAT_UNDEFINED;
         VkImage m_depth_image = VK_NULL_HANDLE;
         VkDeviceMemory m_depth_image_memory = VK_NULL_HANDLE;
         VkImageView m_depth_image_view = VK_NULL_HANDLE;
+
+        VkSampleCountFlagBits m_msaa_samples = VK_SAMPLE_COUNT_1_BIT;
+        VkImage m_color_image_msaa = VK_NULL_HANDLE;
+        VkDeviceMemory m_color_image_msaa_memory = VK_NULL_HANDLE;
+        VkImageView m_color_image_msaa_view = VK_NULL_HANDLE;
 
         unsigned int m_max_image_index = 0;
         unsigned int m_current_image_index = 0;
 
         void create_image_views();
+
+        void create_color_resource();
 
         void create_depth_resource();
 

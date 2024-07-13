@@ -118,6 +118,7 @@ namespace yage::opengl
 
     void Renderer::setDefaultRenderTarget()
     {
+	    // TODO: use a custom fbo as the default target, so that we can change msaa without recreating the window
         lockContextPtr()->bindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 

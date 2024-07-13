@@ -212,4 +212,12 @@ namespace yage::gl
 
         // TODO: border color
     };
+
+    enum class MSAASamples
+    {
+        SAMPLE_1,
+        SAMPLE_2,
+        SAMPLE_4,
+        SAMPLE_8
+    };
 }

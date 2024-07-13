@@ -84,6 +84,7 @@ int main()
                     .with_viewport({0, 0, 500.0f, 500.0f}, {0, 0, 500, 500})
                     .with_vertex_format(gl::PrimitiveTopology::TRIANGLE_LIST, vertex_data_info.vertex_description,
                                         gl::VertexFormat::INTERLEAVED)
+                    .with_multisampling(gl::MSAASamples::SAMPLE_8)
                     .with_layout(layout)
                     .build();
 
@@ -91,7 +92,7 @@ int main()
 
     UniformBufferData ubo_data;
     ubo_data.projection = transpose(math::matrix::perspective(90.0f, 1.0f, 0.1f, 100.f));
-    ubo_data.view = transpose(math::matrix::look_at(math::Vec3f(0, 1, 1), math::Vec3f(0, 0, 0)));
+    ubo_data.view = transpose(math::matrix::look_at(math::Vec3f(0, 1, 0.5), math::Vec3f(0, 0, 0)));
     ubo_data.model = transpose(math::matrix::translate(0.f, 0.f, 0.f));
 
     ubo_data.projection(1, 1) *= -1;

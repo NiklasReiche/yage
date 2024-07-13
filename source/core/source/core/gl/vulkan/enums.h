@@ -185,7 +185,7 @@ namespace yage::gl::vulkan
             case MipMapMode::LINEAR:
             case MipMapMode::NONE:    return VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
-            default: throw std::invalid_argument("unknown TextureFilter value");
+            default: throw std::invalid_argument("unknown MipMapMode value");
         }
     }
 
@@ -198,6 +198,18 @@ namespace yage::gl::vulkan
             case TextureWrapper2::CLAMP_TO_BORDER: return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
 
             default: throw std::invalid_argument("unknown TextureWrapper value");
+        }
+    }
+
+    inline VkSampleCountFlagBits convert(const MSAASamples samples)
+    {
+        switch (samples) {
+            case MSAASamples::SAMPLE_1: return VK_SAMPLE_COUNT_1_BIT;
+            case MSAASamples::SAMPLE_2: return VK_SAMPLE_COUNT_2_BIT;
+            case MSAASamples::SAMPLE_4: return VK_SAMPLE_COUNT_4_BIT;
+            case MSAASamples::SAMPLE_8: return VK_SAMPLE_COUNT_8_BIT;
+
+            default: throw std::invalid_argument("unknown MSAASamples value");
         }
     }
 }

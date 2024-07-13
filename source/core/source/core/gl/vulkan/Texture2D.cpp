@@ -40,10 +40,10 @@ namespace yage::gl::vulkan
 
             const VkFormat vk_image_format = convert(data_info.image_format);
 
-            m_instance->create_image(m_width, m_height, m_mip_levels, vk_image_format,
-                                     VK_IMAGE_TILING_OPTIMAL,
-                                     VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-                                     VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_vk_images[i], m_vk_memories[i]);
+            m_instance->create_image(
+                    m_width, m_height, m_mip_levels, VK_SAMPLE_COUNT_1_BIT, vk_image_format, VK_IMAGE_TILING_OPTIMAL,
+                    VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_vk_images[i], m_vk_memories[i]);
 
             m_instance->transition_image_layout(m_vk_images[i], vk_image_format, VK_IMAGE_LAYOUT_UNDEFINED,
                                                 VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, m_mip_levels);

@@ -173,7 +173,6 @@ namespace yage::gl::vulkan
     {
         // TODO
         with_blending();
-        with_multisampling();
         with_dynamic_state();
 
         VkGraphicsPipelineCreateInfo pipeline_info{};
@@ -201,7 +200,18 @@ namespace yage::gl::vulkan
     {
         // TODO: defaults for all stages
 
+        // multisampling
+        m_multisampling_info = VkPipelineMultisampleStateCreateInfo{};
+        m_multisampling_info.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+        m_multisampling_info.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT; // MSAA
+        m_multisampling_info.sampleShadingEnable = VK_FALSE; // SSAA
+        m_multisampling_info.minSampleShading = 1.0f; // Optional
+        m_multisampling_info.pSampleMask = nullptr; // Optional
+        m_multisampling_info.alphaToCoverageEnable = VK_FALSE; // Optional
+        m_multisampling_info.alphaToOneEnable = VK_FALSE; // Optional
+
         // depth and stencil tests
+        m_depth_stencil_state_create_info = VkPipelineDepthStencilStateCreateInfo{};
         m_depth_stencil_state_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
         m_depth_stencil_state_create_info.depthTestEnable = VK_FALSE;
         m_depth_stencil_state_create_info.depthWriteEnable = VK_FALSE;
@@ -237,14 +247,17 @@ namespace yage::gl::vulkan
         return *this;
     }
 
-    PipelineBuilder& PipelineBuilder::with_multisampling()
+    PipelineBuilder& PipelineBuilder::with_multisampling(const MSAASamples sample_count)
     {
         m_multisampling_info = VkPipelineMultisampleStateCreateInfo{};
         m_multisampling_info.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-        m_multisampling_info.sampleShadingEnable = VK_FALSE;
-        m_multisampling_info.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+
+        m_multisampling_info.rasterizationSamples = convert(sample_count);
+
+        m_multisampling_info.sampleShadingEnable = VK_FALSE; // TODO
         m_multisampling_info.minSampleShading = 1.0f; // Optional
         m_multisampling_info.pSampleMask = nullptr; // Optional
+
         m_multisampling_info.alphaToCoverageEnable = VK_FALSE; // Optional
         m_multisampling_info.alphaToOneEnable = VK_FALSE; // Optional
 

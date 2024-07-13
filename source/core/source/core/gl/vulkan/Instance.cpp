@@ -230,6 +230,7 @@ namespace yage::gl::vulkan
         for (const auto& device: devices) {
             if (isDeviceSuitable(device)) {
                 m_physical_device = device;
+                m_max_msaa_samples = get_max_usable_sample_count();
                 break;
             }
         }
@@ -446,6 +447,35 @@ namespace yage::gl::vulkan
                                    VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
     }
 
+    VkSampleCountFlagBits Instance::get_max_usable_sample_count()
+    {
+        VkPhysicalDeviceProperties physicalDeviceProperties;
+        vkGetPhysicalDeviceProperties(m_physical_device, &physicalDeviceProperties);
+
+        const VkSampleCountFlags counts = physicalDeviceProperties.limits.framebufferColorSampleCounts &
+                                          physicalDeviceProperties.limits.framebufferDepthSampleCounts;
+        if (counts & VK_SAMPLE_COUNT_64_BIT) {
+            return VK_SAMPLE_COUNT_64_BIT;
+        }
+        if (counts & VK_SAMPLE_COUNT_32_BIT) {
+            return VK_SAMPLE_COUNT_32_BIT;
+        }
+        if (counts & VK_SAMPLE_COUNT_16_BIT) {
+            return VK_SAMPLE_COUNT_16_BIT;
+        }
+        if (counts & VK_SAMPLE_COUNT_8_BIT) {
+            return VK_SAMPLE_COUNT_8_BIT;
+        }
+        if (counts & VK_SAMPLE_COUNT_4_BIT) {
+            return VK_SAMPLE_COUNT_4_BIT;
+        }
+        if (counts & VK_SAMPLE_COUNT_2_BIT) {
+            return VK_SAMPLE_COUNT_2_BIT;
+        }
+
+        return VK_SAMPLE_COUNT_1_BIT;
+    }
+
     void Instance::create_swap_chain()
     {
         const SwapChainSupportDetails swapChainSupport = querySwapChainSupport(m_physical_device);
@@ -491,7 +521,7 @@ namespace yage::gl::vulkan
 
         createInfo.oldSwapchain = VK_NULL_HANDLE; // TODO: window resizing
 
-        m_swap_chain = SwapChain(this, createInfo, findDepthFormat());
+        m_swap_chain = SwapChain(this, createInfo, findDepthFormat(), m_max_msaa_samples);
     }
 
     void Instance::create_command_pool()
@@ -767,7 +797,8 @@ namespace yage::gl::vulkan
     }
 
     void Instance::create_image(const std::uint32_t width, const std::uint32_t height, const unsigned int mip_levels,
-                                const VkFormat format, const VkImageTiling tiling, const VkImageUsageFlags usage,
+                                const VkSampleCountFlagBits num_samples, const VkFormat format,
+                                const VkImageTiling tiling, const VkImageUsageFlags usage,
                                 const VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& image_memory)
     {
         VkImageCreateInfo create_info{};
@@ -783,7 +814,7 @@ namespace yage::gl::vulkan
         create_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         create_info.usage = usage;
         create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-        create_info.samples = VK_SAMPLE_COUNT_1_BIT;
+        create_info.samples = num_samples;
         create_info.flags = 0; // Optional
 
         if (vkCreateImage(m_device, &create_info, nullptr, &image) != VK_SUCCESS) {
@@ -1040,8 +1071,8 @@ namespace yage::gl::vulkan
         barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
         barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
-        vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0,
-                             nullptr, 0, nullptr, 1, &barrier);
+        vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0,
+                             0, nullptr, 0, nullptr, 1, &barrier);
 
         end_one_time_command_buffer(command_buffer);
     }

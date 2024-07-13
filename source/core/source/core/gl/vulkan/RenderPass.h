@@ -31,6 +31,8 @@ namespace yage::gl::vulkan
         Instance* m_instance; // can be raw pointer, since the resource lives within the store on the instance
         VkDevice m_vk_device;
         VkRenderPass m_vk_handle{};
+
+
     };
 
     using RenderPassHandle = Handle<RenderPass>;
