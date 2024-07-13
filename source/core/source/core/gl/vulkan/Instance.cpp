@@ -442,8 +442,8 @@ namespace yage::gl::vulkan
 
     VkFormat Instance::findDepthFormat()
     {
-        return findSupportedFormat({VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
-                                   VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+        return findSupportedFormat({VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT}, VK_IMAGE_TILING_OPTIMAL,
+                                   VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
     }
 
     void Instance::create_swap_chain()
@@ -555,7 +555,7 @@ namespace yage::gl::vulkan
             if (result == VK_ERROR_OUT_OF_DATE_KHR) {
                 recreateSwapChain();
             }
-        } while(result == VK_ERROR_OUT_OF_DATE_KHR);
+        } while (result == VK_ERROR_OUT_OF_DATE_KHR);
 
         if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
             throw std::runtime_error("Vulkan: failed to acquire swap chain image!");
@@ -766,8 +766,8 @@ namespace yage::gl::vulkan
         end_one_time_command_buffer(command_buffer);
     }
 
-    void Instance::create_image(const std::uint32_t width, const std::uint32_t height, const VkFormat format,
-                                const VkImageTiling tiling, const VkImageUsageFlags usage,
+    void Instance::create_image(const std::uint32_t width, const std::uint32_t height, const unsigned int mip_levels,
+                                const VkFormat format, const VkImageTiling tiling, const VkImageUsageFlags usage,
                                 const VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& image_memory)
     {
         VkImageCreateInfo create_info{};
@@ -776,7 +776,7 @@ namespace yage::gl::vulkan
         create_info.extent.width = width;
         create_info.extent.height = height;
         create_info.extent.depth = 1;
-        create_info.mipLevels = 1;
+        create_info.mipLevels = static_cast<std::uint32_t>(mip_levels);
         create_info.arrayLayers = 1;
         create_info.format = format;
         create_info.tiling = tiling;
@@ -806,7 +806,8 @@ namespace yage::gl::vulkan
         vkBindImageMemory(m_device, image, image_memory, 0);
     }
 
-    VkImageView Instance::create_image_view(const VkImage image, const VkFormat format, VkImageAspectFlags aspect_flags)
+    VkImageView Instance::create_image_view(const VkImage image, const VkFormat format,
+                                            const VkImageAspectFlags aspect_flags, const unsigned int mip_levels)
     {
         VkImageViewCreateInfo create_info{};
         create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -821,7 +822,7 @@ namespace yage::gl::vulkan
 
         create_info.subresourceRange.aspectMask = aspect_flags;
         create_info.subresourceRange.baseMipLevel = 0;
-        create_info.subresourceRange.levelCount = 1;
+        create_info.subresourceRange.levelCount = static_cast<std::uint32_t>(mip_levels);
         create_info.subresourceRange.baseArrayLayer = 0;
         create_info.subresourceRange.layerCount = 1;
 
@@ -832,7 +833,7 @@ namespace yage::gl::vulkan
         return image_view;
     }
 
-    VkSampler Instance::create_texture_sampler(const TextureSampler& sampler)
+    VkSampler Instance::create_texture_sampler(const TextureSampler& sampler, const unsigned int mip_levels)
     {
         VkSamplerCreateInfo samplerInfo{};
         samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -854,10 +855,10 @@ namespace yage::gl::vulkan
         samplerInfo.compareEnable = VK_FALSE;
         samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 
-        samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+        samplerInfo.mipmapMode = convert(sampler.mip_map_mode);
         samplerInfo.mipLodBias = 0.0f;
         samplerInfo.minLod = 0.0f;
-        samplerInfo.maxLod = 0.0f;
+        samplerInfo.maxLod = sampler.mip_map_mode == MipMapMode::NONE ? 0.0f : static_cast<float>(mip_levels);
 
         VkSampler texture_sampler;
         if (vkCreateSampler(m_device, &samplerInfo, nullptr, &texture_sampler) != VK_SUCCESS) {
@@ -903,7 +904,7 @@ namespace yage::gl::vulkan
     }
 
     void Instance::transition_image_layout(const VkImage image, VkFormat, const VkImageLayout old_layout,
-                                           const VkImageLayout new_layout)
+                                           const VkImageLayout new_layout, const unsigned int mip_levels)
     {
         const VkCommandBuffer command_buffer = begin_one_time_command_buffer();
 
@@ -916,7 +917,7 @@ namespace yage::gl::vulkan
         barrier.image = image;
         barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         barrier.subresourceRange.baseMipLevel = 0;
-        barrier.subresourceRange.levelCount = 1;
+        barrier.subresourceRange.levelCount = static_cast<std::uint32_t>(mip_levels);
         barrier.subresourceRange.baseArrayLayer = 0;
         barrier.subresourceRange.layerCount = 1;
 
@@ -961,6 +962,86 @@ namespace yage::gl::vulkan
         region.imageExtent = {width, height, 1};
 
         vkCmdCopyBufferToImage(command_buffer, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+
+        end_one_time_command_buffer(command_buffer);
+    }
+
+    void Instance::generate_mip_maps(const VkImage image, const VkFormat format, const unsigned int width,
+                                     const unsigned int height, const unsigned int mip_levels)
+    {
+        // Check if image format supports linear blitting
+        VkFormatProperties formatProperties;
+        vkGetPhysicalDeviceFormatProperties(m_physical_device, format, &formatProperties);
+
+        if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT)) {
+            throw std::runtime_error("Vulkan: texture image format does not support linear blitting!");
+        }
+
+        const VkCommandBuffer command_buffer = begin_one_time_command_buffer();
+
+        VkImageMemoryBarrier barrier{};
+        barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier.image = image;
+        barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        barrier.subresourceRange.baseArrayLayer = 0;
+        barrier.subresourceRange.layerCount = 1;
+        barrier.subresourceRange.levelCount = 1;
+
+        int mip_width = static_cast<int>(width);
+        int mip_height = static_cast<int>(height);
+        for (unsigned int i = 1; i < mip_levels; i++) {
+            barrier.subresourceRange.baseMipLevel = i - 1;
+            barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+            barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+            barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+            barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+
+            vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0,
+                                 nullptr, 0, nullptr, 1, &barrier);
+
+            VkImageBlit blit{};
+            blit.srcOffsets[0] = {0, 0, 0};
+            blit.srcOffsets[1] = {mip_width, mip_height, 1};
+            blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            blit.srcSubresource.mipLevel = i - 1;
+            blit.srcSubresource.baseArrayLayer = 0;
+            blit.srcSubresource.layerCount = 1;
+            blit.dstOffsets[0] = {0, 0, 0};
+            blit.dstOffsets[1] = {mip_width > 1 ? mip_width / 2 : 1, mip_height > 1 ? mip_height / 2 : 1, 1};
+            blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            blit.dstSubresource.mipLevel = i;
+            blit.dstSubresource.baseArrayLayer = 0;
+            blit.dstSubresource.layerCount = 1;
+
+            vkCmdBlitImage(command_buffer, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, image,
+                           VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit, VK_FILTER_LINEAR);
+
+            barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+            barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+            vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                                 0, 0, nullptr, 0, nullptr, 1, &barrier);
+
+            if (mip_width > 1) {
+                mip_width /= 2;
+            }
+            if (mip_height > 1) {
+                mip_height /= 2;
+            }
+        }
+
+        barrier.subresourceRange.baseMipLevel = mip_levels - 1;
+        barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+        vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0,
+                             nullptr, 0, nullptr, 1, &barrier);
 
         end_one_time_command_buffer(command_buffer);
     }

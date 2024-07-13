@@ -149,16 +149,16 @@ namespace yage::gl::vulkan
     {
         m_image_views.resize(m_images.size());
         for (std::size_t i = 0; i < m_images.size(); i++) {
-            m_image_views[i] = m_instance->create_image_view(m_images[i], m_image_format, VK_IMAGE_ASPECT_COLOR_BIT);
+            m_image_views[i] = m_instance->create_image_view(m_images[i], m_image_format, VK_IMAGE_ASPECT_COLOR_BIT, 1);
         }
     }
 
     void SwapChain::create_depth_resource()
     {
-        m_instance->create_image(m_extent.width, m_extent.height, m_depth_image_format, VK_IMAGE_TILING_OPTIMAL,
+        m_instance->create_image(m_extent.width, m_extent.height, 1, m_depth_image_format, VK_IMAGE_TILING_OPTIMAL,
                     VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_depth_image,
                     m_depth_image_memory);
-        m_depth_image_view = m_instance->create_image_view(m_depth_image, m_depth_image_format, VK_IMAGE_ASPECT_DEPTH_BIT);
+        m_depth_image_view = m_instance->create_image_view(m_depth_image, m_depth_image_format, VK_IMAGE_ASPECT_DEPTH_BIT, 1);
 
         // TODO: transition?
     }

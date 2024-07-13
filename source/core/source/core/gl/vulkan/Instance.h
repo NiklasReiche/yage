@@ -114,22 +114,26 @@ namespace yage::gl::vulkan
 
         void copy_buffer(VkBuffer source, VkBuffer destination, VkDeviceSize size);
 
-        void create_image(std::uint32_t width, std::uint32_t height, VkFormat format, VkImageTiling tiling,
-                          VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image,
-                          VkDeviceMemory& image_memory);
+        void create_image(std::uint32_t width, std::uint32_t height, unsigned int mip_levels, VkFormat format,
+                          VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties,
+                          VkImage& image, VkDeviceMemory& image_memory);
 
-        VkImageView create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspect_flags);
+        VkImageView create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspect_flags,
+                                      unsigned int mip_levels);
 
-        VkSampler create_texture_sampler(const TextureSampler& sampler);
+        VkSampler create_texture_sampler(const TextureSampler& sampler, unsigned int mip_levels);
 
         VkCommandBuffer begin_one_time_command_buffer();
 
         void end_one_time_command_buffer(VkCommandBuffer command_buffer);
 
-        void transition_image_layout(VkImage image, VkFormat format, VkImageLayout old_layout,
-                                     VkImageLayout new_layout);
+        void transition_image_layout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout,
+                                     unsigned int mip_levels);
 
         void copy_buffer_to_image(VkBuffer buffer, VkImage image, std::uint32_t width, std::uint32_t height);
+
+        void generate_mip_maps(VkImage image, VkFormat format, unsigned int width, unsigned int height,
+                               unsigned int mip_levels);
 
     private:
         const unsigned int MAX_FRAMES_IN_FLIGHT = 2;

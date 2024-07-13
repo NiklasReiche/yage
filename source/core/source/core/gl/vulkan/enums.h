@@ -178,6 +178,17 @@ namespace yage::gl::vulkan
         }
     }
 
+    inline VkSamplerMipmapMode convert(const MipMapMode mode)
+    {
+        switch (mode) {
+            case MipMapMode::NEAREST: return VK_SAMPLER_MIPMAP_MODE_NEAREST;
+            case MipMapMode::LINEAR:
+            case MipMapMode::NONE:    return VK_SAMPLER_MIPMAP_MODE_LINEAR;
+
+            default: throw std::invalid_argument("unknown TextureFilter value");
+        }
+    }
+
     inline VkSamplerAddressMode convert(const TextureWrapper2 wrapper)
     {
         switch (wrapper) {

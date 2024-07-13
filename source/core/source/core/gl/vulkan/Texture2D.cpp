@@ -12,6 +12,16 @@ namespace yage::gl::vulkan
     {
         const VkDeviceSize buffer_size = data.size();
 
+        m_width = data_info.width;
+        m_height = data_info.height;
+
+        if (sampler.mip_map_mode != MipMapMode::NONE) {
+            m_mip_levels =
+                    static_cast<unsigned int>(std::floor(std::log2(std::max(data_info.width, data_info.height)))) + 1;
+        } else {
+            m_mip_levels = 1; // even without mip mapping we need one level for the original image
+        }
+
         VkBuffer staging_buffer;
         VkDeviceMemory staging_buffer_memory;
         m_instance->create_buffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -30,22 +40,24 @@ namespace yage::gl::vulkan
 
             const VkFormat vk_image_format = convert(data_info.image_format);
 
-            m_instance->create_image(data_info.width, data_info.height, vk_image_format, VK_IMAGE_TILING_OPTIMAL,
-                                     VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+            m_instance->create_image(m_width, m_height, m_mip_levels, vk_image_format,
+                                     VK_IMAGE_TILING_OPTIMAL,
+                                     VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
                                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_vk_images[i], m_vk_memories[i]);
 
             m_instance->transition_image_layout(m_vk_images[i], vk_image_format, VK_IMAGE_LAYOUT_UNDEFINED,
-                                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+                                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, m_mip_levels);
 
-            m_instance->copy_buffer_to_image(staging_buffer, m_vk_images[i], data_info.width, data_info.height);
+            m_instance->copy_buffer_to_image(staging_buffer, m_vk_images[i], m_width, m_height);
 
-            m_instance->transition_image_layout(m_vk_images[i], vk_image_format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            // transitioned to VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL while generating mipmaps
+            m_instance->generate_mip_maps(m_vk_images[i], vk_image_format, m_width, m_height, m_mip_levels);
 
-            m_vk_image_views[i] = instance->create_image_view(m_vk_images[i], vk_image_format, VK_IMAGE_ASPECT_COLOR_BIT);
+            m_vk_image_views[i] = instance->create_image_view(m_vk_images[i], vk_image_format,
+                                                              VK_IMAGE_ASPECT_COLOR_BIT, m_mip_levels);
         }
 
-        m_vk_sampler = instance->create_texture_sampler(sampler);
+        m_vk_sampler = instance->create_texture_sampler(sampler, m_mip_levels);
 
         vkDestroyBuffer(m_vk_device, staging_buffer, nullptr);
         vkFreeMemory(m_vk_device, staging_buffer_memory, nullptr);

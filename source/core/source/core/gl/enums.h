@@ -192,14 +192,23 @@ namespace yage::gl
         LINEAR
     };
 
+    enum class MipMapMode
+    {
+        NEAREST,
+        LINEAR,
+        NONE
+    };
+
     struct TextureSampler
     {
-        TextureFilter2 min_filter;
-        TextureFilter2 mag_filter;
+        TextureFilter2 min_filter = TextureFilter2::LINEAR;
+        TextureFilter2 mag_filter = TextureFilter2::LINEAR;
 
-        TextureWrapper2 u_wrapper;
-        TextureWrapper2 v_wrapper;
-        TextureWrapper2 w_wrapper;
+        MipMapMode mip_map_mode = MipMapMode::NONE;
+
+        TextureWrapper2 u_wrapper = TextureWrapper2::REPEAT;
+        TextureWrapper2 v_wrapper = TextureWrapper2::REPEAT;
+        TextureWrapper2 w_wrapper = TextureWrapper2::REPEAT;
 
         // TODO: border color
     };

@@ -42,5 +42,9 @@ namespace yage::gl::vulkan
         std::vector<VkImage> m_vk_images;
         std::vector<VkImageView> m_vk_image_views;
         VkSampler m_vk_sampler = VK_NULL_HANDLE; // TODO: cache and reuse identical samplers
+
+        unsigned int m_width = 0;
+        unsigned int m_height = 0;
+        unsigned int m_mip_levels = 0;
     };
 }
