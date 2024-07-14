@@ -159,12 +159,14 @@ namespace yage::gl::vulkan
     {
         m_render_pass = std::move(render_pass);
 
+        m_multisampling_info.rasterizationSamples = m_render_pass.get<RenderPass>().samples();
+
         return *this;
     }
 
     PipelineBuilder& PipelineBuilder::with_swap_chain_render_pass()
     {
-        m_render_pass = m_instance.lock()->swap_chain().render_pass();
+        with_render_pass(m_instance.lock()->swap_chain().render_pass());
 
         return *this;
     }
@@ -243,23 +245,6 @@ namespace yage::gl::vulkan
         m_blend_info.blendConstants[1] = 0.0f; // Optional
         m_blend_info.blendConstants[2] = 0.0f; // Optional
         m_blend_info.blendConstants[3] = 0.0f; // Optional
-
-        return *this;
-    }
-
-    PipelineBuilder& PipelineBuilder::with_multisampling(const MSAASamples sample_count)
-    {
-        m_multisampling_info = VkPipelineMultisampleStateCreateInfo{};
-        m_multisampling_info.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-
-        m_multisampling_info.rasterizationSamples = convert(sample_count);
-
-        m_multisampling_info.sampleShadingEnable = VK_FALSE; // TODO
-        m_multisampling_info.minSampleShading = 1.0f; // Optional
-        m_multisampling_info.pSampleMask = nullptr; // Optional
-
-        m_multisampling_info.alphaToCoverageEnable = VK_FALSE; // Optional
-        m_multisampling_info.alphaToOneEnable = VK_FALSE; // Optional
 
         return *this;
     }

@@ -84,7 +84,6 @@ int main()
                     .with_viewport({0, 0, 500.0f, 500.0f}, {0, 0, 500, 500})
                     .with_vertex_format(gl::PrimitiveTopology::TRIANGLE_LIST, vertex_data_info.vertex_description,
                                         gl::VertexFormat::INTERLEAVED)
-                    .with_multisampling(gl::MSAASamples::SAMPLE_8)
                     .with_layout(layout)
                     .build();
 

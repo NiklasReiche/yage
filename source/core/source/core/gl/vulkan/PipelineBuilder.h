@@ -46,8 +46,6 @@ namespace yage::gl::vulkan
 
         PipelineBuilder& with_depth_test();
 
-        PipelineBuilder& with_multisampling(MSAASamples sample_count);
-
         PipelineHandle build();
 
     private:

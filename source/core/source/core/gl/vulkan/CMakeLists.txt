@@ -39,8 +39,8 @@ target_sources(yage_core PRIVATE
 
         RenderPass.h
         RenderPass.cpp
-        RenderPassCreator.h
-        RenderPassCreator.cpp
+        RenderPassBuilder.h
+        RenderPassBuilder.cpp
 
         ImageView.h
         ImageView.cpp

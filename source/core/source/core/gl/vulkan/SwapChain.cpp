@@ -286,7 +286,7 @@ namespace yage::gl::vulkan
         create_info.dependencyCount = 1;
         create_info.pDependencies = &dependency;
 
-        m_render_pass = m_instance->store_render_passes().create(m_instance, create_info);
+        m_render_pass = m_instance->store_render_passes().create(m_instance, create_info, m_msaa_samples);
     }
 
     void SwapChain::create_frame_buffers()
