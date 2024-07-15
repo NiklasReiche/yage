@@ -37,8 +37,6 @@ target_sources(yage_core PRIVATE
         RenderTargetBuilder.h
         RenderTargetBuilder.cpp
 
-        ImageView.h
-        ImageView.cpp
         Renderer.h
         Renderer.cpp
 

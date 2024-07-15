@@ -45,7 +45,6 @@ namespace yage::gl::vulkan
         m_swap_chain.clear();
 
         m_store_frame_buffers->clear();
-        m_store_image_views->clear();
         m_store_pipelines->clear();
         m_store_vertex_buffers->clear();
         m_store_index_buffers->clear();

@@ -8,7 +8,6 @@
 #include "../IRenderTarget.h"
 #include "../enums.h"
 #include "FrameCounter.h"
-#include "ImageView.h"
 #include "core/gl/ITexture2D.h"
 
 namespace yage::gl::vulkan

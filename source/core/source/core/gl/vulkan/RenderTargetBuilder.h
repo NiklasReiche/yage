@@ -4,7 +4,6 @@
 
 #include "../Handle.h"
 #include "../IRenderTargetBuilder.h"
-#include "ImageView.h"
 #include "RenderTarget.h"
 
 namespace yage::gl::vulkan

@@ -29,7 +29,6 @@ namespace yage::gl::vulkan
 
     using RenderTargetStore = Store<IRenderTarget, RenderTarget>;
 
-    using ImageViewStore = Store<ImageView, ImageView>;
     using Texture2DStore = Store<ITexture2D2, Texture2D>;
 
     using DrawableStore = Store<IDrawable2, Drawable>;
@@ -190,7 +189,6 @@ namespace yage::gl::vulkan
 
         std::shared_ptr<RenderTargetStore> m_store_render_targets = std::make_shared<RenderTargetStore>();
 
-        std::shared_ptr<ImageViewStore> m_store_image_views = std::make_shared<ImageViewStore>();
         std::shared_ptr<Texture2DStore> m_store_textures = std::make_shared<Texture2DStore>();
 
         std::shared_ptr<DrawableStore> m_store_drawables = std::make_shared<DrawableStore>();
