@@ -28,10 +28,7 @@ namespace yage::gl::vulkan
 
     Pipeline::~Pipeline()
     {
-        if (m_vk_handle != VK_NULL_HANDLE) {
-            vkDestroyPipeline(m_vk_device, m_vk_handle, nullptr);
-            vkDestroyPipelineLayout(m_vk_device, m_graphics_pipeline_layout, nullptr);
-        }
+        clear();
     }
 
     Pipeline::Pipeline(Pipeline&& other) noexcept
@@ -40,6 +37,7 @@ namespace yage::gl::vulkan
           m_vk_handle(other.m_vk_handle),
           m_graphics_pipeline_layout(other.m_graphics_pipeline_layout)
     {
+        other.m_instance = nullptr;
         other.m_vk_device = VK_NULL_HANDLE;
         other.m_vk_handle = VK_NULL_HANDLE;
         other.m_graphics_pipeline_layout = VK_NULL_HANDLE;
@@ -49,10 +47,15 @@ namespace yage::gl::vulkan
     {
         if (this == &other)
             return *this;
+
+        clear();
+
         m_instance = other.m_instance;
-        m_vk_device = other.m_vk_device, m_vk_handle = other.m_vk_handle;
+        m_vk_device = other.m_vk_device;
+        m_vk_handle = other.m_vk_handle;
         m_graphics_pipeline_layout = other.m_graphics_pipeline_layout;
 
+        other.m_instance = nullptr;
         other.m_vk_device = VK_NULL_HANDLE;
         other.m_vk_handle = VK_NULL_HANDLE;
         other.m_graphics_pipeline_layout = VK_NULL_HANDLE;
@@ -68,5 +71,15 @@ namespace yage::gl::vulkan
     VkPipelineLayout Pipeline::vk_layout() const
     {
         return m_graphics_pipeline_layout;
+    }
+
+    void Pipeline::clear()
+    {
+        if (m_vk_handle != VK_NULL_HANDLE) {
+            vkDestroyPipeline(m_vk_device, m_vk_handle, nullptr);
+        }
+        if (m_graphics_pipeline_layout != VK_NULL_HANDLE) {
+            vkDestroyPipelineLayout(m_vk_device, m_graphics_pipeline_layout, nullptr);
+        }
     }
 }

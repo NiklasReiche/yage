@@ -25,10 +25,43 @@ namespace yage::gl::vulkan
 
     UniformBuffer::~UniformBuffer()
     {
-        for (size_t i = 0; i < m_frame_counter.max_frame_index; i++) {
-            vkDestroyBuffer(m_vk_device, m_vk_buffers[i], nullptr);
-            vkFreeMemory(m_vk_device, m_vk_memories[i], nullptr);
-        }
+        clear();
+    }
+
+    UniformBuffer::UniformBuffer(UniformBuffer&& other) noexcept
+        : m_instance(other.m_instance),
+          m_vk_device(other.m_vk_device),
+          m_frame_counter(other.m_frame_counter),
+          m_buffer_size(other.m_buffer_size),
+          m_vk_buffers(std::move(other.m_vk_buffers)),
+          m_vk_memories(std::move(other.m_vk_memories)),
+          m_buffers_mapped(std::move(other.m_buffers_mapped))
+    {
+        other.m_instance = nullptr;
+        other.m_vk_device = VK_NULL_HANDLE;
+        other.m_buffer_size = 0;
+    }
+
+    UniformBuffer& UniformBuffer::operator=(UniformBuffer&& other) noexcept
+    {
+        if (this == &other)
+            return *this;
+
+        clear();
+
+        m_instance = other.m_instance;
+        m_vk_device = other.m_vk_device;
+        m_frame_counter = other.m_frame_counter;
+        m_buffer_size = other.m_buffer_size;
+        m_vk_buffers = std::move(other.m_vk_buffers);
+        m_vk_memories = std::move(other.m_vk_memories);
+        m_buffers_mapped = std::move(other.m_buffers_mapped);
+
+        other.m_instance = nullptr;
+        other.m_vk_device = VK_NULL_HANDLE;
+        other.m_buffer_size = 0;
+
+        return *this;
     }
 
     void UniformBuffer::update_data(const std::size_t size, const void* data)
@@ -50,5 +83,15 @@ namespace yage::gl::vulkan
                     .buffer = m_vk_buffers[*m_frame_counter.curent_frame_index], .offset = 0, .range = m_buffer_size});
         }
         return buffer_infos;
+    }
+
+    void UniformBuffer::clear()
+    {
+        for (size_t i = 0; i < m_frame_counter.max_frame_index; i++) {
+            vkDestroyBuffer(m_vk_device, m_vk_buffers[i], nullptr);
+            vkFreeMemory(m_vk_device, m_vk_memories[i], nullptr);
+        }
+        m_vk_buffers.clear();
+        m_vk_memories.clear();
     }
 }

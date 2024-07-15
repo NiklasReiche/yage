@@ -51,5 +51,7 @@ namespace yage::gl::vulkan
         unsigned int m_width = 0;
         unsigned int m_height = 0;
         unsigned int m_mip_levels = 0;
+
+        void clear();
     };
 }

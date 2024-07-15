@@ -31,9 +31,7 @@ namespace yage::gl::vulkan
 
     SwapChain::~SwapChain()
     {
-        if (m_swap_chain_khr != VK_NULL_HANDLE) {
-            clear();
-        }
+        clear();
     }
 
     SwapChain::SwapChain(SwapChain&& other) noexcept
@@ -80,9 +78,7 @@ namespace yage::gl::vulkan
         if (this == &other)
             return *this;
 
-        if (m_swap_chain_khr != VK_NULL_HANDLE) {
-            clear();
-        }
+        clear();
 
         m_instance = other.m_instance;
         m_vk_device = other.m_vk_device;
@@ -145,23 +141,29 @@ namespace yage::gl::vulkan
 
         if (m_depth_image_view != VK_NULL_HANDLE) {
             vkDestroyImageView(m_vk_device, m_depth_image_view, nullptr);
+            m_depth_image_view = VK_NULL_HANDLE;
         }
         if (m_depth_image != VK_NULL_HANDLE) {
             vkDestroyImage(m_vk_device, m_depth_image, nullptr);
+            m_depth_image = VK_NULL_HANDLE;
         }
         if (m_depth_image_memory != VK_NULL_HANDLE) {
             vkFreeMemory(m_vk_device, m_depth_image_memory, nullptr);
+            m_depth_image_memory = VK_NULL_HANDLE;
         }
         m_depth_attachment_info = VkRenderingAttachmentInfo{};
 
         if (m_color_image_view != VK_NULL_HANDLE) {
             vkDestroyImageView(m_vk_device, m_color_image_view, nullptr);
+            m_color_image_view = VK_NULL_HANDLE;
         }
         if (m_color_image != VK_NULL_HANDLE) {
             vkDestroyImage(m_vk_device, m_color_image, nullptr);
+            m_color_image = VK_NULL_HANDLE;
         }
         if (m_color_image_memory != VK_NULL_HANDLE) {
             vkFreeMemory(m_vk_device, m_color_image_memory, nullptr);
+            m_color_image_memory = VK_NULL_HANDLE;
         }
 
         for (const auto& m_image_view: m_resolve_image_views) {
@@ -170,8 +172,10 @@ namespace yage::gl::vulkan
         m_resolve_image_views.clear();
 
         // swap chain images are destroyed implicitly
-        vkDestroySwapchainKHR(m_vk_device, m_swap_chain_khr, nullptr);
-        m_swap_chain_khr = VK_NULL_HANDLE;
+        if (m_swap_chain_khr != VK_NULL_HANDLE) {
+            vkDestroySwapchainKHR(m_vk_device, m_swap_chain_khr, nullptr);
+            m_swap_chain_khr = VK_NULL_HANDLE;
+        }
     }
 
     VkExtent2D SwapChain::extent() const

@@ -41,5 +41,7 @@ namespace yage::gl::vulkan
         VkPipelineLayout m_graphics_pipeline_layout{};
 
         std::vector<DescriptorSetLayoutHandle> m_descriptor_set_layouts;
+
+        void clear();
     };
 }

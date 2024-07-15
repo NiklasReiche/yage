@@ -15,6 +15,14 @@ namespace yage::gl::vulkan
 
         ~DescriptorSetLayout();
 
+        DescriptorSetLayout(const DescriptorSetLayout& other) = delete;
+
+        DescriptorSetLayout(DescriptorSetLayout&& other) noexcept;
+
+        DescriptorSetLayout& operator=(const DescriptorSetLayout& other) = delete;
+
+        DescriptorSetLayout& operator=(DescriptorSetLayout&& other) noexcept;
+
         [[nodiscard]] const VkDescriptorSetLayout& vk_handle() const;
 
     private:
@@ -22,5 +30,7 @@ namespace yage::gl::vulkan
         VkDevice m_vk_device = VK_NULL_HANDLE;
 
         VkDescriptorSetLayout m_vk_handle = VK_NULL_HANDLE;
+
+        void clear();
     };
 }

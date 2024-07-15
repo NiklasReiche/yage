@@ -18,6 +18,14 @@ namespace yage::gl::vulkan
 
         ~UniformBuffer() override;
 
+        UniformBuffer(const UniformBuffer& other) = delete;
+
+        UniformBuffer(UniformBuffer&& other) noexcept;
+
+        UniformBuffer& operator=(const UniformBuffer& other) = delete;
+
+        UniformBuffer& operator=(UniformBuffer&& other) noexcept;
+
         void update_data(std::size_t size, const void* data) override;
 
         void update_sub_data(std::size_t byte_offset, std::size_t byte_size, const void* data) override;
@@ -33,5 +41,7 @@ namespace yage::gl::vulkan
         std::vector<VkBuffer> m_vk_buffers;
         std::vector<VkDeviceMemory> m_vk_memories;
         std::vector<void*> m_buffers_mapped;
+
+        void clear();
     };
 }

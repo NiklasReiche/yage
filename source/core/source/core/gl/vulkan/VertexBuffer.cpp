@@ -33,10 +33,7 @@ namespace yage::gl::vulkan
 
     VertexBuffer::~VertexBuffer()
     {
-        if (m_buffer_handle != VK_NULL_HANDLE) {
-            vkDestroyBuffer(m_vk_device, m_buffer_handle, nullptr);
-            vkFreeMemory(m_vk_device, m_memory_handle, nullptr);
-        }
+        clear();
     }
 
     VertexBuffer::VertexBuffer(VertexBuffer&& other) noexcept
@@ -46,23 +43,30 @@ namespace yage::gl::vulkan
           m_memory_handle(other.m_memory_handle),
           m_vertex_count(other.m_vertex_count)
     {
+        other.m_instance = nullptr;
         other.m_vk_device = VK_NULL_HANDLE;
         other.m_buffer_handle = VK_NULL_HANDLE;
         other.m_memory_handle = VK_NULL_HANDLE;
+        other.m_vertex_count = 0;
     }
 
     VertexBuffer& VertexBuffer::operator=(VertexBuffer&& other) noexcept
     {
         if (this == &other)
             return *this;
+
+        clear();
+
         m_instance = other.m_instance;
         m_vk_device = other.m_vk_device, m_buffer_handle = other.m_buffer_handle;
         m_memory_handle = other.m_memory_handle;
         m_vertex_count = other.m_vertex_count;
 
+        other.m_instance = nullptr;
         other.m_vk_device = VK_NULL_HANDLE;
         other.m_buffer_handle = VK_NULL_HANDLE;
         other.m_memory_handle = VK_NULL_HANDLE;
+        other.m_vertex_count = 0;
 
         return *this;
     }
@@ -75,5 +79,15 @@ namespace yage::gl::vulkan
     std::size_t VertexBuffer::vertex_count() const
     {
         return m_vertex_count;
+    }
+
+    void VertexBuffer::clear()
+    {
+        if (m_buffer_handle != VK_NULL_HANDLE) {
+            vkDestroyBuffer(m_vk_device, m_buffer_handle, nullptr);
+        }
+        if (m_memory_handle != VK_NULL_HANDLE) {
+            vkFreeMemory(m_vk_device, m_memory_handle, nullptr);
+        }
     }
 }

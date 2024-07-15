@@ -50,7 +50,6 @@ namespace yage::gl::vulkan
 
     private:
         Instance* m_instance; // can be raw pointer, since the resource lives within the store on the instance
-        VkDevice m_vk_device;
         FrameCounter m_frame_counter;
 
         std::vector<std::vector<VkRenderingAttachmentInfo>> m_color_attachment_infos;

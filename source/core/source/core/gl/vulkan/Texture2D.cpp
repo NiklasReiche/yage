@@ -100,12 +100,7 @@ namespace yage::gl::vulkan
 
     Texture2D::~Texture2D()
     {
-        for (unsigned int i = 0; i < m_frame_counter.max_frame_index; ++i) {
-            vkDestroySampler(m_vk_device, m_vk_sampler, nullptr);
-            vkDestroyImageView(m_vk_device, m_vk_image_views[i], nullptr);
-            vkDestroyImage(m_vk_device, m_vk_images[i], nullptr);
-            vkFreeMemory(m_vk_device, m_vk_memories[i], nullptr);
-        }
+        clear();
     }
 
     Texture2D::Texture2D(Texture2D&& other) noexcept
@@ -117,6 +112,7 @@ namespace yage::gl::vulkan
           m_vk_image_views(std::move(other.m_vk_image_views)),
           m_vk_sampler(other.m_vk_sampler)
     {
+        other.m_instance = nullptr;
         other.m_vk_device = VK_NULL_HANDLE;
         other.m_vk_images.clear();
         other.m_vk_memories.clear();
@@ -129,6 +125,8 @@ namespace yage::gl::vulkan
         if (this == &other)
             return *this;
 
+        clear();
+
         m_instance = other.m_instance;
         m_vk_device = other.m_vk_device;
         m_frame_counter = other.m_frame_counter;
@@ -137,6 +135,7 @@ namespace yage::gl::vulkan
         m_vk_image_views = std::move(other.m_vk_image_views);
         m_vk_sampler = other.m_vk_sampler;
 
+        other.m_instance = nullptr;
         other.m_vk_device = VK_NULL_HANDLE;
         other.m_vk_images.clear();
         other.m_vk_memories.clear();
@@ -169,5 +168,20 @@ namespace yage::gl::vulkan
     VkImageView Texture2D::vk_image_view(const unsigned int instance) const
     {
         return m_vk_image_views[instance];
+    }
+
+    void Texture2D::clear()
+    {
+        for (unsigned int i = 0; i < m_frame_counter.max_frame_index; ++i) {
+            vkDestroySampler(m_vk_device, m_vk_sampler, nullptr);
+            vkDestroyImageView(m_vk_device, m_vk_image_views[i], nullptr);
+            vkDestroyImage(m_vk_device, m_vk_images[i], nullptr);
+            vkFreeMemory(m_vk_device, m_vk_memories[i], nullptr);
+        }
+
+        m_vk_sampler = VK_NULL_HANDLE;
+        m_vk_image_views.clear();
+        m_vk_images.clear();
+        m_vk_memories.clear();
     }
 }

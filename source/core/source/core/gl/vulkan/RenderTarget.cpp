@@ -9,7 +9,6 @@ namespace yage::gl::vulkan
                                std::span<std::tuple<VkRenderingAttachmentInfo, ImageFormat2>> color_attachments,
                                std::optional<std::tuple<VkRenderingAttachmentInfo, ImageFormat2>> depth_attachment)
         : m_instance(instance),
-          m_vk_device(m_instance->device()),
           m_frame_counter(frame_counter),
           m_extent({width, height}),
           m_samples(samples)
@@ -86,12 +85,18 @@ namespace yage::gl::vulkan
 
     RenderTarget::RenderTarget(RenderTarget&& other) noexcept
         : m_instance(other.m_instance),
-          m_vk_device(other.m_vk_device),
           m_frame_counter(other.m_frame_counter),
+          m_color_attachment_infos(std::move(other.m_color_attachment_infos)),
+          m_color_attachment_formats(std::move(other.m_color_attachment_formats)),
+          m_color_attachments(std::move(other.m_color_attachments)),
+          m_color_resolve_attachments(std::move(other.m_color_resolve_attachments)),
+          m_depth_attachment_info(std::move(other.m_depth_attachment_info)),
+          m_depth_attachment_format(other.m_depth_attachment_format),
+          m_depth_attachment(std::move(other.m_depth_attachment)),
           m_extent(other.m_extent),
           m_samples(other.m_samples)
     {
-        other.m_vk_device = VK_NULL_HANDLE;
+        other.m_instance = nullptr;
         other.m_extent = {0, 0};
     }
 
@@ -99,13 +104,13 @@ namespace yage::gl::vulkan
     {
         if (this == &other)
             return *this;
+
         m_instance = other.m_instance;
-        m_vk_device = other.m_vk_device;
         m_frame_counter = other.m_frame_counter;
         m_extent = other.m_extent;
         m_samples = other.m_samples;
 
-        other.m_vk_device = VK_NULL_HANDLE;
+        other.m_instance = nullptr;
         other.m_extent = {0, 0};
 
         return *this;

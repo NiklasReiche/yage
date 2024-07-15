@@ -15,13 +15,46 @@ namespace yage::gl::vulkan
 
     DescriptorSetLayout::~DescriptorSetLayout()
     {
-        if (m_vk_handle != VK_NULL_HANDLE) {
-            vkDestroyDescriptorSetLayout(m_vk_device, m_vk_handle, nullptr);
-        }
+        clear();
+    }
+
+    DescriptorSetLayout::DescriptorSetLayout(DescriptorSetLayout&& other) noexcept
+        : m_instance(other.m_instance),
+          m_vk_device(other.m_vk_device),
+          m_vk_handle(other.m_vk_handle)
+    {
+        other.m_instance = nullptr;
+        other.m_vk_device = VK_NULL_HANDLE;
+        other.m_vk_handle = VK_NULL_HANDLE;
+    }
+
+    DescriptorSetLayout& DescriptorSetLayout::operator=(DescriptorSetLayout&& other) noexcept
+    {
+        if (this == &other)
+            return *this;
+
+        clear();
+
+        m_instance = other.m_instance;
+        m_vk_device = other.m_vk_device;
+        m_vk_handle = other.m_vk_handle;
+
+        other.m_instance = nullptr;
+        other.m_vk_device = VK_NULL_HANDLE;
+        other.m_vk_handle = VK_NULL_HANDLE;
+
+        return *this;
     }
 
     const VkDescriptorSetLayout& DescriptorSetLayout::vk_handle() const
     {
         return m_vk_handle;
+    }
+
+    void DescriptorSetLayout::clear()
+    {
+        if (m_vk_handle != VK_NULL_HANDLE) {
+            vkDestroyDescriptorSetLayout(m_vk_device, m_vk_handle, nullptr);
+        }
     }
 }
