@@ -7,18 +7,28 @@
 
 #include "../../platform/desktop/GlfwWindow.h"
 #include "../Handle.h"
+#include "../IContext.h"
 #include "DescriptorAllocator.h"
+#include "DescriptorSetCreator.h"
 #include "DescriptorSetLayout.h"
+#include "DescriptorSetLayoutBuilder.h"
 #include "Drawable.h"
+#include "DrawableCreator.h"
 #include "FrameCounter.h"
 #include "IndexBuffer.h"
+#include "IndexBufferCreator.h"
 #include "Pipeline.h"
+#include "PipelineBuilder.h"
 #include "RenderTarget.h"
 #include "RenderTargetBuilder.h"
+#include "Renderer.h"
 #include "SwapChain.h"
 #include "Texture2D.h"
+#include "Texture2DCreator.h"
 #include "UniformBuffer.h"
+#include "UniformBufferCreator.h"
 #include "VertexBuffer.h"
+#include "VertexBufferCreator.h"
 
 namespace yage::gl::vulkan
 {
@@ -56,12 +66,32 @@ namespace yage::gl::vulkan
         std::vector<VkPresentModeKHR> presentModes;
     };
 
-    class Instance final : public std::enable_shared_from_this<Instance>
+    class Instance final : public IContext, public std::enable_shared_from_this<Instance>
     {
     public:
         explicit Instance(std::weak_ptr<platform::desktop::GlfwWindow> window);
 
-        ~Instance();
+        ~Instance() override;
+
+        IRenderer2& renderer() override;
+
+        IPipelineBuilder& pipeline_builder() override;
+
+        IRenderTargetBuilder& render_target_builder() override;
+
+        IDrawableCreator2& drawable_creator() override;
+
+        IDescriptorSetLayoutBuilder& descriptor_set_layout_builder() override;
+
+        IDescriptorSetCreator& descriptor_set_creator() override;
+
+        ITexture2DCreator& texture_2d_creator() override;
+
+        IVertexBufferCreator& vertex_buffer_creator() override;
+
+        IIndexBufferCreator& index_buffer_creator() override;
+
+        IUniformBufferCreator& uniform_buffer_creator() override;
 
         void initialize();
 
@@ -196,6 +226,17 @@ namespace yage::gl::vulkan
         std::shared_ptr<DescriptorSetLayoutStore> m_store_descriptor_set_layouts =
                 std::make_shared<DescriptorSetLayoutStore>();
         std::shared_ptr<PipelineStore> m_store_pipelines = std::make_shared<PipelineStore>();
+
+        std::optional<VertexBufferCreator> m_vertex_buffer_creator;
+        std::optional<IndexBufferCreator> m_index_buffer_creator;
+        std::optional<UniformBufferCreator> m_uniform_buffer_creator;
+        std::optional<DrawableCreator> m_drawable_creator;
+        std::optional<Texture2DCreator> m_texture_2d_creator;
+        std::optional<DescriptorSetCreator> m_descriptor_set_creator;
+        std::optional<DescriptorSetLayoutBuilder> m_descriptor_set_layout_builder;
+        std::optional<PipelineBuilder> m_pipeline_builder;
+        std::optional<RenderTargetBuilder> m_render_target_builder;
+        std::optional<Renderer> m_renderer;
 
         void create_instance();
 

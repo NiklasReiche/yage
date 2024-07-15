@@ -6,7 +6,7 @@ namespace yage::gl::vulkan
 {
     class Instance;
 
-    class IndexBufferCreator final : IIndexBufferCreator
+    class IndexBufferCreator final : public IIndexBufferCreator
     {
     public:
         explicit IndexBufferCreator(std::weak_ptr<Instance> instance);

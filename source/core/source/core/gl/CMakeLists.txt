@@ -29,6 +29,8 @@ target_sources(yage_core
 		IRenderTarget.h
 		IRenderTargetBuilder.h
 
+		IContext.h
+
 		IRenderer.h
 
 		IPipeline.h

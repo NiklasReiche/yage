@@ -7,7 +7,8 @@
 namespace yage::gl::vulkan
 {
     PipelineBuilder::PipelineBuilder(std::weak_ptr<Instance> instance)
-        : m_instance(std::move(instance))
+        : m_instance(std::move(instance)),
+          m_vk_device(m_instance.lock()->device())
     {
         clear();
     }
@@ -292,7 +293,8 @@ namespace yage::gl::vulkan
         pipeline_layout_info.pPushConstantRanges = nullptr; // Optional
 
         const auto instance = m_instance.lock();
-        return instance->store_pipelines().create(instance.get(), pipeline_info, pipeline_layout_info, m_descriptor_set_layouts);
+        return instance->store_pipelines().create(instance.get(), pipeline_info, pipeline_layout_info,
+                                                  m_descriptor_set_layouts);
     }
 
     void PipelineBuilder::clear()
@@ -379,10 +381,9 @@ namespace yage::gl::vulkan
 
     void PipelineBuilder::destroy_shader_modules()
     {
-        const VkDevice device = m_instance.lock()->device();
         for (const VkShaderModule module: m_shader_modules) {
             if (module != nullptr) {
-                vkDestroyShaderModule(device, module, nullptr);
+                vkDestroyShaderModule(m_vk_device, module, nullptr);
             }
         }
 

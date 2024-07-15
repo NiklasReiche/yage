@@ -21,14 +21,6 @@ namespace yage::gl::vulkan
 
         ~PipelineBuilder() override;
 
-        PipelineBuilder(PipelineBuilder& other) = delete;
-
-        PipelineBuilder(PipelineBuilder&& other) = delete;
-
-        PipelineBuilder& operator=(PipelineBuilder& other) = delete;
-
-        PipelineBuilder& operator=(PipelineBuilder&& other) = delete;
-
         IPipelineBuilder& with_shaders(ShaderSource vertex_code, ShaderSource fragment_code) override;
 
         IPipelineBuilder& with_shaders(ShaderSource vertex_code, ShaderSource fragment_code,
@@ -56,6 +48,7 @@ namespace yage::gl::vulkan
 
     private:
         std::weak_ptr<Instance> m_instance; // cannot be raw pointer, since the creator might outlive the instance
+        VkDevice m_vk_device;
 
         std::vector<VkShaderModule> m_shader_modules{};
         std::vector<VkPipelineShaderStageCreateInfo> m_shader_stages{};

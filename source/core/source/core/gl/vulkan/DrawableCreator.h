@@ -8,7 +8,7 @@ namespace yage::gl::vulkan
 {
     class Instance;
 
-    class DrawableCreator final : IDrawableCreator2
+    class DrawableCreator final : public IDrawableCreator2
     {
     public:
         explicit DrawableCreator(std::weak_ptr<Instance> m_instance);

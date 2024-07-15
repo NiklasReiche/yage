@@ -12,6 +12,8 @@ namespace yage::gl
     public:
         virtual ~IRenderer2() = default;
 
+        virtual void begin_command_buffer() = 0;
+
         virtual void begin_render_pass() = 0;
 
         virtual void begin_render_pass(const IRenderTarget& render_target) = 0;
@@ -23,5 +25,7 @@ namespace yage::gl
         virtual void draw(const IDrawable2& drawable) = 0;
 
         virtual void end_render_pass() = 0;
+
+        virtual void end_command_buffer() = 0;
     };
 }

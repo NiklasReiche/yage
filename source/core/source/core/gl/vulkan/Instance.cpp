@@ -42,6 +42,8 @@ namespace yage::gl::vulkan
 
     Instance::~Instance()
     {
+        m_pipeline_builder.value().clear(); // destroys remaining shader modules
+
         m_swap_chain.clear();
 
         m_store_frame_buffers->clear();
@@ -73,6 +75,56 @@ namespace yage::gl::vulkan
         vkDestroyInstance(m_instance, nullptr);
     }
 
+    IRenderer2& Instance::renderer()
+    {
+        return m_renderer.value();
+    }
+
+    IPipelineBuilder& Instance::pipeline_builder()
+    {
+        return m_pipeline_builder.value();
+    }
+
+    IRenderTargetBuilder& Instance::render_target_builder()
+    {
+        return m_render_target_builder.value();
+    }
+
+    IDrawableCreator2& Instance::drawable_creator()
+    {
+        return m_drawable_creator.value();
+    }
+
+    IDescriptorSetLayoutBuilder& Instance::descriptor_set_layout_builder()
+    {
+        return m_descriptor_set_layout_builder.value();
+    }
+
+    IDescriptorSetCreator& Instance::descriptor_set_creator()
+    {
+        return m_descriptor_set_creator.value();
+    }
+
+    ITexture2DCreator& Instance::texture_2d_creator()
+    {
+        return m_texture_2d_creator.value();
+    }
+
+    IVertexBufferCreator& Instance::vertex_buffer_creator()
+    {
+        return m_vertex_buffer_creator.value();
+    }
+
+    IIndexBufferCreator& Instance::index_buffer_creator()
+    {
+        return m_index_buffer_creator.value();
+    }
+
+    IUniformBufferCreator& Instance::uniform_buffer_creator()
+    {
+        return m_uniform_buffer_creator.value();
+    }
+
     void Instance::initialize()
     {
         create_instance();
@@ -85,6 +137,17 @@ namespace yage::gl::vulkan
         create_sync_objects();
         create_descriptor_allocator();
         create_swap_chain();
+
+        m_vertex_buffer_creator = VertexBufferCreator(weak_from_this());
+        m_index_buffer_creator = IndexBufferCreator(weak_from_this());
+        m_uniform_buffer_creator = UniformBufferCreator(weak_from_this());
+        m_drawable_creator = DrawableCreator(weak_from_this());
+        m_texture_2d_creator = Texture2DCreator(weak_from_this());
+        m_descriptor_set_creator = DescriptorSetCreator(weak_from_this());
+        m_descriptor_set_layout_builder = DescriptorSetLayoutBuilder(weak_from_this());
+        m_pipeline_builder = PipelineBuilder(weak_from_this());
+        m_render_target_builder = RenderTargetBuilder(weak_from_this());
+        m_renderer = Renderer(weak_from_this());
     }
 
     void Instance::create_instance()
@@ -1187,8 +1250,8 @@ namespace yage::gl::vulkan
                              &image_memory_barrier);
     }
 
-    void Instance::transition_from_undefined_to_color_attachment_optimal(
-            const VkCommandBuffer command_buffer, const VkImage image)
+    void Instance::transition_from_undefined_to_color_attachment_optimal(const VkCommandBuffer command_buffer,
+                                                                         const VkImage image)
     {
         VkImageMemoryBarrier image_memory_barrier{};
         image_memory_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;

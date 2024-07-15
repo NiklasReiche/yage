@@ -4,13 +4,7 @@
 #include <core/platform/desktop/GlfwWindow.h>
 
 #include <core/gl/vulkan/Instance.h>
-#include <core/gl/vulkan/PipelineBuilder.h>
-#include <core/gl/vulkan/Renderer.h>
 
-#include "core/gl/vulkan/DescriptorSetCreator.h"
-#include "core/gl/vulkan/DescriptorSetLayoutBuilder.h"
-#include "core/gl/vulkan/DrawableCreator.h"
-#include "core/gl/vulkan/UniformBufferCreator.h"
 #include "math/math.h"
 
 using namespace yage;
@@ -30,7 +24,7 @@ int main()
             std::make_shared<gl::vulkan::Instance>(std::static_pointer_cast<platform::desktop::GlfwWindow>(window));
     context->initialize();
 
-    const auto drawable_creator = gl::vulkan::DrawableCreator(context);
+    const gl::IDrawableCreator2& drawable_creator = context->drawable_creator();
 
     const gl::VertexDataInfo vertex_data_info{
             .vertex_description =
@@ -58,34 +52,35 @@ int main()
             .index_count = 12,
     };
     constexpr std::array<std::uint16_t, 12> index_data = {0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4};
-    const auto drawable = drawable_creator.create(vertex_data_info, std::as_bytes(std::span{vertex_data}),
-                                                  index_data_info, std::as_bytes(std::span{index_data}));
+    const gl::DrawableHandle drawable = drawable_creator.create(vertex_data_info, std::as_bytes(std::span{vertex_data}),
+                                                                index_data_info, std::as_bytes(std::span{index_data}));
 
-    const auto uniform_buffer_creator = gl::vulkan::UniformBufferCreator(context);
+    const gl::IUniformBufferCreator& uniform_buffer_creator = context->uniform_buffer_creator();
     const gl::UniformBufferHandle ubo =
             uniform_buffer_creator.create(sizeof(UniformBufferData), gl::ResourceUsage::DYNAMIC);
 
-    auto descriptor_set_layout_builder = gl::vulkan::DescriptorSetLayoutBuilder(context);
+    gl::IDescriptorSetLayoutBuilder& descriptor_set_layout_builder = context->descriptor_set_layout_builder();
     const gl::DescriptorSetLayoutHandle layout = descriptor_set_layout_builder.with_uniform_buffer_at(0).build();
 
-    auto descriptor_set_creator = gl::vulkan::DescriptorSetCreator(context);
-    gl::DescriptorSetHandle descriptor_set = descriptor_set_creator.create(gl::ResourceUsage::DYNAMIC, layout);
+    gl::IDescriptorSetCreator& descriptor_set_creator = context->descriptor_set_creator();
+    const gl::DescriptorSetHandle descriptor_set = descriptor_set_creator.create(gl::ResourceUsage::DYNAMIC, layout);
     descriptor_set->write(0, ubo);
 
     const auto file_reader = window->getFileReader();
     auto vert_code = file_reader->openBinaryFile(R"(assets/vert.spv)", platform::IFile::AccessMode::READ)->read_all();
     auto frag_code = file_reader->openBinaryFile(R"(assets/frag.spv)", platform::IFile::AccessMode::READ)->read_all();
-    const auto graphics_pipeline = gl::vulkan::PipelineBuilder(context)
-                                           .with_shaders(vert_code, frag_code)
-                                           .with_vertex_format(gl::PrimitiveTopology::TRIANGLE_LIST, vertex_data_info)
-                                           .append_layout(layout)
-                                           .with_rasterizer(gl::PolygonMode::FILL, gl::CullMode::NONE, 1.0f)
-                                           .with_viewport({0, 0, 500.0f, 500.0f}, {0, 0, 500, 500})
-                                           .with_swap_chain_render_target()
-                                           .with_depth_test()
-                                           .build();
+    const gl::PipelineHandle graphics_pipeline =
+            gl::vulkan::PipelineBuilder(context)
+                    .with_shaders(vert_code, frag_code)
+                    .with_vertex_format(gl::PrimitiveTopology::TRIANGLE_LIST, vertex_data_info)
+                    .append_layout(layout)
+                    .with_rasterizer(gl::PolygonMode::FILL, gl::CullMode::NONE, 1.0f)
+                    .with_viewport({0, 0, 500.0f, 500.0f}, {0, 0, 500, 500})
+                    .with_swap_chain_render_target()
+                    .with_depth_test()
+                    .build();
 
-    gl::vulkan::Renderer renderer(context);
+    gl::IRenderer2& renderer = context->renderer();
 
     UniformBufferData ubo_data;
     ubo_data.projection = transpose(math::matrix::perspective(90.0f, 1.0f, 0.1f, 100.f));

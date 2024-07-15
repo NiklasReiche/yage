@@ -14,7 +14,7 @@ namespace yage::gl::vulkan
     public:
         explicit Renderer(std::weak_ptr<Instance> instance);
 
-        void begin_command_buffer();
+        void begin_command_buffer() override;
 
         void begin_render_pass() override;
 
@@ -28,7 +28,7 @@ namespace yage::gl::vulkan
 
         void end_render_pass() override;
 
-        void end_command_buffer();
+        void end_command_buffer() override;
 
     private:
         std::weak_ptr<Instance> m_instance; // cannot be raw pointer, since the creator might outlive the instance
