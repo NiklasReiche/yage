@@ -11,6 +11,7 @@ namespace yage::gl::vulkan
 {
     class Instance;
 
+    // TODO: dynamic state
     class Pipeline final : public IPipeline
     {
     public:

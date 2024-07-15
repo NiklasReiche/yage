@@ -585,7 +585,7 @@ namespace yage::gl::vulkan
         createInfo.presentMode = presentMode;
         createInfo.clipped = VK_TRUE; // clip pixels under overlapping windows
 
-        createInfo.oldSwapchain = VK_NULL_HANDLE; // TODO: window resizing
+        createInfo.oldSwapchain = m_swap_chain.swapchain_khr();
 
         m_swap_chain = SwapChain(this, createInfo, findDepthFormat(), m_max_msaa_samples);
     }

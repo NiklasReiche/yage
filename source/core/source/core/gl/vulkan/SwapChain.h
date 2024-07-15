@@ -47,6 +47,8 @@ namespace yage::gl::vulkan
 
         [[nodiscard]] VkImage& present_image();
 
+        [[nodiscard]] VkSwapchainKHR& swapchain_khr();
+
     private:
         Instance* m_instance = nullptr;
         VkDevice m_vk_device = VK_NULL_HANDLE;

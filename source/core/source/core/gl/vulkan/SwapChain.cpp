@@ -80,6 +80,10 @@ namespace yage::gl::vulkan
         if (this == &other)
             return *this;
 
+        if (m_swap_chain_khr != VK_NULL_HANDLE) {
+            clear();
+        }
+
         m_instance = other.m_instance;
         m_vk_device = other.m_vk_device;
 
@@ -203,6 +207,11 @@ namespace yage::gl::vulkan
     VkImage& SwapChain::present_image()
     {
         return m_resolve_images[m_current_image_index];
+    }
+
+    VkSwapchainKHR& SwapChain::swapchain_khr()
+    {
+        return m_swap_chain_khr;
     }
 
     void SwapChain::create_image_views()

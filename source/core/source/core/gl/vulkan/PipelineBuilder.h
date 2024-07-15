@@ -4,16 +4,17 @@
 
 #include <vulkan/vulkan.h>
 
+#include "../IPipelineBuilder.h"
 #include "../enums.h"
 #include "DescriptorSetLayout.h"
 #include "Pipeline.h"
 #include "RenderTarget.h"
-#include "core/gl/IPipelineBuilder.h"
 
 namespace yage::gl::vulkan
 {
     class Instance;
 
+    // TODO: dynamic state
     class PipelineBuilder final : public IPipelineBuilder
     {
     public:
