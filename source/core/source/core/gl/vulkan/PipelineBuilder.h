@@ -14,7 +14,6 @@ namespace yage::gl::vulkan
 {
     class Instance;
 
-    // TODO: dynamic state
     class PipelineBuilder final : public IPipelineBuilder
     {
     public:
@@ -35,9 +34,11 @@ namespace yage::gl::vulkan
 
         IPipelineBuilder& with_viewport(Viewport viewport, ScissorRectangle scissor) override;
 
-        IPipelineBuilder& with_render_target(const IRenderTarget& render_target) override;
+        IPipelineBuilder& with_dynamic_viewport() override;
 
-        IPipelineBuilder& with_swap_chain_render_target() override;
+        IPipelineBuilder& for_render_target(const IRenderTarget& render_target) override;
+
+        IPipelineBuilder& for_swap_chain_render_target() override;
 
         IPipelineBuilder& with_depth_test() override;
 

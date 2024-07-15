@@ -82,14 +82,16 @@ namespace yage::gl::vulkan
         m_descriptor_sets_to_bind.push_back(static_cast<const DescriptorSet&>(descriptor_set).vk_handle());
     }
 
-    void Renderer::bind_pipeline(const IPipeline& pipeline)
+    void Renderer::bind_pipeline(IPipeline& pipeline)
     {
-        const auto& pipeline_impl = static_cast<const Pipeline&>(pipeline);
+        auto& pipeline_impl = static_cast<Pipeline&>(pipeline);
 
         vkCmdBindDescriptorSets(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_impl.vk_layout(), 0,
                                 m_descriptor_sets_to_bind.size(), m_descriptor_sets_to_bind.data(), 0, nullptr);
 
         vkCmdBindPipeline(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_impl.vk_handle());
+
+        pipeline_impl.submit_dynamic_state(m_command_buffer);
 
         m_descriptor_sets_to_bind.clear();
     }

@@ -161,6 +161,8 @@ namespace yage::gl::vulkan
 
     IPipelineBuilder& PipelineBuilder::with_viewport(const Viewport viewport, const ScissorRectangle scissor)
     {
+        // TODO: check if dynmic state contains dynamic viewport
+
         m_viewport = VkViewport{};
         m_viewport.x = viewport.x;
         m_viewport.y = viewport.y;
@@ -183,7 +185,15 @@ namespace yage::gl::vulkan
         return *this;
     }
 
-    IPipelineBuilder& PipelineBuilder::with_render_target(const IRenderTarget& render_target)
+    IPipelineBuilder& PipelineBuilder::with_dynamic_viewport()
+    {
+        m_dynamic_states.push_back(VK_DYNAMIC_STATE_VIEWPORT);
+        m_dynamic_states.push_back(VK_DYNAMIC_STATE_SCISSOR);
+
+        return *this;
+    }
+
+    IPipelineBuilder& PipelineBuilder::for_render_target(const IRenderTarget& render_target)
     {
         const auto& render_target_impl = static_cast<const RenderTarget&>(render_target);
 
@@ -201,7 +211,7 @@ namespace yage::gl::vulkan
         return *this;
     }
 
-    IPipelineBuilder& PipelineBuilder::with_swap_chain_render_target()
+    IPipelineBuilder& PipelineBuilder::for_swap_chain_render_target()
     {
         const auto& swap_chain = m_instance.lock()->swap_chain();
 
@@ -294,7 +304,7 @@ namespace yage::gl::vulkan
 
         const auto instance = m_instance.lock();
         return instance->store_pipelines().create(instance.get(), pipeline_info, pipeline_layout_info,
-                                                  m_descriptor_set_layouts);
+                                                  m_descriptor_set_layouts, m_dynamic_states);
     }
 
     void PipelineBuilder::clear()
@@ -323,6 +333,10 @@ namespace yage::gl::vulkan
         m_scissor = VkRect2D{};
         m_viewport_state = VkPipelineViewportStateCreateInfo{};
         m_viewport_state.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+        m_viewport_state.viewportCount = 1;
+        m_viewport_state.pViewports = VK_NULL_HANDLE;
+        m_viewport_state.scissorCount = 1;
+        m_viewport_state.pScissors = VK_NULL_HANDLE;
 
         // render target
         m_rendering_create_info = VkPipelineRenderingCreateInfo{};

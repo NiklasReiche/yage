@@ -1,12 +1,14 @@
 #include "Pipeline.h"
 #include <stdexcept>
+#include <utility>
 #include "Instance.h"
 
 namespace yage::gl::vulkan
 {
     Pipeline::Pipeline(Instance* instance, VkGraphicsPipelineCreateInfo& pipeline_info,
                        const VkPipelineLayoutCreateInfo& layout_info,
-                       std::span<DescriptorSetLayoutHandle> descriptor_set_layouts)
+                       std::span<DescriptorSetLayoutHandle> descriptor_set_layouts,
+                       std::span<VkDynamicState> dynamic_state)
         : m_instance(instance),
           m_vk_device(m_instance->device())
     {
@@ -23,6 +25,10 @@ namespace yage::gl::vulkan
         if (vkCreateGraphicsPipelines(m_vk_device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &m_vk_handle) !=
             VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to create graphics pipeline!");
+        }
+
+        if (std::ranges::find(dynamic_state, VK_DYNAMIC_STATE_VIEWPORT) != dynamic_state.end()) {
+            set_dynamic_viewport(Viewport{}, ScissorRectangle{});
         }
     }
 
@@ -63,6 +69,20 @@ namespace yage::gl::vulkan
         return *this;
     }
 
+    void Pipeline::set_dynamic_viewport(const Viewport viewport, const ScissorRectangle scissor)
+    {
+        m_dynamic_viewport = VkViewport{
+                .x = viewport.x,
+                .y = viewport.y,
+                .width = viewport.width,
+                .height = viewport.height,
+                .minDepth = 0.0f,
+                .maxDepth = 1.0f,
+        };
+
+        m_dynamic_scissor = VkRect2D{.offset = {scissor.x, scissor.y}, .extent = {scissor.width, scissor.height}};
+    }
+
     VkPipeline Pipeline::vk_handle() const
     {
         return m_vk_handle;
@@ -71,6 +91,16 @@ namespace yage::gl::vulkan
     VkPipelineLayout Pipeline::vk_layout() const
     {
         return m_graphics_pipeline_layout;
+    }
+
+    void Pipeline::submit_dynamic_state(const VkCommandBuffer command_buffer)
+    {
+        if (m_dynamic_viewport.has_value()) {
+            vkCmdSetViewport(command_buffer, 0, 1, &m_dynamic_viewport.value());
+        }
+        if (m_dynamic_scissor.has_value()) {
+            vkCmdSetScissor(command_buffer, 0, 1, &m_dynamic_scissor.value());
+        }
     }
 
     void Pipeline::clear()

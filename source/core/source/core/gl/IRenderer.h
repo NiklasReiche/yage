@@ -20,7 +20,7 @@ namespace yage::gl
 
         virtual void bind_descriptor_set(const IDescriptorSet& descriptor_set) = 0;
 
-        virtual void bind_pipeline(const IPipeline& pipeline) = 0;
+        virtual void bind_pipeline(IPipeline& pipeline) = 0;
 
         virtual void draw(const IDrawable2& drawable) = 0;
 

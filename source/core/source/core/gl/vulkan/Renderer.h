@@ -22,7 +22,7 @@ namespace yage::gl::vulkan
 
         void bind_descriptor_set(const IDescriptorSet& descriptor_set) override;
 
-        void bind_pipeline(const IPipeline& pipeline) override;
+        void bind_pipeline(IPipeline& pipeline) override;
 
         void draw(const IDrawable2& drawable) override;
 

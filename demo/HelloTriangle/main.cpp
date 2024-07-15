@@ -76,10 +76,17 @@ int main()
                     .with_vertex_format(gl::PrimitiveTopology::TRIANGLE_LIST, vertex_data_info)
                     .append_layout(layout)
                     .with_rasterizer(gl::PolygonMode::FILL, gl::CullMode::NONE, 1.0f)
-                    .with_viewport({0, 0, 500.0f, 500.0f}, {0, 0, 500, 500})
-                    .with_swap_chain_render_target()
+                    .with_dynamic_viewport()
+                    .for_swap_chain_render_target()
                     .with_depth_test()
                     .build();
+
+    graphics_pipeline->set_dynamic_viewport({0, 0, 500.0f, 500.0f}, {0, 0, 500, 500});
+    window->attach_on_framebuffer_resize([&graphics_pipeline](const int width, const int height) {
+        graphics_pipeline->set_dynamic_viewport(
+                {0, 0, static_cast<float>(width), static_cast<float>(height)},
+                {0, 0, static_cast<unsigned int>(width), static_cast<unsigned int>(width)});
+    });
 
     gl::IRenderer2& renderer = context->renderer();
 

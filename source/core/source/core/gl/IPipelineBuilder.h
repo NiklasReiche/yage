@@ -30,9 +30,11 @@ namespace yage::gl
 
         virtual IPipelineBuilder& with_viewport(Viewport viewport, ScissorRectangle scissor) = 0;
 
-        virtual IPipelineBuilder& with_render_target(const IRenderTarget& render_target) = 0;
+        virtual IPipelineBuilder& with_dynamic_viewport() = 0;
 
-        virtual IPipelineBuilder& with_swap_chain_render_target() = 0;
+        virtual IPipelineBuilder& for_render_target(const IRenderTarget& render_target) = 0;
+
+        virtual IPipelineBuilder& for_swap_chain_render_target() = 0;
 
         // optional
         virtual IPipelineBuilder& with_depth_test() = 0;
