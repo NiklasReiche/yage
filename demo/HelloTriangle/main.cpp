@@ -78,7 +78,7 @@ int main()
     const auto graphics_pipeline = gl::vulkan::PipelineBuilder(context)
                                            .with_shaders(vert_code, frag_code)
                                            .with_vertex_format(gl::PrimitiveTopology::TRIANGLE_LIST, vertex_data_info)
-                                           .with_layout(layout)
+                                           .append_layout(layout)
                                            .with_rasterizer(gl::PolygonMode::FILL, gl::CullMode::NONE, 1.0f)
                                            .with_viewport({0, 0, 500.0f, 500.0f}, {0, 0, 500, 500})
                                            .with_swap_chain_render_target()
@@ -104,7 +104,8 @@ int main()
 
         renderer.begin_command_buffer();
         renderer.begin_render_pass();
-        renderer.bind_pipeline(*graphics_pipeline, *descriptor_set);
+        renderer.bind_descriptor_set(*descriptor_set);
+        renderer.bind_pipeline(*graphics_pipeline);
         renderer.draw(*drawable);
         renderer.end_render_pass();
         renderer.end_command_buffer();

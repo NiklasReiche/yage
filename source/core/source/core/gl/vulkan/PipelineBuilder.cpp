@@ -130,7 +130,7 @@ namespace yage::gl::vulkan
         return *this;
     }
 
-    IPipelineBuilder& PipelineBuilder::with_layout(const DescriptorSetLayoutHandle layout)
+    IPipelineBuilder& PipelineBuilder::append_layout(const DescriptorSetLayoutHandle layout)
     {
         m_descriptor_set_layouts.push_back(layout);
 

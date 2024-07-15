@@ -36,7 +36,7 @@ namespace yage::gl::vulkan
 
         IPipelineBuilder& with_vertex_format(PrimitiveTopology topology, VertexDataInfo vertex_data_info) override;
 
-        IPipelineBuilder& with_layout(DescriptorSetLayoutHandle layout) override;
+        IPipelineBuilder& append_layout(DescriptorSetLayoutHandle layout) override;
 
         IPipelineBuilder& with_rasterizer(PolygonMode polygon_mode, CullMode cull_mode, float line_width) override;
 

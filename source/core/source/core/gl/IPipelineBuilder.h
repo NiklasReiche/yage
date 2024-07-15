@@ -24,7 +24,7 @@ namespace yage::gl
 
         virtual IPipelineBuilder& with_vertex_format(PrimitiveTopology topology, VertexDataInfo vertex_data_info) = 0;
 
-        virtual IPipelineBuilder& with_layout(DescriptorSetLayoutHandle layout) = 0;
+        virtual IPipelineBuilder& append_layout(DescriptorSetLayoutHandle layout) = 0;
 
         virtual IPipelineBuilder& with_rasterizer(PolygonMode polygon_mode, CullMode cull_mode, float line_width) = 0;
 
