@@ -32,15 +32,10 @@ target_sources(yage_core PRIVATE
         PipelineBuilder.h
         PipelineBuilder.cpp
 
-        FrameBuffer.h
-        FrameBuffer.cpp
-        FrameBufferCreator.h
-        FrameBufferCreator.cpp
-
-        RenderPass.h
-        RenderPass.cpp
-        RenderPassBuilder.h
-        RenderPassBuilder.cpp
+        RenderTarget.h
+        RenderTarget.cpp
+        RenderTargetBuilder.h
+        RenderTargetBuilder.cpp
 
         ImageView.h
         ImageView.cpp

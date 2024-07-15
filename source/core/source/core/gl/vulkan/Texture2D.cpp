@@ -63,6 +63,41 @@ namespace yage::gl::vulkan
         vkFreeMemory(m_vk_device, staging_buffer_memory, nullptr);
     }
 
+    Texture2D::Texture2D(Instance* instance, const FrameCounter frame_counter, const TextureSampler& sampler,
+                         const PixelTransferInfo& data_info, const VkImageUsageFlags usage,
+                         const VkImageLayout layout, const VkSampleCountFlagBits msaa_samples)
+        : m_instance(instance),
+          m_vk_device(m_instance->device()),
+          m_frame_counter(frame_counter)
+    {
+        m_width = data_info.width;
+        m_height = data_info.height;
+        m_mip_levels = 1; // no mip-mapping
+
+        VkImageAspectFlags aspect = VK_IMAGE_ASPECT_NONE;
+        if (usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT || usage & VK_IMAGE_USAGE_SAMPLED_BIT) {
+            aspect |= VK_IMAGE_ASPECT_COLOR_BIT;
+        }
+        if (usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+            aspect |= VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+        }
+
+        for (unsigned int i = 0; i < m_frame_counter.max_frame_index; ++i) {
+            const VkFormat vk_image_format = convert(data_info.image_format);
+
+            m_instance->create_image(m_width, m_height, m_mip_levels, msaa_samples, vk_image_format,
+                                     VK_IMAGE_TILING_OPTIMAL, usage, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                                     m_vk_images[i], m_vk_memories[i]);
+
+            m_instance->transition_image_layout(m_vk_images[i], vk_image_format, VK_IMAGE_LAYOUT_UNDEFINED, layout,
+                                                m_mip_levels);
+
+            m_vk_image_views[i] = instance->create_image_view(m_vk_images[i], vk_image_format, aspect, m_mip_levels);
+        }
+
+        m_vk_sampler = instance->create_texture_sampler(sampler, m_mip_levels);
+    }
+
     Texture2D::~Texture2D()
     {
         for (unsigned int i = 0; i < m_frame_counter.max_frame_index; ++i) {
@@ -129,5 +164,10 @@ namespace yage::gl::vulkan
             image_infos.push_back(info);
         }
         return image_infos;
+    }
+
+    VkImageView Texture2D::vk_image_view(const unsigned int instance) const
+    {
+        return m_vk_image_views[instance];
     }
 }

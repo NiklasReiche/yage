@@ -28,41 +28,49 @@ namespace yage::gl::vulkan
 
     void Renderer::begin_render_pass()
     {
-        const auto& swap_chain = m_instance.lock()->swap_chain();
+        const auto instance = m_instance.lock();
+        auto& swap_chain = instance->swap_chain();
 
-        VkRenderPassBeginInfo render_pass_info{};
-        render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        render_pass_info.renderPass = swap_chain.render_pass().get<RenderPass>().vk_handle();
-        render_pass_info.framebuffer = swap_chain.current_frame_buffer();
-        render_pass_info.renderArea.offset = {0, 0};
-        render_pass_info.renderArea.extent = swap_chain.extent();
+        instance->transition_from_undefined_to_color_attachment_optimal(m_command_buffer, swap_chain.present_image());
 
-        std::array<VkClearValue, 2> clear_values{};
-        clear_values[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
-        clear_values[1].depthStencil = {1.0f, 0};
+        VkRenderingInfo rendering_info{};
+        rendering_info.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
+        rendering_info.flags = 0;
+        rendering_info.renderArea.offset = {0, 0};
+        rendering_info.renderArea.extent = swap_chain.extent();
+        rendering_info.layerCount = 1;
+        rendering_info.viewMask = 0;
+        rendering_info.colorAttachmentCount = 1;
+        rendering_info.pColorAttachments = &swap_chain.color_attachment();
+        rendering_info.pDepthAttachment = &swap_chain.depth_attachment();
 
-        render_pass_info.clearValueCount = static_cast<std::uint32_t>(clear_values.size());
-        render_pass_info.pClearValues = &clear_values[0];
+        vkCmdBeginRendering(m_command_buffer, &rendering_info);
 
-        vkCmdBeginRenderPass(m_command_buffer, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
+        m_render_to_swap_chain = true;
     }
 
-    void Renderer::begin_render_pass(const FrameBuffer& frame_buffer)
+    void Renderer::begin_render_pass(const RenderTarget& render_target)
     {
-        VkRenderPassBeginInfo renderPassInfo{};
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = frame_buffer.render_pass().get<RenderPass>().vk_handle();
-        renderPassInfo.framebuffer = frame_buffer.vk_handle();
-        renderPassInfo.renderArea.offset = {0, 0};
+        math::Vec2ui render_target_size = render_target.extent();
+        const std::vector<VkRenderingAttachmentInfo>& color_attachment_infos = render_target.color_attachment_infos();
+        const std::optional<VkRenderingAttachmentInfo>& depth_attachment_info = render_target.depth_attachment_info();
 
-        const math::Vec2ui extent = frame_buffer.extent();
-        renderPassInfo.renderArea.extent = {extent.x(), extent.y()};
+        VkRenderingInfo rendering_info{};
+        rendering_info.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
+        rendering_info.flags = 0;
+        rendering_info.renderArea = {0, 0, render_target_size.x(), render_target_size.y()};
+        rendering_info.layerCount = 1;
+        rendering_info.viewMask = 0;
+        rendering_info.colorAttachmentCount = color_attachment_infos.size();
+        rendering_info.pColorAttachments = color_attachment_infos.data();
+        if (depth_attachment_info.has_value()) {
+            rendering_info.pDepthAttachment = &depth_attachment_info.value();
+        }
+        // TODO: stencil attachment
 
-        constexpr VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}}; // TODO: depth & stencil
-        renderPassInfo.clearValueCount = 1;
-        renderPassInfo.pClearValues = &clearColor;
+        vkCmdBeginRendering(m_command_buffer, &rendering_info);
 
-        vkCmdBeginRenderPass(m_command_buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        m_render_to_swap_chain = false;
     }
 
     void Renderer::bind_pipeline(const Pipeline& pipeline, const IDescriptorSet& descriptor_set)
@@ -92,7 +100,14 @@ namespace yage::gl::vulkan
 
     void Renderer::end_render_pass()
     {
-        vkCmdEndRenderPass(m_command_buffer);
+        vkCmdEndRendering(m_command_buffer);
+
+        if (m_render_to_swap_chain) {
+            const auto instance = m_instance.lock();
+            auto& swap_chain = instance->swap_chain();
+            instance->transition_from_color_attachment_optimal_to_present_src(m_command_buffer,
+                                                                              swap_chain.present_image());
+        }
     }
 
     void Renderer::end_command_buffer()

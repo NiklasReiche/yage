@@ -19,6 +19,9 @@ namespace yage::gl::vulkan
         Texture2D(Instance* instance, FrameCounter frame_counter, const TextureSampler& sampler,
                   const PixelTransferInfo& data_info, std::span<const std::byte> data);
 
+        Texture2D(Instance* instance, FrameCounter frame_counter, const TextureSampler& sampler,
+                  const PixelTransferInfo& data_info, VkImageUsageFlags usage, VkImageLayout layout, VkSampleCountFlagBits msaa_samples);
+
         ~Texture2D() override;
 
         Texture2D(const Texture2D& other) = delete;
@@ -32,6 +35,8 @@ namespace yage::gl::vulkan
         [[nodiscard]] VkSampler vk_sampler() const;
 
         [[nodiscard]] std::vector<VkDescriptorImageInfo> descriptor_info() const;
+
+        [[nodiscard]] VkImageView vk_image_view(unsigned int instance) const;
 
     private:
         Instance* m_instance; // can be raw pointer, since the resource lives within the store on the instance

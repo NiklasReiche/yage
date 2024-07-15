@@ -4,8 +4,8 @@
 
 #include "../IDrawable.h"
 #include "DescriptorSet.h"
-#include "FrameBuffer.h"
 #include "Pipeline.h"
+#include "RenderTarget.h"
 
 namespace yage::gl::vulkan
 {
@@ -20,7 +20,7 @@ namespace yage::gl::vulkan
 
         void begin_render_pass();
 
-        void begin_render_pass(const FrameBuffer& frame_buffer);
+        void begin_render_pass(const RenderTarget& render_target);
 
         void bind_pipeline(const Pipeline& pipeline, const IDescriptorSet& descriptor_set);
 
@@ -33,5 +33,7 @@ namespace yage::gl::vulkan
     private:
         std::weak_ptr<Instance> m_instance; // cannot be raw pointer, since the creator might outlive the instance
         VkCommandBuffer m_command_buffer{};
+
+        bool m_render_to_swap_chain = false;
     };
 }

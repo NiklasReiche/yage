@@ -7,8 +7,8 @@
 #include "../DrawableCreator.h"
 #include "../enums.h"
 #include "DescriptorSetLayout.h"
-#include "FrameBuffer.h"
 #include "Pipeline.h"
+#include "RenderTarget.h"
 
 namespace yage::gl::vulkan
 {
@@ -38,7 +38,7 @@ namespace yage::gl::vulkan
 
         PipelineBuilder& with_viewport(Viewport viewport, ScissorRectangle scissor);
 
-        PipelineBuilder& with_render_pass(RenderPassHandle render_pass);
+        PipelineBuilder& with_render_target(const IRenderTarget& render_target);
 
         PipelineBuilder& with_swap_chain_render_pass();
 
@@ -66,13 +66,13 @@ namespace yage::gl::vulkan
         std::vector<VkDynamicState> m_dynamic_states{};
         VkPipelineDynamicStateCreateInfo m_dynamic_state{};
 
-        RenderPassHandle m_render_pass{};
-
         VkPipelineRasterizationStateCreateInfo m_rasterizer_info{};
         VkPipelineColorBlendAttachmentState m_blend_attachment{};
         VkPipelineColorBlendStateCreateInfo m_blend_info{};
         VkPipelineMultisampleStateCreateInfo m_multisampling_info{};
         VkPipelineLayoutCreateInfo m_pipeline_layout_info{};
+
+        VkPipelineRenderingCreateInfo m_rendering_create_info{};
 
         VkPipelineDepthStencilStateCreateInfo m_depth_stencil_state_create_info{};
 

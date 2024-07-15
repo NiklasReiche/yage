@@ -155,18 +155,33 @@ namespace yage::gl::vulkan
         return *this;
     }
 
-    PipelineBuilder& PipelineBuilder::with_render_pass(RenderPassHandle render_pass)
+    PipelineBuilder& PipelineBuilder::with_render_target(const IRenderTarget& render_target)
     {
-        m_render_pass = std::move(render_pass);
+        const auto& render_target_impl = static_cast<const RenderTarget&>(render_target);
 
-        m_multisampling_info.rasterizationSamples = m_render_pass.get<RenderPass>().samples();
+        const std::vector<VkFormat>& color_attachment_formats = render_target_impl.color_attachment_formats();
+        const std::optional<VkFormat>& depth_attachment_format = render_target_impl.depth_attachment_format();
+
+        m_rendering_create_info.colorAttachmentCount = color_attachment_formats.size();
+        m_rendering_create_info.pColorAttachmentFormats = color_attachment_formats.data();
+        if (depth_attachment_format.has_value()) {
+            m_rendering_create_info.depthAttachmentFormat = depth_attachment_format.value();
+        }
+
+        m_multisampling_info.rasterizationSamples = convert(render_target_impl.samples());
 
         return *this;
     }
 
     PipelineBuilder& PipelineBuilder::with_swap_chain_render_pass()
     {
-        with_render_pass(m_instance.lock()->swap_chain().render_pass());
+        const auto& swap_chain = m_instance.lock()->swap_chain();
+
+        m_rendering_create_info.colorAttachmentCount = 1;
+        m_rendering_create_info.pColorAttachmentFormats = &swap_chain.color_format();
+        m_rendering_create_info.depthAttachmentFormat = swap_chain.depth_format();
+
+        m_multisampling_info.rasterizationSamples = swap_chain.samples();
 
         return *this;
     }
@@ -179,6 +194,7 @@ namespace yage::gl::vulkan
 
         VkGraphicsPipelineCreateInfo pipeline_info{};
         pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+        pipeline_info.pNext = &m_rendering_create_info;
         pipeline_info.stageCount = m_shader_stages.size();
         pipeline_info.pStages = m_shader_stages.data();
         pipeline_info.pVertexInputState = &m_vertex_input_info;
@@ -189,13 +205,13 @@ namespace yage::gl::vulkan
         pipeline_info.pDepthStencilState = &m_depth_stencil_state_create_info;
         pipeline_info.pColorBlendState = &m_blend_info;
         pipeline_info.pDynamicState = &m_dynamic_state;
-        pipeline_info.renderPass = m_render_pass.get<RenderPass>().vk_handle();
+        pipeline_info.renderPass = nullptr; // uses dynamic rendering
         pipeline_info.subpass = 0;
         pipeline_info.basePipelineHandle = VK_NULL_HANDLE; // Optional
         pipeline_info.basePipelineIndex = -1; // Optional
 
         const auto instance = m_instance.lock();
-        return instance->store_pipelines().create(instance.get(), m_render_pass, pipeline_info, m_pipeline_layout_info);
+        return instance->store_pipelines().create(instance.get(), pipeline_info, m_pipeline_layout_info);
     }
 
     void PipelineBuilder::populate_defaults()
@@ -218,6 +234,14 @@ namespace yage::gl::vulkan
         m_depth_stencil_state_create_info.depthTestEnable = VK_FALSE;
         m_depth_stencil_state_create_info.depthWriteEnable = VK_FALSE;
         m_depth_stencil_state_create_info.stencilTestEnable = VK_FALSE;
+
+        // render target
+        m_rendering_create_info = VkPipelineRenderingCreateInfo{};
+        m_rendering_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
+        m_rendering_create_info.colorAttachmentCount = 0;
+        m_rendering_create_info.pColorAttachmentFormats = nullptr;
+        m_rendering_create_info.depthAttachmentFormat = VK_FORMAT_UNDEFINED;
+        m_rendering_create_info.stencilAttachmentFormat = VK_FORMAT_UNDEFINED;
     }
 
     PipelineBuilder& PipelineBuilder::with_blending()

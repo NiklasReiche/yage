@@ -47,7 +47,6 @@ namespace yage::gl::vulkan
         m_store_frame_buffers->clear();
         m_store_image_views->clear();
         m_store_pipelines->clear();
-        m_store_render_passes->clear();
         m_store_vertex_buffers->clear();
         m_store_index_buffers->clear();
         m_store_uniform_buffers->clear();
@@ -82,11 +81,11 @@ namespace yage::gl::vulkan
         create_surface();
         pick_physical_device();
         create_logical_device();
-        create_swap_chain();
         create_command_pool();
         create_command_buffers();
         create_sync_objects();
         create_descriptor_allocator();
+        create_swap_chain();
     }
 
     void Instance::create_instance()
@@ -97,7 +96,7 @@ namespace yage::gl::vulkan
         appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
         appInfo.pEngineName = "No Engine";
         appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.apiVersion = VK_API_VERSION_1_0;
+        appInfo.apiVersion = VK_API_VERSION_1_3;
 
         VkInstanceCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -314,8 +313,13 @@ namespace yage::gl::vulkan
         VkPhysicalDeviceFeatures deviceFeatures{};
         deviceFeatures.samplerAnisotropy = VK_TRUE;
 
+        VkPhysicalDeviceDynamicRenderingFeatures dynamic_rendering_feature{};
+        dynamic_rendering_feature.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES;
+        dynamic_rendering_feature.dynamicRendering = VK_TRUE;
+
         VkDeviceCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+        createInfo.pNext = &dynamic_rendering_feature;
         createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
         createInfo.pQueueCreateInfos = queueCreateInfos.data();
 
@@ -680,14 +684,9 @@ namespace yage::gl::vulkan
         return m_command_buffers[m_current_frame_in_flight];
     }
 
-    const SwapChain& Instance::swap_chain() const
+    SwapChain& Instance::swap_chain()
     {
         return m_swap_chain;
-    }
-
-    RenderPassStore& Instance::store_render_passes()
-    {
-        return *m_store_render_passes;
     }
 
     FrameBufferStore& Instance::store_frame_buffers()
@@ -713,6 +712,11 @@ namespace yage::gl::vulkan
     UniformBufferStore& Instance::store_uniform_buffers()
     {
         return *m_store_uniform_buffers;
+    }
+
+    RenderTargetStore& Instance::store_render_targets()
+    {
+        return *m_store_render_targets;
     }
 
     DrawableStore& Instance::store_drawables()
@@ -1075,6 +1079,138 @@ namespace yage::gl::vulkan
                              0, nullptr, 0, nullptr, 1, &barrier);
 
         end_one_time_command_buffer(command_buffer);
+    }
+
+    void Instance::transition_from_undefined_to_depth_stencil_attachment_optimal(const VkImage image)
+    {
+        const VkCommandBuffer command_buffer = begin_one_time_command_buffer();
+
+        VkImageMemoryBarrier image_memory_barrier{};
+        image_memory_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        image_memory_barrier.srcAccessMask = 0;
+        image_memory_barrier.dstAccessMask =
+                VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+        image_memory_barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        image_memory_barrier.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        image_memory_barrier.image = image;
+        image_memory_barrier.subresourceRange = {
+                .aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
+                .baseMipLevel = 0,
+                .levelCount = 1,
+                .baseArrayLayer = 0,
+                .layerCount = 1,
+        };
+
+        constexpr VkPipelineStageFlagBits src_stage_mask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        constexpr VkPipelineStageFlagBits dst_stage_mask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+
+        vkCmdPipelineBarrier(command_buffer, src_stage_mask, dst_stage_mask, 0, 0, nullptr, 0, nullptr, 1,
+                             &image_memory_barrier);
+
+        end_one_time_command_buffer(command_buffer);
+    }
+
+    void Instance::transition_from_undefined_to_color_attachment_optimal(const VkImage image)
+    {
+        const VkCommandBuffer command_buffer = begin_one_time_command_buffer();
+
+        VkImageMemoryBarrier image_memory_barrier{};
+        image_memory_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        image_memory_barrier.srcAccessMask = 0;
+        image_memory_barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        image_memory_barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        image_memory_barrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        image_memory_barrier.image = image;
+        image_memory_barrier.subresourceRange = {
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                .baseMipLevel = 0,
+                .levelCount = 1,
+                .baseArrayLayer = 0,
+                .layerCount = 1,
+        };
+
+        constexpr VkPipelineStageFlagBits src_stage_mask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        constexpr VkPipelineStageFlagBits dst_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+        vkCmdPipelineBarrier(command_buffer, src_stage_mask, dst_stage_mask, 0, 0, nullptr, 0, nullptr, 1,
+                             &image_memory_barrier);
+
+        end_one_time_command_buffer(command_buffer);
+    }
+
+    void Instance::transition_from_color_attachment_optimal_to_present_src(const VkCommandBuffer command_buffer,
+                                                                           const VkImage image)
+    {
+        VkImageMemoryBarrier image_memory_barrier{};
+        image_memory_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        image_memory_barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        image_memory_barrier.dstAccessMask = 0;
+        image_memory_barrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        image_memory_barrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        image_memory_barrier.image = image;
+        image_memory_barrier.subresourceRange = {
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                .baseMipLevel = 0,
+                .levelCount = 1,
+                .baseArrayLayer = 0,
+                .layerCount = 1,
+        };
+
+        constexpr VkPipelineStageFlagBits src_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        constexpr VkPipelineStageFlagBits dst_stage_mask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+
+        vkCmdPipelineBarrier(command_buffer, src_stage_mask, dst_stage_mask, 0, 0, nullptr, 0, nullptr, 1,
+                             &image_memory_barrier);
+    }
+
+    void Instance::transition_from_present_src_to_color_attachment_optimal(const VkCommandBuffer command_buffer,
+                                                                           const VkImage image)
+    {
+        VkImageMemoryBarrier image_memory_barrier{};
+        image_memory_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        image_memory_barrier.srcAccessMask = 0;
+        image_memory_barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        image_memory_barrier.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        image_memory_barrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        image_memory_barrier.image = image;
+        image_memory_barrier.subresourceRange = {
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                .baseMipLevel = 0,
+                .levelCount = 1,
+                .baseArrayLayer = 0,
+                .layerCount = 1,
+        };
+
+        constexpr VkPipelineStageFlagBits src_stage_mask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        constexpr VkPipelineStageFlagBits dst_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+        vkCmdPipelineBarrier(command_buffer, src_stage_mask, dst_stage_mask, 0, 0, nullptr, 0, nullptr, 1,
+                             &image_memory_barrier);
+    }
+
+    void Instance::transition_from_undefined_to_color_attachment_optimal(
+            const VkCommandBuffer command_buffer, const VkImage image)
+    {
+        VkImageMemoryBarrier image_memory_barrier{};
+        image_memory_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        image_memory_barrier.srcAccessMask = 0;
+        image_memory_barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        image_memory_barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        image_memory_barrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        image_memory_barrier.image = image;
+        image_memory_barrier.subresourceRange = {
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                .baseMipLevel = 0,
+                .levelCount = 1,
+                .baseArrayLayer = 0,
+                .layerCount = 1,
+        };
+
+        constexpr VkPipelineStageFlagBits src_stage_mask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        constexpr VkPipelineStageFlagBits dst_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+        vkCmdPipelineBarrier(command_buffer, src_stage_mask, dst_stage_mask, 0, 0, nullptr, 0, nullptr, 1,
+                             &image_memory_barrier);
     }
 
     void Instance::recreateSwapChain()

@@ -127,6 +127,7 @@ namespace yage::gl
 
     enum class ImageFormat2
     {
+        UNDEFINED,
         R8_UNORM, // linear space format, values in range [0.0f, 255.0f]
         R8G8_UNORM,
         R8G8B8_UNORM,

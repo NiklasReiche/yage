@@ -13,20 +13,20 @@ namespace yage::gl::vulkan
         }
 
         vkGetSwapchainImagesKHR(m_vk_device, m_swap_chain_khr, &m_max_image_index, nullptr); // TODO: error handling
-        m_images.resize(m_max_image_index);
+        m_resolve_images.resize(m_max_image_index);
         vkGetSwapchainImagesKHR(m_vk_device, m_swap_chain_khr, &m_max_image_index,
-                                m_images.data()); // TODO: error handling
+                                m_resolve_images.data()); // TODO: error handling
+        // swap chain images are transitioned during rendering (from UNDEFINED to PRESENT_SRC)
 
         m_image_format = create_info.imageFormat;
         m_extent = create_info.imageExtent;
-        m_msaa_samples = msaa_samples;
+        m_samples = msaa_samples;
         m_depth_image_format = depth_format;
 
         create_image_views();
         create_color_resource();
         create_depth_resource();
-        create_render_pass();
-        create_frame_buffers();
+        create_attachment_infos();
     }
 
     SwapChain::~SwapChain()
@@ -42,17 +42,18 @@ namespace yage::gl::vulkan
           m_swap_chain_khr(other.m_swap_chain_khr),
           m_image_format(other.m_image_format),
           m_extent(other.m_extent),
-          m_render_pass(std::move(other.m_render_pass)),
-          m_images(std::move(other.m_images)),
-          m_image_views(std::move(other.m_image_views)),
-          m_frame_buffers(std::move(other.m_frame_buffers)),
+          m_resolve_images(std::move(other.m_resolve_images)),
+          m_resolve_image_views(std::move(other.m_resolve_image_views)),
+          m_resolve_attachment_infos(std::move(other.m_resolve_attachment_infos)),
+          m_depth_image_format(other.m_depth_image_format),
           m_depth_image(other.m_depth_image),
           m_depth_image_memory(other.m_depth_image_memory),
           m_depth_image_view(other.m_depth_image_view),
-          m_msaa_samples(other.m_msaa_samples),
-          m_color_image_msaa(other.m_color_image_msaa),
-          m_color_image_msaa_memory(other.m_color_image_msaa_memory),
-          m_color_image_msaa_view(other.m_color_image_msaa_view),
+          m_depth_attachment_info(other.m_depth_attachment_info),
+          m_samples(other.m_samples),
+          m_color_image(other.m_color_image),
+          m_color_image_memory(other.m_color_image_memory),
+          m_color_image_view(other.m_color_image_view),
           m_max_image_index(other.m_max_image_index),
           m_current_image_index(other.m_current_image_index)
     {
@@ -68,10 +69,10 @@ namespace yage::gl::vulkan
         other.m_depth_image = VK_NULL_HANDLE;
         other.m_depth_image_memory = VK_NULL_HANDLE;
 
-        other.m_msaa_samples = VK_SAMPLE_COUNT_1_BIT;
-        other.m_color_image_msaa = VK_NULL_HANDLE;
-        other.m_color_image_msaa_memory = VK_NULL_HANDLE;
-        other.m_color_image_msaa_view = VK_NULL_HANDLE;
+        other.m_samples = VK_SAMPLE_COUNT_1_BIT;
+        other.m_color_image = VK_NULL_HANDLE;
+        other.m_color_image_memory = VK_NULL_HANDLE;
+        other.m_color_image_view = VK_NULL_HANDLE;
     }
 
     SwapChain& SwapChain::operator=(SwapChain&& other) noexcept
@@ -85,19 +86,20 @@ namespace yage::gl::vulkan
         m_swap_chain_khr = other.m_swap_chain_khr;
         m_image_format = other.m_image_format;
         m_extent = other.m_extent;
-        m_render_pass = std::move(other.m_render_pass);
-        m_images = std::move(other.m_images);
-        m_image_views = std::move(other.m_image_views);
-        m_frame_buffers = std::move(other.m_frame_buffers);
+        m_resolve_images = std::move(other.m_resolve_images);
+        m_resolve_image_views = std::move(other.m_resolve_image_views);
+        m_resolve_attachment_infos = std::move(other.m_resolve_attachment_infos);
+        m_depth_image_format = other.m_depth_image_format;
         m_depth_image = other.m_depth_image;
         m_depth_image_memory = other.m_depth_image_memory;
         m_depth_image_view = other.m_depth_image_view;
+        m_depth_attachment_info = other.m_depth_attachment_info;
         m_max_image_index = other.m_max_image_index;
         m_current_image_index = other.m_current_image_index;
-        m_msaa_samples = other.m_msaa_samples;
-        m_color_image_msaa = other.m_color_image_msaa;
-        m_color_image_msaa_memory = other.m_color_image_msaa_memory;
-        m_color_image_msaa_view = other.m_color_image_msaa_view;
+        m_samples = other.m_samples;
+        m_color_image = other.m_color_image;
+        m_color_image_memory = other.m_color_image_memory;
+        m_color_image_view = other.m_color_image_view;
 
         other.m_instance = nullptr;
         other.m_vk_device = VK_NULL_HANDLE;
@@ -111,10 +113,10 @@ namespace yage::gl::vulkan
         other.m_depth_image = VK_NULL_HANDLE;
         other.m_depth_image_memory = VK_NULL_HANDLE;
 
-        other.m_msaa_samples = VK_SAMPLE_COUNT_1_BIT;
-        other.m_color_image_msaa = VK_NULL_HANDLE;
-        other.m_color_image_msaa_memory = VK_NULL_HANDLE;
-        other.m_color_image_msaa_view = VK_NULL_HANDLE;
+        other.m_samples = VK_SAMPLE_COUNT_1_BIT;
+        other.m_color_image = VK_NULL_HANDLE;
+        other.m_color_image_memory = VK_NULL_HANDLE;
+        other.m_color_image_view = VK_NULL_HANDLE;
 
         return *this;
     }
@@ -135,12 +137,7 @@ namespace yage::gl::vulkan
 
     void SwapChain::clear()
     {
-        for (const auto& m_frame_buffer: m_frame_buffers) {
-            vkDestroyFramebuffer(m_vk_device, m_frame_buffer, nullptr);
-        }
-        m_frame_buffers.clear();
-
-        m_render_pass.reset();
+        m_resolve_attachment_infos.clear();
 
         if (m_depth_image_view != VK_NULL_HANDLE) {
             vkDestroyImageView(m_vk_device, m_depth_image_view, nullptr);
@@ -151,35 +148,26 @@ namespace yage::gl::vulkan
         if (m_depth_image_memory != VK_NULL_HANDLE) {
             vkFreeMemory(m_vk_device, m_depth_image_memory, nullptr);
         }
+        m_depth_attachment_info = VkRenderingAttachmentInfo{};
 
-        if (m_color_image_msaa_view != VK_NULL_HANDLE) {
-            vkDestroyImageView(m_vk_device, m_color_image_msaa_view, nullptr);
+        if (m_color_image_view != VK_NULL_HANDLE) {
+            vkDestroyImageView(m_vk_device, m_color_image_view, nullptr);
         }
-        if (m_color_image_msaa != VK_NULL_HANDLE) {
-            vkDestroyImage(m_vk_device, m_color_image_msaa, nullptr);
+        if (m_color_image != VK_NULL_HANDLE) {
+            vkDestroyImage(m_vk_device, m_color_image, nullptr);
         }
-        if (m_color_image_msaa_memory != VK_NULL_HANDLE) {
-            vkFreeMemory(m_vk_device, m_color_image_msaa_memory, nullptr);
+        if (m_color_image_memory != VK_NULL_HANDLE) {
+            vkFreeMemory(m_vk_device, m_color_image_memory, nullptr);
         }
 
-        for (const auto& m_image_view: m_image_views) {
+        for (const auto& m_image_view: m_resolve_image_views) {
             vkDestroyImageView(m_vk_device, m_image_view, nullptr);
         }
-        m_image_views.clear();
+        m_resolve_image_views.clear();
 
         // swap chain images are destroyed implicitly
         vkDestroySwapchainKHR(m_vk_device, m_swap_chain_khr, nullptr);
         m_swap_chain_khr = VK_NULL_HANDLE;
-    }
-
-    const RenderPassHandle& SwapChain::render_pass() const
-    {
-        return m_render_pass;
-    }
-
-    VkFramebuffer SwapChain::current_frame_buffer() const
-    {
-        return m_frame_buffers[m_current_image_index];
     }
 
     VkExtent2D SwapChain::extent() const
@@ -187,126 +175,99 @@ namespace yage::gl::vulkan
         return m_extent;
     }
 
+    VkSampleCountFlagBits SwapChain::samples() const
+    {
+        return m_samples;
+    }
+
+    const VkFormat& SwapChain::color_format() const
+    {
+        return m_image_format;
+    }
+
+    const VkRenderingAttachmentInfo& SwapChain::color_attachment() const
+    {
+        return m_resolve_attachment_infos[m_current_image_index];
+    }
+
+    const VkFormat& SwapChain::depth_format() const
+    {
+        return m_depth_image_format;
+    }
+
+    const VkRenderingAttachmentInfo& SwapChain::depth_attachment() const
+    {
+        return m_depth_attachment_info;
+    }
+
+    VkImage& SwapChain::present_image()
+    {
+        return m_resolve_images[m_current_image_index];
+    }
+
     void SwapChain::create_image_views()
     {
-        m_image_views.resize(m_images.size());
-        for (std::size_t i = 0; i < m_images.size(); i++) {
-            m_image_views[i] = m_instance->create_image_view(m_images[i], m_image_format, VK_IMAGE_ASPECT_COLOR_BIT, 1);
+        m_resolve_image_views.resize(m_resolve_images.size());
+        for (std::size_t i = 0; i < m_resolve_images.size(); i++) {
+            m_resolve_image_views[i] =
+                    m_instance->create_image_view(m_resolve_images[i], m_image_format, VK_IMAGE_ASPECT_COLOR_BIT, 1);
         }
     }
 
     void SwapChain::create_color_resource()
     {
-        m_instance->create_image(m_extent.width, m_extent.height, 1, m_msaa_samples, m_image_format,
-                                 VK_IMAGE_TILING_OPTIMAL,
-                                 VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-                                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_color_image_msaa, m_color_image_msaa_memory);
+        m_instance->create_image(m_extent.width, m_extent.height, 1, m_samples, m_image_format, VK_IMAGE_TILING_OPTIMAL,
+                                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                                 m_color_image, m_color_image_memory);
 
-        m_color_image_msaa_view =
-                m_instance->create_image_view(m_color_image_msaa, m_image_format, VK_IMAGE_ASPECT_COLOR_BIT, 1);
+        m_color_image_view = m_instance->create_image_view(m_color_image, m_image_format, VK_IMAGE_ASPECT_COLOR_BIT, 1);
+
+        m_instance->transition_from_undefined_to_color_attachment_optimal(m_color_image);
     }
 
     void SwapChain::create_depth_resource()
     {
-        m_instance->create_image(m_extent.width, m_extent.height, 1, m_msaa_samples, m_depth_image_format,
+        m_instance->create_image(m_extent.width, m_extent.height, 1, m_samples, m_depth_image_format,
                                  VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
                                  VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_depth_image, m_depth_image_memory);
         m_depth_image_view =
                 m_instance->create_image_view(m_depth_image, m_depth_image_format, VK_IMAGE_ASPECT_DEPTH_BIT, 1);
 
-        // TODO: transition?
+        m_instance->transition_from_undefined_to_depth_stencil_attachment_optimal(m_depth_image);
     }
 
-    void SwapChain::create_render_pass()
+    void SwapChain::create_attachment_infos()
     {
-        VkAttachmentDescription color_attachment{};
-        color_attachment.format = m_image_format;
-        color_attachment.samples = m_msaa_samples;
-        color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        color_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-        color_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        color_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        color_attachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-        VkAttachmentReference color_attachment_ref{};
-        color_attachment_ref.attachment = 0;
-        color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        m_resolve_attachment_infos.resize(m_resolve_image_views.size());
+        for (std::size_t i = 0; i < m_resolve_image_views.size(); i++) {
+            VkRenderingAttachmentInfo attachment_info{};
+            attachment_info.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
 
-        VkAttachmentDescription depth_attachment{};
-        depth_attachment.format = m_depth_image_format;
-        depth_attachment.samples = m_msaa_samples;
-        depth_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        depth_attachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        depth_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-        depth_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        depth_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        depth_attachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-        VkAttachmentReference depth_attachment_ref{};
-        depth_attachment_ref.attachment = 1;
-        depth_attachment_ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+            attachment_info.imageView = m_color_image_view;
+            attachment_info.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-        VkAttachmentDescription color_attachment_resolve{};
-        color_attachment_resolve.format = m_image_format;
-        color_attachment_resolve.samples = VK_SAMPLE_COUNT_1_BIT;
-        color_attachment_resolve.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-        color_attachment_resolve.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        color_attachment_resolve.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-        color_attachment_resolve.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        color_attachment_resolve.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        color_attachment_resolve.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-        VkAttachmentReference color_attachment_resolve_ref{};
-        color_attachment_resolve_ref.attachment = 2;
-        color_attachment_resolve_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+            attachment_info.resolveMode = VK_RESOLVE_MODE_AVERAGE_BIT;
+            attachment_info.resolveImageView = m_resolve_image_views[i];
+            attachment_info.resolveImageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-        VkSubpassDescription subpass{};
-        subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-        subpass.colorAttachmentCount = 1;
-        subpass.pColorAttachments = &color_attachment_ref;
-        subpass.pDepthStencilAttachment = &depth_attachment_ref;
-        subpass.pResolveAttachments = &color_attachment_resolve_ref;
+            attachment_info.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+            attachment_info.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+            attachment_info.clearValue = {0.0f, 0.0f, 0.0f, 1.0f};
 
-        const std::array attachments = {color_attachment, depth_attachment, color_attachment_resolve};
-        VkRenderPassCreateInfo create_info{};
-        create_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-        create_info.attachmentCount = static_cast<std::uint32_t>(attachments.size());
-        create_info.pAttachments = &attachments[0];
-        create_info.subpassCount = 1;
-        create_info.pSubpasses = &subpass;
-
-        VkSubpassDependency dependency{};
-        dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-        dependency.dstSubpass = 0;
-        dependency.srcStageMask =
-                VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-        dependency.srcAccessMask = 0;
-        dependency.dstStageMask =
-                VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-
-        create_info.dependencyCount = 1;
-        create_info.pDependencies = &dependency;
-
-        m_render_pass = m_instance->store_render_passes().create(m_instance, create_info, m_msaa_samples);
-    }
-
-    void SwapChain::create_frame_buffers()
-    {
-        m_frame_buffers.resize(m_image_views.size());
-        for (std::size_t i = 0; i < m_image_views.size(); i++) {
-            const std::array attachments = {m_color_image_msaa_view, m_depth_image_view, m_image_views[i]};
-
-            VkFramebufferCreateInfo create_info{};
-            create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-            create_info.renderPass = m_render_pass.get<RenderPass>().vk_handle();
-            create_info.attachmentCount = static_cast<std::uint32_t>(attachments.size());
-            create_info.pAttachments = &attachments[0];
-            create_info.width = m_extent.width;
-            create_info.height = m_extent.height;
-            create_info.layers = 1;
-
-            if (vkCreateFramebuffer(m_vk_device, &create_info, nullptr, &m_frame_buffers[i]) != VK_SUCCESS) {
-                throw std::runtime_error("failed to create swap chain framebuffers!");
-            }
+            m_resolve_attachment_infos[i] = attachment_info;
         }
+
+        m_depth_attachment_info.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
+
+        m_depth_attachment_info.imageView = m_depth_image_view;
+        m_depth_attachment_info.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        m_depth_attachment_info.resolveMode = VK_RESOLVE_MODE_NONE;
+        m_depth_attachment_info.resolveImageView = VK_NULL_HANDLE;
+        m_depth_attachment_info.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+        m_depth_attachment_info.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        m_depth_attachment_info.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        m_depth_attachment_info.clearValue = {1.0f};
     }
 }

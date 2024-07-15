@@ -4,11 +4,10 @@
 
 namespace yage::gl::vulkan
 {
-    Pipeline::Pipeline(Instance* instance, RenderPassHandle render_pass,
-                       VkGraphicsPipelineCreateInfo& pipeline_info, const VkPipelineLayoutCreateInfo& layout_info)
+    Pipeline::Pipeline(Instance* instance, VkGraphicsPipelineCreateInfo& pipeline_info,
+                       const VkPipelineLayoutCreateInfo& layout_info)
         : m_instance(instance),
-          m_vk_device(m_instance->device()),
-          m_render_pass(std::move(render_pass))
+          m_vk_device(m_instance->device())
     {
         if (vkCreatePipelineLayout(m_vk_device, &layout_info, nullptr, &m_graphics_pipeline_layout) != VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to create pipeline layout!");
@@ -33,7 +32,6 @@ namespace yage::gl::vulkan
     Pipeline::Pipeline(Pipeline&& other) noexcept
         : m_instance(other.m_instance),
           m_vk_device(other.m_vk_device),
-          m_render_pass(std::move(other.m_render_pass)),
           m_vk_handle(other.m_vk_handle),
           m_graphics_pipeline_layout(other.m_graphics_pipeline_layout)
     {
@@ -47,9 +45,7 @@ namespace yage::gl::vulkan
         if (this == &other)
             return *this;
         m_instance = other.m_instance;
-        m_vk_device = other.m_vk_device,
-        m_render_pass = std::move(other.m_render_pass);
-        m_vk_handle = other.m_vk_handle;
+        m_vk_device = other.m_vk_device, m_vk_handle = other.m_vk_handle;
         m_graphics_pipeline_layout = other.m_graphics_pipeline_layout;
 
         other.m_vk_device = VK_NULL_HANDLE;

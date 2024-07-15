@@ -1,10 +1,9 @@
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include <vulkan/vulkan.h>
-
-#include "RenderPass.h"
 
 namespace yage::gl::vulkan
 {
@@ -34,11 +33,19 @@ namespace yage::gl::vulkan
 
         void clear();
 
-        [[nodiscard]] const RenderPassHandle& render_pass() const; // TODO: return handle to const
-
-        [[nodiscard]] VkFramebuffer current_frame_buffer() const;
-
         [[nodiscard]] VkExtent2D extent() const;
+
+        [[nodiscard]] VkSampleCountFlagBits samples() const;
+
+        [[nodiscard]] const VkFormat& color_format() const;
+
+        [[nodiscard]] const VkRenderingAttachmentInfo& color_attachment() const;
+
+        [[nodiscard]] const VkFormat& depth_format() const;
+
+        [[nodiscard]] const VkRenderingAttachmentInfo& depth_attachment() const;
+
+        [[nodiscard]] VkImage& present_image();
 
     private:
         Instance* m_instance = nullptr;
@@ -48,21 +55,22 @@ namespace yage::gl::vulkan
         VkFormat m_image_format = VK_FORMAT_UNDEFINED;
         VkExtent2D m_extent{};
 
-        RenderPassHandle m_render_pass;
+        std::vector<VkImage> m_resolve_images;
+        std::vector<VkImageView> m_resolve_image_views;
+        std::vector<VkRenderingAttachmentInfo> m_resolve_attachment_infos;
 
-        std::vector<VkImage> m_images;
-        std::vector<VkImageView> m_image_views;
-        std::vector<VkFramebuffer> m_frame_buffers;
-
+        // only one depth image, since its contents don't need to be preserved after rendering the frame
         VkFormat m_depth_image_format = VK_FORMAT_UNDEFINED;
         VkImage m_depth_image = VK_NULL_HANDLE;
         VkDeviceMemory m_depth_image_memory = VK_NULL_HANDLE;
         VkImageView m_depth_image_view = VK_NULL_HANDLE;
+        VkRenderingAttachmentInfo m_depth_attachment_info{};
 
-        VkSampleCountFlagBits m_msaa_samples = VK_SAMPLE_COUNT_1_BIT;
-        VkImage m_color_image_msaa = VK_NULL_HANDLE;
-        VkDeviceMemory m_color_image_msaa_memory = VK_NULL_HANDLE;
-        VkImageView m_color_image_msaa_view = VK_NULL_HANDLE;
+        // only one color image, since its contents don't need to be preserved after rendering the frame and resolving
+        VkSampleCountFlagBits m_samples = VK_SAMPLE_COUNT_1_BIT;
+        VkImage m_color_image = VK_NULL_HANDLE;
+        VkDeviceMemory m_color_image_memory = VK_NULL_HANDLE;
+        VkImageView m_color_image_view = VK_NULL_HANDLE;
 
         unsigned int m_max_image_index = 0;
         unsigned int m_current_image_index = 0;
@@ -73,8 +81,6 @@ namespace yage::gl::vulkan
 
         void create_depth_resource();
 
-        void create_render_pass();
-
-        void create_frame_buffers();
+        void create_attachment_infos();
     };
 }

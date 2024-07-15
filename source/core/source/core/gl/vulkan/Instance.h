@@ -10,11 +10,11 @@
 #include "DescriptorAllocator.h"
 #include "DescriptorSetLayout.h"
 #include "Drawable.h"
-#include "FrameBuffer.h"
-#include "FrameBufferCreator.h"
 #include "FrameCounter.h"
 #include "IndexBuffer.h"
 #include "Pipeline.h"
+#include "RenderTarget.h"
+#include "RenderTargetBuilder.h"
 #include "SwapChain.h"
 #include "Texture2D.h"
 #include "UniformBuffer.h"
@@ -25,7 +25,9 @@ namespace yage::gl::vulkan
     using UniformBufferStore = Store<IUniformBuffer, UniformBuffer>;
     using VertexBufferStore = Store<IVertexBuffer, VertexBuffer>;
     using IndexBufferStore = Store<IIndexBuffer, IndexBuffer>;
-    using FrameBufferStore = Store<IFrameBuffer, FrameBuffer>;
+    using FrameBufferStore = Store<IRenderTarget, RenderTarget>;
+
+    using RenderTargetStore = Store<IRenderTarget, RenderTarget>;
 
     using ImageViewStore = Store<ImageView, ImageView>;
     using Texture2DStore = Store<ITexture2D2, Texture2D>;
@@ -33,7 +35,6 @@ namespace yage::gl::vulkan
     using DrawableStore = Store<IDrawable2, Drawable>;
 
     using DescriptorSetLayoutStore = Store<IDescriptorSetLayout, DescriptorSetLayout>;
-    using RenderPassStore = Store<IRenderPass, RenderPass>;
     using PipelineStore = Store<Pipeline, Pipeline>;
 
     class DescriptorSet;
@@ -83,9 +84,7 @@ namespace yage::gl::vulkan
 
         [[nodiscard]] VkCommandBuffer command_buffer_for_frame() const;
 
-        const SwapChain& swap_chain() const;
-
-        RenderPassStore& store_render_passes();
+        SwapChain& swap_chain();
 
         FrameBufferStore& store_frame_buffers();
 
@@ -96,6 +95,8 @@ namespace yage::gl::vulkan
         IndexBufferStore& store_index_buffers();
 
         UniformBufferStore& store_uniform_buffers();
+
+        RenderTargetStore& store_render_targets();
 
         DrawableStore& store_drawables();
 
@@ -136,10 +137,21 @@ namespace yage::gl::vulkan
         void generate_mip_maps(VkImage image, VkFormat format, unsigned int width, unsigned int height,
                                unsigned int mip_levels);
 
+        void transition_from_undefined_to_depth_stencil_attachment_optimal(VkImage image);
+
+        void transition_from_undefined_to_color_attachment_optimal(VkImage image);
+
+        void transition_from_color_attachment_optimal_to_present_src(VkCommandBuffer command_buffer, VkImage image);
+
+        void transition_from_present_src_to_color_attachment_optimal(VkCommandBuffer command_buffer, VkImage image);
+
+        void transition_from_undefined_to_color_attachment_optimal(VkCommandBuffer command_buffer, VkImage image);
+
     private:
         const unsigned int MAX_FRAMES_IN_FLIGHT = 2;
         const std::vector<const char*> VALIDATION_LAYERS = {"VK_LAYER_KHRONOS_validation"};
-        const std::vector<const char*> DEVICE_EXTENSIONS = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+        const std::vector<const char*> DEVICE_EXTENSIONS = {VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+                                                            VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME};
 
         std::weak_ptr<platform::desktop::GlfwWindow> m_window;
 
@@ -176,6 +188,8 @@ namespace yage::gl::vulkan
         std::shared_ptr<IndexBufferStore> m_store_index_buffers = std::make_shared<IndexBufferStore>();
         std::shared_ptr<UniformBufferStore> m_store_uniform_buffers = std::make_shared<UniformBufferStore>();
 
+        std::shared_ptr<RenderTargetStore> m_store_render_targets = std::make_shared<RenderTargetStore>();
+
         std::shared_ptr<ImageViewStore> m_store_image_views = std::make_shared<ImageViewStore>();
         std::shared_ptr<Texture2DStore> m_store_textures = std::make_shared<Texture2DStore>();
 
@@ -183,7 +197,6 @@ namespace yage::gl::vulkan
 
         std::shared_ptr<DescriptorSetLayoutStore> m_store_descriptor_set_layouts =
                 std::make_shared<DescriptorSetLayoutStore>();
-        std::shared_ptr<RenderPassStore> m_store_render_passes = std::make_shared<RenderPassStore>();
         std::shared_ptr<PipelineStore> m_store_pipelines = std::make_shared<PipelineStore>();
 
         void create_instance();

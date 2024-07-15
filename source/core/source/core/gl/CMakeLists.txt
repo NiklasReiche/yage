@@ -26,11 +26,8 @@ target_sources(yage_core
 		IDescriptorSet.h
 		IDescriptorSetCreator.h
 
-		IFrameBuffer.h
-        IFrameBufferCreator.h
-
-		IRenderPass.h
-		IRenderPassBuilder.h
+		IRenderTarget.h
+		IRenderTargetBuilder.h
 
 		IVertexBuffer.h
 		IVertexBufferCreator.h
