@@ -12,7 +12,7 @@ namespace yage::gl
     public:
         virtual ~IIndexBufferCreator() = default;
 
-        [[nodiscard]] virtual IndexBufferHandle create(IndexDataInfo data_info,
-                                                       std::span<const std::byte> data) const = 0;
+        [[nodiscard]] virtual IndexBufferHandle create(IndexDataInfo data_info, std::span<const std::byte> data,
+                                                       ResourceUsage usage) const = 0;
     };
 }

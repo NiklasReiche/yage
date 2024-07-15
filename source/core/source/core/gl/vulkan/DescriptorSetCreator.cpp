@@ -8,18 +8,11 @@ namespace yage::gl::vulkan
     {
     }
 
-    DescriptorSetHandle DescriptorSetCreator::create(const ResourceUsage usage,
-    DescriptorSetLayoutHandle layout)
+    DescriptorSetHandle DescriptorSetCreator::create(DescriptorSetLayoutHandle layout, const ResourceUsage usage)
     {
         const auto instance = m_instance.lock();
 
-        FrameCounter frame_counter{};
-        switch (usage) {
-            case ResourceUsage::STATIC:  frame_counter = instance->static_counter(); break;
-            case ResourceUsage::DYNAMIC: frame_counter = instance->frames_in_flight_counter(); break;
-
-            default: throw std::invalid_argument("unknown ResourceUsage value");
-        }
+        FrameCounter frame_counter = instance->frame_counter_for_usage(usage);
 
         const std::vector layouts(frame_counter.max_frame_index, layout.get<DescriptorSetLayout>().vk_handle());
 

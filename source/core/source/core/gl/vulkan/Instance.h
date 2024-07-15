@@ -101,9 +101,7 @@ namespace yage::gl::vulkan
 
         void flush_gpu();
 
-        FrameCounter frames_in_flight_counter() const;
-
-        FrameCounter static_counter() const;
+        FrameCounter frame_counter_for_usage(ResourceUsage usage) const;
 
         [[nodiscard]] VkDevice device() const;
 

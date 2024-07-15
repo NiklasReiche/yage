@@ -8,9 +8,11 @@ namespace yage::gl::vulkan
     {
     }
 
-    IndexBufferHandle IndexBufferCreator::create(IndexDataInfo data_info, std::span<const std::byte> data) const
+    IndexBufferHandle IndexBufferCreator::create(IndexDataInfo data_info, std::span<const std::byte> data,
+                                                 const ResourceUsage usage) const
     {
         const auto instance = m_instance.lock();
-        return instance->store_index_buffers().create(instance.get(), data_info, data);
+        return instance->store_index_buffers().create(instance.get(), instance->frame_counter_for_usage(usage),
+                                                      data_info, data);
     }
 }

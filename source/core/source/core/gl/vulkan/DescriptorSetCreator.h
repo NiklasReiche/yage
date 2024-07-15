@@ -15,7 +15,7 @@ namespace yage::gl::vulkan
     public:
         explicit DescriptorSetCreator(std::weak_ptr<Instance> instance);
 
-        DescriptorSetHandle create(ResourceUsage usage, DescriptorSetLayoutHandle layout) override;
+        DescriptorSetHandle create(DescriptorSetLayoutHandle layout, ResourceUsage usage) override;
 
     private:
         std::weak_ptr<Instance> m_instance;

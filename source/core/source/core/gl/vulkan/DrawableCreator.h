@@ -14,8 +14,8 @@ namespace yage::gl::vulkan
         explicit DrawableCreator(std::weak_ptr<Instance> m_instance);
 
         [[nodiscard]] Handle<IDrawable2> create(VertexDataInfo vertex_data_info, std::span<const std::byte> vertices,
-                                                IndexDataInfo index_data_info,
-                                                std::span<const std::byte> indices) const override;
+                                                IndexDataInfo index_data_info, std::span<const std::byte> indices,
+                                                ResourceUsage usage) const override;
 
     private:
         std::weak_ptr<Instance> m_instance; // cannot be raw pointer, since the creator might outlive the instance

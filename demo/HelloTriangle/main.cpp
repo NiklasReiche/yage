@@ -52,8 +52,9 @@ int main()
             .index_count = 12,
     };
     constexpr std::array<std::uint16_t, 12> index_data = {0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4};
-    const gl::DrawableHandle drawable = drawable_creator.create(vertex_data_info, std::as_bytes(std::span{vertex_data}),
-                                                                index_data_info, std::as_bytes(std::span{index_data}));
+    const gl::DrawableHandle drawable =
+            drawable_creator.create(vertex_data_info, std::as_bytes(std::span{vertex_data}), index_data_info,
+                                    std::as_bytes(std::span{index_data}), gl::ResourceUsage::STATIC);
 
     const gl::IUniformBufferCreator& uniform_buffer_creator = context->uniform_buffer_creator();
     const gl::UniformBufferHandle ubo =
@@ -63,7 +64,7 @@ int main()
     const gl::DescriptorSetLayoutHandle layout = descriptor_set_layout_builder.with_uniform_buffer_at(0).build();
 
     gl::IDescriptorSetCreator& descriptor_set_creator = context->descriptor_set_creator();
-    const gl::DescriptorSetHandle descriptor_set = descriptor_set_creator.create(gl::ResourceUsage::DYNAMIC, layout);
+    const gl::DescriptorSetHandle descriptor_set = descriptor_set_creator.create(layout, gl::ResourceUsage::DYNAMIC);
     descriptor_set->write(0, ubo);
 
     const auto file_reader = window->getFileReader();

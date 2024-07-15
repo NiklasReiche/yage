@@ -72,14 +72,6 @@ namespace yage::gl::vulkan
     RenderTargetHandle RenderTargetBuilder::build(const unsigned int width, const unsigned int height,
                                                   const ResourceUsage usage)
     {
-        FrameCounter frame_counter{};
-        switch (usage) {
-            case ResourceUsage::STATIC:  frame_counter = m_instance.lock()->static_counter(); break;
-            case ResourceUsage::DYNAMIC: frame_counter = m_instance.lock()->frames_in_flight_counter(); break;
-
-            default: throw std::invalid_argument("unkown ResourceUsage value");
-        }
-
         std::vector<std::tuple<VkRenderingAttachmentInfo, ImageFormat2>> color_attachments;
         for (std::size_t i = 0; i < m_color_attachment_descriptions.size(); ++i) {
             color_attachments.emplace_back(m_color_attachment_descriptions[i], m_color_image_formats[i]);
@@ -91,8 +83,8 @@ namespace yage::gl::vulkan
         }
 
         const auto instance = m_instance.lock();
-        return instance->store_render_targets().create(instance.get(), frame_counter, width, height, m_samples,
-                                                       color_attachments, depth_attachment);
+        return instance->store_render_targets().create(instance.get(), instance->frame_counter_for_usage(usage), width,
+                                                       height, m_samples, color_attachments, depth_attachment);
     }
 
     void RenderTargetBuilder::clear()

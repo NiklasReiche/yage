@@ -15,6 +15,6 @@ namespace yage::gl
 
         [[nodiscard]] virtual DrawableHandle create(VertexDataInfo vertex_data_info,
                                                     std::span<const std::byte> vertices, IndexDataInfo index_data_info,
-                                                    std::span<const std::byte> indices) const = 0;
+                                                    std::span<const std::byte> indices, ResourceUsage usage) const = 0;
     };
 }

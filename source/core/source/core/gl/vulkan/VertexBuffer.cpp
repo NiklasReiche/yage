@@ -3,10 +3,11 @@
 
 namespace yage::gl::vulkan
 {
-    VertexBuffer::VertexBuffer(Instance* instance, const VertexDataInfo& data_info,
+    VertexBuffer::VertexBuffer(Instance* instance, const FrameCounter frame_counter, const VertexDataInfo& data_info,
                                const std::span<const std::byte>& data)
         : m_instance(instance),
           m_vk_device(m_instance->device()),
+          m_frame_counter(frame_counter),
           m_vertex_count(gl::vertex_count(data_info, data))
     {
         const VkDeviceSize buffer_size = data.size();
@@ -14,18 +15,23 @@ namespace yage::gl::vulkan
         VkBuffer staging_buffer;
         VkDeviceMemory staging_buffer_memory;
         m_instance->create_buffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer,
-                      staging_buffer_memory);
+                                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                  staging_buffer, staging_buffer_memory);
 
         void* mapped_data;
         vkMapMemory(m_vk_device, staging_buffer_memory, 0, buffer_size, 0, &mapped_data);
         memcpy(mapped_data, data.data(), buffer_size);
         vkUnmapMemory(m_vk_device, staging_buffer_memory);
 
-        m_instance->create_buffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_buffer_handle, m_memory_handle);
+        m_buffer_handles.resize(m_frame_counter.max_frame_index);
+        m_memory_handles.resize(m_frame_counter.max_frame_index);
+        for (std::size_t i = 0; i < m_frame_counter.max_frame_index; i++) {
+            // TODO: for dynamic buffers we probably don't want VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+            m_instance->create_buffer(buffer_size, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, m_buffer_handles[i], m_memory_handles[i]);
 
-        m_instance->copy_buffer(staging_buffer, m_buffer_handle, buffer_size);
+            m_instance->copy_buffer(staging_buffer, m_buffer_handles[i], buffer_size);
+        }
 
         vkDestroyBuffer(m_vk_device, staging_buffer, nullptr);
         vkFreeMemory(m_vk_device, staging_buffer_memory, nullptr);
@@ -39,14 +45,13 @@ namespace yage::gl::vulkan
     VertexBuffer::VertexBuffer(VertexBuffer&& other) noexcept
         : m_instance(other.m_instance),
           m_vk_device(other.m_vk_device),
-          m_buffer_handle(other.m_buffer_handle),
-          m_memory_handle(other.m_memory_handle),
+          m_frame_counter(other.m_frame_counter),
+          m_buffer_handles(std::move(other.m_buffer_handles)),
+          m_memory_handles(std::move(other.m_memory_handles)),
           m_vertex_count(other.m_vertex_count)
     {
         other.m_instance = nullptr;
         other.m_vk_device = VK_NULL_HANDLE;
-        other.m_buffer_handle = VK_NULL_HANDLE;
-        other.m_memory_handle = VK_NULL_HANDLE;
         other.m_vertex_count = 0;
     }
 
@@ -58,14 +63,14 @@ namespace yage::gl::vulkan
         clear();
 
         m_instance = other.m_instance;
-        m_vk_device = other.m_vk_device, m_buffer_handle = other.m_buffer_handle;
-        m_memory_handle = other.m_memory_handle;
+        m_vk_device = other.m_vk_device;
+        m_frame_counter = other.m_frame_counter;
+        m_buffer_handles = std::move(other.m_buffer_handles);
+        m_memory_handles = std::move(other.m_memory_handles);
         m_vertex_count = other.m_vertex_count;
 
         other.m_instance = nullptr;
         other.m_vk_device = VK_NULL_HANDLE;
-        other.m_buffer_handle = VK_NULL_HANDLE;
-        other.m_memory_handle = VK_NULL_HANDLE;
         other.m_vertex_count = 0;
 
         return *this;
@@ -73,7 +78,7 @@ namespace yage::gl::vulkan
 
     VkBuffer VertexBuffer::vk_handle() const
     {
-        return m_buffer_handle;
+        return m_buffer_handles[*m_frame_counter.curent_frame_index];
     }
 
     std::size_t VertexBuffer::vertex_count() const
@@ -83,11 +88,9 @@ namespace yage::gl::vulkan
 
     void VertexBuffer::clear()
     {
-        if (m_buffer_handle != VK_NULL_HANDLE) {
-            vkDestroyBuffer(m_vk_device, m_buffer_handle, nullptr);
-        }
-        if (m_memory_handle != VK_NULL_HANDLE) {
-            vkFreeMemory(m_vk_device, m_memory_handle, nullptr);
+        for (std::size_t i = 0; i < m_frame_counter.max_frame_index; ++i) {
+            vkDestroyBuffer(m_vk_device, m_buffer_handles[i], nullptr);
+            vkFreeMemory(m_vk_device, m_memory_handles[i], nullptr);
         }
     }
 }

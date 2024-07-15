@@ -13,15 +13,7 @@ namespace yage::gl::vulkan
                                              const std::span<const std::byte> data, const ResourceUsage usage) const
     {
         const auto instance = m_instance.lock();
-
-        FrameCounter frame_counter{};
-        switch (usage) {
-            case ResourceUsage::STATIC:  frame_counter = m_instance.lock()->static_counter(); break;
-            case ResourceUsage::DYNAMIC: frame_counter = m_instance.lock()->frames_in_flight_counter(); break;
-
-            default: throw std::invalid_argument("unkown ResourceUsage value");
-        }
-
-        return instance->store_textures().create(instance.get(), frame_counter, sampler, data_info, data);
+        return instance->store_textures().create(instance.get(), instance->frame_counter_for_usage(usage), sampler,
+                                                 data_info, data);
     }
 }

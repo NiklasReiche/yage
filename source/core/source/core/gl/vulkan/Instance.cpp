@@ -710,20 +710,22 @@ namespace yage::gl::vulkan
         vkDeviceWaitIdle(m_device);
     }
 
-    FrameCounter Instance::frames_in_flight_counter() const
+    FrameCounter Instance::frame_counter_for_usage(const ResourceUsage usage) const
     {
-        return {
-                .curent_frame_index = &m_current_frame_in_flight,
-                .max_frame_index = MAX_FRAMES_IN_FLIGHT,
-        };
-    }
+        switch (usage) {
+            case ResourceUsage::STATIC:
+                return {
+                        .curent_frame_index = &m_current_frame_static,
+                        .max_frame_index = 1,
+                };
+            case ResourceUsage::DYNAMIC:
+                return {
+                        .curent_frame_index = &m_current_frame_in_flight,
+                        .max_frame_index = MAX_FRAMES_IN_FLIGHT,
+                };
 
-    FrameCounter Instance::static_counter() const
-    {
-        return {
-                .curent_frame_index = &m_current_frame_static,
-                .max_frame_index = 1,
-        };
+            default: throw std::invalid_argument("unknown ResourceUsage value");
+        }
     }
 
     VkDevice Instance::device() const
