@@ -34,7 +34,7 @@ namespace yage::gl::vulkan
     using DrawableStore = Store<IDrawable2, Drawable>;
 
     using DescriptorSetLayoutStore = Store<IDescriptorSetLayout, DescriptorSetLayout>;
-    using PipelineStore = Store<Pipeline, Pipeline>;
+    using PipelineStore = Store<IPipeline, Pipeline>;
 
     class DescriptorSet;
 

@@ -22,7 +22,7 @@ namespace yage::gl::vulkan
 
         void begin_render_pass(const RenderTarget& render_target);
 
-        void bind_pipeline(const Pipeline& pipeline, const IDescriptorSet& descriptor_set);
+        void bind_pipeline(const IPipeline& pipeline, const IDescriptorSet& descriptor_set);
 
         void draw(const IDrawable2& drawable);
 

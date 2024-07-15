@@ -1,20 +1,24 @@
 #pragma once
 
+#include <span>
 #include <vulkan/vulkan.h>
 
 #include "../Handle.h"
+#include "../IDescriptorSetLayout.h"
+#include "../IPipeline.h"
 
 namespace yage::gl::vulkan
 {
     class Instance;
 
-    class Pipeline final
+    class Pipeline final : public IPipeline
     {
     public:
         Pipeline(Instance* instance, VkGraphicsPipelineCreateInfo& pipeline_info,
-                 const VkPipelineLayoutCreateInfo& layout_info);
+                 const VkPipelineLayoutCreateInfo& layout_info,
+                 std::span<DescriptorSetLayoutHandle> descriptor_set_layouts);
 
-        ~Pipeline();
+        ~Pipeline() override;
 
         Pipeline(const Pipeline& other) = delete;
 
@@ -34,7 +38,7 @@ namespace yage::gl::vulkan
 
         VkPipeline m_vk_handle{};
         VkPipelineLayout m_graphics_pipeline_layout{};
-    };
 
-    using PipelineHandle = Handle<Pipeline>;
+        std::vector<DescriptorSetLayoutHandle> m_descriptor_set_layouts;
+    };
 }

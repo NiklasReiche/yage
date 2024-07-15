@@ -7,6 +7,8 @@
 #include <stdexcept>
 #include <vector>
 
+#include "math/vector.h"
+
 namespace yage::gl
 {
     enum class PolygonMode
@@ -220,5 +222,40 @@ namespace yage::gl
         SAMPLE_2,
         SAMPLE_4,
         SAMPLE_8
+    };
+
+    enum class BlendFactor
+    {
+        ZERO,
+        ONE,
+        SRC_COLOR,
+        ONE_MINUS_SRC_COLOR,
+        DST_COLOR,
+        ONE_MINUS_DST_COLOR,
+        SRC_ALPHA,
+        ONE_MINUS_SRC_ALPHA,
+        DST_ALPHA,
+        ONE_MINUS_DST_ALPHA,
+        CONSTANT_COLOR,
+        ONE_MINUS_CONSTANT_COLOR,
+        CONSTANT_ALPHA,
+        ONE_MINUS_CONSTANT_ALPHA
+    };
+
+    enum class BlendOperation
+    {
+        ADD,
+        SUBTRACT,
+        REVERSE_SUBTRACT,
+        MIN,
+        MAX
+    };
+
+    struct BlendInfo
+    {
+        BlendFactor source_factor = BlendFactor::SRC_ALPHA;
+        BlendFactor destination_factor = BlendFactor::ONE_MINUS_SRC_ALPHA;
+        BlendOperation operation = BlendOperation::ADD;
+        math::Vec4f constant;
     };
 }

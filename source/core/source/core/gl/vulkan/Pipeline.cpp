@@ -5,10 +5,15 @@
 namespace yage::gl::vulkan
 {
     Pipeline::Pipeline(Instance* instance, VkGraphicsPipelineCreateInfo& pipeline_info,
-                       const VkPipelineLayoutCreateInfo& layout_info)
+                       const VkPipelineLayoutCreateInfo& layout_info,
+                       std::span<DescriptorSetLayoutHandle> descriptor_set_layouts)
         : m_instance(instance),
           m_vk_device(m_instance->device())
     {
+        m_descriptor_set_layouts.reserve(descriptor_set_layouts.size());
+        m_descriptor_set_layouts.insert(m_descriptor_set_layouts.end(), descriptor_set_layouts.begin(),
+                                        descriptor_set_layouts.end());
+
         if (vkCreatePipelineLayout(m_vk_device, &layout_info, nullptr, &m_graphics_pipeline_layout) != VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to create pipeline layout!");
         }

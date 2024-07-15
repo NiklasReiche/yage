@@ -4,22 +4,22 @@
 
 #include <vulkan/vulkan.h>
 
-#include "../DrawableCreator.h"
 #include "../enums.h"
 #include "DescriptorSetLayout.h"
 #include "Pipeline.h"
 #include "RenderTarget.h"
+#include "core/gl/IPipelineBuilder.h"
 
 namespace yage::gl::vulkan
 {
     class Instance;
 
-    class PipelineBuilder final
+    class PipelineBuilder final : public IPipelineBuilder
     {
     public:
         explicit PipelineBuilder(std::weak_ptr<Instance> instance);
 
-        ~PipelineBuilder();
+        ~PipelineBuilder() override;
 
         PipelineBuilder(PipelineBuilder& other) = delete;
 
@@ -29,58 +29,59 @@ namespace yage::gl::vulkan
 
         PipelineBuilder& operator=(PipelineBuilder&& other) = delete;
 
-        PipelineBuilder& with_shaders(std::span<const std::byte> vertex_code, std::span<const std::byte> fragment_code);
+        IPipelineBuilder& with_shaders(ShaderSource vertex_code, ShaderSource fragment_code) override;
 
-        PipelineBuilder& with_rasterizer(PolygonMode polygon_mode, CullMode cull_mode, float line_width);
+        IPipelineBuilder& with_shaders(ShaderSource vertex_code, ShaderSource fragment_code,
+                                       ShaderSource geometry_code) override;
 
-        PipelineBuilder& with_vertex_format(PrimitiveTopology topology,
-                                            std::span<const VertexComponent> vertex_description, VertexFormat format);
+        IPipelineBuilder& with_vertex_format(PrimitiveTopology topology, VertexDataInfo vertex_data_info) override;
 
-        PipelineBuilder& with_viewport(Viewport viewport, ScissorRectangle scissor);
+        IPipelineBuilder& with_layout(DescriptorSetLayoutHandle layout) override;
 
-        PipelineBuilder& with_render_target(const IRenderTarget& render_target);
+        IPipelineBuilder& with_rasterizer(PolygonMode polygon_mode, CullMode cull_mode, float line_width) override;
 
-        PipelineBuilder& with_swap_chain_render_pass();
+        IPipelineBuilder& with_viewport(Viewport viewport, ScissorRectangle scissor) override;
 
-        PipelineBuilder& with_layout(DescriptorSetLayoutHandle layout);
+        IPipelineBuilder& with_render_target(const IRenderTarget& render_target) override;
 
-        PipelineBuilder& with_depth_test();
+        IPipelineBuilder& with_swap_chain_render_target() override;
 
-        PipelineHandle build();
+        IPipelineBuilder& with_depth_test() override;
+
+        IPipelineBuilder& with_blending(BlendInfo blend_info) override;
+
+        PipelineHandle build() override;
+
+        void clear() override;
 
     private:
         std::weak_ptr<Instance> m_instance; // cannot be raw pointer, since the creator might outlive the instance
 
-        std::array<VkShaderModule, 2> m_shader_modules{};
-        std::array<VkPipelineShaderStageCreateInfo, 2> m_shader_stages{};
+        std::vector<VkShaderModule> m_shader_modules{};
+        std::vector<VkPipelineShaderStageCreateInfo> m_shader_stages{};
 
-        VkPipelineInputAssemblyStateCreateInfo m_input_assembly{};
-        std::vector<VkVertexInputBindingDescription> m_vertex_binding_descriptions{};
         std::vector<VkVertexInputAttributeDescription> m_vertex_attribute_descriptions{};
+        std::vector<VkVertexInputBindingDescription> m_vertex_binding_descriptions{};
         VkPipelineVertexInputStateCreateInfo m_vertex_input_info{};
+        VkPipelineInputAssemblyStateCreateInfo m_input_assembly{};
+
+        std::vector<DescriptorSetLayoutHandle> m_descriptor_set_layouts;
+
+        VkPipelineRasterizationStateCreateInfo m_rasterizer_info{};
 
         VkViewport m_viewport{};
         VkRect2D m_scissor{};
         VkPipelineViewportStateCreateInfo m_viewport_state{};
 
-        std::vector<VkDynamicState> m_dynamic_states{};
-        VkPipelineDynamicStateCreateInfo m_dynamic_state{};
-
-        VkPipelineRasterizationStateCreateInfo m_rasterizer_info{};
-        VkPipelineColorBlendAttachmentState m_blend_attachment{};
-        VkPipelineColorBlendStateCreateInfo m_blend_info{};
-        VkPipelineMultisampleStateCreateInfo m_multisampling_info{};
-        VkPipelineLayoutCreateInfo m_pipeline_layout_info{};
-
         VkPipelineRenderingCreateInfo m_rendering_create_info{};
+        VkPipelineMultisampleStateCreateInfo m_multisampling_info{};
 
         VkPipelineDepthStencilStateCreateInfo m_depth_stencil_state_create_info{};
 
-        void populate_defaults();
+        VkPipelineColorBlendAttachmentState m_blend_attachment{};
+        VkPipelineColorBlendStateCreateInfo m_blend_info{};
 
-        PipelineBuilder& with_blending();
-
-        PipelineBuilder& with_dynamic_state();
+        std::vector<VkDynamicState> m_dynamic_states{};
 
         VkShaderModule create_shader_module(std::span<const std::byte> code);
 

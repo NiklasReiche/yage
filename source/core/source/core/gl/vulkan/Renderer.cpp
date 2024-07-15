@@ -73,14 +73,15 @@ namespace yage::gl::vulkan
         m_render_to_swap_chain = false;
     }
 
-    void Renderer::bind_pipeline(const Pipeline& pipeline, const IDescriptorSet& descriptor_set)
+    void Renderer::bind_pipeline(const IPipeline& pipeline, const IDescriptorSet& descriptor_set)
     {
         const auto& descriptor_set_impl = static_cast<const DescriptorSet&>(descriptor_set);
+        const auto& pipeline_impl = static_cast<const Pipeline&>(pipeline);
 
-        vkCmdBindDescriptorSets(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.vk_layout(), 0, 1,
+        vkCmdBindDescriptorSets(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_impl.vk_layout(), 0, 1,
                                 &descriptor_set_impl.vk_handle(), 0, nullptr);
 
-        vkCmdBindPipeline(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.vk_handle());
+        vkCmdBindPipeline(m_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_impl.vk_handle());
     }
 
     void Renderer::draw(const IDrawable2& drawable)

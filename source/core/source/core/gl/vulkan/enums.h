@@ -212,4 +212,39 @@ namespace yage::gl::vulkan
             default: throw std::invalid_argument("unknown MSAASamples value");
         }
     }
+
+    inline VkBlendFactor convert(const BlendFactor factor)
+    {
+        switch (factor) {
+            case BlendFactor::ZERO:                     return VK_BLEND_FACTOR_ZERO;
+            case BlendFactor::ONE:                      return VK_BLEND_FACTOR_ONE;
+            case BlendFactor::SRC_COLOR:                return VK_BLEND_FACTOR_SRC_COLOR;
+            case BlendFactor::ONE_MINUS_SRC_COLOR:      return VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR;
+            case BlendFactor::DST_COLOR:                return VK_BLEND_FACTOR_DST_COLOR;
+            case BlendFactor::ONE_MINUS_DST_COLOR:      return VK_BLEND_FACTOR_ONE_MINUS_DST_COLOR;
+            case BlendFactor::SRC_ALPHA:                return VK_BLEND_FACTOR_SRC_ALPHA;
+            case BlendFactor::ONE_MINUS_SRC_ALPHA:      return VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+            case BlendFactor::DST_ALPHA:                return VK_BLEND_FACTOR_DST_ALPHA;
+            case BlendFactor::ONE_MINUS_DST_ALPHA:      return VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA;
+            case BlendFactor::CONSTANT_COLOR:           return VK_BLEND_FACTOR_CONSTANT_COLOR;
+            case BlendFactor::ONE_MINUS_CONSTANT_COLOR: return VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_COLOR;
+            case BlendFactor::CONSTANT_ALPHA:           return VK_BLEND_FACTOR_CONSTANT_ALPHA;
+            case BlendFactor::ONE_MINUS_CONSTANT_ALPHA: return VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_ALPHA;
+
+            default: throw std::invalid_argument("unknown BlendFactor value");
+        }
+    }
+
+    inline VkBlendOp convert(const BlendOperation operation)
+    {
+        switch (operation) {
+            case BlendOperation::ADD:              return VK_BLEND_OP_ADD;
+            case BlendOperation::SUBTRACT:         return VK_BLEND_OP_SUBTRACT;
+            case BlendOperation::REVERSE_SUBTRACT: return VK_BLEND_OP_REVERSE_SUBTRACT;
+            case BlendOperation::MIN:              return VK_BLEND_OP_MIN;
+            case BlendOperation::MAX:              return VK_BLEND_OP_MAX;
+
+            default: throw std::invalid_argument("unknown BlendOperation value");
+        }
+    }
 }
