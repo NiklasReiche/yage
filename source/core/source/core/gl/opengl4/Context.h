@@ -11,12 +11,19 @@ namespace yage::gl::opengl4
     public:
         void bind_buffer(GLenum target, GLuint buffer);
 
+        void unbind_buffer(GLenum target, GLuint buffer);
+
+        void bind_vao(GLuint vao);
+
+        void unbind_vao(GLuint vao);
+
     private:
         struct OpenGlState
         {
             std::unordered_map<GLenum, GLuint> bound_buffer_per_target;
+            GLuint bound_vao = 0;
         };
 
-        OpenGlState m_state;
+        OpenGlState m_state{};
     };
 }

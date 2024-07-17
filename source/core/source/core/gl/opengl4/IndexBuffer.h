@@ -18,9 +18,19 @@ namespace yage::gl::opengl4
 
         ~IndexBuffer() override;
 
+        IndexBuffer(const IndexBuffer& other) = delete;
+
+        IndexBuffer(IndexBuffer&& other) noexcept;
+
+        IndexBuffer& operator=(const IndexBuffer& other) = delete;
+
+        IndexBuffer& operator=(IndexBuffer&& other) noexcept;
+
     private:
         Context* m_context;
 
         GLuint m_ebo_handle = 0;
+
+        void clear();
     };
 }
