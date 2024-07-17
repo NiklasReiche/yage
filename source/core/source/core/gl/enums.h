@@ -177,6 +177,7 @@ namespace yage::gl
 
     enum class ResourceUsage
     {
+        // TODO: add specification for read/write/...
         STATIC,
         DYNAMIC
     };
