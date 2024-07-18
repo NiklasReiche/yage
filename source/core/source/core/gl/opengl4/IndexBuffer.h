@@ -26,6 +26,8 @@ namespace yage::gl::opengl4
 
         IndexBuffer& operator=(IndexBuffer&& other) noexcept;
 
+        [[nodiscard]] GLuint gl_handle() const;
+
     private:
         Context* m_context;
 

@@ -46,6 +46,11 @@ namespace yage::gl::opengl4
         return *this;
     }
 
+    GLuint IndexBuffer::gl_handle() const
+    {
+        return m_ebo_handle;
+    }
+
     void IndexBuffer::clear()
     {
         // only delete resources if this handle is in a valid state

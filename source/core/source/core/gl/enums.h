@@ -41,10 +41,10 @@ namespace yage::gl
         FLOAT_64,
         SINT_16,
         SINT_32,
-        SINT_64,
+        SINT_64, // TODO: opengl does not support 64 bit integers without extensions
         UINT_16, // TODO: are unsigned components even possible in GLSL?
         UINT_32,
-        UINT_64
+        UINT_64 // TODO: opengl does not support 64 bit integers without extensions
     };
 
     inline std::size_t byte_size(const VertexComponentType data_type)

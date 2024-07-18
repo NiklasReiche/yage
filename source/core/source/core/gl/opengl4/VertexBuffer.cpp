@@ -43,6 +43,11 @@ namespace yage::gl::opengl4
         return *this;
     }
 
+    GLuint VertexBuffer::gl_handle() const
+    {
+        return m_vbo_handle;
+    }
+
     void VertexBuffer::clear()
     {
         if (m_context != nullptr) {

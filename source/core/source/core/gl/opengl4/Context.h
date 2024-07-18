@@ -11,6 +11,8 @@ namespace yage::gl::opengl4
     public:
         void bind_buffer(GLenum target, GLuint buffer);
 
+        void force_bind_buffer(GLenum target, GLuint buffer);
+
         void unbind_buffer(GLenum target, GLuint buffer);
 
         void bind_vao(GLuint vao);
