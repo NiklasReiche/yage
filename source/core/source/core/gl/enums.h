@@ -249,6 +249,18 @@ namespace yage::gl
         SAMPLE_8
     };
 
+    inline unsigned int n_samples(const MSAASamples samples)
+    {
+        switch (samples) {
+            case MSAASamples::SAMPLE_1: return 1;
+            case MSAASamples::SAMPLE_2: return 2;
+            case MSAASamples::SAMPLE_4: return 4;
+            case MSAASamples::SAMPLE_8: return 8;
+
+            default: throw std::invalid_argument("unknown MSSASamples value");
+        }
+    }
+
     enum class BlendFactor
     {
         ZERO,

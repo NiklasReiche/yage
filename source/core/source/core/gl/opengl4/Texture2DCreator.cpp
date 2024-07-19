@@ -14,4 +14,10 @@ namespace yage::gl::opengl4
     {
         return m_context->store_texture2ds().create(m_context, sampler, data_info, data);
     }
+
+    Texture2DHandle Texture2DCreator::create_multisampled(const MSAASamples samples, const PixelTransferInfo& data_info,
+                                                          ResourceUsage) const
+    {
+        return m_context->store_texture2ds().create(m_context, samples, data_info);
+    }
 }

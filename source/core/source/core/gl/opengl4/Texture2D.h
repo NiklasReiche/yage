@@ -17,6 +17,8 @@ namespace yage::gl::opengl4
         Texture2D(Context* context, const TextureSampler& sampler, const PixelTransferInfo& data_info,
                   std::span<const std::byte> data);
 
+        Texture2D(Context* context, MSAASamples samples, const PixelTransferInfo& data_info);
+
         ~Texture2D() override;
 
         Texture2D(const Texture2D& other) = delete;
@@ -26,6 +28,8 @@ namespace yage::gl::opengl4
         Texture2D& operator=(const Texture2D& other) = delete;
 
         Texture2D& operator=(Texture2D&& other) noexcept;
+
+        [[nodiscard]] GLuint gl_handle() const;
 
     private:
         Context* m_context;

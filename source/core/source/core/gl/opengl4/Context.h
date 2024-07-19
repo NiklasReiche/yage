@@ -82,6 +82,18 @@ namespace yage::gl::opengl4
 
         void unbind_vao(GLuint vao);
 
+        void bind_frame_buffer(GLenum target, GLuint frame_buffer);
+
+        void force_bind_frame_buffer(GLenum target, GLuint frame_buffer);
+
+        void unbind_frame_buffer(GLenum target, GLuint frame_buffer);
+
+        void bind_render_buffer(GLuint render_buffer);
+
+        void force_bind_render_buffer(GLuint render_buffer);
+
+        void unbind_render_buffer(GLuint render_buffer);
+
         void set_pixel_store_param(GLenum param, GLint value);
 
     private:
@@ -89,7 +101,9 @@ namespace yage::gl::opengl4
         {
             std::unordered_map<GLenum, GLuint> bound_buffer_per_target;
             std::unordered_map<GLenum, GLuint> bound_texture_per_target;
+            std::unordered_map<GLenum, GLuint> bound_framebuffers;
             GLuint bound_vao;
+            GLuint bound_render_buffer;
 
             std::unordered_map<GLenum, GLint> pixel_store_params;
         };

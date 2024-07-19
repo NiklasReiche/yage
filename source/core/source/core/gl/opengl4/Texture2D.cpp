@@ -31,6 +31,20 @@ namespace yage::gl::opengl4
                         static_cast<GLint>(convert(sampler.mag_filter, sampler.mip_map_mode)));
     }
 
+    Texture2D::Texture2D(Context* context, const MSAASamples samples, const PixelTransferInfo& data_info)
+        : m_context(context)
+    {
+        glGenTextures(1, &m_texture_handle);
+
+        m_context->bind_texture(GL_TEXTURE_2D_MULTISAMPLE, m_texture_handle);
+
+        const auto internal_format = static_cast<GLint>(to_internal_format(data_info.image_format));
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, static_cast<GLsizei>(n_samples(samples)), internal_format,
+                                static_cast<GLsizei>(data_info.width), static_cast<GLsizei>(data_info.height), GL_TRUE);
+
+        // we have no sampler parameters for multusampled textures, since they cannot be sampled in shaders
+    }
+
     Texture2D::~Texture2D()
     {
         clear();
@@ -58,6 +72,11 @@ namespace yage::gl::opengl4
         other.m_texture_handle = 0;
 
         return *this;
+    }
+
+    GLuint Texture2D::gl_handle() const
+    {
+        return m_texture_handle;
     }
 
     void Texture2D::clear()

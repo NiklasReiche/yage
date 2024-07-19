@@ -180,6 +180,65 @@ namespace yage::gl::opengl4
         }
     }
 
+    void Context::bind_frame_buffer(const GLenum target, const GLuint frame_buffer)
+    {
+        if (target == GL_FRAMEBUFFER) {
+            bind_frame_buffer(GL_READ_FRAMEBUFFER, frame_buffer);
+            bind_frame_buffer(GL_DRAW_FRAMEBUFFER, frame_buffer);
+        } else {
+            if (m_state.bound_framebuffers[target] != target) {
+                glBindFramebuffer(target, frame_buffer);
+                m_state.bound_framebuffers[target] = target;
+            }
+        }
+    }
+
+    void Context::force_bind_frame_buffer(const GLenum target, const GLuint frame_buffer)
+    {
+        if (target == GL_FRAMEBUFFER) {
+            force_bind_frame_buffer(GL_READ_FRAMEBUFFER, frame_buffer);
+            force_bind_frame_buffer(GL_DRAW_FRAMEBUFFER, frame_buffer);
+        } else {
+            glBindFramebuffer(target, frame_buffer);
+            m_state.bound_framebuffers[target] = target;
+        }
+    }
+
+    void Context::unbind_frame_buffer(const GLenum target, const GLuint frame_buffer)
+    {
+        if (target == GL_FRAMEBUFFER) {
+            unbind_frame_buffer(GL_READ_FRAMEBUFFER, frame_buffer);
+            unbind_frame_buffer(GL_DRAW_FRAMEBUFFER, frame_buffer);
+        } else {
+            if (m_state.bound_framebuffers[target] == target) {
+                glBindFramebuffer(target, frame_buffer);
+                m_state.bound_framebuffers[target] = 0;
+            }
+        }
+    }
+
+    void Context::bind_render_buffer(const GLuint render_buffer)
+    {
+        if (m_state.bound_render_buffer != render_buffer) {
+            glBindRenderbuffer(GL_RENDERBUFFER, render_buffer);
+            m_state.bound_render_buffer = render_buffer;
+        }
+    }
+
+    void Context::force_bind_render_buffer(const GLuint render_buffer)
+    {
+        glBindRenderbuffer(GL_RENDERBUFFER, render_buffer);
+        m_state.bound_render_buffer = render_buffer;
+    }
+
+    void Context::unbind_render_buffer(const GLuint render_buffer)
+    {
+        if (m_state.bound_render_buffer == render_buffer) {
+            glBindRenderbuffer(GL_RENDERBUFFER, render_buffer);
+            m_state.bound_render_buffer = 0;
+        }
+    }
+
     void Context::set_pixel_store_param(const GLenum param, const GLint value)
     {
         if (m_state.pixel_store_params[param] != value) {
