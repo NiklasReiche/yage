@@ -26,8 +26,6 @@ namespace yage::gl::vulkan
 
         UniformBuffer& operator=(UniformBuffer&& other) noexcept;
 
-        void update_data(std::size_t size, const void* data) override;
-
         void update_sub_data(std::size_t byte_offset, std::size_t byte_size, const void* data) override;
 
         [[nodiscard]] std::vector<VkDescriptorBufferInfo> descriptor_info() const;
