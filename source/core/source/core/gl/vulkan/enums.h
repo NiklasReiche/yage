@@ -140,29 +140,43 @@ namespace yage::gl::vulkan
         }
     }
 
-    inline VkFormat convert(const ImageFormat2 image_format)
+    inline VkFormat convert(const TextureFormat2 image_format)
     {
         switch (image_format) {
-            case ImageFormat2::R8_UNORM:            return VK_FORMAT_R8_UNORM;
-            case ImageFormat2::R8G8_UNORM:          return VK_FORMAT_R8G8_UNORM;
-            case ImageFormat2::R8G8B8_UNORM:        return VK_FORMAT_R8G8B8_UNORM;
-            case ImageFormat2::R8G8B8A8_UNORM:      return VK_FORMAT_R8G8B8A8_UNORM;
-            case ImageFormat2::R8_UNORM_SRGB:       return VK_FORMAT_R8_SRGB;
-            case ImageFormat2::R8G8_UNORM_SRGB:     return VK_FORMAT_R8G8_SRGB;
-            case ImageFormat2::R8G8B8_UNORM_SRGB:   return VK_FORMAT_R8G8B8_SRGB;
-            case ImageFormat2::R8G8B8A8_UNORM_SRGB: return VK_FORMAT_R8G8B8A8_SRGB;
-            case ImageFormat2::R8_SNORM:            return VK_FORMAT_R8_SNORM;
-            case ImageFormat2::R8G8_SNORM:          return VK_FORMAT_R8G8_SNORM;
-            case ImageFormat2::R8G8B8_SNORM:        return VK_FORMAT_R8G8B8_SNORM;
-            case ImageFormat2::R8G8B8A8_SNORM:      return VK_FORMAT_R8G8B8A8_SNORM;
-            case ImageFormat2::R8_UINT:             return VK_FORMAT_R8_UINT;
-            case ImageFormat2::R8G8_UINT:           return VK_FORMAT_R8G8_UINT;
-            case ImageFormat2::R8G8B8_UINT:         return VK_FORMAT_R8G8B8_UINT;
-            case ImageFormat2::R8G8B8A8_UINT:       return VK_FORMAT_R8G8B8A8_UINT;
-            case ImageFormat2::R8_SINT:             return VK_FORMAT_R8_SINT;
-            case ImageFormat2::R8G8_SINT:           return VK_FORMAT_R8G8_SINT;
-            case ImageFormat2::R8G8B8_SINT:         return VK_FORMAT_R8G8B8_SINT;
-            case ImageFormat2::R8G8B8A8_SINT:       return VK_FORMAT_R8G8B8A8_SINT;
+            case TextureFormat2::R8_UNORM:            return VK_FORMAT_R8_UNORM;
+            case TextureFormat2::R8G8_UNORM:          return VK_FORMAT_R8G8_UNORM;
+            case TextureFormat2::R8G8B8_UNORM:        return VK_FORMAT_R8G8B8_UNORM;
+            case TextureFormat2::R8G8B8A8_UNORM:      return VK_FORMAT_R8G8B8A8_UNORM;
+            case TextureFormat2::R8G8B8_UNORM_SRGB:   return VK_FORMAT_R8G8B8_SRGB;
+            case TextureFormat2::R8G8B8A8_UNORM_SRGB: return VK_FORMAT_R8G8B8A8_SRGB;
+            case TextureFormat2::R8_SNORM:            return VK_FORMAT_R8_SNORM;
+            case TextureFormat2::R8G8_SNORM:          return VK_FORMAT_R8G8_SNORM;
+            case TextureFormat2::R8G8B8_SNORM:        return VK_FORMAT_R8G8B8_SNORM;
+            case TextureFormat2::R8G8B8A8_SNORM:      return VK_FORMAT_R8G8B8A8_SNORM;
+            case TextureFormat2::R8_UINT:             return VK_FORMAT_R8_UINT;
+            case TextureFormat2::R8G8_UINT:           return VK_FORMAT_R8G8_UINT;
+            case TextureFormat2::R8G8B8_UINT:         return VK_FORMAT_R8G8B8_UINT;
+            case TextureFormat2::R8G8B8A8_UINT:       return VK_FORMAT_R8G8B8A8_UINT;
+            case TextureFormat2::R8_SINT:             return VK_FORMAT_R8_SINT;
+            case TextureFormat2::R8G8_SINT:           return VK_FORMAT_R8G8_SINT;
+            case TextureFormat2::R8G8B8_SINT:         return VK_FORMAT_R8G8B8_SINT;
+            case TextureFormat2::R8G8B8A8_SINT:       return VK_FORMAT_R8G8B8A8_SINT;
+            case TextureFormat2::R16_UNORM:           return VK_FORMAT_R16_UNORM;
+            case TextureFormat2::R16G16_UNORM:        return VK_FORMAT_R16G16_UNORM;
+            case TextureFormat2::R16G16B16_UNORM:     return VK_FORMAT_R16G16B16_UNORM;
+            case TextureFormat2::R16G16B16A16_UNORM:  return VK_FORMAT_R16G16B16A16_UNORM;
+            case TextureFormat2::R16_SNORM:           return VK_FORMAT_R16_SNORM;
+            case TextureFormat2::R16G16_SNORM:        return VK_FORMAT_R16G16_SNORM;
+            case TextureFormat2::R16G16B16_SNORM:     return VK_FORMAT_R16G16B16_SNORM;
+            case TextureFormat2::R16G16B16A16_SNORM:  return VK_FORMAT_R16G16B16A16_SNORM;
+            case TextureFormat2::R16_UINT:            return VK_FORMAT_R16_UINT;
+            case TextureFormat2::R16G16_UINT:         return VK_FORMAT_R16G16_UINT;
+            case TextureFormat2::R16G16B16_UINT:      return VK_FORMAT_R16G16B16_UINT;
+            case TextureFormat2::R16G16B16A16_UINT:   return VK_FORMAT_R16G16B16A16_UINT;
+            case TextureFormat2::R16_SINT:            return VK_FORMAT_R16_SINT;
+            case TextureFormat2::R16G16_SINT:         return VK_FORMAT_R16G16_SINT;
+            case TextureFormat2::R16G16B16_SINT:      return VK_FORMAT_R16G16B16_SINT;
+            case TextureFormat2::R16G16B16A16_SINT:   return VK_FORMAT_R16G16B16A16_SINT;
 
             default: throw std::invalid_argument("Unknown ImageFormat value");
         }

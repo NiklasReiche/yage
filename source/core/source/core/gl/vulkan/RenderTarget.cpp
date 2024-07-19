@@ -6,8 +6,8 @@ namespace yage::gl::vulkan
 {
     RenderTarget::RenderTarget(Instance* instance, const FrameCounter frame_counter, unsigned int width,
                                unsigned int height, const MSAASamples samples,
-                               std::span<std::tuple<VkRenderingAttachmentInfo, ImageFormat2>> color_attachments,
-                               std::optional<std::tuple<VkRenderingAttachmentInfo, ImageFormat2>> depth_attachment)
+                               std::span<std::tuple<VkRenderingAttachmentInfo, TextureFormat2>> color_attachments,
+                               std::optional<std::tuple<VkRenderingAttachmentInfo, TextureFormat2>> depth_attachment)
         : m_instance(instance),
           m_frame_counter(frame_counter),
           m_extent({width, height}),

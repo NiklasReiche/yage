@@ -17,9 +17,9 @@ namespace yage::gl::vulkan
 
         IRenderTargetBuilder& with_msaa(MSAASamples samples) override;
 
-        IRenderTargetBuilder& with_color_attachment(ImageFormat2 format) override;
+        IRenderTargetBuilder& with_color_attachment(TextureFormat2 format) override;
 
-        IRenderTargetBuilder& with_depth_attachment(ImageFormat2 format) override;
+        IRenderTargetBuilder& with_depth_attachment(TextureFormat2 format) override;
 
         IRenderTargetBuilder& with_resolve_attachments() override;
 
@@ -32,8 +32,8 @@ namespace yage::gl::vulkan
 
         MSAASamples m_samples = MSAASamples::SAMPLE_1;
 
-        ImageFormat2 m_depth_image_format = ImageFormat2::UNDEFINED;
-        std::vector<ImageFormat2> m_color_image_formats;
+        TextureFormat2 m_depth_image_format = TextureFormat2::UNDEFINED;
+        std::vector<TextureFormat2> m_color_image_formats;
 
         std::vector<VkRenderingAttachmentInfo> m_color_attachment_descriptions;
         std::optional<VkRenderingAttachmentInfo> m_depth_attachment_description;

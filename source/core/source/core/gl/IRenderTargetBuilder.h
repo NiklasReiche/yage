@@ -13,9 +13,9 @@ namespace yage::gl
 
         virtual IRenderTargetBuilder& with_msaa(MSAASamples samples) = 0;
 
-        virtual IRenderTargetBuilder& with_color_attachment(ImageFormat2 format) = 0;
+        virtual IRenderTargetBuilder& with_color_attachment(TextureFormat2 format) = 0;
 
-        virtual IRenderTargetBuilder& with_depth_attachment(ImageFormat2 format) = 0;
+        virtual IRenderTargetBuilder& with_depth_attachment(TextureFormat2 format) = 0;
 
         virtual IRenderTargetBuilder& with_resolve_attachments() = 0;
 

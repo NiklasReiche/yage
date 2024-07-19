@@ -127,34 +127,58 @@ namespace yage::gl
         std::size_t index_count;
     };
 
-    enum class ImageFormat2
+    enum class TextureFormat2
     {
         UNDEFINED,
-        R8_UNORM, // linear space format, values in range [0.0f, 255.0f]
+        // stored as 8-bit integers, interpreted as [0.0f, 1.0f] floats in linear space
+        R8_UNORM,
         R8G8_UNORM,
         R8G8B8_UNORM,
         R8G8B8A8_UNORM,
-        R8_UNORM_SRGB, // srgb space format, values in range [0.0f, 255.0f]
-        R8G8_UNORM_SRGB,
+        // stored as 8-bit integers, interpreted as [0.0f, 1.0f] floats in srgb space
+        // we don't have R8_UNORM_SRGB or R8G8_UNORM_SRGB, since OpenGL doesn't support those
         R8G8B8_UNORM_SRGB,
         R8G8B8A8_UNORM_SRGB,
-        R8_SNORM, // values in range [-1.0f, 1.0f]
+        // stored as 8-bit integers, interpreted as [-1.0f, 1.0f] floats in linear space
+        R8_SNORM,
         R8G8_SNORM,
         R8G8B8_SNORM,
         R8G8B8A8_SNORM,
-        R8_UINT, // values in range [0, 255]
+        // stored as 8-bit integers, interpreted as [0, 255] integers
+        R8_UINT,
         R8G8_UINT,
         R8G8B8_UINT,
         R8G8B8A8_UINT,
-        R8_SINT, // values in range [-128, 127]
+        // stored as 8-bit integers, interpreted as [-128, 127] integers
+        R8_SINT,
         R8G8_SINT,
         R8G8B8_SINT,
         R8G8B8A8_SINT,
+        // stored as 16-bit integers, interpreted as [0.0f, 1.0f] floats in linear space
+        R16_UNORM,
+        R16G16_UNORM,
+        R16G16B16_UNORM,
+        R16G16B16A16_UNORM,
+        // stored as 16-bit integers, interpreted as [-1.0f, 1.0f] floats in linear space
+        R16_SNORM,
+        R16G16_SNORM,
+        R16G16B16_SNORM,
+        R16G16B16A16_SNORM,
+        // stored as 16-bit integers, interpreted as [0, 65535] integers
+        R16_UINT,
+        R16G16_UINT,
+        R16G16B16_UINT,
+        R16G16B16A16_UINT,
+        // stored as 16-bit integers, interpreted as [-32768, 32767] integers
+        R16_SINT,
+        R16G16_SINT,
+        R16G16B16_SINT,
+        R16G16B16A16_SINT,
     };
 
     struct PixelTransferInfo
     {
-        ImageFormat2 image_format;
+        TextureFormat2 image_format;
         std::uint32_t width;
         std::uint32_t height;
     };

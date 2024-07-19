@@ -15,7 +15,7 @@ namespace yage::gl::vulkan
         return *this;
     }
 
-    IRenderTargetBuilder& RenderTargetBuilder::with_color_attachment(const ImageFormat2 format)
+    IRenderTargetBuilder& RenderTargetBuilder::with_color_attachment(const TextureFormat2 format)
     {
         if (m_with_resolve) {
             throw std::logic_error(
@@ -41,7 +41,7 @@ namespace yage::gl::vulkan
         return *this;
     }
 
-    IRenderTargetBuilder& RenderTargetBuilder::with_depth_attachment(const ImageFormat2 format)
+    IRenderTargetBuilder& RenderTargetBuilder::with_depth_attachment(const TextureFormat2 format)
     {
         m_depth_image_format = format;
 
@@ -72,12 +72,12 @@ namespace yage::gl::vulkan
     RenderTargetHandle RenderTargetBuilder::build(const unsigned int width, const unsigned int height,
                                                   const ResourceUsage usage)
     {
-        std::vector<std::tuple<VkRenderingAttachmentInfo, ImageFormat2>> color_attachments;
+        std::vector<std::tuple<VkRenderingAttachmentInfo, TextureFormat2>> color_attachments;
         for (std::size_t i = 0; i < m_color_attachment_descriptions.size(); ++i) {
             color_attachments.emplace_back(m_color_attachment_descriptions[i], m_color_image_formats[i]);
         }
 
-        std::optional<std::tuple<VkRenderingAttachmentInfo, ImageFormat2>> depth_attachment;
+        std::optional<std::tuple<VkRenderingAttachmentInfo, TextureFormat2>> depth_attachment;
         if (m_depth_attachment_description.has_value()) {
             depth_attachment = std::make_tuple(m_depth_attachment_description.value(), m_depth_image_format);
         }
@@ -91,7 +91,7 @@ namespace yage::gl::vulkan
     {
         m_samples = MSAASamples::SAMPLE_1;
 
-        m_depth_image_format = ImageFormat2::UNDEFINED;
+        m_depth_image_format = TextureFormat2::UNDEFINED;
         m_color_image_formats.clear();
 
         m_color_attachment_descriptions.clear();
