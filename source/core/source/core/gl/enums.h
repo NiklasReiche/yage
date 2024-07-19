@@ -179,6 +179,7 @@ namespace yage::gl
     struct PixelTransferInfo
     {
         TextureFormat2 image_format;
+        // TODO: opengl has signed 32-bit, vulkan has unsigned 32-bit texture sizes
         std::uint32_t width;
         std::uint32_t height;
     };

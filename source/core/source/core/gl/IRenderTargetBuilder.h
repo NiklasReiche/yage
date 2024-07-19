@@ -19,6 +19,7 @@ namespace yage::gl
 
         virtual IRenderTargetBuilder& with_resolve_attachments() = 0;
 
+        // TODO: fixed-width types
         virtual RenderTargetHandle build(unsigned int width, unsigned int height, ResourceUsage usage) = 0;
 
         virtual void clear() = 0;
