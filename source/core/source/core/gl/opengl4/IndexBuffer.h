@@ -14,7 +14,7 @@ namespace yage::gl::opengl4
     class IndexBuffer final : public IIndexBuffer
     {
     public:
-        IndexBuffer(Context* context, std::span<const std::byte> indices, ResourceUsage usage);
+        IndexBuffer(Context* context, std::span<const std::byte> data, ResourceUsage usage);
 
         ~IndexBuffer() override;
 

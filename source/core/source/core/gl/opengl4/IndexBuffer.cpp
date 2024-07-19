@@ -5,7 +5,7 @@
 
 namespace yage::gl::opengl4
 {
-    IndexBuffer::IndexBuffer(Context* context, const std::span<const std::byte> indices, const ResourceUsage usage)
+    IndexBuffer::IndexBuffer(Context* context, const std::span<const std::byte> data, const ResourceUsage usage)
         : m_context(context)
     {
         glGenBuffers(1, &m_ebo_handle);
@@ -14,7 +14,7 @@ namespace yage::gl::opengl4
         m_context->bind_vao(0);
 
         m_context->bind_buffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo_handle);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(indices.size()), indices.data(), convert(usage));
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(data.size()), data.data(), convert(usage));
     }
 
     IndexBuffer::~IndexBuffer()

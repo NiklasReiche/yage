@@ -1,5 +1,7 @@
 #include "VertexBufferCreator.h"
 
+#include "Context.h"
+
 namespace yage::gl::opengl4
 {
     VertexBufferCreator::VertexBufferCreator(Context* context)
@@ -7,9 +9,9 @@ namespace yage::gl::opengl4
     {
     }
 
-    VertexBufferHandle VertexBufferCreator::create(const VertexDataInfo& data_info, std::span<const std::byte> data,
+    VertexBufferHandle VertexBufferCreator::create(const VertexDataInfo&, std::span<const std::byte> data,
                                                    ResourceUsage usage) const
     {
-
+        return m_context->store_vertex_buffers().create(m_context, data, usage);
     }
 }
