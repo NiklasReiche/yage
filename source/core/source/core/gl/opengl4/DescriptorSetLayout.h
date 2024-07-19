@@ -1,8 +1,10 @@
 #pragma once
 
+#include "../IDescriptorSetLayout.h"
+
 namespace yage::gl::opengl4
 {
-    class DescriptorSetLayout
+    class DescriptorSetLayout final : public IDescriptorSetLayout
     {
     };
 }

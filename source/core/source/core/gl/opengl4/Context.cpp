@@ -5,6 +5,122 @@ namespace yage::gl::opengl4
     Context::Context()
     {
         populate_default_state();
+
+        m_store_vertex_buffers = std::make_shared<VertexBufferStore>();
+        m_store_index_buffers = std::make_shared<IndexBufferStore>();
+        m_store_uniform_buffers = std::make_shared<UniformBufferStore>();
+        m_store_drawables = std::make_shared<DrawableStore>();
+        m_store_texture2ds = std::make_shared<Texture2DStore>();
+        m_store_descriptor_sets = std::make_shared<DescriptorSetStore>();
+        m_store_descriptor_set_layouts = std::make_shared<DescriptorSetLayoutStore>();
+        m_store_pipelines = std::make_shared<PipelineStore>();
+        m_store_render_targets = std::make_shared<RenderTargetStore>();
+
+        m_vertex_buffer_creator = VertexBufferCreator(this);
+        m_index_buffer_creator = IndexBufferCreator(this);
+        m_uniform_buffer_creator = UniformBufferCreator(this);
+        m_drawable_creator = DrawableCreator(this);
+        m_texture2d_creator = Texture2DCreator(this);
+        m_descriptor_set_creator = DescriptorSetCreator(this);
+        m_descriptor_set_layout_builder = DescriptorSetLayoutBuilder(this);
+        m_pipeline_builder = PipelineBuilder(this);
+        m_render_target_builder = RenderTargetBuilder(this);
+        m_renderer = Renderer(this);
+    }
+
+    IVertexBufferCreator& Context::vertex_buffer_creator()
+    {
+        return m_vertex_buffer_creator.value();
+    }
+
+    IIndexBufferCreator& Context::index_buffer_creator()
+    {
+        return m_index_buffer_creator.value();
+    }
+
+    IUniformBufferCreator& Context::uniform_buffer_creator()
+    {
+        return m_uniform_buffer_creator.value();
+    }
+
+    IDrawableCreator2& Context::drawable_creator()
+    {
+        return m_drawable_creator.value();
+    }
+
+    ITexture2DCreator& Context::texture_2d_creator()
+    {
+        return m_texture2d_creator.value();
+    }
+
+    IDescriptorSetCreator& Context::descriptor_set_creator()
+    {
+        return m_descriptor_set_creator.value();
+    }
+
+    IDescriptorSetLayoutBuilder& Context::descriptor_set_layout_builder()
+    {
+        return m_descriptor_set_layout_builder.value();
+    }
+
+    IPipelineBuilder& Context::pipeline_builder()
+    {
+        return m_pipeline_builder.value();
+    }
+
+    IRenderTargetBuilder& Context::render_target_builder()
+    {
+        return m_render_target_builder.value();
+    }
+
+    IRenderer2& Context::renderer()
+    {
+        return m_renderer.value();
+    }
+
+    VertexBufferStore& Context::store_vertex_buffers()
+    {
+        return *m_store_vertex_buffers;
+    }
+
+    IndexBufferStore& Context::store_index_buffers()
+    {
+        return *m_store_index_buffers;
+    }
+
+    UniformBufferStore& Context::store_uniform_buffers()
+    {
+        return *m_store_uniform_buffers;
+    }
+
+    DrawableStore& Context::store_drawables()
+    {
+        return *m_store_drawables;
+    }
+
+    Texture2DStore& Context::store_texture2ds()
+    {
+        return *m_store_texture2ds;
+    }
+
+    DescriptorSetStore& Context::store_descriptor_sets()
+    {
+        return *m_store_descriptor_sets;
+    }
+
+    DescriptorSetLayoutStore& Context::store_descriptor_set_layouts()
+    {
+        return *m_store_descriptor_set_layouts;
+    }
+
+    PipelineStore& Context::store_pipelines()
+    {
+        return *m_store_pipelines;
+    }
+
+    RenderTargetStore& Context::store_render_targets()
+    {
+        return *m_store_render_targets;
     }
 
     void Context::bind_buffer(const GLenum target, const GLuint buffer)
