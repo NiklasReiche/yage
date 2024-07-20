@@ -29,6 +29,6 @@ namespace yage::gl::opengl4
         MSAASamples m_samples = MSAASamples::SAMPLE_1;
         std::vector<TextureFormat2> m_color_attachments;
         std::optional<TextureFormat2> m_depth_attachment;
-        bool m_with_resolve;
+        bool m_with_resolve = false;
     };
 }

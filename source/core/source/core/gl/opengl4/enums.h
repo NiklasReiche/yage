@@ -30,6 +30,16 @@ namespace yage::gl::opengl4
         }
     }
 
+    inline GLenum convert(const IndexType type)
+    {
+        switch (type) {
+            case IndexType::UINT_16: return GL_UNSIGNED_SHORT;
+            case IndexType::UINT_32: return GL_UNSIGNED_INT;
+
+            default: throw std::invalid_argument("unknonw IndexType value");
+        }
+    }
+
     inline GLenum to_internal_format(const TextureFormat2 format)
     {
         switch (format) {
@@ -196,6 +206,41 @@ namespace yage::gl::opengl4
                 }
 
             default: throw std::invalid_argument("Unknown MipMapMode value");
+        }
+    }
+
+    inline GLenum convert(const PrimitiveTopology topology)
+    {
+        switch (topology) {
+            case PrimitiveTopology::POINT_LIST:     return GL_POINTS;
+            case PrimitiveTopology::LINE_LIST:      return GL_LINES;
+            case PrimitiveTopology::LINE_STRIP:     return GL_LINE_STRIP;
+            case PrimitiveTopology::TRIANGLE_LIST:  return GL_TRIANGLES;
+            case PrimitiveTopology::TRIANGLE_STRIP: return GL_TRIANGLE_STRIP;
+
+            default: throw std::invalid_argument("Unknown PrimitiveTopology value");
+        }
+    }
+
+    inline GLenum convert(const PolygonMode polygon_mode)
+    {
+        switch (polygon_mode) {
+            case PolygonMode::POINT: return GL_POINT;
+            case PolygonMode::LINE:  return GL_LINE;
+            case PolygonMode::FILL:  return GL_FILL;
+
+            default: throw std::invalid_argument("Unknown PolygonMode value");
+        }
+    }
+
+    inline GLenum convert(const CullMode cull_mode)
+    {
+        switch (cull_mode) {
+            case CullMode::FRONT_FACE:          return GL_FRONT;
+            case CullMode::BACK_FACE:           return GL_BACK;
+            case CullMode::FRONT_AND_BACK_FACE: return GL_FRONT_AND_BACK;
+
+            default: throw std::invalid_argument("Unknown CullMode value");
         }
     }
 }

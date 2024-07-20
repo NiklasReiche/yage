@@ -239,6 +239,28 @@ namespace yage::gl::opengl4
         }
     }
 
+    void Context::bind_shader(const GLuint shader_program)
+    {
+        if (m_state.bound_shader != shader_program) {
+            glUseProgram(shader_program);
+            m_state.bound_shader = shader_program;
+        }
+    }
+
+    void Context::force_bind_shader(const GLuint shader_program)
+    {
+        glUseProgram(shader_program);
+        m_state.bound_shader = shader_program;
+    }
+
+    void Context::unbind_shader(const GLuint shader_program)
+    {
+        if (m_state.bound_shader == shader_program) {
+            glUseProgram(0);
+            m_state.bound_shader = 0;
+        }
+    }
+
     void Context::set_pixel_store_param(const GLenum param, const GLint value)
     {
         if (m_state.pixel_store_params[param] != value) {
@@ -250,8 +272,6 @@ namespace yage::gl::opengl4
     void Context::populate_default_state()
     {
         // texture and buffer bindings default to zero
-
-        m_state.bound_vao = 0;
 
         // the other pixel store parameters all default to zero
         m_state.pixel_store_params[GL_PACK_ALIGNMENT] = 4;

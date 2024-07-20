@@ -11,6 +11,9 @@ namespace yage::gl::opengl4
           m_vertex_buffer(std::move(descriptor.vertex_buffer)),
           m_index_buffer(std::move(descriptor.index_buffer))
     {
+        m_indices_count = descriptor.index_data_info.index_count;
+        m_indices_data_type = convert(descriptor.index_data_info.data_type);
+
         glGenVertexArrays(1, &m_vao_handle);
 
         context->bind_vao(m_vao_handle);
@@ -107,6 +110,21 @@ namespace yage::gl::opengl4
         other.m_vao_handle = 0;
 
         return *this;
+    }
+
+    GLuint Drawable::gl_vao_handle() const
+    {
+        return m_vao_handle;
+    }
+
+    GLenum Drawable::gl_index_type() const
+    {
+        return m_indices_data_type;
+    }
+
+    std::int32_t Drawable::indices_count() const
+    {
+        return m_indices_count;
     }
 
     void Drawable::clear()

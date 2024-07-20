@@ -1,6 +1,11 @@
 #pragma once
 
+#include <vector>
+
+#include <glad/gl.h>
+
 #include "../IPipelineBuilder.h"
+#include "Pipeline.h"
 
 namespace yage::gl::opengl4
 {
@@ -40,5 +45,11 @@ namespace yage::gl::opengl4
 
     private:
         Context* m_context; // TODO
+
+        PipelineDescriptor m_descriptor;
+
+        void destroy_shader_modules();
+
+        static void check_shader_model_compilation_error(const GLuint module);
     };
 }

@@ -37,6 +37,12 @@ namespace yage::gl::opengl4
 
         Drawable& operator=(Drawable&& other) noexcept;
 
+        [[nodiscard]] GLuint gl_vao_handle() const;
+
+        [[nodiscard]] GLenum gl_index_type() const;
+
+        [[nodiscard]] std::int32_t indices_count() const;
+
     private:
         Context* m_context;
 
@@ -44,6 +50,9 @@ namespace yage::gl::opengl4
 
         VertexBufferHandle m_vertex_buffer;
         IndexBufferHandle m_index_buffer;
+
+        std::int32_t m_indices_count;
+        GLenum m_indices_data_type;
 
         void clear();
     };

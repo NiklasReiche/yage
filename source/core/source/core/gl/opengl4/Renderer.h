@@ -1,5 +1,8 @@
 #pragma once
-#include "core/gl/IRenderer.h"
+
+#include <glad/gl.h>
+
+#include "../IRenderer.h"
 
 namespace yage::gl::opengl4
 {
@@ -28,5 +31,7 @@ namespace yage::gl::opengl4
 
     private:
         Context* m_context;
+
+        GLenum m_current_pipeline_primitive;
     };
 }

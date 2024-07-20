@@ -10,7 +10,7 @@
 
 namespace yage::gl
 {
-    using ShaderSource = std::variant<std::string_view, std::span<const std::byte>>;
+    using ShaderSource = std::variant<const std::string_view, std::span<const std::byte>>;
 
     class IPipelineBuilder
     {
