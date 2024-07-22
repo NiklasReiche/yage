@@ -95,6 +95,7 @@ namespace yage::gl::vulkan
 
     void Pipeline::submit_dynamic_state(const VkCommandBuffer command_buffer)
     {
+        // TODO: this would also submit for a static pipeline on which set_dynamic_viewport was called
         if (m_dynamic_viewport.has_value()) {
             vkCmdSetViewport(command_buffer, 0, 1, &m_dynamic_viewport.value());
         }

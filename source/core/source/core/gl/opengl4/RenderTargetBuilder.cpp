@@ -25,6 +25,10 @@ namespace yage::gl::opengl4
 
     IRenderTargetBuilder& RenderTargetBuilder::with_depth_attachment(TextureFormat2 format)
     {
+        if (!has_depth_component(format)) {
+            throw std::invalid_argument("Invalid texture format for depth attachment");
+        }
+
         m_depth_attachment = format;
 
         return *this;
@@ -37,7 +41,7 @@ namespace yage::gl::opengl4
         return *this;
     }
 
-    RenderTargetHandle RenderTargetBuilder::build(unsigned width, unsigned height, ResourceUsage usage)
+    RenderTargetHandle RenderTargetBuilder::build(unsigned width, unsigned height, ResourceUsage)
     {
         return m_context->store_render_targets().create(m_context, width, height, m_samples, m_color_attachments,
                                                         m_depth_attachment, m_with_resolve);

@@ -22,7 +22,7 @@ namespace yage::gl::opengl4
         IndexDataInfo index_data_info;
     };
 
-    class Drawable : public IDrawable2
+    class Drawable final : public IDrawable2
     {
     public:
         Drawable(Context* context, DrawableDescriptor descriptor);
@@ -36,6 +36,8 @@ namespace yage::gl::opengl4
         Drawable& operator=(const Drawable& other) = delete;
 
         Drawable& operator=(Drawable&& other) noexcept;
+
+        [[nodiscard]] VertexDataInfo vertex_data_info() const override;
 
         [[nodiscard]] GLuint gl_vao_handle() const;
 
@@ -53,6 +55,7 @@ namespace yage::gl::opengl4
 
         std::int32_t m_indices_count;
         GLenum m_indices_data_type;
+        VertexDataInfo m_vertex_data_info;
 
         void clear();
     };

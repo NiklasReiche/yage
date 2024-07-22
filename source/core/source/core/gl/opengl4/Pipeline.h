@@ -41,6 +41,8 @@ namespace yage::gl::opengl4
 
         void bind_state();
 
+        [[nodiscard]] GLenum primitive() const;
+
     private:
         Context* m_context;
 

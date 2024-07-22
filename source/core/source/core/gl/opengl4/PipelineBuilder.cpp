@@ -50,6 +50,12 @@ namespace yage::gl::opengl4
         return *this;
     }
 
+    IPipelineBuilder& PipelineBuilder::append_layout(DescriptorSetLayoutHandle)
+    {
+        // TODO
+        return *this;
+    }
+
     IPipelineBuilder& PipelineBuilder::with_rasterizer(const PolygonMode polygon_mode, const CullMode cull_mode,
                                                        const float line_width)
     {
@@ -71,7 +77,7 @@ namespace yage::gl::opengl4
         return *this;
     }
 
-    IPipelineBuilder& PipelineBuilder::for_render_target(const IRenderTarget& render_target)
+    IPipelineBuilder& PipelineBuilder::for_render_target(const IRenderTarget&)
     {
         return *this;
     }

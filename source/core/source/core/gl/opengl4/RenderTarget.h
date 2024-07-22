@@ -16,7 +16,7 @@ namespace yage::gl::opengl4
     {
     public:
         RenderTarget(Context* context, unsigned int width, unsigned int height, MSAASamples samples,
-                     std::span<const TextureFormat2> color_attachments, std::optional<GLenum> depth_attachment,
+                     std::span<const TextureFormat2> color_attachments, std::optional<TextureFormat2> depth_attachment,
                      bool with_resolve);
 
         ~RenderTarget() override;
@@ -49,9 +49,9 @@ namespace yage::gl::opengl4
 
         void build_draw_buffer(unsigned int width, unsigned int height, MSAASamples samples,
                                std::span<const TextureFormat2> color_attachments,
-                               std::optional<GLenum> depth_attachment);
+                               std::optional<TextureFormat2> depth_attachment);
 
-        void build_read_buffer(unsigned int width, unsigned int height, MSAASamples samples,
+        void build_read_buffer(unsigned int width, unsigned int height,
                                std::span<const TextureFormat2> color_attachments);
 
         void clear();

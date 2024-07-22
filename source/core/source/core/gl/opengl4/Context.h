@@ -1,9 +1,11 @@
 #pragma once
 
-#include <unordered_map>
 #include <memory>
+#include <unordered_map>
 
 #include <glad/gl.h>
+
+#include <core/platform/Window.h>
 
 #include "../Handle.h"
 #include "../IContext.h"
@@ -26,7 +28,6 @@
 #include "UniformBufferCreator.h"
 #include "VertexBuffer.h"
 #include "VertexBufferCreator.h"
-#include "core/platform/Window.h"
 
 namespace yage::gl::opengl4
 {
@@ -166,6 +167,7 @@ namespace yage::gl::opengl4
 
             std::unordered_map<GLenum, GLint> pixel_store_params;
         };
+
         OpenGlState m_state{};
 
         std::shared_ptr<platform::IWindow> m_window;

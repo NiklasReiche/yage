@@ -24,11 +24,17 @@ namespace yage::gl::opengl4
         m_context->bind_frame_buffer(GL_FRAMEBUFFER, static_cast<const RenderTarget&>(render_target).gl_draw_handle());
     }
 
-    void Renderer::bind_descriptor_set(const IDescriptorSet& descriptor_set) {}
+    void Renderer::bind_descriptor_set(const IDescriptorSet&)
+    {
+        // TODO
+    }
 
     void Renderer::bind_pipeline(IPipeline& pipeline)
     {
+        auto& pipeline_impl = static_cast<Pipeline&>(pipeline);
 
+        m_current_pipeline_primitive = pipeline_impl.primitive();
+        pipeline_impl.bind_state();
     }
 
     void Renderer::draw(const IDrawable2& drawable)

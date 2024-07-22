@@ -43,6 +43,7 @@ namespace yage::gl::opengl4
     inline GLenum to_internal_format(const TextureFormat2 format)
     {
         switch (format) {
+            case TextureFormat2::DEPTH24_STENCIL_8:   return GL_DEPTH24_STENCIL8;
             case TextureFormat2::R8_UNORM:            return GL_R8;
             case TextureFormat2::R8G8_UNORM:          return GL_RG8;
             case TextureFormat2::R8G8B8_UNORM:        return GL_RGB8;

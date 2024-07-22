@@ -16,4 +16,11 @@ namespace yage::gl::vulkan
         return instance->store_textures().create(instance.get(), instance->frame_counter_for_usage(usage), sampler,
                                                  data_info, data);
     }
+
+    Texture2DHandle Texture2DCreator::create_multisampled(MSAASamples, const PixelTransferInfo&,
+                                                          ResourceUsage) const
+    {
+        // TODO
+        return Texture2DHandle();
+    }
 }

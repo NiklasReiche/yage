@@ -1,16 +1,17 @@
 #include "RenderTarget.h"
 #include "Context.h"
+#include "enums.h"
 
 namespace yage::gl::opengl4
 {
     RenderTarget::RenderTarget(Context* context, const unsigned int width, const unsigned int height,
                                const MSAASamples samples, const std::span<const TextureFormat2> color_attachments,
-                               const std::optional<GLenum> depth_attachment, const bool with_resolve)
+                               const std::optional<TextureFormat2> depth_attachment, const bool with_resolve)
         : m_context(context)
     {
         build_draw_buffer(width, height, samples, color_attachments, depth_attachment);
         if (with_resolve) {
-            build_read_buffer(width, height, samples, color_attachments);
+            build_read_buffer(width, height, color_attachments);
         }
     }
 
@@ -70,7 +71,7 @@ namespace yage::gl::opengl4
 
     void RenderTarget::build_draw_buffer(const unsigned int width, const unsigned int height, const MSAASamples samples,
                                          const std::span<const TextureFormat2> color_attachments,
-                                         const std::optional<GLenum> depth_attachment)
+                                         const std::optional<TextureFormat2> depth_attachment)
     {
         glGenFramebuffers(1, &m_fbo_handle);
 
@@ -85,7 +86,7 @@ namespace yage::gl::opengl4
                 .v_wrapper = TextureWrapper2::REPEAT,
         };
         for (std::size_t i = 0; i < color_attachments.size(); ++i) {
-            PixelTransferInfo data_info{.width = width, .height = height, .image_format = color_attachments[i]};
+            PixelTransferInfo data_info{.image_format = color_attachments[i], .width = width, .height = height};
 
             if (samples == MSAASamples::SAMPLE_1) {
                 m_color_attachments.push_back(texture_creator.create(sampler, data_info, {}, ResourceUsage::DYNAMIC));
@@ -105,12 +106,13 @@ namespace yage::gl::opengl4
 
             m_context->bind_render_buffer(rbo);
 
+            const GLenum internal_format = to_internal_format(depth_attachment.value());
             if (samples == MSAASamples::SAMPLE_1) {
-                glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, static_cast<GLsizei>(width),
+                glRenderbufferStorage(GL_RENDERBUFFER, internal_format, static_cast<GLsizei>(width),
                                       static_cast<GLsizei>(height));
             } else {
                 glRenderbufferStorageMultisample(GL_RENDERBUFFER, static_cast<GLsizei>(n_samples(samples)),
-                                                 GL_DEPTH24_STENCIL8, static_cast<GLsizei>(width),
+                                                 internal_format, static_cast<GLsizei>(width),
                                                  static_cast<GLsizei>(height));
             }
 
@@ -125,7 +127,7 @@ namespace yage::gl::opengl4
         }
     }
 
-    void RenderTarget::build_read_buffer(const unsigned int width, const unsigned int height, const MSAASamples samples,
+    void RenderTarget::build_read_buffer(const unsigned int width, const unsigned int height,
                                          const std::span<const TextureFormat2> color_attachments)
     {
         glGenFramebuffers(1, &m_fbo_resolve_handle);
@@ -141,7 +143,7 @@ namespace yage::gl::opengl4
                 .v_wrapper = TextureWrapper2::REPEAT,
         };
         for (std::size_t i = 0; i < color_attachments.size(); ++i) {
-            PixelTransferInfo data_info{.width = width, .height = height, .image_format = color_attachments[i]};
+            PixelTransferInfo data_info{.image_format = color_attachments[i], .width = width, .height = height};
             m_resolve_color_attachments.push_back(texture_creator.create(sampler, data_info, {}, ResourceUsage::DYNAMIC));
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D,
                                    m_resolve_color_attachments[i].get<Texture2D>().gl_handle(), 0);

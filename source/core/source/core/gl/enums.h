@@ -130,6 +130,7 @@ namespace yage::gl
     enum class TextureFormat2
     {
         UNDEFINED,
+        DEPTH24_STENCIL_8,
         // stored as 8-bit integers, interpreted as [0.0f, 1.0f] floats in linear space
         R8_UNORM,
         R8G8_UNORM,
@@ -183,6 +184,22 @@ namespace yage::gl
         std::uint32_t width; // TODO: use signed
         std::uint32_t height;
     };
+
+    inline bool has_depth_component(const TextureFormat2 format)
+    {
+        switch (format) {
+            case TextureFormat2::DEPTH24_STENCIL_8: return true;
+            default:                                return false;
+        }
+    }
+
+    inline bool has_stencil_component(const TextureFormat2 format)
+    {
+        switch (format) {
+            case TextureFormat2::DEPTH24_STENCIL_8: return true;
+            default:                                return false;
+        }
+    }
 
     struct Viewport // TODO: opengl does not have float viewports, so we could merge this with the scissor rect
     {

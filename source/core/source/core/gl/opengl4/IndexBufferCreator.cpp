@@ -9,7 +9,7 @@ namespace yage::gl::opengl4
     {
     }
 
-    IndexBufferHandle IndexBufferCreator::create(IndexDataInfo data_info, std::span<const std::byte> data,
+    IndexBufferHandle IndexBufferCreator::create(IndexDataInfo, std::span<const std::byte> data,
                                                  ResourceUsage usage) const
     {
         return m_context->store_index_buffers().create(m_context, data, usage);

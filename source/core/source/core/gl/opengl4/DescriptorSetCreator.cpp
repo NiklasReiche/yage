@@ -6,4 +6,10 @@ namespace yage::gl::opengl4
         : m_context(context)
     {
     }
+
+    DescriptorSetHandle DescriptorSetCreator::create(DescriptorSetLayoutHandle, ResourceUsage)
+    {
+        // TODO
+        return DescriptorSetHandle();
+    }
 }

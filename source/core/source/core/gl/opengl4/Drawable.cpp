@@ -9,7 +9,8 @@ namespace yage::gl::opengl4
     Drawable::Drawable(Context* context, DrawableDescriptor descriptor)
         : m_context(context),
           m_vertex_buffer(std::move(descriptor.vertex_buffer)),
-          m_index_buffer(std::move(descriptor.index_buffer))
+          m_index_buffer(std::move(descriptor.index_buffer)),
+          m_vertex_data_info(descriptor.vertex_data_info)
     {
         m_indices_count = descriptor.index_data_info.index_count;
         m_indices_data_type = convert(descriptor.index_data_info.data_type);
@@ -88,7 +89,10 @@ namespace yage::gl::opengl4
         : m_context(other.m_context),
           m_vao_handle(other.m_vao_handle),
           m_vertex_buffer(std::move(other.m_vertex_buffer)),
-          m_index_buffer(std::move(other.m_index_buffer))
+          m_index_buffer(std::move(other.m_index_buffer)),
+          m_indices_count(other.m_indices_count),
+          m_indices_data_type(other.m_indices_data_type),
+          m_vertex_data_info(std::move(other.m_vertex_data_info))
     {
         other.m_context = nullptr;
         other.m_vao_handle = 0;
@@ -105,11 +109,19 @@ namespace yage::gl::opengl4
         m_vao_handle = other.m_vao_handle;
         m_vertex_buffer = std::move(other.m_vertex_buffer);
         m_index_buffer = std::move(other.m_index_buffer);
+        m_indices_count = other.m_indices_count;
+        m_indices_data_type = other.m_indices_data_type;
+        m_vertex_data_info = std::move(other.m_vertex_data_info);
 
         other.m_context = nullptr;
         other.m_vao_handle = 0;
 
         return *this;
+    }
+
+    VertexDataInfo Drawable::vertex_data_info() const
+    {
+        return m_vertex_data_info;
     }
 
     GLuint Drawable::gl_vao_handle() const

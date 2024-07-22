@@ -72,20 +72,16 @@ namespace yage::gl::opengl4
 
     void Pipeline::set_dynamic_viewport(const Viewport viewport, const ScissorRectangle scissor)
     {
-        if (!m_viewport.has_value()) {
-            m_context->set_viewport(viewport.x, viewport.y, viewport.width, viewport.height);
-        }
-        if (!m_scissor.has_value()) {
-            m_context->set_scissor(scissor.x, scissor.y, scissor.width, scissor.height);
-        }
+        m_viewport = viewport;
+        m_scissor = scissor;
     }
 
     void Pipeline::bind_state()
     {
+        // TODO: this would also submit for a static pipeline on which set_dynamic_viewport was called
         if (m_viewport.has_value()) {
             m_context->set_viewport(m_viewport->x, m_viewport->y, m_viewport->width, m_viewport->height);
         }
-
         if (m_scissor.has_value()) {
             m_context->set_scissor(m_scissor->x, m_scissor->y, m_scissor->width, m_scissor->height);
         }
@@ -111,7 +107,11 @@ namespace yage::gl::opengl4
         } else {
             m_context->set_capability_enabled(GL_BLEND, false);
         }
+    }
 
+    GLenum Pipeline::primitive() const
+    {
+        return m_primitive;
     }
 
     void Pipeline::clear()
