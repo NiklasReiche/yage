@@ -15,17 +15,18 @@
 #include "DrawableCreator.h"
 #include "IndexBuffer.h"
 #include "IndexBufferCreator.h"
+#include "Pipeline.h"
+#include "PipelineBuilder.h"
 #include "RenderTarget.h"
 #include "RenderTargetBuilder.h"
+#include "Renderer.h"
 #include "Texture2D.h"
 #include "Texture2DCreator.h"
 #include "UniformBuffer.h"
 #include "UniformBufferCreator.h"
 #include "VertexBuffer.h"
 #include "VertexBufferCreator.h"
-#include "Pipeline.h"
-#include "PipelineBuilder.h"
-#include "Renderer.h"
+#include "core/platform/Window.h"
 
 namespace yage::gl::opengl4
 {
@@ -43,7 +44,7 @@ namespace yage::gl::opengl4
     class Context final : public IContext
     {
     public:
-        Context();
+        explicit Context(std::shared_ptr<platform::IWindow> window);
 
         IVertexBufferCreator& vertex_buffer_creator() override;
         IIndexBufferCreator& index_buffer_creator() override;
@@ -102,7 +103,43 @@ namespace yage::gl::opengl4
 
         void set_pixel_store_param(GLenum param, GLint value);
 
+        void set_viewport(GLint x, GLint y, GLsizei width, GLsizei height);
+
+        void set_scissor(GLint x, GLint y, GLsizei width, GLsizei height);
+
+        void set_capability_enabled(GLenum capability, bool enabled);
+
+        void set_cull_mode(GLenum mode);
+
+        void set_polygon_mode(GLenum mode);
+
+        void set_line_width(GLfloat width);
+
+        void set_blend_func(GLenum sfactor, GLenum dfactor);
+
+        void set_blend_equation(GLenum op);
+
+        void set_blend_constant(math::Vec4<GLfloat> color);
+
     private:
+        struct OpenGlRect
+        {
+            GLint x = 0;
+            GLint y = 0;
+            GLsizei width;
+            GLsizei height;
+
+            friend bool operator==(const OpenGlRect& lhs, const OpenGlRect& rhs)
+            {
+                return std::tie(lhs.x, lhs.y, lhs.width, lhs.height) == std::tie(rhs.x, rhs.y, rhs.width, rhs.height);
+            }
+
+            friend bool operator!=(const OpenGlRect& lhs, const OpenGlRect& rhs)
+            {
+                return !(lhs == rhs);
+            }
+        };
+
         struct OpenGlState
         {
             std::unordered_map<GLenum, GLuint> bound_buffer_per_target;
@@ -112,9 +149,26 @@ namespace yage::gl::opengl4
             GLuint bound_render_buffer = 0;
             GLuint bound_shader = 0;
 
+            std::unordered_map<GLenum, bool> enabled_capabilities;
+
+            OpenGlRect viewport;
+            OpenGlRect scissor;
+
+            GLenum polygon_mode = GL_FILL;
+            GLfloat line_width = 1.0f;
+
+            GLenum cull_mode = GL_BACK;
+
+            GLenum blending_source_factor = GL_ONE;
+            GLenum blending_destination_factor = GL_ZERO;
+            GLenum blending_operation = GL_FUNC_ADD;
+            math::Vec4<GLfloat> blending_constant = {0.0f, 0.0f, 0.0f, 0.0f};
+
             std::unordered_map<GLenum, GLint> pixel_store_params;
         };
         OpenGlState m_state{};
+
+        std::shared_ptr<platform::IWindow> m_window;
 
         // TODO: without shared_ptr
         std::shared_ptr<VertexBufferStore> m_store_vertex_buffers;

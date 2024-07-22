@@ -48,7 +48,7 @@ namespace yage::gl::opengl4
 
         GLenum m_primitive;
         GLenum m_polygon_mode;
-        GLenum m_cull_mode;
+        std::optional<GLenum> m_cull_mode;
         float m_line_width;
         std::optional<Viewport> m_viewport{};
         std::optional<ScissorRectangle> m_scissor{};

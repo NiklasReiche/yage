@@ -2,7 +2,8 @@
 
 namespace yage::gl::opengl4
 {
-    Context::Context()
+    Context::Context(std::shared_ptr<platform::IWindow> window)
+        : m_window(std::move(window))
     {
         populate_default_state();
 
@@ -269,12 +270,104 @@ namespace yage::gl::opengl4
         }
     }
 
+    void Context::set_viewport(const GLint x, const GLint y, const GLsizei width, const GLsizei height)
+    {
+        const OpenGlRect viewport{x, y, width, height};
+        if (m_state.viewport != viewport) {
+            glViewport(viewport.x, viewport.y, viewport.width, viewport.height);
+            m_state.viewport = viewport;
+        }
+    }
+
+    void Context::set_scissor(const GLint x, const GLint y, const GLsizei width, const GLsizei height)
+    {
+        const OpenGlRect scissor{x, y, width, height};
+        if (m_state.scissor != scissor) {
+            glScissor(scissor.x, scissor.y, scissor.width, scissor.height);
+            m_state.scissor = scissor;
+        }
+    }
+
+    void Context::set_capability_enabled(const GLenum capability, const bool enabled)
+    {
+        if (m_state.enabled_capabilities[capability] == enabled) {
+            if (enabled) {
+                glEnable(capability);
+            } else {
+                glDisable(capability);
+            }
+            m_state.enabled_capabilities[capability] = enabled;
+        }
+    }
+
+    void Context::set_cull_mode(const GLenum mode)
+    {
+        if (m_state.cull_mode != mode) {
+            glCullFace(mode);
+            m_state.cull_mode = mode;
+        }
+    }
+
+    void Context::set_polygon_mode(const GLenum mode)
+    {
+        if (m_state.polygon_mode != mode) {
+            glPolygonMode(GL_FRONT_AND_BACK, mode);
+            m_state.polygon_mode = mode;
+        }
+    }
+
+    void Context::set_line_width(const GLfloat width)
+    {
+        if (m_state.line_width != width) {
+            glLineWidth(width);
+            m_state.line_width = width;
+        }
+    }
+
+    void Context::set_blend_func(const GLenum sfactor, const GLenum dfactor)
+    {
+        if (m_state.blending_source_factor != sfactor || m_state.blending_destination_factor != dfactor) {
+            glBlendFunc(sfactor, dfactor);
+            m_state.blending_source_factor = sfactor;
+            m_state.blending_destination_factor = dfactor;
+        }
+    }
+
+    void Context::set_blend_equation(const GLenum op)
+    {
+        if (m_state.blending_operation != op) {
+            glBlendEquation(op);
+            m_state.blending_operation = op;
+        }
+    }
+
+    void Context::set_blend_constant(const math::Vec4<GLfloat> color)
+    {
+        if (m_state.blending_constant != color) {
+            glBlendColor(color(0), color(1), color(2), color(3));
+            m_state.blending_constant = color;
+        }
+    }
+
     void Context::populate_default_state()
     {
         // texture and buffer bindings default to zero
 
+        // capabilities default to disabled exepct for GL_MULTISAMPLE and GL_DITHER
+        m_state.enabled_capabilities[GL_MULTISAMPLE] = true;
+        m_state.enabled_capabilities[GL_DITHER] = true;
+
         // the other pixel store parameters all default to zero
         m_state.pixel_store_params[GL_PACK_ALIGNMENT] = 4;
         m_state.pixel_store_params[GL_UNPACK_ALIGNMENT] = 4;
+
+        m_state.viewport.x = 0;
+        m_state.viewport.y = 0;
+        m_state.viewport.width = m_window->getWidth();
+        m_state.viewport.height = m_window->getHeight();
+        m_state.scissor.x = 0;
+        m_state.scissor.y = 0;
+        m_state.scissor.width = m_window->getWidth();
+        m_state.scissor.height = m_window->getHeight();
     }
 }

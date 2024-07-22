@@ -180,11 +180,11 @@ namespace yage::gl
     {
         TextureFormat2 image_format;
         // TODO: opengl has signed 32-bit, vulkan has unsigned 32-bit texture sizes
-        std::uint32_t width;
+        std::uint32_t width; // TODO: use signed
         std::uint32_t height;
     };
 
-    struct Viewport
+    struct Viewport // TODO: opengl does not have float viewports, so we could merge this with the scissor rect
     {
         float x = 0;
         float y = 0;
@@ -196,7 +196,7 @@ namespace yage::gl
     {
         int x = 0;
         int y = 0;
-        unsigned int width = 0;
+        unsigned int width = 0; // TODO: signed type
         unsigned int height = 0;
     };
 

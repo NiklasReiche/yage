@@ -16,7 +16,9 @@ namespace yage::gl::opengl4
 
         m_primitive = convert(descriptor.primitive);
         m_polygon_mode = convert(descriptor.polygon_mode);
-        m_cull_mode = convert(descriptor.cull_mode);
+        if (descriptor.cull_mode != CullMode::NONE) {
+            m_cull_mode = convert(descriptor.cull_mode);
+        }
         m_line_width = descriptor.line_width;
         m_viewport = descriptor.viewport;
         m_scissor = descriptor.scissor;
@@ -68,16 +70,48 @@ namespace yage::gl::opengl4
         return *this;
     }
 
-    void Pipeline::set_dynamic_viewport(const Viewport viewport, ScissorRectangle scissor)
+    void Pipeline::set_dynamic_viewport(const Viewport viewport, const ScissorRectangle scissor)
     {
-        // TODO: set through context
-        glViewport(viewport.x, viewport.y, viewport.width, viewport.height);
-        glScissor(scissor.x, scissor.y, scissor.width, scissor.height);
+        if (!m_viewport.has_value()) {
+            m_context->set_viewport(viewport.x, viewport.y, viewport.width, viewport.height);
+        }
+        if (!m_scissor.has_value()) {
+            m_context->set_scissor(scissor.x, scissor.y, scissor.width, scissor.height);
+        }
     }
 
     void Pipeline::bind_state()
     {
-        // TODO
+        if (m_viewport.has_value()) {
+            m_context->set_viewport(m_viewport->x, m_viewport->y, m_viewport->width, m_viewport->height);
+        }
+
+        if (m_scissor.has_value()) {
+            m_context->set_scissor(m_scissor->x, m_scissor->y, m_scissor->width, m_scissor->height);
+        }
+
+        m_context->set_polygon_mode(m_polygon_mode);
+
+        if (m_cull_mode) {
+            m_context->set_capability_enabled(GL_CULL_FACE, true);
+            m_context->set_cull_mode(m_cull_mode.value());
+        } else {
+            m_context->set_capability_enabled(GL_CULL_FACE, false);
+        }
+
+        m_context->set_line_width(m_line_width);
+
+        m_context->set_capability_enabled(GL_DEPTH_TEST, m_depth_test);
+
+        if (m_blend_state.has_value()) {
+            m_context->set_capability_enabled(GL_BLEND, true);
+            m_context->set_blend_func(m_blend_state->source_factor, m_blend_state->destination_factor);
+            m_context->set_blend_equation(m_blend_state->operation);
+            m_context->set_blend_constant(m_blend_state->constant);
+        } else {
+            m_context->set_capability_enabled(GL_BLEND, false);
+        }
+
     }
 
     void Pipeline::clear()
