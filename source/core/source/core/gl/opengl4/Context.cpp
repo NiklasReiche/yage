@@ -321,7 +321,7 @@ namespace yage::gl::opengl4
 
     void Context::set_capability_enabled(const GLenum capability, const bool enabled)
     {
-        if (m_state.enabled_capabilities[capability] == enabled) {
+        if (m_state.enabled_capabilities[capability] != enabled) {
             if (enabled) {
                 glEnable(capability);
             } else {

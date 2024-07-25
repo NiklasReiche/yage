@@ -45,6 +45,7 @@ namespace yage::gl::vulkan
         rendering_info.pDepthAttachment = &swap_chain.depth_attachment();
 
         vkCmdBeginRendering(m_command_buffer, &rendering_info);
+        // TODO: clearing
 
         m_render_to_swap_chain = true;
     }
@@ -71,6 +72,8 @@ namespace yage::gl::vulkan
             rendering_info.pDepthAttachment = &depth_attachment_info.value();
         }
         // TODO: stencil attachment
+
+        // TODO: clearing
 
         vkCmdBeginRendering(m_command_buffer, &rendering_info);
 

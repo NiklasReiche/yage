@@ -17,11 +17,13 @@ namespace yage::gl::opengl4
     void Renderer::begin_render_pass()
     {
         m_context->bind_frame_buffer(GL_FRAMEBUFFER, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO
     }
 
     void Renderer::begin_render_pass(const IRenderTarget& render_target)
     {
         m_context->bind_frame_buffer(GL_FRAMEBUFFER, static_cast<const RenderTarget&>(render_target).gl_draw_handle());
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // TODO
     }
 
     void Renderer::bind_descriptor_set(const IDescriptorSet& descriptor_set)
@@ -42,7 +44,8 @@ namespace yage::gl::opengl4
         auto& drawable_impl = static_cast<const Drawable&>(drawable);
 
         m_context->bind_vao(drawable_impl.gl_vao_handle());
-        glDrawElements(m_current_pipeline_primitive, drawable_impl.indices_count(), drawable_impl.indices_count(), nullptr);
+        glDrawElements(m_current_pipeline_primitive, drawable_impl.indices_count(), drawable_impl.gl_index_type(),
+                       nullptr);
     }
 
     void Renderer::end_render_pass()

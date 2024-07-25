@@ -69,8 +69,8 @@ int main()
     descriptor_set->write(0, ubo);
 
     const auto file_reader = window->getFileReader();
-    auto vert_code = file_reader->openBinaryFile(R"(assets/vert.spv)", platform::IFile::AccessMode::READ)->read_all();
-    auto frag_code = file_reader->openBinaryFile(R"(assets/frag.spv)", platform::IFile::AccessMode::READ)->read_all();
+    auto vert_code = file_reader->openTextFile(R"(assets/shader.vert)", platform::IFile::AccessMode::READ)->readAll();
+    auto frag_code = file_reader->openTextFile(R"(assets/shader.frag)", platform::IFile::AccessMode::READ)->readAll();
     const gl::PipelineHandle graphics_pipeline =
             context->pipeline_builder()
                     .with_shaders(vert_code, frag_code)
@@ -96,7 +96,7 @@ int main()
     ubo_data.view = transpose(math::matrix::look_at(math::Vec3f(0, 1, 0.5), math::Vec3f(0, 0, 0)));
     ubo_data.model = transpose(math::matrix::translate(0.f, 0.f, 0.f));
 
-    ubo_data.projection(1, 1) *= -1;
+    //ubo_data.projection(1, 1) *= -1;
 
     window->show();
     while (!window->shouldDestroy()) {

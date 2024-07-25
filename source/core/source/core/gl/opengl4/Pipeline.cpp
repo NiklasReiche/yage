@@ -78,6 +78,8 @@ namespace yage::gl::opengl4
 
     void Pipeline::bind_state()
     {
+        m_context->bind_shader(m_shader_program);
+
         // TODO: this would also submit for a static pipeline on which set_dynamic_viewport was called
         if (m_viewport.has_value()) {
             m_context->set_viewport(m_viewport->x, m_viewport->y, m_viewport->width, m_viewport->height);
