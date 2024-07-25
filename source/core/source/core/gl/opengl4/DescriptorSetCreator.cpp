@@ -1,5 +1,7 @@
 #include "DescriptorSetCreator.h"
 
+#include "Context.h"
+
 namespace yage::gl::opengl4
 {
     DescriptorSetCreator::DescriptorSetCreator(Context* context)
@@ -9,7 +11,6 @@ namespace yage::gl::opengl4
 
     DescriptorSetHandle DescriptorSetCreator::create(DescriptorSetLayoutHandle, ResourceUsage)
     {
-        // TODO
-        return DescriptorSetHandle();
+        return m_context->store_descriptor_sets().create();
     }
 }

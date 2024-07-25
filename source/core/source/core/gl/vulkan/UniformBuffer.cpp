@@ -1,5 +1,6 @@
 #include "UniformBuffer.h"
 #include "Instance.h"
+#include <cstring>
 
 namespace yage::gl::vulkan
 {
@@ -66,7 +67,7 @@ namespace yage::gl::vulkan
 
     void UniformBuffer::update_sub_data(const std::size_t byte_offset, const std::size_t byte_size, const void* data)
     {
-        memcpy(static_cast<std::byte*>(m_buffers_mapped[*m_frame_counter.curent_frame_index]) + byte_offset, data, byte_size);
+        std::memcpy(static_cast<std::byte*>(m_buffers_mapped[*m_frame_counter.curent_frame_index]) + byte_offset, data, byte_size);
     }
 
     std::vector<VkDescriptorBufferInfo> UniformBuffer::descriptor_info() const

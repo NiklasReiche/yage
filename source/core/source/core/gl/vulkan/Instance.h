@@ -95,9 +95,9 @@ namespace yage::gl::vulkan
 
         void initialize();
 
-        void prepare_frame();
+        void prepare_frame() override;
 
-        void present_frame();
+        void present_frame() override;
 
         void flush_gpu();
 

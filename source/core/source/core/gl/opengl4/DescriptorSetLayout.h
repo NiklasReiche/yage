@@ -6,5 +6,7 @@ namespace yage::gl::opengl4
 {
     class DescriptorSetLayout final : public IDescriptorSetLayout
     {
+    public:
+        DescriptorSetLayout() = default;
     };
 }

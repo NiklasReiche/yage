@@ -124,7 +124,6 @@ namespace yage::platform::desktop
 
 	void GlfwWindow::swapBuffers()
 	{
-        // TODO: vulkan
 		glfwSwapBuffers(glfwWindow);
 	}
 

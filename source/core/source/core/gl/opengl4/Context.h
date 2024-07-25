@@ -47,6 +47,10 @@ namespace yage::gl::opengl4
     public:
         explicit Context(std::shared_ptr<platform::IWindow> window);
 
+        void prepare_frame() override;
+
+        void present_frame() override;
+
         IVertexBufferCreator& vertex_buffer_creator() override;
         IIndexBufferCreator& index_buffer_creator() override;
         IUniformBufferCreator& uniform_buffer_creator() override;

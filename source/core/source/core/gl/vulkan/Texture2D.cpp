@@ -1,6 +1,7 @@
 #include "Texture2D.h"
 #include "Instance.h"
 #include "enums.h"
+#include <cstring>
 
 namespace yage::gl::vulkan
 {
@@ -35,7 +36,7 @@ namespace yage::gl::vulkan
         for (unsigned int i = 0; i < m_frame_counter.max_frame_index; ++i) {
             void* mapped_data;
             vkMapMemory(m_vk_device, staging_buffer_memory, 0, buffer_size, 0, &mapped_data);
-            memcpy(mapped_data, data.data(), buffer_size);
+            std::memcpy(mapped_data, data.data(), buffer_size);
             vkUnmapMemory(m_vk_device, staging_buffer_memory);
 
             const VkFormat vk_image_format = convert(data_info.image_format);

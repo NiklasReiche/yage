@@ -1,5 +1,6 @@
 #include "IndexBuffer.h"
 #include "Instance.h"
+#include <cstring>
 
 namespace yage::gl::vulkan
 {
@@ -21,7 +22,7 @@ namespace yage::gl::vulkan
 
         void* mapped_data;
         vkMapMemory(m_vk_device, staging_buffer_memory, 0, buffer_size, 0, &mapped_data);
-        memcpy(mapped_data, data.data(), buffer_size);
+        std::memcpy(mapped_data, data.data(), buffer_size);
         vkUnmapMemory(m_vk_device, staging_buffer_memory);
 
         m_buffer_handles.resize(m_frame_counter.max_frame_index);

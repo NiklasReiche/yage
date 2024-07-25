@@ -1,10 +1,32 @@
 #include "Context.h"
 
+#include <GLFW/glfw3.h>
+
 namespace yage::gl::opengl4
 {
+    void APIENTRY on_gl_error(
+        const GLenum, const GLenum, const GLuint id, const GLenum severity,
+        const GLsizei, const GLchar* message, const void*)
+    {
+        if (severity == GL_DEBUG_SEVERITY_HIGH) {
+            throw std::runtime_error(std::string(message) + ": " + std::to_string(id));
+        }
+    }
+
     Context::Context(std::shared_ptr<platform::IWindow> window)
         : m_window(std::move(window))
     {
+        // GLAD
+        if (!gladLoadGL(glfwGetProcAddress)) {
+            throw std::runtime_error("Failed to initialize GLAD");
+        }
+
+#ifndef NDEBUG
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(static_cast<GLDEBUGPROC>(on_gl_error), nullptr);
+#endif
+
         populate_default_state();
 
         m_store_vertex_buffers = std::make_shared<VertexBufferStore>();
@@ -27,6 +49,15 @@ namespace yage::gl::opengl4
         m_pipeline_builder = PipelineBuilder(this);
         m_render_target_builder = RenderTargetBuilder(this);
         m_renderer = Renderer(this);
+    }
+
+    void Context::prepare_frame()
+    {
+    }
+
+    void Context::present_frame()
+    {
+        m_window->swapBuffers();
     }
 
     IVertexBufferCreator& Context::vertex_buffer_creator()

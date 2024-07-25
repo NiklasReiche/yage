@@ -9,6 +9,8 @@ namespace yage::gl::opengl4
     class DescriptorSet final : public IDescriptorSet
     {
     public:
+        DescriptorSet() = default;
+
         void write(unsigned binding, const UniformBufferHandle& uniform_buffer) override;
 
         void write(unsigned binding, const Texture2DHandle& texture_2d) override;
@@ -16,6 +18,6 @@ namespace yage::gl::opengl4
         void bind_state() const;
 
     private:
-        std::pmr::unordered_map<unsigned int, Texture2DHandle> m_samplers;
+        std::unordered_map<unsigned int, Texture2DHandle> m_samplers;
     };
 }

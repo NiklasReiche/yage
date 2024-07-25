@@ -17,6 +17,10 @@ namespace yage::gl
     public:
         virtual ~IContext() = default;
 
+        virtual void prepare_frame() = 0;
+
+        virtual void present_frame() = 0;
+
         virtual IRenderer2& renderer() = 0;
 
         virtual IPipelineBuilder& pipeline_builder() = 0;

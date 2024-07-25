@@ -4,6 +4,7 @@
 #include <core/platform/desktop/GlfwWindow.h>
 
 #include <core/gl/vulkan/Instance.h>
+#include <core/gl/opengl4/Context.h>
 
 #include "math/math.h"
 
@@ -19,10 +20,10 @@ struct UniformBufferData
 int main()
 {
     const std::shared_ptr<platform::IWindow> window = std::make_shared<platform::desktop::GlfwWindow>(
-            500, 500, "Hello Triangle", platform::desktop::GlfwWindow::GlApi::API_VULKAN);
-    const std::shared_ptr<gl::vulkan::Instance> context =
-            std::make_shared<gl::vulkan::Instance>(std::static_pointer_cast<platform::desktop::GlfwWindow>(window));
-    context->initialize();
+            500, 500, "Hello Triangle", platform::desktop::GlfwWindow::GlApi::API_OPENGL);
+    const std::shared_ptr<gl::IContext> context =
+            std::make_shared<gl::opengl4::Context>(std::static_pointer_cast<platform::desktop::GlfwWindow>(window));
+    //context->initialize();
 
     const gl::IDrawableCreator2& drawable_creator = context->drawable_creator();
 
@@ -71,7 +72,7 @@ int main()
     auto vert_code = file_reader->openBinaryFile(R"(assets/vert.spv)", platform::IFile::AccessMode::READ)->read_all();
     auto frag_code = file_reader->openBinaryFile(R"(assets/frag.spv)", platform::IFile::AccessMode::READ)->read_all();
     const gl::PipelineHandle graphics_pipeline =
-            gl::vulkan::PipelineBuilder(context)
+            context->pipeline_builder()
                     .with_shaders(vert_code, frag_code)
                     .with_vertex_format(gl::PrimitiveTopology::TRIANGLE_LIST, vertex_data_info)
                     .append_layout(layout)
@@ -116,6 +117,6 @@ int main()
         context->present_frame();
     }
 
-    context->flush_gpu();
+    //context->flush_gpu();
     return 0;
 }
