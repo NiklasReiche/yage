@@ -50,6 +50,11 @@ namespace yage::gl::opengl4
                         data);
     }
 
+    GLuint UniformBuffer::gl_handle() const
+    {
+        return m_ubo_handle;
+    }
+
     void UniformBuffer::clear()
     {
         if (m_context != nullptr) {

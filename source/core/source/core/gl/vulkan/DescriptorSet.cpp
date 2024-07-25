@@ -59,7 +59,7 @@ namespace yage::gl::vulkan
             descriptor_write.dstSet = m_vk_handles[i];
             descriptor_write.dstBinding = static_cast<std::uint32_t>(binding);
             descriptor_write.dstArrayElement = 0;
-            descriptor_write.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            descriptor_write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
             descriptor_write.descriptorCount = 1;
             // if the texture is static, then use the same reference for each instance
             descriptor_write.pImageInfo = &image_infos[image_infos.size() == 1 ? 1 : i];

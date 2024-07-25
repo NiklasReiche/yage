@@ -24,9 +24,9 @@ namespace yage::gl::opengl4
         m_context->bind_frame_buffer(GL_FRAMEBUFFER, static_cast<const RenderTarget&>(render_target).gl_draw_handle());
     }
 
-    void Renderer::bind_descriptor_set(const IDescriptorSet&)
+    void Renderer::bind_descriptor_set(const IDescriptorSet& descriptor_set)
     {
-        // TODO
+        static_cast<const DescriptorSet&>(descriptor_set).bind_state();
     }
 
     void Renderer::bind_pipeline(IPipeline& pipeline)

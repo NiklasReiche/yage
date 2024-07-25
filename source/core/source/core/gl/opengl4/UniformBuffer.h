@@ -26,6 +26,8 @@ namespace yage::gl::opengl4
 
         void update_sub_data(std::size_t byte_offset, std::size_t byte_size, const void* data) override;
 
+        [[nodiscard]] GLuint gl_handle() const;
+
     private:
         Context* m_context;
 
