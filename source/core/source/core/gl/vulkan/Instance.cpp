@@ -37,7 +37,7 @@ namespace yage::gl::vulkan
     Instance::Instance(platform::desktop::GlfwWindow* window)
         : m_window(window)
     {
-        m_window->attach_on_framebuffer_resize([this](int, int) { this->m_framebuffer_resized = true; });
+        m_window->attach_on_resize([this](int, int) { this->m_framebuffer_resized = true; });
     }
 
     Instance::~Instance()
@@ -476,8 +476,8 @@ namespace yage::gl::vulkan
             return capabilities.currentExtent;
         }
 
-        const int width = m_window->getPixelWidth();
-        const int height = m_window->getPixelHeight();
+        const int width = m_window->pixel_width();
+        const int height = m_window->pixel_height();
 
         VkExtent2D actualExtent = {static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height)};
 
@@ -1279,13 +1279,13 @@ namespace yage::gl::vulkan
 
     void Instance::recreateSwapChain()
     {
-        int width = m_window->getPixelWidth();
-        int height = m_window->getPixelHeight();
+        int width = m_window->pixel_width();
+        int height = m_window->pixel_height();
         while (width == 0 || height == 0) {
-            if (m_window->shouldDestroy())
+            if (m_window->should_destroy())
                 return;
-            width = m_window->getPixelWidth();
-            height = m_window->getPixelHeight();
+            width = m_window->pixel_width();
+            height = m_window->pixel_height();
             glfwWaitEvents(); // TODO
         }
 

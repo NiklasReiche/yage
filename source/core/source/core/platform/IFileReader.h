@@ -14,9 +14,9 @@ namespace yage::platform
         virtual ~IFileReader() = default;
 
 		[[nodiscard]]
-		virtual std::unique_ptr<IBinaryFile> openBinaryFile(const std::string& filename, IFile::AccessMode mode) const = 0;
+		virtual std::unique_ptr<IBinaryFile> open_binary_file(const std::string& filename, IFile::AccessMode mode) const = 0;
 
 		[[nodiscard]]
-		virtual std::unique_ptr<ITextFile> openTextFile(const std::string& filename, IFile::AccessMode mode) const = 0;
+		virtual std::unique_ptr<ITextFile> open_text_file(const std::string& filename, IFile::AccessMode mode) const = 0;
 	};
 }

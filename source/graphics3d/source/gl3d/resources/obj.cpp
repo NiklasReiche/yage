@@ -21,7 +21,7 @@ namespace yage::gl3d::resources
         auto tmp = utils::strip(filename, "/");
         tmp.pop_back();
         std::string base_path = utils::join(tmp) + "/";
-        auto file = file_reader.openTextFile(filename, platform::IFile::AccessMode::READ);
+        auto file = file_reader.open_text_file(filename, platform::IFile::AccessMode::READ);
 
         std::vector<unsigned char> full_data{255, 255, 255, 255};
         const std::shared_ptr<gl::ITexture2D> full_texture = texture_creator.createTexture2D(
@@ -31,7 +31,7 @@ namespace yage::gl3d::resources
         std::string name;
 
         while (!file->eof()) {
-            std::istringstream line(file->readLine());
+            std::istringstream line(file->read_line());
             std::string type;
             line >> type;
 
@@ -62,31 +62,31 @@ namespace yage::gl3d::resources
             } else if (type == "map_Ka") {
                 std::string path;
                 line >> path;
-                auto image_file = file_reader.openBinaryFile(base_path + path, platform::IFile::AccessMode::READ);
+                auto image_file = file_reader.open_binary_file(base_path + path, platform::IFile::AccessMode::READ);
                 img::Image image = img::readFromFile(*image_file);
                 materials[name].add_uniform("ambientMap", image.toTexture(texture_creator));
             } else if (type == "map_Kd") {
                 std::string path;
                 line >> path;
-                auto image_file = file_reader.openBinaryFile(base_path + path, platform::IFile::AccessMode::READ);
+                auto image_file = file_reader.open_binary_file(base_path + path, platform::IFile::AccessMode::READ);
                 img::Image image = img::readFromFile(*image_file);
                 materials[name].add_uniform("diffuseMap", image.toTexture(texture_creator));
             } else if (type == "map_Ks") {
                 std::string path;
                 line >> path;
-                auto image_file = file_reader.openBinaryFile(base_path + path, platform::IFile::AccessMode::READ);
+                auto image_file = file_reader.open_binary_file(base_path + path, platform::IFile::AccessMode::READ);
                 img::Image image = img::readFromFile(*image_file);
                 materials[name].add_uniform("specularMap", image.toTexture(texture_creator));
             } else if (type == "map_Ns") {
                 std::string path;
                 line >> path;
-                auto image_file = file_reader.openBinaryFile(base_path + path, platform::IFile::AccessMode::READ);
+                auto image_file = file_reader.open_binary_file(base_path + path, platform::IFile::AccessMode::READ);
                 img::Image image = img::readFromFile(*image_file);
                 materials[name].add_uniform("shininessMap", image.toTexture(texture_creator));
             } else if (type == "norm") {
                 std::string path;
                 line >> path;
-                auto image_file = file_reader.openBinaryFile(base_path + path, platform::IFile::AccessMode::READ);
+                auto image_file = file_reader.open_binary_file(base_path + path, platform::IFile::AccessMode::READ);
                 img::Image image = img::readFromFile(*image_file);
                 materials[name].add_uniform("normalMap", image.toTexture(texture_creator));
                 materials[name].set_shader(shaders.at(ShaderPermutation::PHONG_NORMAL_MAP));
@@ -106,7 +106,7 @@ namespace yage::gl3d::resources
         tmp.pop_back();
         std::string base_path = utils::join(tmp, "/") + "/";
 
-        auto file = file_reader.openTextFile(filename, platform::IFile::AccessMode::READ);
+        auto file = file_reader.open_text_file(filename, platform::IFile::AccessMode::READ);
 
         std::unordered_map<std::string, Material> materials;
         std::shared_ptr<Material> material;
@@ -121,7 +121,7 @@ namespace yage::gl3d::resources
         unsigned int index = 0;
 
         while (!file->eof()) {
-            std::istringstream line(file->readLine());
+            std::istringstream line(file->read_line());
             std::string type;
             line >> type;
 

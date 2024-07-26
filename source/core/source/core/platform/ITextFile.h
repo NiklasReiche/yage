@@ -13,10 +13,10 @@ namespace yage::platform
 
 		virtual std::string read() = 0;
 
-		virtual std::string readLine() = 0;
+		virtual std::string read_line() = 0;
 
-		virtual std::stringstream& readAll(std::stringstream& output) = 0;
+		virtual std::stringstream& read_all(std::stringstream& output) = 0;
 
-		virtual std::string readAll() = 0;
+		virtual std::string read_all() = 0;
 	};
 }

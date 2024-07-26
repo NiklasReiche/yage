@@ -2,7 +2,7 @@
 
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include <core/platform/Window.h>
+#include <core/platform/IWindow.h>
 
 namespace yage::gl::opengl4
 {
@@ -402,11 +402,11 @@ namespace yage::gl::opengl4
 
         m_state.viewport.x = 0;
         m_state.viewport.y = 0;
-        m_state.viewport.width = m_window->getWidth();
-        m_state.viewport.height = m_window->getHeight();
+        m_state.viewport.width = m_window->width();
+        m_state.viewport.height = m_window->height();
         m_state.scissor.x = 0;
         m_state.scissor.y = 0;
-        m_state.scissor.width = m_window->getWidth();
-        m_state.scissor.height = m_window->getHeight();
+        m_state.scissor.width = m_window->width();
+        m_state.scissor.height = m_window->height();
     }
 }

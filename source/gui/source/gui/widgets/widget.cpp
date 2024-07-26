@@ -247,7 +247,7 @@ namespace yage::gui
     {
         if (!texture_template.filename.empty()) {
             auto reader = m_master->window().getFileReader();
-            auto file = reader->openBinaryFile(texture_template.filename, platform::IFile::AccessMode::READ);
+            auto file = reader->open_binary_file(texture_template.filename, platform::IFile::AccessMode::READ);
             img::Image image = img::readFromFile(*file, img::FORCE_CHANNELS::RGBA);
             return m_master->texture_atlas_store().add(image);
         } else {

@@ -14,22 +14,22 @@ namespace yage::platform::desktop
 		return output;
 	}
 
-	std::string TextFile::readLine()
+	std::string TextFile::read_line()
 	{
 		std::string output;
 		std::getline(*fileStream, output);
 		return output;
 	}
 
-	std::stringstream& TextFile::readAll(std::stringstream& output)
+	std::stringstream& TextFile::read_all(std::stringstream& output)
 	{
 		output << fileStream->rdbuf();
 		return output;
 	}
 
-	std::string TextFile::readAll()
+	std::string TextFile::read_all()
 	{
 		std::stringstream output;
-		return readAll(output).str();
+		return read_all(output).str();
 	}
 }

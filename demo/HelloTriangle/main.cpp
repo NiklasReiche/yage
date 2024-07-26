@@ -19,7 +19,7 @@ struct UniformBufferData
 int main()
 {
     const std::shared_ptr<platform::IWindow> window = std::make_shared<platform::desktop::GlfwWindow>(
-            500, 500, "Hello Triangle", platform::desktop::GlfwWindow::GlApi::API_OPENGL);
+            500, 500, "Hello Triangle", gl::Api::API_OPENGL);
     const std::shared_ptr<gl::IContext> context = window->gl_context().lock();
 
     const gl::IDrawableCreator2& drawable_creator = context->drawable_creator();
@@ -66,8 +66,8 @@ int main()
     descriptor_set->write(0, ubo);
 
     const auto file_reader = window->getFileReader();
-    auto vert_code = file_reader->openTextFile(R"(assets/shader.vert)", platform::IFile::AccessMode::READ)->readAll();
-    auto frag_code = file_reader->openTextFile(R"(assets/shader.frag)", platform::IFile::AccessMode::READ)->readAll();
+    auto vert_code = file_reader->open_text_file(R"(assets/shader.vert)", platform::IFile::AccessMode::READ)->read_all();
+    auto frag_code = file_reader->open_text_file(R"(assets/shader.frag)", platform::IFile::AccessMode::READ)->read_all();
     const gl::PipelineHandle graphics_pipeline =
             context->pipeline_builder()
                     .with_shaders(vert_code, frag_code)
@@ -80,7 +80,7 @@ int main()
                     .build();
 
     graphics_pipeline->set_dynamic_viewport({0, 0, 500.0f, 500.0f}, {0, 0, 500, 500});
-    window->attach_on_framebuffer_resize([&graphics_pipeline](const int width, const int height) {
+    window->attach_on_resize([&graphics_pipeline](const int width, const int height) {
         graphics_pipeline->set_dynamic_viewport(
                 {0, 0, static_cast<float>(width), static_cast<float>(height)},
                 {0, 0, static_cast<unsigned int>(width), static_cast<unsigned int>(width)});
@@ -96,7 +96,7 @@ int main()
     //ubo_data.projection(1, 1) *= -1;
 
     window->show();
-    while (!window->shouldDestroy()) {
+    while (!window->should_destroy()) {
         window->pollEvents();
 
         ubo->update_sub_data(0, sizeof(UniformBufferData), &ubo_data);

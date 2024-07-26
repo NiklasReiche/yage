@@ -13,7 +13,7 @@ namespace yage::gl3d
 		
 		for (unsigned int i = 0; i < paths.size(); ++i) {
 			if (!paths[i].empty()) {
-				auto file = file_reader.openBinaryFile(paths[i], platform::IFile::AccessMode::READ);
+				auto file = file_reader.open_binary_file(paths[i], platform::IFile::AccessMode::READ);
 				images[i] = readFromFile(*file, img::FORCE_CHANNELS::RGB);
 #if 0
 				if (images.at(i).getWidth() != textureSize || images.at(i).getHeight() != textureSize) {

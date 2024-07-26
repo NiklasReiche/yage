@@ -1,5 +1,7 @@
 target_sources(yage_core
 	PRIVATE
+		api.h
+
 		Handle.h
 
 		color.h

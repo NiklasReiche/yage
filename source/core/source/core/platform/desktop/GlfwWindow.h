@@ -4,13 +4,13 @@
 #include <iostream>
 #include <string>
 
+#include <core/gl/api.h>
 #include <core/input/CharEvent.h>
 #include <core/input/InputListener.h>
 #include <core/input/KeyEvent.h>
 #include <core/input/MousePosEvent.h>
 
-#include "../IFileReader.h"
-#include "../Window.h"
+#include "../IWindow.h"
 #include "File.h"
 
 class GLFWwindow;
@@ -20,13 +20,8 @@ namespace yage::platform::desktop
     class GlfwWindow final : public IWindow, public std::enable_shared_from_this<GlfwWindow>
     {
     public:
-        enum class GlApi
-        {
-            API_OPENGL,
-            API_VULKAN
-        };
+        GlfwWindow(int width, int height, const std::string& title, gl::Api gl_api);
 
-        GlfwWindow(int width, int height, const std::string& title, GlApi gl_api);
         ~GlfwWindow() override;
 
         std::weak_ptr<gl::IContext> gl_context() override;
@@ -34,15 +29,20 @@ namespace yage::platform::desktop
         void makeCurrent() override;
         void pollEvents() override;
         void swapBuffers() override;
+
         void show() override;
+
         void hide() override;
 
         [[nodiscard]] std::unique_ptr<IFileReader> getFileReader() override;
 
-        [[nodiscard]] int getWidth() const override;
-        [[nodiscard]] int getHeight() const override;
-        [[nodiscard]] int getPixelWidth() const override;
-        [[nodiscard]] int getPixelHeight() const override;
+        [[nodiscard]] int width() const override;
+
+        [[nodiscard]] int height() const override;
+
+        [[nodiscard]] int pixel_width() const override;
+
+        [[nodiscard]] int pixel_height() const override;
 
         void enableVSync();
         void disableVSync();
@@ -51,16 +51,16 @@ namespace yage::platform::desktop
         void hideCursor() override;
         void showCursor() override;
 
-        int shouldDestroy() override;
+        int should_destroy() override;
 
         void enableCharInput() override;
         void disableCharInput() override;
         void enableKeyInput() override;
         void disableKeyInput() override;
 
-        [[nodiscard]] int getDpi() const override
+        [[nodiscard]] int dpi() const override
         {
-            return dpi;
+            return m_dpi;
         }
 
         [[nodiscard]] double getTime() const override;
@@ -72,7 +72,7 @@ namespace yage::platform::desktop
         std::string openFileDialog(std::string defaultPath = "", std::vector<std::string> filterList = {},
                                    std::string filterName = "");
 
-        void attach_on_framebuffer_resize(std::function<void(int, int)> callback) override;
+        void attach_on_resize(std::function<void(int, int)> callback) override;
 
         void attach(input::InputListener& listener) override;
         void detach(input::InputListener& listener);
@@ -89,17 +89,17 @@ namespace yage::platform::desktop
         GLFWwindow* glfw_window_ptr(); // TODO: ugly
 
     private:
-        GLFWwindow* glfwWindow = nullptr;
+        GLFWwindow* m_glfw_handle = nullptr;
         std::shared_ptr<gl::IContext> m_gl_context;
 
-        std::vector<std::reference_wrapper<input::InputListener>> inputListeners;
-        std::vector<std::function<void(int, int)>> on_framebuffer_resize;
+        std::vector<std::reference_wrapper<input::InputListener>> m_input_listeners;
+        std::vector<std::function<void(int, int)>> m_on_resize_callbacks;
 
-        bool cursorVisible = true;
-        bool isCharInputEnabled = false;
-        bool isKeyInputEnabled = true;
-        int dpi = 0;
-        double lastTimeStep = 0.0;
+        bool m_cursor_visible = true;
+        bool m_char_input_enabled = false;
+        bool m_key_input_enabled = true;
+        int m_dpi = 0;
+        double m_last_time_step = 0.0;
 
         void notifyListeners(const input::KeyEvent& event);
         void notifyListeners(const input::MousePosEvent& event);

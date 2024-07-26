@@ -5,7 +5,7 @@ target_sources(yage_core
 		IFileReader.h
 		ITextFile.h
 		IBinaryFile.h
-		Window.h)
+        IWindow.h)
 
 if(WIN32 OR UNIX)
 	add_subdirectory(desktop)

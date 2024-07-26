@@ -36,7 +36,7 @@ namespace yage::platform::desktop
 		}
 	}
 
-	std::string File::getFileName()
+	std::string File::file_name()
 	{
 		return filename;
 	}

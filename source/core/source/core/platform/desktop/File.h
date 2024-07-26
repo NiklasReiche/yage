@@ -22,7 +22,7 @@ namespace yage::platform::desktop
 
 		void seek(int index, SeekOffset offset) override;
 
-		std::string getFileName() override;
+		std::string file_name() override;
 
 		bool eof() override;
 

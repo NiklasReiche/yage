@@ -7,7 +7,7 @@ namespace yage::platform::desktop
 		: File(filename, FileType::BINARY, mode)
 	{ }
 
-	void BinaryFile::read(void* buffer, size_t size)
+	void BinaryFile::read(void* buffer, std::size_t size)
 	{
 		if (mode == AccessMode::READ || mode == AccessMode::READ_WRITE) {
 			fileStream->read(static_cast<char*>(buffer), size);
@@ -16,7 +16,7 @@ namespace yage::platform::desktop
 		}
 	}
 
-	void BinaryFile::write(void* buffer, size_t size)
+	void BinaryFile::write(void* buffer, std::size_t size)
 	{
 		if (mode == AccessMode::WRITE || mode == AccessMode::READ_WRITE) {
 			fileStream->write((char*)buffer, size);

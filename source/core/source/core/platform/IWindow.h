@@ -19,7 +19,10 @@ namespace yage::platform
 	    virtual std::weak_ptr<gl::IContext> gl_context() = 0;
 
 		virtual void show() = 0;
+
 		virtual void hide() = 0;
+
+	    virtual int should_destroy() = 0;
 
 		virtual void makeCurrent() = 0;
 		virtual void pollEvents() = 0;
@@ -27,9 +30,7 @@ namespace yage::platform
 
 		virtual void attach(input::InputListener & listener) = 0;
 
-        virtual void attach_on_framebuffer_resize(std::function<void(int, int)>) = 0;
-
-		virtual int shouldDestroy() = 0;
+        virtual void attach_on_resize(std::function<void(int, int)>) = 0;
 
 	    virtual void toggleCursor() = 0;
         virtual void hideCursor() = 0;
@@ -53,16 +54,14 @@ namespace yage::platform
 		 */
 		virtual double getTimeStep() = 0;
 
-		[[nodiscard]]
-		virtual int getWidth() const = 0;
-		[[nodiscard]]
-		virtual int getHeight() const = 0;
-		[[nodiscard]]
-		virtual int getPixelWidth() const = 0;
-		[[nodiscard]]
-		virtual int getPixelHeight() const = 0;
+		[[nodiscard]] virtual int width() const = 0;
 
-		[[nodiscard]]
-		virtual int getDpi() const = 0;
+	    [[nodiscard]] virtual int height() const = 0;
+
+	    [[nodiscard]] virtual int pixel_width() const = 0;
+
+		[[nodiscard]] virtual int pixel_height() const = 0;
+
+		[[nodiscard]] virtual int dpi() const = 0;
 	};
 }

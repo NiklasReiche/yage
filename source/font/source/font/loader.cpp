@@ -11,7 +11,7 @@ namespace yage::font
 
     Font FontFileLoader::load_resource(const std::string& uri)
     {
-        auto file = fileReader->openBinaryFile(uri, platform::IFile::AccessMode::READ);
+        auto file = fileReader->open_binary_file(uri, platform::IFile::AccessMode::READ);
         FontFile fontFile;
 
         file->seek(0, platform::IFile::SeekOffset::BEG);

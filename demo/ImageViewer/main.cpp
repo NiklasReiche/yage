@@ -15,7 +15,7 @@ int main(int argc, char* argv[], char*[])
 	img::Image image;
 	{
 		platform::desktop::FileReader fileReader;
-		auto file = fileReader.openBinaryFile(argv[1], platform::IFile::AccessMode::READ);
+		auto file = fileReader.open_binary_file(argv[1], platform::IFile::AccessMode::READ);
 		image = img::readFromFile(*file, img::FORCE_CHANNELS::RGB);
 	}
 
@@ -39,9 +39,9 @@ int main(int argc, char* argv[], char*[])
 
 	auto fileReader = platform::desktop::FileReader();
 	const std::string vertexCode = fileReader.
-		openTextFile("assets/shader.vert", platform::IFile::AccessMode::READ)->readAll();
+		open_text_file("assets/shader.vert", platform::IFile::AccessMode::READ)->read_all();
 	const std::string fragmentCode = fileReader.
-		openTextFile("assets/shader.frag", platform::IFile::AccessMode::READ)->readAll();
+		open_text_file("assets/shader.frag", platform::IFile::AccessMode::READ)->read_all();
 	auto shader = context->getShaderCreator()->createShader(vertexCode, fragmentCode);
 
 	auto renderer = context->getRenderer();

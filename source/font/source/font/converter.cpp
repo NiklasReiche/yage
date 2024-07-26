@@ -171,7 +171,7 @@ namespace yage::font
 #if 1 // TODO: make this an output option
         {
             platform::desktop::FileReader fileReader;
-            auto file = fileReader.openBinaryFile(R"(C:\Users\Niklas\Downloads\sdf.bmp)",
+            auto file = fileReader.open_binary_file(R"(C:\Users\Niklas\Downloads\sdf.bmp)",
                                                   platform::IFile::AccessMode::WRITE);
             img::writeToFile(*file, atlasImage);
         }

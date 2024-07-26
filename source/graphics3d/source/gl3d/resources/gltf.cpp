@@ -294,10 +294,10 @@ namespace yage::gl3d::resources
         std::string warn;
         bool ret;
         if (filetype == "gltf") {
-            const std::string data = fileReader.openTextFile(filename, platform::IFile::AccessMode::READ)->readAll();
+            const std::string data = fileReader.open_text_file(filename, platform::IFile::AccessMode::READ)->read_all();
             ret = loader.LoadASCIIFromString(&model, &err, &warn, data.data(), data.length(), basedir);
         } else if (filetype == "glb") {
-            std::vector<std::byte> data = fileReader.openBinaryFile(filename, platform::IFile::AccessMode::READ)
+            std::vector<std::byte> data = fileReader.open_binary_file(filename, platform::IFile::AccessMode::READ)
                                                     ->read_all();
             ret = loader.LoadBinaryFromMemory(&model, &err, &warn, reinterpret_cast<unsigned char*>(data.data()),
                                               data.size(), basedir);

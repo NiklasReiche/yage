@@ -11,6 +11,7 @@ namespace yage::platform
 		{
 			READ, WRITE, READ_WRITE
 		};
+
 		enum class SeekOffset
 		{
 			BEG, CUR
@@ -20,7 +21,7 @@ namespace yage::platform
 
 		virtual void seek(int index, SeekOffset offset) = 0;
 
-		virtual std::string getFileName() = 0;
+		virtual std::string file_name() = 0;
 
 		virtual bool eof() = 0;
 	};

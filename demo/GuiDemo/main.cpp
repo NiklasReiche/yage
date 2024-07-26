@@ -646,7 +646,7 @@ int main()
     double timer = 0.0;
     double dt = 1.0 / 60.0;
     double frame_time;
-    while (!window->shouldDestroy()) {
+    while (!window->should_destroy()) {
         renderer->clear();
 
         frame_time = window->getTimeStep();
