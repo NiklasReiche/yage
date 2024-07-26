@@ -5,8 +5,6 @@
 
 #include <glad/gl.h>
 
-#include <core/platform/Window.h>
-
 #include "../Handle.h"
 #include "../IContext.h"
 #include "DescriptorSet.h"
@@ -29,6 +27,11 @@
 #include "VertexBuffer.h"
 #include "VertexBufferCreator.h"
 
+namespace yage::platform
+{
+    class IWindow;
+}
+
 namespace yage::gl::opengl4
 {
     using UniformBufferStore = Store<IUniformBuffer, UniformBuffer>;
@@ -45,7 +48,12 @@ namespace yage::gl::opengl4
     class Context final : public IContext
     {
     public:
-        explicit Context(std::shared_ptr<platform::IWindow> window);
+        explicit Context(platform::IWindow* window);
+
+        Context(const Context& other) = delete;
+        Context(Context&& other) noexcept = delete;
+        Context& operator=(const Context& other) = delete;
+        Context& operator=(Context&& other) noexcept = delete;
 
         void prepare_frame() override;
 
@@ -174,7 +182,7 @@ namespace yage::gl::opengl4
 
         OpenGlState m_state{};
 
-        std::shared_ptr<platform::IWindow> m_window;
+        platform::IWindow* m_window;
 
         // TODO: without shared_ptr
         std::shared_ptr<VertexBufferStore> m_store_vertex_buffers;

@@ -1,20 +1,30 @@
 #include "Context.h"
 
 #include <GLFW/glfw3.h>
+#include <iostream>
+#include <core/platform/Window.h>
 
 namespace yage::gl::opengl4
 {
-    void APIENTRY on_gl_error(
-        const GLenum, const GLenum, const GLuint id, const GLenum severity,
-        const GLsizei, const GLchar* message, const void*)
+    // TODO: move this to window, since it uses glfw
+    void APIENTRY on_gl_error(const GLenum, const GLenum, const GLuint, const GLenum severity, const GLsizei,
+                              const GLchar* message, const void*)
     {
-        if (severity == GL_DEBUG_SEVERITY_HIGH) {
-            throw std::runtime_error(std::string(message) + ": " + std::to_string(id));
+        std::ostream& ostream = severity >= GL_DEBUG_SEVERITY_MEDIUM ? std::cerr : std::cout;
+
+        switch (severity) {
+            case GL_DEBUG_SEVERITY_NOTIFICATION: ostream << "[VERBOSE]: "; break;
+            case GL_DEBUG_SEVERITY_LOW:          ostream << "[INFO]: "; break;
+            case GL_DEBUG_SEVERITY_MEDIUM:       ostream << "[WARNING]: "; break;
+            case GL_DEBUG_SEVERITY_HIGH:         ostream << "[ERROR]: "; break;
+            default: break;
         }
+
+        ostream << message << std::endl;
     }
 
-    Context::Context(std::shared_ptr<platform::IWindow> window)
-        : m_window(std::move(window))
+    Context::Context(platform::IWindow* window)
+        : m_window(window)
     {
         // GLAD
         if (!gladLoadGL(glfwGetProcAddress)) {
@@ -51,9 +61,7 @@ namespace yage::gl::opengl4
         m_renderer = Renderer(this);
     }
 
-    void Context::prepare_frame()
-    {
-    }
+    void Context::prepare_frame() {}
 
     void Context::present_frame()
     {

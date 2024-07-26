@@ -1,6 +1,5 @@
 #include <memory>
 
-#include <core/platform/Window.h>
 #include <core/platform/desktop/GlfwWindow.h>
 
 #include <core/gl/vulkan/Instance.h>
@@ -21,9 +20,7 @@ int main()
 {
     const std::shared_ptr<platform::IWindow> window = std::make_shared<platform::desktop::GlfwWindow>(
             500, 500, "Hello Triangle", platform::desktop::GlfwWindow::GlApi::API_OPENGL);
-    const std::shared_ptr<gl::IContext> context =
-            std::make_shared<gl::opengl4::Context>(std::static_pointer_cast<platform::desktop::GlfwWindow>(window));
-    //context->initialize();
+    const std::shared_ptr<gl::IContext> context = window->gl_context().lock();
 
     const gl::IDrawableCreator2& drawable_creator = context->drawable_creator();
 

@@ -5,7 +5,7 @@
 #include <limits>
 #include <set>
 #include <utility>
-
+#include <core/platform/desktop/GlfwWindow.h>
 #include "enums.h"
 
 namespace yage::gl::vulkan
@@ -34,10 +34,10 @@ namespace yage::gl::vulkan
         }
     }
 
-    Instance::Instance(std::weak_ptr<platform::desktop::GlfwWindow> window)
-        : m_window(std::move(window))
+    Instance::Instance(platform::desktop::GlfwWindow* window)
+        : m_window(window)
     {
-        m_window.lock()->attach_on_framebuffer_resize([this](int, int) { this->m_framebuffer_resized = true; });
+        m_window->attach_on_framebuffer_resize([this](int, int) { this->m_framebuffer_resized = true; });
     }
 
     Instance::~Instance()
@@ -271,7 +271,7 @@ namespace yage::gl::vulkan
 
     void Instance::create_surface()
     {
-        if (glfwCreateWindowSurface(m_instance, m_window.lock()->glfw_window_ptr(), nullptr, &m_surface) !=
+        if (glfwCreateWindowSurface(m_instance, m_window->glfw_window_ptr(), nullptr, &m_surface) !=
             VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to create window surface!");
         }
@@ -476,8 +476,8 @@ namespace yage::gl::vulkan
             return capabilities.currentExtent;
         }
 
-        const int width = m_window.lock()->getPixelWidth();
-        const int height = m_window.lock()->getPixelHeight();
+        const int width = m_window->getPixelWidth();
+        const int height = m_window->getPixelHeight();
 
         VkExtent2D actualExtent = {static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height)};
 
@@ -1279,14 +1279,13 @@ namespace yage::gl::vulkan
 
     void Instance::recreateSwapChain()
     {
-        const auto window = m_window.lock();
-        int width = window->getPixelWidth();
-        int height = window->getPixelHeight();
+        int width = m_window->getPixelWidth();
+        int height = m_window->getPixelHeight();
         while (width == 0 || height == 0) {
-            if (window->shouldDestroy())
+            if (m_window->shouldDestroy())
                 return;
-            width = window->getPixelWidth();
-            height = window->getPixelHeight();
+            width = m_window->getPixelWidth();
+            height = m_window->getPixelHeight();
             glfwWaitEvents(); // TODO
         }
 

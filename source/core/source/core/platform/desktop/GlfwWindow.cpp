@@ -7,6 +7,8 @@
 
 #include <utils/strings.h>
 #include <utils/NotImplementedException.h>
+#include <core/gl/opengl4/Context.h>
+#include <core/gl/vulkan/Instance.h>
 
 #include "GlfwException.h"
 #include "FileReader.h"
@@ -37,6 +39,8 @@ namespace yage::platform::desktop
             case GlApi::API_VULKAN:
                 glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
                 break;
+            default:
+                throw std::invalid_argument("Unsupported gl-api");
         }
 
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
@@ -51,10 +55,16 @@ namespace yage::platform::desktop
 
 		glfwSetWindowUserPointer(glfwWindow, this);
 
-        if (gl_api == GlApi::API_OPENGL) {
-            glfwMakeContextCurrent(glfwWindow);
-            glfwSwapInterval(1);
-        }
+	    switch (gl_api) {
+	        case GlApi::API_OPENGL:
+	            glfwMakeContextCurrent(glfwWindow);
+	            m_gl_context = std::make_shared<gl::opengl4::Context>(this);
+	            break;
+	        case GlApi::API_VULKAN:
+	            m_gl_context = std::make_shared<gl::vulkan::Instance>(this);
+	            std::static_pointer_cast<gl::vulkan::Instance>(m_gl_context)->initialize();
+	            break;
+	    }
 
 		glfwSetCharCallback(glfwWindow, onCharEvent);
 		glfwSetKeyCallback(glfwWindow, onKeyEvent);
@@ -66,14 +76,19 @@ namespace yage::platform::desktop
         // TODO
 		dpi = 96;
 	}
-	
-	GlfwWindow::~GlfwWindow()
-	{
-        glfwDestroyWindow(glfwWindow);
-		glfwTerminate();
-	}
 
-	void GlfwWindow::show()
+	GlfwWindow::~GlfwWindow()
+    {
+        glfwDestroyWindow(glfwWindow);
+        glfwTerminate();
+    }
+
+    std::weak_ptr<gl::IContext> GlfwWindow::gl_context()
+    {
+        return m_gl_context;
+    }
+
+    void GlfwWindow::show()
 	{
 		glfwShowWindow(glfwWindow);
 	}

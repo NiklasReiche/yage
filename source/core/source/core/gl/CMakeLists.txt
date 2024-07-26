@@ -1,24 +1,8 @@
 target_sources(yage_core
 	PRIVATE
 		Handle.h
-		color.h
-		Context.h
-		Cubemap.h
-		Drawable.h
-		VertexArray.h
-		VertexBuffer.h
-		ElementBuffer.h
-		DrawableCreator.h
-		Frame.h
-		FrameCreator.h
-		graphics.h
-        TextureParams.h
-		Renderer.h
-		Shader.h
-		ShaderCreator.h
-		Texture2D.h
-		TextureCreator.h
 
+		color.h
 		enums.h
 
 		IDescriptorSetLayout.h

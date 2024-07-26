@@ -2,20 +2,21 @@
 
 #include <memory>
 #include <string>
-
-#include <core/input/InputListener.h>
 #include <functional>
+
+#include <core/gl/IContext.h>
+#include <core/input/InputListener.h>
 #include "IFileReader.h"
+
 
 namespace yage::platform
 {
-	class IWindow;
-	typedef std::shared_ptr<IWindow> Window;
-
 	class IWindow
 	{
 	public:
 		virtual ~IWindow() = default;
+
+	    virtual std::weak_ptr<gl::IContext> gl_context() = 0;
 
 		virtual void show() = 0;
 		virtual void hide() = 0;

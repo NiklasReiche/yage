@@ -5,7 +5,6 @@
 
 #include <vulkan/vulkan.h>
 
-#include "../../platform/desktop/GlfwWindow.h"
 #include "../Handle.h"
 #include "../IContext.h"
 #include "DescriptorAllocator.h"
@@ -29,6 +28,11 @@
 #include "UniformBufferCreator.h"
 #include "VertexBuffer.h"
 #include "VertexBufferCreator.h"
+
+namespace yage::platform::desktop
+{
+    class GlfwWindow;
+}
 
 namespace yage::gl::vulkan
 {
@@ -69,7 +73,7 @@ namespace yage::gl::vulkan
     class Instance final : public IContext, public std::enable_shared_from_this<Instance>
     {
     public:
-        explicit Instance(std::weak_ptr<platform::desktop::GlfwWindow> window);
+        explicit Instance(platform::desktop::GlfwWindow* window);
 
         ~Instance() override;
 
@@ -180,7 +184,7 @@ namespace yage::gl::vulkan
         const std::vector<const char*> DEVICE_EXTENSIONS = {VK_KHR_SWAPCHAIN_EXTENSION_NAME,
                                                             VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME};
 
-        std::weak_ptr<platform::desktop::GlfwWindow> m_window;
+        platform::desktop::GlfwWindow* m_window;
 
         VkInstance m_instance = VK_NULL_HANDLE;
         VkDebugUtilsMessengerEXT m_debug_messenger = VK_NULL_HANDLE;
