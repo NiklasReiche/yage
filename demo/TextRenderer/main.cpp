@@ -134,7 +134,7 @@ int main(int argc, char *argv[], char *[])
         renderer->draw(text16.drawable());
 
 		window->swapBuffers();
-		window->pollEvents();
+		window->poll_events();
 	}
 
 	return 0;

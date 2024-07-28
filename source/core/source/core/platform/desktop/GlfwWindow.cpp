@@ -99,56 +99,39 @@ namespace yage::platform::desktop
     int GlfwWindow::width() const
     {
         int width;
-        glfwGetWindowSize(m_glfw_handle, &width, nullptr);
+        glfwGetFramebufferSize(m_glfw_handle, &width, nullptr);
         return width;
     }
 
     int GlfwWindow::height() const
     {
         int height;
-        glfwGetWindowSize(m_glfw_handle, nullptr, &height);
-        return height;
-    }
-
-    int GlfwWindow::pixel_width() const
-    {
-        int width;
-        glfwGetFramebufferSize(m_glfw_handle, &width, nullptr);
-        return width;
-    }
-
-    int GlfwWindow::pixel_height() const
-    {
-        int height;
         glfwGetFramebufferSize(m_glfw_handle, nullptr, &height);
         return height;
     }
 
-    void GlfwWindow::makeCurrent()
+    void GlfwWindow::make_current()
     {
-        // TODO: vulkan
         glfwMakeContextCurrent(m_glfw_handle);
     }
 
-    void GlfwWindow::pollEvents()
+    void GlfwWindow::poll_events()
     {
         glfwPollEvents();
     }
 
-    void GlfwWindow::swapBuffers()
+    void GlfwWindow::swap_buffers()
     {
         glfwSwapBuffers(m_glfw_handle);
     }
 
-    void GlfwWindow::enableVSync()
+    void GlfwWindow::enable_vsync()
     {
-        // TODO: vulkan
         glfwSwapInterval(1);
     }
 
-    void GlfwWindow::disableVSync()
+    void GlfwWindow::disable_vsync()
     {
-        // TODO: vulkan
         glfwSwapInterval(0);
     }
 
@@ -484,6 +467,16 @@ namespace yage::platform::desktop
     GLFWwindow* GlfwWindow::glfw_window_ptr()
     {
         return m_glfw_handle;
+    }
+
+    VkSurfaceKHR GlfwWindow::create_surface(VkInstance instance)
+    {
+        VkSurfaceKHR surface;
+        if (glfwCreateWindowSurface(instance, m_glfw_handle, nullptr, &surface) !=
+            VK_SUCCESS) {
+            throw std::runtime_error("Vulkan: failed to create window surface!");
+            }
+        return surface;
     }
 
     void GlfwWindow::attach_on_resize(std::function<void(int, int)> callback)

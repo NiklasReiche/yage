@@ -97,7 +97,7 @@ int main()
 
     window->show();
     while (!window->should_destroy()) {
-        window->pollEvents();
+        window->poll_events();
 
         ubo->update_sub_data(0, sizeof(UniformBufferData), &ubo_data);
 

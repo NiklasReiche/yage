@@ -666,7 +666,7 @@ int main()
         guiTest.master.render();
 
         window->swapBuffers();
-        window->pollEvents();
+        window->poll_events();
     }
 
     return 0;

@@ -54,7 +54,7 @@ int main(int argc, char* argv[], char*[])
 		renderer->draw(*quad);
 
 		window->swapBuffers();
-		window->pollEvents();
+		window->poll_events();
 	}
 
 	return 0;

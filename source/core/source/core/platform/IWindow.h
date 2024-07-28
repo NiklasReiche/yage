@@ -4,6 +4,8 @@
 #include <string>
 #include <functional>
 
+#include <vulkan/vulkan.h>
+
 #include <core/gl/IContext.h>
 #include <core/input/InputListener.h>
 #include "IFileReader.h"
@@ -24,9 +26,7 @@ namespace yage::platform
 
 	    virtual int should_destroy() = 0;
 
-		virtual void makeCurrent() = 0;
-		virtual void pollEvents() = 0;
-		virtual void swapBuffers() = 0;
+		virtual void poll_events() = 0;
 
 		virtual void attach(input::InputListener & listener) = 0;
 
@@ -58,10 +58,28 @@ namespace yage::platform
 
 	    [[nodiscard]] virtual int height() const = 0;
 
-	    [[nodiscard]] virtual int pixel_width() const = 0;
-
-		[[nodiscard]] virtual int pixel_height() const = 0;
-
 		[[nodiscard]] virtual int dpi() const = 0;
 	};
+
+    class IOpenGlWindow
+    {
+    public:
+        virtual ~IOpenGlWindow() = default;
+
+        virtual void make_current() = 0;
+
+        virtual void swap_buffers() = 0;
+
+        virtual void enable_vsync() = 0;
+
+        virtual void disable_vsync() = 0;
+    };
+
+    class IVulkanWindow
+    {
+    public:
+        virtual ~IVulkanWindow() = default;
+
+        virtual VkSurfaceKHR create_surface(VkInstance instance) = 0;
+    };
 }

@@ -17,7 +17,7 @@ class GLFWwindow;
 
 namespace yage::platform::desktop
 {
-    class GlfwWindow final : public IWindow, public std::enable_shared_from_this<GlfwWindow>
+    class GlfwWindow final : public IWindow, public IOpenGlWindow, public IVulkanWindow, public std::enable_shared_from_this<GlfwWindow>
     {
     public:
         GlfwWindow(int width, int height, const std::string& title, gl::Api gl_api);
@@ -26,9 +26,7 @@ namespace yage::platform::desktop
 
         std::weak_ptr<gl::IContext> gl_context() override;
 
-        void makeCurrent() override;
-        void pollEvents() override;
-        void swapBuffers() override;
+        void poll_events() override;
 
         void show() override;
 
@@ -40,12 +38,13 @@ namespace yage::platform::desktop
 
         [[nodiscard]] int height() const override;
 
-        [[nodiscard]] int pixel_width() const override;
+        void make_current() override;
 
-        [[nodiscard]] int pixel_height() const override;
+        void swap_buffers() override;
 
-        void enableVSync();
-        void disableVSync();
+        void enable_vsync() override;
+
+        void disable_vsync() override;
 
         void toggleCursor() override;
         void hideCursor() override;
@@ -87,6 +86,8 @@ namespace yage::platform::desktop
         static void onError(int error, const char* description);
 
         GLFWwindow* glfw_window_ptr(); // TODO: ugly
+
+        VkSurfaceKHR create_surface(VkInstance instance) override;
 
     private:
         GLFWwindow* m_glfw_handle = nullptr;
