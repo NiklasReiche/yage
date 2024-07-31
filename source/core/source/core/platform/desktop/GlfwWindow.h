@@ -17,7 +17,7 @@ class GLFWwindow;
 
 namespace yage::platform::desktop
 {
-    class GlfwWindow final : public IWindow, public IOpenGlWindow, public IVulkanWindow, public std::enable_shared_from_this<GlfwWindow>
+    class GlfwWindow final : public IOpenGlWindow, public IVulkanWindow, public std::enable_shared_from_this<GlfwWindow>
     {
     public:
         GlfwWindow(int width, int height, const std::string& title, gl::Api gl_api);
@@ -89,6 +89,10 @@ namespace yage::platform::desktop
 
         VkSurfaceKHR create_surface(VkInstance instance) override;
 
+        std::vector<const char*> get_required_instance_extensions() override;
+
+        void wait_events() override;
+
     private:
         GLFWwindow* m_glfw_handle = nullptr;
         std::shared_ptr<gl::IContext> m_gl_context;
@@ -110,5 +114,7 @@ namespace yage::platform::desktop
         static input::KeyEvent::Code convertToKeyCode(int key) noexcept;
         static input::KeyEvent::Action convertToKeyAction(int action) noexcept;
         static input::KeyEvent::Code convertToMouseButtonCode(int button) noexcept;
+
+        static void load_gl();
     };
 }

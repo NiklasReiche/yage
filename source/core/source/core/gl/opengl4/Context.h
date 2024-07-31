@@ -29,7 +29,7 @@
 
 namespace yage::platform
 {
-    class IWindow;
+    class IOpenGlWindow;
 }
 
 namespace yage::gl::opengl4
@@ -48,7 +48,7 @@ namespace yage::gl::opengl4
     class Context final : public IContext
     {
     public:
-        explicit Context(platform::IWindow* window);
+        explicit Context(platform::IOpenGlWindow* window);
 
         Context(const Context& other) = delete;
         Context(Context&& other) noexcept = delete;
@@ -182,7 +182,7 @@ namespace yage::gl::opengl4
 
         OpenGlState m_state{};
 
-        platform::IWindow* m_window;
+        platform::IOpenGlWindow* m_window;
 
         // TODO: without shared_ptr
         std::shared_ptr<VertexBufferStore> m_store_vertex_buffers;

@@ -1,42 +1,13 @@
 #include "Context.h"
 
-#include <GLFW/glfw3.h>
 #include <iostream>
 #include <core/platform/IWindow.h>
 
 namespace yage::gl::opengl4
 {
-    // TODO: move this to window, since it uses glfw
-    void APIENTRY on_gl_error(const GLenum, const GLenum, const GLuint, const GLenum severity, const GLsizei,
-                              const GLchar* message, const void*)
-    {
-        std::ostream& ostream = severity >= GL_DEBUG_SEVERITY_MEDIUM ? std::cerr : std::cout;
-
-        switch (severity) {
-            case GL_DEBUG_SEVERITY_NOTIFICATION: ostream << "[VERBOSE]: "; break;
-            case GL_DEBUG_SEVERITY_LOW:          ostream << "[INFO]: "; break;
-            case GL_DEBUG_SEVERITY_MEDIUM:       ostream << "[WARNING]: "; break;
-            case GL_DEBUG_SEVERITY_HIGH:         ostream << "[ERROR]: "; break;
-            default: break;
-        }
-
-        ostream << message << std::endl;
-    }
-
-    Context::Context(platform::IWindow* window)
+    Context::Context(platform::IOpenGlWindow* window)
         : m_window(window)
     {
-        // GLAD
-        if (!gladLoadGL(glfwGetProcAddress)) {
-            throw std::runtime_error("Failed to initialize GLAD");
-        }
-
-#ifndef NDEBUG
-        glEnable(GL_DEBUG_OUTPUT);
-        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-        glDebugMessageCallback(static_cast<GLDEBUGPROC>(on_gl_error), nullptr);
-#endif
-
         populate_default_state();
 
         m_store_vertex_buffers = std::make_shared<VertexBufferStore>();
@@ -65,7 +36,7 @@ namespace yage::gl::opengl4
 
     void Context::present_frame()
     {
-        m_window->swapBuffers();
+        m_window->swap_buffers();
     }
 
     IVertexBufferCreator& Context::vertex_buffer_creator()

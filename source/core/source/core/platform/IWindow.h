@@ -61,10 +61,10 @@ namespace yage::platform
 		[[nodiscard]] virtual int dpi() const = 0;
 	};
 
-    class IOpenGlWindow
+    class IOpenGlWindow : public virtual IWindow
     {
     public:
-        virtual ~IOpenGlWindow() = default;
+        ~IOpenGlWindow() override = default;
 
         virtual void make_current() = 0;
 
@@ -75,11 +75,15 @@ namespace yage::platform
         virtual void disable_vsync() = 0;
     };
 
-    class IVulkanWindow
+    class IVulkanWindow : public virtual IWindow
     {
     public:
-        virtual ~IVulkanWindow() = default;
+        ~IVulkanWindow() override = default;
 
         virtual VkSurfaceKHR create_surface(VkInstance instance) = 0;
+
+        virtual std::vector<const char*> get_required_instance_extensions() = 0;
+
+        virtual void wait_events() = 0;
     };
 }

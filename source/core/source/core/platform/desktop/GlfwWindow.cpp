@@ -15,6 +15,22 @@
 
 namespace yage::platform::desktop
 {
+    void APIENTRY on_gl_error(const GLenum, const GLenum, const GLuint, const GLenum severity, const GLsizei,
+                              const GLchar* message, const void*)
+    {
+        std::ostream& ostream = severity >= GL_DEBUG_SEVERITY_MEDIUM ? std::cerr : std::cout;
+
+        switch (severity) {
+            case GL_DEBUG_SEVERITY_NOTIFICATION: ostream << "[VERBOSE]: "; break;
+            case GL_DEBUG_SEVERITY_LOW:          ostream << "[INFO]: "; break;
+            case GL_DEBUG_SEVERITY_MEDIUM:       ostream << "[WARNING]: "; break;
+            case GL_DEBUG_SEVERITY_HIGH:         ostream << "[ERROR]: "; break;
+            default:                             break;
+        }
+
+        ostream << message << std::endl;
+    }
+
     GlfwWindow::GlfwWindow(const int width, const int height, const std::string& title, const gl::Api gl_api)
     {
         if (width < 1 || height < 1) {
@@ -55,6 +71,7 @@ namespace yage::platform::desktop
         switch (gl_api) {
             case gl::Api::API_OPENGL:
                 glfwMakeContextCurrent(m_glfw_handle);
+                load_gl();
                 m_gl_context = std::make_shared<gl::opengl4::Context>(this);
                 break;
             case gl::Api::API_VULKAN:
@@ -469,27 +486,52 @@ namespace yage::platform::desktop
         return m_glfw_handle;
     }
 
-    VkSurfaceKHR GlfwWindow::create_surface(VkInstance instance)
+    VkSurfaceKHR GlfwWindow::create_surface(const VkInstance instance)
     {
         VkSurfaceKHR surface;
-        if (glfwCreateWindowSurface(instance, m_glfw_handle, nullptr, &surface) !=
-            VK_SUCCESS) {
+        if (glfwCreateWindowSurface(instance, m_glfw_handle, nullptr, &surface) != VK_SUCCESS) {
             throw std::runtime_error("Vulkan: failed to create window surface!");
-            }
+        }
         return surface;
     }
 
-    void GlfwWindow::attach_on_resize(std::function<void(int, int)> callback)
+    void GlfwWindow::load_gl()
+    {
+        if (!gladLoadGL(glfwGetProcAddress)) {
+            throw std::runtime_error("OpengGL: failed to initialize GLAD");
+        }
+
+#ifndef NDEBUG
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(static_cast<GLDEBUGPROC>(on_gl_error), nullptr);
+#endif
+    }
+
+    std::vector<const char*> GlfwWindow::get_required_instance_extensions()
+    {
+        std::uint32_t glfwExtensionCount = 0;
+        const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+        return {glfwExtensions, glfwExtensions + glfwExtensionCount};
+    }
+
+    void GlfwWindow::wait_events()
+    {
+        glfwWaitEvents();
+    }
+
+    void GlfwWindow::attach_on_resize(const std::function<void(int, int)> callback)
     {
         m_on_resize_callbacks.push_back(callback);
     }
 
-    void GlfwWindow::on_framebuffer_resize_event(GLFWwindow* window, int width, int height)
+    void GlfwWindow::on_framebuffer_resize_event(GLFWwindow* window, const int width, const int height)
     {
-        auto handle = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
+        const auto handle = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
         for (auto& callback: handle->m_on_resize_callbacks) {
-            if (callback)
+            if (callback) {
                 callback(width, height);
+            }
         }
     }
 }

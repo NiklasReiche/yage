@@ -2,9 +2,6 @@
 
 #include <core/platform/desktop/GlfwWindow.h>
 
-#include <core/gl/vulkan/Instance.h>
-#include <core/gl/opengl4/Context.h>
-
 #include "math/math.h"
 
 using namespace yage;
@@ -19,7 +16,7 @@ struct UniformBufferData
 int main()
 {
     const std::shared_ptr<platform::IWindow> window = std::make_shared<platform::desktop::GlfwWindow>(
-            500, 500, "Hello Triangle", gl::Api::API_OPENGL);
+            500, 500, "Hello Triangle", gl::Api::API_VULKAN);
     const std::shared_ptr<gl::IContext> context = window->gl_context().lock();
 
     const gl::IDrawableCreator2& drawable_creator = context->drawable_creator();
@@ -66,8 +63,8 @@ int main()
     descriptor_set->write(0, ubo);
 
     const auto file_reader = window->getFileReader();
-    auto vert_code = file_reader->open_text_file(R"(assets/shader.vert)", platform::IFile::AccessMode::READ)->read_all();
-    auto frag_code = file_reader->open_text_file(R"(assets/shader.frag)", platform::IFile::AccessMode::READ)->read_all();
+    auto vert_code = file_reader->open_binary_file(R"(assets/vert.spv)", platform::IFile::AccessMode::READ)->read_all();
+    auto frag_code = file_reader->open_binary_file(R"(assets/frag.spv)", platform::IFile::AccessMode::READ)->read_all();
     const gl::PipelineHandle graphics_pipeline =
             context->pipeline_builder()
                     .with_shaders(vert_code, frag_code)

@@ -29,9 +29,9 @@
 #include "VertexBuffer.h"
 #include "VertexBufferCreator.h"
 
-namespace yage::platform::desktop
+namespace yage::platform
 {
-    class GlfwWindow;
+    class IVulkanWindow;
 }
 
 namespace yage::gl::vulkan
@@ -73,7 +73,7 @@ namespace yage::gl::vulkan
     class Instance final : public IContext, public std::enable_shared_from_this<Instance>
     {
     public:
-        explicit Instance(platform::desktop::GlfwWindow* window);
+        explicit Instance(platform::IVulkanWindow* window);
 
         ~Instance() override;
 
@@ -184,7 +184,7 @@ namespace yage::gl::vulkan
         const std::vector<const char*> DEVICE_EXTENSIONS = {VK_KHR_SWAPCHAIN_EXTENSION_NAME,
                                                             VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME};
 
-        platform::desktop::GlfwWindow* m_window;
+        platform::IVulkanWindow* m_window;
 
         VkInstance m_instance = VK_NULL_HANDLE;
         VkDebugUtilsMessengerEXT m_debug_messenger = VK_NULL_HANDLE;
@@ -249,7 +249,7 @@ namespace yage::gl::vulkan
 
         static bool checkValidationLayerSupport(const std::vector<const char*>& validationLayers);
 
-        static std::vector<const char*> required_extensions();
+        std::vector<const char*> required_extensions();
 
         void setup_debug_messenger();
 

@@ -1,11 +1,10 @@
 #include "Instance.h"
-#include <GLFW/glfw3.h>
+#include <core/platform/IWindow.h>
 #include <cstdint>
 #include <cstring>
+#include <iostream>
 #include <limits>
 #include <set>
-#include <utility>
-#include <core/platform/desktop/GlfwWindow.h>
 #include "enums.h"
 
 namespace yage::gl::vulkan
@@ -34,7 +33,7 @@ namespace yage::gl::vulkan
         }
     }
 
-    Instance::Instance(platform::desktop::GlfwWindow* window)
+    Instance::Instance(platform::IVulkanWindow* window)
         : m_window(window)
     {
         m_window->attach_on_resize([this](int, int) { this->m_framebuffer_resized = true; });
@@ -217,9 +216,7 @@ namespace yage::gl::vulkan
 
     std::vector<const char*> Instance::required_extensions()
     {
-        std::uint32_t glfwExtensionCount = 0;
-        const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-        std::vector extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+        std::vector<const char*> extensions = m_window->get_required_instance_extensions();
 
 #ifndef NDEBUG
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
@@ -271,10 +268,7 @@ namespace yage::gl::vulkan
 
     void Instance::create_surface()
     {
-        if (glfwCreateWindowSurface(m_instance, m_window->glfw_window_ptr(), nullptr, &m_surface) !=
-            VK_SUCCESS) {
-            throw std::runtime_error("Vulkan: failed to create window surface!");
-        }
+        m_surface = m_window->create_surface(m_instance);
     }
 
     void Instance::pick_physical_device()
@@ -476,8 +470,8 @@ namespace yage::gl::vulkan
             return capabilities.currentExtent;
         }
 
-        const int width = m_window->pixel_width();
-        const int height = m_window->pixel_height();
+        const int width = m_window->width();
+        const int height = m_window->height();
 
         VkExtent2D actualExtent = {static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height)};
 
@@ -688,10 +682,8 @@ namespace yage::gl::vulkan
 
         VkPresentInfoKHR present_info{};
         present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-
         present_info.waitSemaphoreCount = 1;
         present_info.pWaitSemaphores = signal_semaphores;
-
         m_swap_chain.fill_present_info(present_info);
 
         const VkResult result = vkQueuePresentKHR(m_present_queue, &present_info);
@@ -1279,14 +1271,14 @@ namespace yage::gl::vulkan
 
     void Instance::recreateSwapChain()
     {
-        int width = m_window->pixel_width();
-        int height = m_window->pixel_height();
+        int width = m_window->width();
+        int height = m_window->height();
         while (width == 0 || height == 0) {
             if (m_window->should_destroy())
                 return;
-            width = m_window->pixel_width();
-            height = m_window->pixel_height();
-            glfwWaitEvents(); // TODO
+            width = m_window->width();
+            height = m_window->height();
+            m_window->wait_events();
         }
 
         vkDeviceWaitIdle(m_device);
